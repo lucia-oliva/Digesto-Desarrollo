@@ -7,6 +7,11 @@ async function query(sql, params) {
   const connection = await pool.getConnection();
   try {
     const [results] = await connection.query(sql, params);
+
+    if (results.length === 0) {
+      throw new Error("No se encontraron resultados");
+    }
+
     return results;
   } catch (error) {
     if (error.code === "ER_ACCESS_DENIED_ERROR") {
