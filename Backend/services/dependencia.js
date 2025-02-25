@@ -1,0 +1,71 @@
+import db from "./db.js";
+
+// Funciones CRUD basicas
+
+//Mostrar todos las dependencias
+async function getAllDependencias() {
+  const sql = "SELECT * FROM dependencia";
+  const results = await db.query(sql);
+  return results;
+}
+
+//Mostrar usuario por ID
+async function getDepenendenciaById(id) {
+  const sql = "SELECT * FROM dependencia WHERE id = ?";
+  const results = await db.query(sql, [id]);
+  return results[0];
+}
+
+/*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
+campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ] 
+*/
+//FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
+//FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
+
+async function createDependencia(user) {
+  console.log(user);
+
+  const sql =
+    "INSERT INTO dependencia (nombre , nombre_completo ,estado ,color,codificacion) VALUES (?,?,?,?,?)";
+  const results = await db.query(sql, [
+    user.nombre,
+    user.nombre_completo,
+    user.estado,
+    user.color,
+    user.codificacion,
+  ]);
+  return results;
+}
+//Modificar usuario
+async function updateDependencia(id, data) {
+  const sql =
+    "UPDATE dependencia SET nombre = ?, estado = ?, color = ? codificacion = ?, nombre_completo = ? WHERE id = ?";
+  const results = await db.query(sql, [
+    data.nombre,
+    data.estado,
+    data.color,
+    data.codificacion,
+    data.nombre_completo,
+    id,,
+  ]);
+  return results;
+}
+
+//Eliminar usuario
+async function deleteDependencia(id) {
+  const sql = "DELETE FROM dependencia WHERE id = ?";
+  const results = await db.query(sql, [id]);
+  return results;
+}
+
+// Funciones para endpoints especiales
+
+
+//Mostrar todos las dependencias
+async function getAllNamesDependencias() {
+    const sql = "SELECT nombre FROM dependencia";
+    const results = await db.query(sql,[]);
+    return results;
+  }
+
+export default {getAllDependencias, getDepenendenciaById, createDependencia, deleteDependencia, getAllNamesDependencias}

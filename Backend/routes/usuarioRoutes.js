@@ -24,4 +24,64 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  const data = req.params.id;
+  try {
+    const users = await UsuariosDB.deleteUsuario(data);
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const id = req.params.id; // Capturamos el ID desde la URL
+  const data = req.body; // Capturamos los datos del usuario desde el cuerpo
+
+  try {
+    const result = await UsuariosDB.updateUsuario(id, data);
+    
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado o sin cambios" });
+    }
+    
+    res.json({ message: "Usuario actualizado correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/filter/:id", async (req, res) => {
+  const id = req.params.id;
+  try{
+  const users = await UsuariosDB.filterUsuariosporDepartament(id);
+  res.json(users);
+    if(users.affectedRows === 0){
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    }catch(error){
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/userEmail", async (req, res) => {
+  const {email} = req.body;
+  console.log("Datos recibimos:", email);
+  
+  if (!email) {
+    return res.status(400).json({ error: "Faltan parámetros 'email'" });
+  }
+
+  try{
+  const result = await UsuariosDB.UsuarioByEmailAndEstado(email);
+  console.log("Resultado de la consulta:", result);
+
+    if(result.affectedRows === 0){
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+    res.json(result);
+    }catch(error){
+    res.status(500).json({ error: error.message });
+  }
+});
 export default router;
