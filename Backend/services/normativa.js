@@ -30,8 +30,18 @@ async function searchByNumber(number){
 }
 }
 
-async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio){
+
+async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null){
+    console.log("Buscando normativa con los siguientes parámetros:");
+    console.log("Numero:", numero);
+    console.log("Dependencia:", dependencia);
+    console.log("Emisor:", emisor);
+    console.log("Documento:", documento);
+    console.log("Anio:", anio);
+    console.log("Limite:", limite);
+    
     try{
+
     let sql = "SELECT * FROM normativa where 1 = 1";
     let params = [];
 
@@ -55,6 +65,14 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
         sql += " AND anio = ?";
         params.push(anio);
     }
+    //En esta parte se define cuantos registros queremos mostrar a la hora de buscar registros
+    if (limite) {
+        let limiteInt = parseInt(limite);
+        if(!isNaN(limiteInt)){
+        sql += " LIMIT ?";
+        params.push(limiteInt);
+        }
+    }
 
     console.log("Consulta SQL: " + sql);
     console.log(params); 
@@ -70,5 +88,6 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
     console.error("Error al buscar normativa por parámetros: ", err);
     throw err;
 }};
+
 
 export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas}; 

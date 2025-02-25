@@ -3,26 +3,16 @@ import express from "express";
 
 const router = express.Router();
 
-router.get('/search', async (req, res) => {
-    const { numero, dependencia, emisor, documento, anio } = req.query;
+//Verificar de no usar Query si no Body
+router.post('/search', async (req, res) => {
+    const { numero, dependencia, emisor, documento, anio,limite } = req.body;
 
     try {
         console.log("Ruta /search alcanzada");
-        console.log("Parámetros recibidos:", { numero, dependencia, emisor, documento, anio });
-
         let normativa;
-
-        if (!numero && !dependencia && !emisor && !documento && !anio) {
-            // ✅ Si no hay parámetros, devolver todas las normativas
-            normativa = await normativaDB.getAllNormativas();
-        } else if (numero && !dependencia && !emisor && !documento && !anio) {
-            // 🔹 Si solo se pasa número, buscar solo por número
-            normativa = await normativaDB.searchByNumber(numero);
-        } else {
-            // 🔹 Si hay otros parámetros, filtrar por ellos
-            normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio);
-        }
-
+        // Si hay otros parámetros, filtrar por ellos
+        normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite);
+        
         if (!normativa || normativa.length === 0) {
             return res.status(404).json({ error: "No se encontró la normativa que coincida con su búsqueda" });
         }
@@ -35,7 +25,7 @@ router.get('/search', async (req, res) => {
 });
 
 
-router.get("/year", async (req, res) => {
+router.get("/yearNormativa", async (req, res) => {
 try{
     const normativa = await normativaDB.getAllYears(); 
     res.json(normativa);
