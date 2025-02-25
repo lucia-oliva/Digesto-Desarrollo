@@ -6,12 +6,14 @@ const router = express.Router();
 //Verificar de no usar Query si no Body
 router.post('/search', async (req, res) => {
     const { numero, dependencia, emisor, documento, anio,limite } = req.body;
+    const{page} = req.query;
 
     try {
         console.log("Ruta /search alcanzada");
         let normativa;
         // Si hay otros parámetros, filtrar por ellos
-        normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite);
+        const offset = (page - 1) * limite;
+        normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
         
         if (!normativa || normativa.length === 0) {
             return res.status(404).json({ error: "No se encontró la normativa que coincida con su búsqueda" });
