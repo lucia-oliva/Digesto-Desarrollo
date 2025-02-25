@@ -82,5 +82,31 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
     throw err;
 }};
 
+//Buscador mediante Tags...
+async function searchNormativasByTags(dependencia, tags) {
+    console.log(tags);
+    const placeholders = tags.map(()=> "?").join(",");
+    
+    const sql = `
+        SELECT n.id, n.titulo, n.numero, n.id_dependencia,
+        n.id_tipo_normativa,n.resumen,n.anio, n.estado,
+        GROUP_CONCAT(t.nombre SEPARATOR ',') AS tags
+        FROM normativa n
+        JOIN tag_normativa tn ON n.id = tn.id_normativa
+        JOIN tag t ON tn.id_tag = t.id
+        WHERE n.id_dependencia = ? AND LOWER(t.nombre) IN (${placeholders})
+        GROUP BY n.id
+    `;
+    try {
+        const params = [dependencia, ...tags];
+        const results = await db.query(sql, params);
+        return results;  
+    } catch (error) {
+        console.log("Error en la consulta de normativas:", error);
+        throw error; 
+    }
+}
 
-export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas}; 
+
+
+export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas,searchNormativasByTags}; 
