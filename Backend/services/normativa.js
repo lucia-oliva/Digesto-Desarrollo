@@ -32,14 +32,6 @@ async function searchByNumber(number){
 
 
 async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null){
-    console.log("Buscando normativa con los siguientes parámetros:");
-    console.log("Numero:", numero);
-    console.log("Dependencia:", dependencia);
-    console.log("Emisor:", emisor);
-    console.log("Documento:", documento);
-    console.log("Anio:", anio);
-    console.log("Limite:", limite);
-    
     try{
 
     let sql = "SELECT * FROM normativa where 1 = 1";
@@ -67,11 +59,9 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
     }
     //En esta parte se define cuantos registros queremos mostrar a la hora de buscar registros
     if (limite) {
-        let limiteInt = parseInt(limite);
-        if(!isNaN(limiteInt)){
         sql += " LIMIT ?";
-        params.push(limiteInt);
-        }
+        params.push(limite);
+        
     }
 
     console.log("Consulta SQL: " + sql);
