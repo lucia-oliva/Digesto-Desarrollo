@@ -88,6 +88,16 @@ router.get("/year/:year", async (req, res) => {
 );
 
 
+router.get("/normativas", async (req, res) => {
+    try {
+    const normativas = await normativaDB.getAllNormativas();
+    res.json(normativas);
+    } catch (error) {
+    console.log("Error al obtener las normativas", error);
+    res.status(500).json({ error: "Error al obtener las normativas" });
+    }
+});
+
 
 export default router;
 
