@@ -1,9 +1,10 @@
-
+import Header from  "../components/Header";
 
 function About(){
 return (
 <>
-    <body className="bg-blue-950 w-screen">
+    <body className="bg-[#1B5B98]">
+        <Header/>
         <div className="px-8">
             <h1 className="text-cyan-400 text-3xl text-center font-bold font-[Montserrat] mt-8">Sobre Digesto UNLaR</h1>
             <h3 className="text-white text-center font-medium text-lg font-[Montserrat] mt-2" >Los objetivos de desarrollo de esta pagina son:</h3>

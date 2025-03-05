@@ -1,9 +1,9 @@
 import { useState } from "react";
-import axios from "axios"; // Importamos 
+import axios from "axios"; 
 import "../styles/Home.css";
 
 function Home() {
-  const [normativas, setNormativas] = useState([]); // Estado para almacenar las normativas
+  const [normativas, setNormativas] = useState([]);
   const [formData, setFormData] = useState({
     numero: "",
     dependencia: "",
@@ -12,11 +12,11 @@ function Home() {
     emisor: ""
   });
 
-  // Función para obtener las normativas por parámetros
+  
   async function searchNormativas() {
     const { numero, dependencia, emisor, tipo_normativa, anio } = formData;
-    const limite = 10; // Definir el límite de resultados por página
-    const page = 1; // Definir la página de resultados (por ejemplo, 1)
+    const limite = 10; 
+    const page = 1;
     
     try {
       const response = await axios.post(
@@ -25,13 +25,13 @@ function Home() {
         { params: { dependencia, page } }
       );
       console.log(response.data);
-      setNormativas(response.data); // Establece las normativas recibidas
+      setNormativas(response.data); 
     } catch (error) {
       console.error("Error al buscar las normativas", error);
     }
   }
 
-  // Función para manejar el cambio en los inputs
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
