@@ -1,1 +1,10 @@
 @import "tailwindcss";
+@plugin "daisyui";
+
+:root {
+    --color-active: oklch(29% 0.066 243.157);
+}
+
+.menu {
+    --menu-active-bg: var(--color-active);
+}

@@ -4,6 +4,7 @@ import "../styles/Home.css";
 
 function Home() {
   const [normativas, setNormativas] = useState([]);
+  const arrayNum = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const [formData, setFormData] = useState({
     numero: "",
     dependencia: "",
@@ -43,6 +44,32 @@ function Home() {
   return (
     <div>
 
+        {/* Hero section */}
+        <div
+          className="hero min-h-screen "
+          style={{
+            backgroundImage: "url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)",
+          }}>
+          <div className="hero-overlay "></div>
+          <div className="hero-content text-center flex items-start py-25
+           min-h-screen ">
+            <div className="max-w-md">
+              <h1 className="mb-4 text-5xl font-semibold font-[Montserrat]">Bienvenido a Digesto UNLaR</h1>
+              <p className="mb-5 font-[Raleway]">
+                La plataforma que sirve como espacio digital para consultar las normativas y toda documentacion emitada por todas las dependencias de la Universidad Nacional de La Rioja.
+              </p>
+              <button className="btn border-1 bg-blue-900
+                border-slate-800
+                font-[Raleway]
+               ">Busqueda Avanzada</button>
+              <div className="divider font-[Raleway]">O Buscar por Dependencias</div>
+            </div>
+          </div>
+        </div>
+
+
+      {/* A partir de aqui el codigo viejo */}
+      <div className="hidden">
       <section className="landing">
         <div className="landing-div">
         </div>
@@ -105,6 +132,12 @@ function Home() {
             /> 2022
           </label>
         </div>
+<ul className="w-full items-center text-center grid-cols-3 md:grid-cols-5 grid ">
+  {arrayNum.map((num) => (
+    <li key={num}>{num}</li>
+  ))}  
+</ul>
+
 
         {/* Toggle de Tipo Normativa */}
         <div>
@@ -165,6 +198,7 @@ function Home() {
         ) : (
           <p>No se encontraron normativas.</p>
         )}
+      </div>
       </div>
     </div>
   );
