@@ -19,12 +19,11 @@ async function getUsuarioById(id) {
 /*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
 campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ] 
 */
+
 //FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
 //FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
 async function createUsuario(user) {
-  console.log(user);
-
   const sql =
     "INSERT INTO usuario (nombre , telefono , email , clave , id_tipo_usuario, id_dependencia, fecha_alta,ultima_visita) VALUES (?,?,?,?,?,?,?,?)";
   const results = await db.query(sql, [
