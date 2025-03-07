@@ -13,16 +13,17 @@ function Header() {
     { name: "Búsqueda Avanzada", href: "#" },
     { name: "Portal Web UNLaR", href: "#" },
     { name: "Contacto", href: "#" },
-    { name: "Ayuda", href: "#" }
+    { name: "Ayuda", href: "#" },
+    { name:"Sobre Digesto", href:"#" }
   ];
 
   return (
     <>
-      <div className=" fixed top-0 left-0 w-full navbar bg-[#1B5B98] shadow-sm  h-0 px-4 lg:h-20">
+      <div className="navbar bg-[#1B5B98] shadow-sm  h-0 px-4 lg:h-15">
         <div className="flex-1">
           <img
             src="https://scontent.firj1-1.fna.fbcdn.net/v/t39.30808-6/471075368_988473086645323_6248816904898158674_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=MzAEWlqv0fsQ7kNvgFXin7g&_nc_oc=AdhWQ9utiV5kMG6hPBMKWGLA01jg0X9270GctGt0-eS7JkdXb9xKvIyBmtTZzJJT-1c&_nc_zt=23&_nc_ht=scontent.firj1-1.fna&_nc_gid=AI3e4X20wOMnJDD8nZItPf5&oh=00_AYBdWHDKYOuhpHwVaxAQoEPMfp4gniWfXw7jMSt0AsBNyg&oe=67CF9089"
-            className="object-cover max-h-15 mask mask-squircle lg:max-h-20"
+            className="object-cover max-h-15 mask mask-squircle lg:max-h-15"
           />
         </div>
         
@@ -33,7 +34,7 @@ function Header() {
               <li key={index}>
                 <a className="font-[Montserrat] text-white transition duration-300 ease-in-out 
                              hover:bg-blue-900 
-                             px-4 py-2 rounded lg:text-base xl:text-lg" href={link.href}>{link.name}</a>
+                             px-4 py-2 rounded lg:text-base xl:text-md" href={link.href}>{link.name}</a>
               </li>
             ))}
           </ul>
