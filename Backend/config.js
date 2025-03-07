@@ -1,7 +1,7 @@
 const config = {
   db: {
     host: "localhost",
-    user: "root",
+    user: "bs_digesto",
     password: "admin",
     database: "bs_digesto",
     connectTimeout: 600000,

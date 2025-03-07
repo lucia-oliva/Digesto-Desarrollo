@@ -1,0 +1,103 @@
+import normativaDB from "../services/normativa.js";
+import express from "express";
+
+const router = express.Router();
+
+//Filtrar normativa por parametros
+router.post('/search', async (req, res) => {
+    let { numero,emisor, documento, anio,limite } = req.body;
+    let {dependencia} =req.query;
+    if(!dependencia){
+        dependencia = req.body.dependencia;
+    }
+    let{page} = req.query;
+    
+
+    try {
+        let normativa;
+        // Si hay otros parámetros, filtrar por ellos
+        const offset = (page - 1) * limite;
+        normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
+        
+        if (!normativa || normativa.length === 0) {
+            return res.status(404).json({ error: "No se encontró la normativa que coincida con su búsqueda" });
+        }
+
+        res.json(normativa);
+    } catch (err) {
+        console.log("Error al buscar la normativa", err);
+        res.status(500).json({ error: "Error al buscar la normativa" });
+    }
+});
+
+//Filtrar normativas por tags
+router.get('/search/tag', async (req, res) => {
+    let {dependencia} = req.query;
+    if(!dependencia){
+        dependencia = req.body.dependencia;
+    }
+    let {tags} = req.body;
+    if(!tags.length=== 0 || !tags){
+        return res.status(400).json({ error: "Debe especificar al menos un tag para la búsqueda" });
+    }
+    try{
+        const normativa = await normativaDB.searchNormativasByTags(dependencia,tags);
+        if(!normativa || normativa.length === 0){
+            return res.status(400).json({ error: "No se encontraron normativas para los parametros proporcionados" });
+        }
+        res.json(normativa);
+    }catch(err){
+        console.log("Error al buscar las normativas",err);
+        res.status(500).json({error: "Error al realizar la busqueda"});
+    }
+
+})
+
+//Filtrar años de las normativas
+
+router.get("/yearNormativa", async (req, res) => {
+try{
+    const normativa = await normativaDB.getAllYears(); 
+    res.json(normativa);
+}catch(err){
+    console.log("Error al obtener los anios de normativas",error);
+    res.status(500).json({ error: "Error al obtener los anios de normativa" });   
+}}
+);
+
+//Filtrar normativas por anio
+
+router.get("/year/:year", async (req, res) => {
+    let {year} = req.params;
+    year = parseInt(year, 10);
+
+    if (isNaN(year) || !Number.isInteger(year)) {
+        return res.status(400).json({ error: "El año debe ser un número entero válido" });
+    }
+
+    try{
+    const normativa = await normativaDB.searchByNumber(year);
+    if(!normativa){
+        return res.status(404).json({ error: "No se encontró la normativa para el año solicitado" });
+    }
+    res.json(normativa);
+    }catch(err){
+    console.log("Error al obtener la normativa del año",error);
+    res.status(500).json({ error: "Error al obtener la normativa del año" });   
+    }}
+);
+
+
+router.get("/normativas", async (req, res) => {
+    try {
+    const normativas = await normativaDB.getAllNormativas();
+    res.json(normativas);
+    } catch (error) {
+    console.log("Error al obtener las normativas", error);
+    res.status(500).json({ error: "Error al obtener las normativas" });
+    }
+});
+
+
+export default router;
+

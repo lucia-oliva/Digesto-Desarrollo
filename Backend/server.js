@@ -1,14 +1,24 @@
 import express from "express";
+import cors from "cors";
 import usuarios from "./routes/usuarioRoutes.js";
+import dependencia from "./routes/dependenciaRoute.js";
+import emisores from "./routes/emisoresRoutes.js";
+import tipo_normativa from "./routes/tipo_normativaRoutes.js";
+import normativa from "./routes/normativaRoutes.js";
 
 // crear el servidor
 const app = express();
 
 // middlewares
 app.use(express.json());
+app.use(cors());
 
 // rutas de la api
 app.use("/api/usuarios", usuarios);
+app.use("/api/dependencia", dependencia);
+app.use("/api/emisores", emisores);
+app.use("/api/tipo_normativa", tipo_normativa);
+app.use("/api/normativa", normativa);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

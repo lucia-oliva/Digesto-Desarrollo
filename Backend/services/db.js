@@ -7,9 +7,13 @@ async function query(sql, params) {
   const connection = await pool.getConnection();
   try {
     const [results] = await connection.query(sql, params);
+
+    if (results.length === 0) {
+      throw new Error("No se encontraron resultados");
+    }
     return results;
   } catch (error) {
-    if (error.code === "ER_ACCESS_DENIED_ERROR") {
+    if (error.errno === 1045) {
       throw new Error("Invalid credentials");
     } else {
       throw error;
