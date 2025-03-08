@@ -8,3 +8,13 @@
 .menu {
     --menu-active-bg: var(--color-active);
 }
+
+.title-table{ 
+    font-family: "Montserrat", Arial, Helvetica, sans-serif;
+    font-weight: 600;
+}
+
+th{
+    font-family: 'Raleway', Courier, monospace;
+    font-weight: 300;
+}

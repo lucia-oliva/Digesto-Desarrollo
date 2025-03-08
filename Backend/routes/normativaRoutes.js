@@ -98,6 +98,17 @@ router.get("/normativas", async (req, res) => {
     }
 });
 
+router.get("/normativasMasBuscadas", function(req,res) { 
+    normativaDB.getMostPopularNormatives()
+       .then((getMostPopularNormatives) => {
+            res.json(getMostPopularNormatives);
+        })
+       .catch((error) => {
+            console.error("Error al obtener las normativas más buscadas:", error);
+            res.status(500).json({ error: "Error al obtener las normativas mas buscadas" });
+        });
+});
+
 
 export default router;
 

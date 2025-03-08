@@ -107,6 +107,12 @@ async function searchNormativasByTags(dependencia, tags) {
     }
 }
 
+// 10 Normativas mas buscadas
+ async function getMostPopularNormatives() {
+    const sql = "SELECT titulo, numero, fecha_normativa, id_tipo_normativa, visitas, resumen, COUNT(*) as total_busqueda FROM normativa GROUP BY id ORDER BY visitas DESC LIMIT 10";
+    const results = await db.query(sql, []);
+    return results;
+}
 
 
-export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas,searchNormativasByTags}; 
+export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas,searchNormativasByTags, getMostPopularNormatives}; 
