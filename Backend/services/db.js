@@ -11,7 +11,6 @@ async function query(sql, params) {
     if (results.length === 0) {
       throw new Error("No se encontraron resultados");
     }
-
     return results;
   } catch (error) {
     if (error.errno === 1045) {
