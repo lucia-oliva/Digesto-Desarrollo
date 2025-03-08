@@ -12,6 +12,7 @@ function Home() {
     anio: "",
     documento: "",
     emisor: "",
+    emisor: "",
   });
 
   const dependencias = [
@@ -32,15 +33,18 @@ function Home() {
   async function searchNormativas() {
     const { numero, dependencia, emisor, tipo_normativa, anio } = formData;
     const limite = 10;
+    const limite = 10;
     const page = 1;
 
     try {
       const response = await axios.post(
         "http://localhost:3000/api/normativa/search",
+        "http://localhost:3000/api/normativa/search",
         { numero, emisor, documento: tipo_normativa, anio, limite },
         { params: { dependencia, page } }
       );
       console.log(response.data);
+      setNormativas(response.data);
       setNormativas(response.data);
     } catch (error) {
       console.error("Error al buscar las normativas", error);
@@ -54,25 +58,25 @@ function Home() {
       [name]: value,
     });
   };
-//Funcion para las normativas mas buscadas
-useEffect(() => {
-  async function fetchData(){
-     try {
-        const response = await axios.get("http://localhost:3000/api/normativa/normativasMasBuscadas");
+  //Funcion para las normativas mas buscadas
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/normativa/normativasMasBuscadas"
+        );
         console.log(response.data);
-        if(response.data.length > 0){
-        setNormativas(response.data);
-      }
-     } catch (error) {
+        if (response.data.length > 0) {
+          setNormativas(response.data);
+        }
+      } catch (error) {
         console.error("Error al obtener las normativas mas buscadas", error);
-     }
-  }
-  fetchData();
-}, []);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
-
-  
     <div>
       {/* Hero section */}
       <div
@@ -83,9 +87,7 @@ useEffect(() => {
         }}
       >
         <div className="hero-overlay "></div>
-        <div
-          className="hero-content text-center flex items-start py-25"
-        >
+        <div className="hero-content text-center flex items-start py-25">
           <div className="max-w-md">
             <h1 className="mb-4 text-5xl font-semibold font-[Montserrat]">
               Bienvenido a Digesto UNLaR
@@ -142,518 +144,517 @@ useEffect(() => {
         </h1>
         <div className="overflow-x-auto">
           {normativas ? (
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="title-table">Numero Normativa</th>
-                <th className="title-table" >Titulo/Codigo</th>
-                <th className="title-table">Resumen</th>
-                <th className="title-table">Fecha</th>
-                <th className="title-table">Dependencia</th>
-                <th className="title-table">Emisor</th>
-                <th className="title-table">Tipo</th>
-                <th className="title-table">Visitas</th>
-                <th className="title-table">Archivo PDF</th>
-              </tr>
-            </thead>
-            <tbody> 
-          
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>{normativas.num}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* titulo codigo */}
-                  <td>{normativas.titulo}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="Ahre">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>{normativas.fecha}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>{normativas.dependencia}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>{normativas.emisor}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>{normativas.tipo_normativa}</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>{normativas.visitas}</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-            
-              {/* row 2 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 3 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 4 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn font-light">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 5 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 6 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 7 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 8 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 9 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-              {/* row 10 */}
-              <tr>
-                <th>
-                  {" "}
-                  {/* Numero normativa*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Resumen */}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/* Codigo*/}
-                  <div className="tooltip" data-tip="hello">
-                    <button className="btn">Hover me</button>
-                  </div>
-                </th>
-                <th>
-                  {" "}
-                  {/*Fecha*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Dependencia*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Emisor*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Tipo*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  {" "}
-                  {/*Visitas*/}
-                  <td>Purple</td>
-                </th>
-                <th>
-                  <button className="btn btn-ghost btn-xs">details</button>
-                </th>
-              </tr>
-            </tbody>
-            {/* foot */}
-            <tfoot>
-              <tr>
-                <th className="title-table">Numero Normativa</th>
-                <th className="title-table">Titulo/Codigo</th>
-                <th className="title-table">Resumen</th>
-                <th className="title-table">Fecha</th>
-                <th className="title-table">Dependencia</th>
-                <th className="title-table">Emisor</th>
-                <th className="title-table">Tipo</th>
-                <th className="title-table">Visitas</th>
-                <th className="title-table">Archivo PDF</th>
-              </tr>
-            </tfoot>
-          </table>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th className="title-table">Numero Normativa</th>
+                  <th className="title-table">Titulo/Codigo</th>
+                  <th className="title-table">Resumen</th>
+                  <th className="title-table">Fecha</th>
+                  <th className="title-table">Dependencia</th>
+                  <th className="title-table">Emisor</th>
+                  <th className="title-table">Tipo</th>
+                  <th className="title-table">Visitas</th>
+                  <th className="title-table">Archivo PDF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>{normativas.num}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* titulo codigo */}
+                    <td>{normativas.titulo}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="Ahre">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>{normativas.fecha}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>{normativas.dependencia}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>{normativas.emisor}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>{normativas.tipo_normativa}</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>{normativas.visitas}</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+
+                {/* row 2 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 3 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 4 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn font-light">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 5 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 6 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 7 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 8 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 9 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+                {/* row 10 */}
+                <tr>
+                  <th>
+                    {" "}
+                    {/* Numero normativa*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Resumen */}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/* Codigo*/}
+                    <div className="tooltip" data-tip="hello">
+                      <button className="btn">Hover me</button>
+                    </div>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Fecha*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Dependencia*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Emisor*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Tipo*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    {" "}
+                    {/*Visitas*/}
+                    <td>Purple</td>
+                  </th>
+                  <th>
+                    <button className="btn btn-ghost btn-xs">details</button>
+                  </th>
+                </tr>
+              </tbody>
+              {/* foot */}
+              <tfoot>
+                <tr>
+                  <th className="title-table">Numero Normativa</th>
+                  <th className="title-table">Titulo/Codigo</th>
+                  <th className="title-table">Resumen</th>
+                  <th className="title-table">Fecha</th>
+                  <th className="title-table">Dependencia</th>
+                  <th className="title-table">Emisor</th>
+                  <th className="title-table">Tipo</th>
+                  <th className="title-table">Visitas</th>
+                  <th className="title-table">Archivo PDF</th>
+                </tr>
+              </tfoot>
+            </table>
           ) : (
             <p>Cargando...</p>
           )}

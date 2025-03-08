@@ -1,20 +1,89 @@
 @import "tailwindcss";
-@plugin "daisyui";
-
-:root {
-    --color-active: oklch(29% 0.066 243.157);
+@plugin "daisyui" {
+  themes: [ "Blues"];
+}
+@plugin "daisyui/theme" {
+  name: "Blues";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: oklch(48% 0.243 264.376);
+  --color-primary-content: oklch(97% 0.014 254.604);
+  --color-secondary: oklch(86% 0.127 207.078);
+  --color-secondary-content: oklch(30% 0.056 229.695);
+  --color-accent: oklch(85% 0.138 181.071);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(37% 0.013 285.805);
+  --color-neutral-content: oklch(93% 0.034 272.788);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
-.menu {
-    --menu-active-bg: var(--color-active);
+/* Edited and custom Classes */
+@layer utilities {
+  /* Custom underline animation */
+  .after-line {
+    position: relative;
+  }
+  .after-line::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    height: 1.5px;
+    width: 0;
+    background-color: #fff;
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+  .after-line:hover::after {
+    width: 80%;
+    left: 10%;
+  }
+
+  .menu {
+    &,
+    &:active {
+      --color-neutral: var(--color-primary-content);
+      --color-neutral-content: var(--color-primary);
+    }
+  }
 }
 
-.title-table{ 
-    font-family: "Montserrat", Arial, Helvetica, sans-serif;
-    font-weight: 600;
-}
+/* CSS RESET */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
 
-th{
-    font-family: 'Raleway', Courier, monospace;
-    font-weight: 300;
+  /* For Firefox. */
+  * {
+    scrollbar-width: none;
+  }
+
+  /* For WebKit (Chrome & Safari). */
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
