@@ -35,6 +35,7 @@
   --border: 1px;
   --depth: 1;
   --noise: 0;
+  --font-sans: "Montserrat";
 }
 
 /* Edited and custom Classes */
@@ -85,5 +86,9 @@
   /* For WebKit (Chrome & Safari). */
   ::-webkit-scrollbar {
     display: none;
+  }
+
+  body {
+    font-family: "Raleway", sans-serif;
   }
 }

@@ -3,10 +3,12 @@ function About() {
     <div className="bg-base-100">
       {/* About Landing */}
       <div className="hero bg-base-200 min-h-screen -mt-18">
-        <div className="hero-content flex-col md:flex-row gap-4 py-20">
+        <div className="hero-content flex-col md:flex-row gap-10 py-20">
           <div className="max-w-md">
-            <h2 className="text-lg font-medium text-gray-500">Acerca de</h2>
-            <h1 className="text-2xl mb-4 font-bold text-slate-800">
+            <h2 className="text-lg font-medium font-sans text-gray-500">
+              Acerca de
+            </h2>
+            <h1 className="text-2xl mb-4 font-sans font-semibold text-slate-800">
               Digesto ayuda a los administrativos a gestionar y revisar las
               normativas de la institución.
             </h1>
