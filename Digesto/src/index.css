@@ -66,6 +66,17 @@
       --color-neutral-content: var(--color-primary);
     }
   }
+  
+  .button{
+    font-family: "Raleway" ,sans-serif;
+  
+  }
+
+  td{
+    font-size: medium;
+    font-family: "Raleway",sans-serif;
+  }
+  
 }
 
 /* CSS RESET */
@@ -91,4 +102,8 @@
   body {
     font-family: "Raleway", sans-serif;
   }
+
+ 
+
 }
+

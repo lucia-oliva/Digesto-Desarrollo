@@ -20,9 +20,9 @@ const dependenciaEnum = [
 const colors = [
   "bg-blue-300",
   "bg-green-300",
-  "bg-yellow-500",
-  "bg-cyan-300",
   "bg-orange-300",
+  "bg-cyan-300",
+  "bg-red-300",
 ];
 
 function Dependencias({ dependencias }) {

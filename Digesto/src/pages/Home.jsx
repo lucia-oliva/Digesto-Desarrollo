@@ -2,18 +2,21 @@ import { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import useAxios from "axios-hooks";
 import Dependencias from "../components/Listas/Dependencias";
+import Table from "../components/layout/Table";
 
 function Home() {
   const [normativas, setNormativas] = useState([]);
 
   // Se obtienen las normativas mas buscadas*/
   const [{ data, loading, error }] = useAxios(
-    "http://localhost:3000/api/normativa/normativasMasBuscadas"
+    //"http://localhost:3000/api/normativa/normativasMasBuscadas"
+    "http://localhost:3000/api/normativa/normativas"
   );
 
   useEffect(() => {
     if (data && data.length > 0) {
       setNormativas(data);
+      console.log(data);
     }
     if (error) {
       console.error("Error al obtener las normativas mas buscadas", error);
@@ -58,11 +61,7 @@ function Home() {
         <Dependencias dependencias={[]} />
 
         {/* Section de Normativas mas buscadas */}
-        <div className="w-auto bg-gray-100 text-neutral text-center overflow-hidden">
-          <h1 className="mb-4 mt-4 text-l font-semibold font-[Montserrat]">
-            Normativas Mas Buscadas
-          </h1>
-        </div>
+        <Table normativas={normativas}/>
       </section>
     </div>
   );
