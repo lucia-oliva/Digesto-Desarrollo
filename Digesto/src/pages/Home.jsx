@@ -3,6 +3,7 @@ import { IoMdSearch } from "react-icons/io";
 import useAxios from "axios-hooks";
 import Dependencias from "../components/Listas/Dependencias";
 import Table from "../components/layout/Table";
+import { Alert, Loading } from "../components/ui/Ui";
 
 function Home() {
   const [normativas, setNormativas] = useState([]);
@@ -10,7 +11,7 @@ function Home() {
   // Se obtienen las normativas mas buscadas*/
   const [{ data, loading, error }] = useAxios(
     //"http://localhost:3000/api/normativa/normativasMasBuscadas"
-    "http://localhost:3000/api/normativa/normativas"
+    import.meta.env.VITE_API_URL + "normativa/normativas"
   );
 
   useEffect(() => {
@@ -19,7 +20,10 @@ function Home() {
       console.log(data);
     }
     if (error) {
-      console.error("Error al obtener las normativas mas buscadas", error);
+      console.error(
+        "Error al obtener las normativas mas buscadas",
+        error.message
+      );
     }
   }, [data, error]);
 
@@ -54,14 +58,23 @@ function Home() {
           </div>
         </div>
       </div>
-      <section className="container mx-auto py-10 px-12 bg-base-100">
+      <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
         {/* Section de Dependencias */}
         {/* TODO si trae las dependencias del back actualizar los parametros */}
 
         <Dependencias dependencias={[]} />
 
         {/* Section de Normativas mas buscadas */}
-        <Table normativas={normativas}/>
+        <Table normativas={normativas} />
+
+        {loading && <Loading />}
+        {error && (
+          <Alert
+            title="Error al obtener las dependencias"
+            message={error?.message}
+            error={!error}
+          />
+        )}
       </section>
     </div>
   );

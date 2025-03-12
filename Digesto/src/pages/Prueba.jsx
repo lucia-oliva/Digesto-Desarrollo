@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import Table from '../components/layout/Table';
-import Pagination from '../components/layout/Pagination';
+import { useState, useEffect } from "react";
+import Table from "../components/layout/Table";
+import Pagination from "../components/layout/Pagination";
 
 async function fetchNormativas(page, limit) {
   const response = await fetch(
     `http://localhost:3000/api/normativa/search?page=${page}&limit=${limit}`,
-   
+
     {
       method: "POST",
       headers: {
@@ -34,23 +34,20 @@ function NormativasContainer() {
     async function loadNormativas() {
       try {
         const data = await fetchNormativas(currentPage, resultsPerPage);
-        console.log('Fetched data:', data); // Debugging log
+        console.log("Fetched data:", data); // Debugging log
         setNormativas(data.normativas);
         setTotalResults(data.totalResults);
       } catch (error) {
-        console.error('Error fetching normativas:', error);
+        console.error("Error fetching normativas:", error);
       }
     }
     loadNormativas();
   }, [currentPage]);
 
-  console.log('Normativas:', normativas);
-  console.log('Total Results:', totalResults);
-
-
+  console.log("Normativas:", normativas);
+  console.log("Total Results:", totalResults);
 
   return (
-
     <div className="w-screen min-h-screen p-10 flex justify-center items-center">
       <div className="w-auto bg-gray-100 text-neutral text-center p-10 rounded-lg shadow-md">
         <h1 className="mb-4 text-lg font-semibold font-[Montserrat]">

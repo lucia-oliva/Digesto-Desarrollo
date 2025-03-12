@@ -25,8 +25,8 @@
   --color-success-content: oklch(37% 0.077 168.94);
   --color-warning: oklch(82% 0.189 84.429);
   --color-warning-content: oklch(41% 0.112 45.904);
-  --color-error: oklch(71% 0.194 13.428);
-  --color-error-content: oklch(27% 0.105 12.094);
+  --color-error: oklch(60% 0.234 29.234);
+  --color-error-content: oklch(30% 0.234 29.234);
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
@@ -59,6 +59,20 @@
     left: 10%;
   }
 
+  /* Custom slide down animation */
+  @keyframes slide-down {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
+
+  .anim-slide-down {
+    animation: slide-down 0.5s ease-in-out;
+  }
+
   .menu {
     &,
     &:active {
@@ -66,17 +80,15 @@
       --color-neutral-content: var(--color-primary);
     }
   }
-  
-  .button{
-    font-family: "Raleway" ,sans-serif;
-  
+
+  .button {
+    font-family: "Raleway", sans-serif;
   }
 
-  td{
+  td {
     font-size: medium;
-    font-family: "Raleway",sans-serif;
+    font-family: "Raleway", sans-serif;
   }
-  
 }
 
 /* CSS RESET */
@@ -102,8 +114,4 @@
   body {
     font-family: "Raleway", sans-serif;
   }
-
- 
-
 }
-
