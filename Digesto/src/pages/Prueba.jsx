@@ -1,56 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/layout/Table';
 import Pagination from '../components/layout/Pagination';
-
-async function fetchNormativas(page, limit) {
-  const response = await fetch(
-    `http://localhost:3000/api/normativa/search?page=${page}&limit=${limit}`,
-   
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        numero: "",
-        emisor: "",
-        documento: "",
-        anio: "",
-        limite: limit,
-      }),
-    }
-  );
-  const data = await response.json();
-  return data;
-}
+import useAxios from 'axios-hooks';
 
 function NormativasContainer() {
-  const [normativas, setNormativas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
   const resultsPerPage = 10;
 
+  const [{ data, loading, error }, refetch] = useAxios({
+    url: `http://localhost:3000/api/normativa/search?page=${currentPage}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: {
+      numero: '',
+      emisor: '',
+      documento: '',
+      anio: '',
+    },
+  });
+
   useEffect(() => {
-    async function loadNormativas() {
-      try {
-        const data = await fetchNormativas(currentPage, resultsPerPage);
-        console.log('Fetched data:', data); // Debugging log
-        setNormativas(data.normativas);
-        setTotalResults(data.totalResults);
-      } catch (error) {
-        console.error('Error fetching normativas:', error);
-      }
-    }
-    loadNormativas();
-  }, [currentPage]);
+    refetch();
+  }, [currentPage, refetch]);
 
-  console.log('Normativas:', normativas);
-  console.log('Total Results:', totalResults);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error fetching data: {error.message}</p>;
 
-
+  const normativas = data?.normativas || [];
+  const totalResults = data?.totalResults || 0;
 
   return (
-
     <div className="w-screen min-h-screen p-10 flex justify-center items-center">
       <div className="w-auto bg-gray-100 text-neutral text-center p-10 rounded-lg shadow-md">
         <h1 className="mb-4 text-lg font-semibold font-[Montserrat]">
@@ -69,3 +50,4 @@ function NormativasContainer() {
 }
 
 export default NormativasContainer;
+

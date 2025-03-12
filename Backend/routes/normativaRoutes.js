@@ -5,17 +5,18 @@ const router = express.Router();
 
 //Filtrar normativa por parametros
 router.post('/search', async (req, res) => {
-    let { numero,emisor, documento, anio,limite } = req.body;
+    let { numero,emisor, documento, anio} = req.body;
     let {dependencia}= req.query;
     if(!dependencia){
         dependencia = req.body.dependencia;
     }
     let{page} = req.query;
-    
-
+    let limite = 10;
+    //convertir pagina a entero y definir por defecto 1 si no se recibe en la query.
+    page = parseInt(page, 10) || 1;
     try {
         // Si hay otros parámetros, filtrar por ellos
-        const offset = (page - 1) * limite;
+        const offset = (page - 1) * limite
         //Get the total count of results
         
         const {normativas, totalResults} = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
