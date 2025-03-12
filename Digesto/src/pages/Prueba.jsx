@@ -1,9 +1,9 @@
-import  { useState, useEffect } from 'react';
-import Table from '../components/layout/Table';
-import Pagination from '../components/layout/Pagination';
-import useAxios from 'axios-hooks';
-//TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion. 
-//TODO: Hay que corregir el front-end de tabla y paginacion. 
+import { useState, useEffect } from "react";
+import Table from "../components/layout/Table";
+import Pagination from "../components/layout/Pagination";
+import useAxios from "axios-hooks";
+//TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion.
+//TODO: Hay que corregir el front-end de tabla y paginacion.
 
 function NormativasContainer() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -11,15 +11,15 @@ function NormativasContainer() {
 
   const [{ data, loading, error }, refetch] = useAxios({
     url: `http://localhost:3000/api/normativa/search?page=${currentPage}`,
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     data: {
-      numero: '',
-      emisor: '',
-      documento: '',
-      anio: '',
+      numero: "",
+      emisor: "",
+      documento: "",
+      anio: "",
     },
   });
 
@@ -40,7 +40,7 @@ function NormativasContainer() {
           Normativas Mas Buscadas
         </h1>
         <Table normativas={normativas} />
-         
+
         <Pagination
           currentPage={currentPage}
           totalResults={totalResults}
@@ -53,4 +53,3 @@ function NormativasContainer() {
 }
 
 export default NormativasContainer;
-
