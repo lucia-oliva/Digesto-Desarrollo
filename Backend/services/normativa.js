@@ -31,31 +31,46 @@ async function searchByNumber(number){
 }
 
 
+
+
 async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null, offset = null){
     try{
 
-    let sql = "SELECT * FROM normativa where 1 = 1";
+    let sql = "SELECT n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa  WHERE 1 = 1 ";
+    
+    let countSql = "SELECT COUNT(*) AS total FROM normativa WHERE 1 = 1";
     let params = [];
+    let countParams = [];
 
     if (numero) {
         sql += " AND numero = ?";
+        countSql += " AND numero = ?";
         params.push(numero);
+        countParams.push(numero);
     }
     if (dependencia) {
         sql += " AND id_dependencia = ?";
+        countSql += " AND id_dependencia = ?";
         params.push(dependencia);
+        countParams.push(dependencia);
     }
     if (emisor) {
         sql += " AND id_emisor = ?";
+        countSql += " AND id_emisor = ?";
         params.push(emisor);
+        countParams.push(emisor);
     }
     if (documento) {
         sql += " AND id_tipo_normativa = ?";
+        countSql += " AND id_tipo_normativa = ?";
         params.push(documento);
+        countParams.push(documento);
     }
     if (anio) {
         sql += " AND anio = ?";
+        countSql += " AND anio = ?";
         params.push(anio);
+        countParams.push(anio);
     }
     //En esta parte se define cuantos registros queremos mostrar a la hora de buscar registros
     if (limite) {
@@ -71,12 +86,13 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
     console.log(params); 
     
     const results = await db.query(sql,params);
+    const countResults = await db.query(countSql,countParams);
 
     if(results.length===0){
         console.log("No se encontró la normativa con los parámetros especificados");
         return null;
     }
-    return results;
+    return {normativas: results, totalResults: countResults[0].total};
 }catch(err){
     console.error("Error al buscar normativa por parámetros: ", err);
     throw err;

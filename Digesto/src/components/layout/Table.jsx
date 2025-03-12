@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+
+
+
 function Table({ normativas }) {
   return (
     <div className="w-screen justify-center flex items-center">
       {/* Section de Normativas mas buscadas */}
       <div className="w-auto  text-neutral text-center rounded-lg">
-        <h1 className="mb-4 text-lg font-semibold font-[Montserrat]">
-          Normativas Mas Buscadas
-        </h1>
-
+        
+        
         {/* Vista de Tarjetas en Mobile */}
         <div className="grid grid-cols-1 md:hidden gap-4">
           {normativas.map((normativa, index) => (
@@ -62,6 +63,7 @@ function Table({ normativas }) {
               ))}
             </tbody>
           </table>
+          
         </div>
       </div>
     </div>

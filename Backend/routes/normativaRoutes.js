@@ -6,7 +6,7 @@ const router = express.Router();
 //Filtrar normativa por parametros
 router.post('/search', async (req, res) => {
     let { numero,emisor, documento, anio,limite } = req.body;
-    let {dependencia} =req.query;
+    let {dependencia}= req.query;
     if(!dependencia){
         dependencia = req.body.dependencia;
     }
@@ -14,16 +14,17 @@ router.post('/search', async (req, res) => {
     
 
     try {
-        let normativa;
         // Si hay otros parámetros, filtrar por ellos
         const offset = (page - 1) * limite;
-        normativa = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
+        //Get the total count of results
         
-        if (!normativa || normativa.length === 0) {
+        const {normativas, totalResults} = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
+        
+        if (!normativas || normativas.length === 0) {
             return res.status(404).json({ error: "No se encontró la normativa que coincida con su búsqueda" });
         }
 
-        res.json(normativa);
+        res.status(200).json({normativas, totalResults});
     } catch (err) {
         console.log("Error al buscar la normativa", err);
         res.status(500).json({ error: "Error al buscar la normativa" });
@@ -45,7 +46,7 @@ router.get('/search/tag', async (req, res) => {
         if(!normativa || normativa.length === 0){
             return res.status(400).json({ error: "No se encontraron normativas para los parametros proporcionados" });
         }
-        res.json(normativa);
+        res.status(200).json({normativas, totalResults});
     }catch(err){
         console.log("Error al buscar las normativas",err);
         res.status(500).json({error: "Error al realizar la busqueda"});
