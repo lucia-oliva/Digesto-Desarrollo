@@ -36,7 +36,7 @@ async function searchByNumber(number){
 async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null, offset = null){
     try{
 
-    let sql = "SELECT n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa  WHERE 1 = 1 ";
+    let sql = "SELECT n.archivo ,n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa  WHERE 1 = 1 AND n.estado = 'publicado'";
     
     let countSql = "SELECT COUNT(*) AS total FROM normativa WHERE 1 = 1";
     let params = [];
