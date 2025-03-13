@@ -2,6 +2,8 @@ import  { useState, useEffect } from 'react';
 import Table from '../components/layout/Table';
 import Pagination from '../components/layout/Pagination';
 import useAxios from 'axios-hooks';
+//TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion. 
+//TODO: Hay que corregir el front-end de tabla y paginacion. 
 
 function NormativasContainer() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,6 +40,7 @@ function NormativasContainer() {
           Normativas Mas Buscadas
         </h1>
         <Table normativas={normativas} />
+         
         <Pagination
           currentPage={currentPage}
           totalResults={totalResults}
