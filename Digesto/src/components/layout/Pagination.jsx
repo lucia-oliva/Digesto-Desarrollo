@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange }) {
   const totalPages = Math.ceil(totalResults / resultsPerPage);
   const maxPageButtons = 10;
-  const [pageGroup, setPageGroup] = useState(0);
+  const [pageGroup, setPageGroup] = useState(Math.floor((currentPage - 1) / maxPageButtons));
 
   const startPage = pageGroup * maxPageButtons + 1;
   const endPage = Math.min(startPage + maxPageButtons - 1, totalPages);
@@ -15,6 +16,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
   };
 
   const handleNextGroup = () => {
+    
     if (endPage < totalPages) {
       setPageGroup(pageGroup + 1);
       handlePageChange(startPage + maxPageButtons);
@@ -32,15 +34,20 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
     const buttons = [];
     for (let i = startPage; i <= endPage; i++) {
       buttons.push(
-        <a
+        <button
           key={i}
-          onClick={() => handlePageChange(i)}
+          onClick={(event) => {
+            event.preventDefault();
+            handlePageChange(i);
+          }}
           className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-            i === currentPage ? 'bg-indigo-600 text-white' : 'text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50'
+            i === currentPage
+              ? "bg-indigo-600 text-white"
+              : "text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
           } focus:z-20 focus:outline-offset-0 cursor-pointer`}
         >
           {i}
-        </a>
+        </button>
       );
     }
     return buttons;
@@ -49,18 +56,18 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
   return (
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
       <div className="flex flex-1 justify-between sm:hidden">
-        <a
+        <button
           onClick={handlePreviousGroup}
           className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
           Previous
-        </a>
-        <a
+        </button>
+        <button
           onClick={handleNextGroup}
           className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
           Next
-        </a>
+        </button>
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
@@ -76,7 +83,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
         </div>
         <div>
           <nav className="isolate inline-flex -space-x-px rounded-md shadow-xs" aria-label="Pagination">
-            <a
+            <button
               onClick={handlePreviousGroup}
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
@@ -88,9 +95,9 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
                   clipRule="evenodd"
                 />
               </svg>
-            </a>
+            </button>
             {renderPageButtons()}
-            <a
+            <button
               onClick={handleNextGroup}
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
@@ -102,12 +109,19 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
                   clipRule="evenodd"
                 />
               </svg>
-            </a>
+            </button>
           </nav>
         </div>
       </div>
     </div>
   );
 }
+
+Pagination.propTypes = { 
+  currentPage: PropTypes.number.isRequired,
+  totalResults: PropTypes.number.isRequired,
+  resultsPerPage: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired
+};
 
 export default Pagination;

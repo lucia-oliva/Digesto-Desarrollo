@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import Table from '../components/layout/Table';
 import Pagination from '../components/layout/Pagination';
 import useAxios from 'axios-hooks';

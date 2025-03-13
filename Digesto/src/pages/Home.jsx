@@ -8,7 +8,7 @@ function Home() {
   const [normativas, setNormativas] = useState([]);
 
   // Se obtienen las normativas mas buscadas*/
-  const [{ data, loading, error }] = useAxios(
+  const [{ data, error }] = useAxios(
     "http://localhost:3000/api/normativa/normativasMasBuscadas"
   );
 
