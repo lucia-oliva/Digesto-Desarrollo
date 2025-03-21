@@ -33,14 +33,18 @@ async function searchByNumber(number){
 
 
 
-async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null, offset = null){
+async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null, offset = null, tags){
     try{
 
-    let sql = "SELECT n.archivo ,n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa  WHERE 1 = 1 AND n.estado = 'publicado'";
+    let sql = "SELECT t.nombre, n.archivo ,n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa LEFT JOIN tag_normativa tn2 ON n.id = tn2.id_normativa LEFT JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
     
-    let countSql = "SELECT COUNT(*) AS total FROM normativa WHERE 1 = 1";
+    let countSql = "SELECT COUNT(*) AS total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa LEFT JOIN tag_normativa tn2 ON n.id = tn2.id_normativa LEFT JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado' ";
     let params = [];
-    let countParams = [];
+    let countParams = []; 
+
+    console.log("Tags recibidos:", tags);
+    console.log("Tipo de tags:", typeof tags);
+    
 
     if (numero) {
         sql += " AND numero = ?";
@@ -72,15 +76,23 @@ async function searchNormativaByParameters(numero,dependencia,emisor,documento,a
         params.push(anio);
         countParams.push(anio);
     }
-    //En esta parte se define cuantos registros queremos mostrar a la hora de buscar registros
-    if (limite) {
-        sql += " LIMIT ?";
-        params.push(limite); 
+    console.log("Tags recibidos al inicio:", tags);
+        if (tags) {
+            
+            sql += ` AND t.nombre = (?)`;
+            countSql += ` AND t.nombre = (?)`;
+            params.push(tags);
+            countParams.push(tags);
+        }
+  
+    sql += " GROUP BY n.id ";
+    
+    if (limite !== null && offset !== null) {
+        sql += " LIMIT ? OFFSET ?";
+        params.push(Number(limite) || 10, Number(offset) || 0);
     }
-    if(offset){
-        sql += " OFFSET ?";
-        params.push(offset);
-    }
+
+   
 
     console.log("Consulta SQL: " + sql);
     console.log(params); 

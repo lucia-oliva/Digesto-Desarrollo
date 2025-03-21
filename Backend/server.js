@@ -5,7 +5,10 @@ import dependencia from "./routes/dependenciaRoute.js";
 import emisores from "./routes/emisoresRoutes.js";
 import tipo_normativa from "./routes/tipo_normativaRoutes.js";
 import normativa from "./routes/normativaRoutes.js";
-
+import path from "path";  
+import { fileURLToPath } from "url";
+import files from "../Backend/routes/filesRoutes.js";
+import tag from "../Backend/routes/tagsRoutes.js";
 // crear el servidor
 const app = express();
 
@@ -13,12 +16,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const __filename = fileURLToPath(import.meta.url);  // 
+const __dirname = path.dirname(__filename); 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // rutas de la api
 app.use("/api/usuarios", usuarios);
 app.use("/api/dependencia", dependencia);
 app.use("/api/emisores", emisores);
 app.use("/api/tipo_normativa", tipo_normativa);
 app.use("/api/normativa", normativa);
+app.use("/api/files", files);
+app.use("/api/tag", tag);
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -5,7 +5,7 @@ const router = express.Router();
 
 //Filtrar normativa por parametros
 router.post('/search', async (req, res) => {
-    let { numero,emisor, documento, anio} = req.body;
+    let { numero,emisor, documento, anio,tags} = req.body;
     let {dependencia}= req.query;
     if(!dependencia){
         dependencia = req.body.dependencia;
@@ -14,12 +14,15 @@ router.post('/search', async (req, res) => {
     let limite = 10;
     //convertir pagina a entero y definir por defecto 1 si no se recibe en la query.
     page = parseInt(page, 10) || 1;
+    
+    console.log("Body recibido en el backend:", req.body);
+    console.log("Tags recibido en el backend:", tags, "Tipo:", typeof tags);
     try {
         // Si hay otros parámetros, filtrar por ellos
         const offset = (page - 1) * limite
         //Get the total count of results
-        
-        const {normativas, totalResults} = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset);
+        console.log("Tags ANTES de llamar a searchNormativaByParameters:", tags, "Tipo:", typeof tags);
+        const {normativas, totalResults} = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset,tags);
         
         if (!normativas || normativas.length === 0) {
             return res.status(404).json({ error: "No se encontró la normativa que coincida con su búsqueda" });
@@ -39,7 +42,7 @@ router.get('/search/tag', async (req, res) => {
         dependencia = req.body.dependencia;
     }
     let {tags} = req.body;
-    if(!tags.length=== 0 || !tags){
+    if(tags.length === 0 || !tags){
         return res.status(400).json({ error: "Debe especificar al menos un tag para la búsqueda" });
     }
     try{
