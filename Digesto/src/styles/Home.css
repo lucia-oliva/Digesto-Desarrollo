@@ -1,0 +1,25 @@
+.landing {
+  background-color: rgb(50, 57, 87);
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/Unlar_web.png");
+  background-size: cover;
+}
+
+.landing-div {
+  background-color: rgb(255, 255, 255);
+  height: 20vh;
+  width: 40vw;
+  border-radius: 50px;
+  opacity: 40%;
+}
+
+.boton {
+  color: rgb(15, 12, 31);
+  position: absolute;
+  background-color: rgb(232, 231, 235);
+  padding: 1% 2%;
+  border-radius: 18px;
+}
