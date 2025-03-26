@@ -7,25 +7,26 @@ async function query(sql, params) {
   try {
     const connection = await pool.getConnection();
     try {
-      const [results] = await connection.query(sql, params);
+      const [result] = await connection.execute(sql, params);
 
-      if (results.length === 0) {
-        throw new Error("No se encontraron resultados");
+      if (!result || result.length === 0) {
+        return null;
       }
-      return results;
+
+      return result;
     } catch (error) {
       if (error.errno === 1045) {
         throw new Error("Invalid credentials");
-      } else {
-        throw error;
       }
+
+      throw error;
     } finally {
       connection.release();
     }
   } catch (error) {
     const { code } = error;
     console.log(error);
-    
+
     return `Error al realizar la consulta: ${code}`;
   }
   // return pool.query(sql, params);
