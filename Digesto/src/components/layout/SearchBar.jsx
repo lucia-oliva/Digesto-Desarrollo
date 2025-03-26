@@ -15,8 +15,8 @@ function SearchBar({onSearch}) {
     setInputValue(value);
     
 
-    if (data?.tags) {
-      const filtered = data.tags.filter(option =>
+    if (value.length >= 2) {
+      const filtered = data.tags.filter((option) =>
         option.nombre.toLowerCase().includes(value.toLowerCase())
       );
       setFilteredOptions(filtered.slice(0, 8));
@@ -37,6 +37,13 @@ function SearchBar({onSearch}) {
       setIsListVisible(false);
     }
   };
+
+  const handleKeyPress =(e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      onSearch(inputValue);
+      setIsListVisible(false);
+    }
+  }
 
   useEffect(() => {
     document.addEventListener('click', handleClickOutside);
@@ -70,8 +77,9 @@ function SearchBar({onSearch}) {
           value={inputValue}
           onChange={handleInputChange}
           onFocus={() => setIsListVisible(true)}
+          onKeyPress={handleKeyPress}
           required
-          placeholder="Buscar..."
+          placeholder="Buscar por tags..."
         />
       </label>
       {inputValue && isListVisible && filteredOptions.length > 0 && (

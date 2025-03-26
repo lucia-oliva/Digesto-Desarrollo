@@ -1,12 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
-
-
-
 function Table({ normativas }) {
-
   
   return (
     <div className="justify-center flex items-center">

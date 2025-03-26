@@ -76,6 +76,10 @@
     font-size: medium;
     font-family: "Raleway",sans-serif;
   }
+
+  #navbar{
+    z-index: 100;
+  }
   
 }
 
@@ -102,6 +106,7 @@
 
   body {
     font-family: "Raleway", sans-serif;
+    background-color: rgb(237, 237, 237)
   }
 
  

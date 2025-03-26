@@ -29,7 +29,7 @@ function Header() {
 
   return (
     <>
-      <div className="navbar bg-primary fixed top-0 flex items-center justify-between px-4 max-h-18">
+      <div className="navbar bg-primary fixed top-0 flex items-center justify-between px-4 max-h-18" id="navbar">
         <div className="navbar-start">
           <Link to="/" className="hover:opacity-80 transition duration-300">
             <img

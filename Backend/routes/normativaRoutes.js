@@ -12,16 +12,11 @@ router.post('/search', async (req, res) => {
     }
     let{page} = req.query;
     let limite = 10;
-    //convertir pagina a entero y definir por defecto 1 si no se recibe en la query.
     page = parseInt(page, 10) || 1;
-    
-    console.log("Body recibido en el backend:", req.body);
-    console.log("Tags recibido en el backend:", tags, "Tipo:", typeof tags);
     try {
         // Si hay otros parámetros, filtrar por ellos
         const offset = (page - 1) * limite
         //Get the total count of results
-        console.log("Tags ANTES de llamar a searchNormativaByParameters:", tags, "Tipo:", typeof tags);
         const {normativas, totalResults} = await normativaDB.searchNormativaByParameters(numero, dependencia, emisor, documento, anio, limite, offset,tags);
         
         if (!normativas || normativas.length === 0) {

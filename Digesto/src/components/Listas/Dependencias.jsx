@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import { IoIosAddCircle } from "react-icons/io";
 import { Link } from "react-router";
 
 const dependenciaEnum = [
@@ -35,7 +34,7 @@ function Dependencias({ dependencias }) {
       {displayedDependencias.map((nombre, index) => (
         <Link
           key={index}
-          to={`/search?dependencia=${nombre}`}
+          to={`busqueda/?dependencia=${nombre}`}
           className={`card  flex flex-1/4 md:flex-1/5 items-center p-2
             text-white font-medium md:text-xl
             ${colors[index] || "bg-slate-400"}

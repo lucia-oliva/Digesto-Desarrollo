@@ -4,8 +4,6 @@ import useAxios from "axios-hooks";
 import Dependencias from "../components/Listas/Dependencias";
 import Table from "../components/layout/Table";
 
-//TODO: Los cards de dependencias quedan por encima del navbar. Creo que sucede lo mismo con la tabla.
-
 function Home() {
   const [normativas, setNormativas] = useState([]);
 
