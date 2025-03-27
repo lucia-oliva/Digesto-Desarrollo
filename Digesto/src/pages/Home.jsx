@@ -44,7 +44,7 @@ function Home() {
               de la Universidad Nacional de La Rioja.
             </p>
             <button
-              className="btn bg-blue-600
+              className="btn bg-primary
                 border-slate-800 text-base-200 shadow-none 
                 hover:bg-primary hover:border-primary"
             >
@@ -60,6 +60,9 @@ function Home() {
         <Dependencias dependencias={[]} />
 
         {/* Section de Normativas mas buscadas */}
+        <div className=" text-center border-b pb-4 mb-4 mt-10">
+        <h2 className="text-xl font-bold">Normativas mas consultadas</h2>
+        </div>
         <Table normativas={normativas}/>
       </section>
     </div>

@@ -75,12 +75,7 @@ function Table({ normativas }) {
                   <td>{normativa.tipo_normativa}</td>
                   <td>{normativa.visitas}</td>
                   <td className="flex flex-col items-center gap-1">
-                    <button
-                      className="btn btn-outline btn-primary btn-sm"
-                    >
-                      Descargar PDF
-                    </button>
-                    <button className="btn btn-outline btn-primary btn-sm">
+                    <button className="btn btn-outline btn-primary btn-sm m-3 p-6">
                       Ver Normativa
                     </button>
                   </td>

@@ -42,7 +42,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
           }}
           className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
             i === currentPage
-              ? "bg-indigo-600 text-white"
+              ? "bg-primary text-white"
               : "text-gray-900 ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
           } focus:z-20 focus:outline-offset-0 cursor-pointer`}
         >

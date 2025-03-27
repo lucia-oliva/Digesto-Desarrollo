@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
-function Form({ dependencia, onSearch }) {
+function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emisor,numero}) {
   const [years, setYears] = useState([]);
-  const [selectedDependencia, setSelectedDependencia] = useState("");
-  const [numero, setNumero] = useState("");
-  const [emisor, setEmisor] = useState("");
-  const [anio, setAnio] = useState("");
-  const [tipoDocumento, setTipoDocumento] = useState("");
+  
+  const [selectedDependencia, setSelectedDependencia] = useState(dependencia);
+  const [selectedNumero, setSelectedNumero] = useState(numero);
+  const [selectedEmisor, setSelectedEmisor] = useState(emisor);
+  const [selectedTipoDocumento, setSelectedTipoDocumento] = useState(documento);
+  const [selectedAnio, setSelectedAnio] = useState(anio);
 
   const dependenciaEnum = [
     "Exactas",
@@ -25,22 +27,8 @@ function Form({ dependencia, onSearch }) {
     "Todas",
   ];
 
-  const dependenciaMap = {
-    "Exactas": "2",
-    "Aplicadas": "1",
-    "Salud": "3",
-    "Sociales": "4",
-    "Humanas": "5",
-    "C. Superior": "20",
-    "Chepes": "22",
-    "Villa Union": "26",
-    "Chamical": "25",
-    "Aimogasta": "24",
-    "Catuna": "23",
-    "Todas": "",
-  };
-
   useEffect(() => {
+    //Esta funcion solo me trae los años de las normativas, para mostrarlas como opciones. 
     const fetchYears = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/normativa/yearNormativa");
@@ -66,34 +54,36 @@ function Form({ dependencia, onSearch }) {
   const handleInputChange = (e, setState) => {
     const value = e.target.value;
     setState(value);
-    onSearch({
-      dependencia: selectedDependencia, 
-      numero, 
-      emisor, 
-      anio, 
-      tipoDocumento
-    });
   };
 
   const handleDependenciaChange = (e) => {
     setSelectedDependencia(e.target.value);
-    onSearch({ dependencia: e.target.value, numero, emisor, anio, tipoDocumento });
+  
   };
 
   const handleEmisorChange = (e) => {
-    setEmisor(e.target.value);
-    onSearch({ dependencia: selectedDependencia, numero, emisor: e.target.value, anio, tipoDocumento });
+    setSelectedEmisor(e.target.value);
   };
 
   const handleAnioChange = (e) => {
-    setAnio(e.target.value);
-    onSearch({ dependencia: selectedDependencia, numero, emisor, anio: e.target.value, tipoDocumento });
+    setSelectedAnio(e.target.value);
   };
 
   const handleTipoDocumentoChange = (e) => {
-    setTipoDocumento(e.target.value);
-    onSearch({ dependencia: selectedDependencia, numero, emisor, anio, tipoDocumento: e.target.value });
+    setSelectedTipoDocumento(e.target.value);
   };
+
+  const handleBuscarClick = () => {
+    onFormChange({
+      dependencia: selectedDependencia,
+      numero: selectedNumero,
+      emisor: selectedEmisor,
+      documento: selectedTipoDocumento,
+      anio: selectedAnio
+    });
+  };
+
+  
 
   return (
     <div className="w-full p-6 rounded-box mb-7">
@@ -105,8 +95,8 @@ function Form({ dependencia, onSearch }) {
             type="text" 
             className="input input-bordered w-full" 
             placeholder="Buscar por numero"
-            value={numero}
-            onChange={(e) => handleInputChange(e, setNumero)}
+            value={selectedNumero}
+            onChange={(e) => handleInputChange(e, setSelectedNumero)}
           />
         </div>
 
@@ -137,7 +127,7 @@ function Form({ dependencia, onSearch }) {
           <label className="text-sm font-medium">Emisor</label>
           <select
             className="select select-bordered w-full"
-            value={emisor}
+            value={selectedEmisor}
             onChange={handleEmisorChange}
           >
             <option value="">Todos los emisores</option>
@@ -154,7 +144,7 @@ function Form({ dependencia, onSearch }) {
           <label className="text-sm font-medium">Año</label>
           <select
             className="select select-bordered w-full"
-            value={anio}
+            value={selectedAnio}
             onChange={handleAnioChange}
           >
             <option value="">Seleccione</option>
@@ -174,7 +164,7 @@ function Form({ dependencia, onSearch }) {
           <label className="text-sm font-medium">Tipo de Documento</label>
           <select
             className="select select-bordered w-full"
-            value={tipoDocumento}
+            value={selectedTipoDocumento}
             onChange={handleTipoDocumentoChange}
           >
             <option value="">Todo los documentos</option>
@@ -188,7 +178,7 @@ function Form({ dependencia, onSearch }) {
         </div>
 
         <div className="flex items-end">
-          <button className="btn btn-neutral w-full">Buscar</button>
+          <button className="btn btn-primary w-full" onClick={handleBuscarClick}>Buscar</button>
         </div>
       </div>
     </div>
