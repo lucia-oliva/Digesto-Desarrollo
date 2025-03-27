@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emisor,numero}) {
+  const navigate = useNavigate();
   const [years, setYears] = useState([]);
-  
   const [selectedDependencia, setSelectedDependencia] = useState(dependencia);
   const [selectedNumero, setSelectedNumero] = useState(numero);
   const [selectedEmisor, setSelectedEmisor] = useState(emisor);
@@ -26,6 +26,21 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
     "C. Superior",
     "Todas",
   ];
+
+  const dependenciaMapInverted = {
+    "2": "Exactas",
+    "1": "Aplicadas",
+    "3": "Salud",
+    "4": "Sociales",
+    "5": "Humanas",
+    "20": "C. Superior",
+    "22": "Chepes",
+    "26": "Villa Union",
+    "25": "Chamical",
+    "24": "Aimogasta",
+    "23": "Catuna",
+    "": "Todas"
+  };
 
   useEffect(() => {
     //Esta funcion solo me trae los años de las normativas, para mostrarlas como opciones. 
@@ -58,7 +73,6 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
 
   const handleDependenciaChange = (e) => {
     setSelectedDependencia(e.target.value);
-  
   };
 
   const handleEmisorChange = (e) => {
@@ -74,6 +88,10 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
   };
 
   const handleBuscarClick = () => {
+    const dependenciaNombre = dependenciaMapInverted[selectedDependencia];
+    // Actualizamos la URL con el número de la dependencia
+    navigate(`?dependencia=${dependenciaNombre}`, { replace: true });
+
     onFormChange({
       dependencia: selectedDependencia,
       numero: selectedNumero,
@@ -119,7 +137,6 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
             <option value="25">Sede Chamical</option>
             <option value="24">Sede Aimogasta</option>
             <option value="23">Sede Catuna</option>
-            <option value="27">Secretaria Relaciones Institucionales</option>
           </select>
         </div>
 

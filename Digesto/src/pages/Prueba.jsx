@@ -120,14 +120,7 @@ function NormativasContainer() {
         
         <div className="flex flex-wrap justify-between items-center border-b pb-4 mb-4">
           <h2 className="text-xl font-bold">Resultados de Normativas</h2>
-          <SearchBar
-            tags={tags}
-            setTags={setTags}
-            onSearch={() => {
-              setCurrentPage(1);
-              refetch();
-            }}
-          />
+          <SearchBar  onSearch={handleSearch}/>
         </div>
 
         {loading ? (
@@ -137,7 +130,7 @@ function NormativasContainer() {
           </div>
         ) : error ? (
           <div className="text-white bg-primary p-4 rounded-lg my-4">
-            Tu búsqueda no arrojó resultados. Ajustá los filtros e intentá nuevamente.
+            Tu búsqueda no arrojó resultados. Ajustá los filtros y/o tags e intentá nuevamente.
           </div>
         ) : (
           <>
@@ -145,7 +138,7 @@ function NormativasContainer() {
             <Pagination
               currentPage={currentPage}
               totalResults={totalResults}
-              resultsPerPage={10}
+              resultsPerPage={resultsPerPage}
               onPageChange={setCurrentPage}
             />
           </>
