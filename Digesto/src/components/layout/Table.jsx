@@ -1,31 +1,9 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
-
-
-
-
 function Table({ normativas }) {
-
-  const handleDownload = (filename) => {
-      const fileUrl = `/pdf/${filename}`
-      console.log(fileUrl);
-      const normativa = normativas.find((normativa) => normativa.archivo === filename);
-      if (normativa) {
-        const link = document.createElement("a");
-        link.href = fileUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        alert("Archivo no disponible");
-      }
-    
-    };
-
+  
   return (
-    <div className="w-screen justify-center flex items-center">
+    <div className="justify-center flex items-center">
       {/* Section de Normativas mas buscadas */}
       <div className="w-auto  text-neutral text-center rounded-lg">
         {/* Vista de Tarjetas en Mobile */}
@@ -56,7 +34,7 @@ function Table({ normativas }) {
               </p>
               <div className="flex flex-col items-center gap-2 mt-2">
                 <button
-                  onClick={() => handleDownload(normativa.archivo)}
+                  
                   className="btn btn-ghost btn-xs"
                 >
                   Descargar PDF
@@ -68,7 +46,7 @@ function Table({ normativas }) {
         </div>
 
         {/* Vista de Tabla en Desktop */}
-        <div className="overflow-x-auto hidden md:block rounded-box border border-base-content/5 bg-base-100 shadow-lg">
+        <div className="overflow-x-auto hidden md:block rounded-box border border-base-content/5 bg-base-100">
           <table className="table-md">
             <thead>
               <tr className="bg-[#F2F2F2]">
@@ -96,13 +74,7 @@ function Table({ normativas }) {
                   <td>{normativa.tipo_normativa}</td>
                   <td>{normativa.visitas}</td>
                   <td className="flex flex-col items-center gap-1">
-                    <button
-                      onClick={() => handleDownload(normativa.archivo)}
-                      className="btn btn-outline btn-primary btn-sm"
-                    >
-                      Descargar PDF
-                    </button>
-                    <button className="btn btn-outline btn-primary btn-sm">
+                    <button className="btn btn-outline btn-primary btn-sm m-3 p-6">
                       Ver Normativa
                     </button>
                   </td>

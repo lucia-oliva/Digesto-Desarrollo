@@ -11,7 +11,7 @@
   --color-base-200: oklch(98% 0 0);
   --color-base-300: oklch(95% 0 0);
   --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(48% 0.243 264.376);
+  --color-primary: oklch(8% 0.243 264.376);
   --color-primary-content: oklch(97% 0.014 254.604);
   --color-secondary: oklch(86% 0.127 207.078);
   --color-secondary-content: oklch(30% 0.056 229.695);
@@ -106,6 +106,17 @@
       --color-neutral-content: var(--color-primary);
     }
   }
+  
+  .button{
+    font-family: "Raleway" ,sans-serif;
+  
+  }
+
+  td{
+    font-size: medium;
+    font-family: "Raleway",sans-serif;
+  }
+  
 }
 
 /* CSS RESET */
@@ -116,6 +127,7 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    
   }
 
   /* For Firefox. */
@@ -130,5 +142,6 @@
 
   body {
     font-family: "Raleway", sans-serif;
+    background-color: rgb(237, 237, 237)
   }
 }

@@ -6,6 +6,7 @@ import emisores from "./routes/emisoresRoutes.js";
 import tipo_normativa from "./routes/tipo_normativaRoutes.js";
 import normativa from "./routes/normativaRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
+import tag from "../Backend/routes/tagsRoutes.js";
 
 // crear el servidor
 const app = express();
@@ -14,6 +15,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const __filename = fileURLToPath(import.meta.url);  // 
+const __dirname = path.dirname(__filename); 
+app.use(express.static(path.join(__dirname, 'public')));
+
 // rutas de la api
 app.use("/api/usuarios", usuarios);
 app.use("/api/dependencia", dependencia);
@@ -21,7 +26,7 @@ app.use("/api/emisores", emisores);
 app.use("/api/tipo_normativa", tipo_normativa);
 app.use("/api/normativa", normativa);
 app.use("/api/file", fileRoutes);
-
+app.use("/api/tag", tag);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
