@@ -30,7 +30,7 @@ function Table({ normativas }) {
       <div className="w-auto  text-neutral text-center rounded-lg">
         {/* Vista de Tarjetas en Mobile */}
         <div className="grid grid-cols-1 md:hidden gap-4">
-          {normativas.map((normativa, index) => (
+          {normativas?.map((normativa, index) => (
             <div
               key={index}
               className="p-4 border rounded-lg shadow-md bg-white text-left"

@@ -30,9 +30,24 @@ async function searchByNumber(number){
 }
 }
 
+async function searchById(id){ 
+    try{
+    const sql = "SELECT n.titulo , CONCAT(n.numero, '/', n.anio) AS numero , n.archivo , n.resumen , DATE_FORMAT(n.fecha_normativa, '%d-%m-%Y') AS fecha ,e.nombre AS emisor,d.nombre AS dependencia,tn.nombre AS tipo_normativa FROM normativa n JOIN emisor e ON n.id_emisor = e.id  JOIN dependencia d ON d.id = n.id_dependencia  JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa WHERE n.id = ?";
+    const results = await db.query(sql, [id]);
+    if(!results){
+        console.log("No se encontró la normativa con el índice", id);
+        return null;
+    }
+    return results[0];
+}catch(err){
+    console.error("Error al buscar normativa por índice: ", err);
+    throw err;
+}   
+}
 
 
 
+//Busqueda avanzada de normativas
 async function searchNormativaByParameters(numero,dependencia,emisor,documento,anio, limite = null, offset = null){
     try{
 
@@ -131,4 +146,4 @@ async function searchNormativasByTags(dependencia, tags) {
 }
 
 
-export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas,searchNormativasByTags, getMostPopularNormatives}; 
+export default {getAllYears, searchByNumber, searchNormativaByParameters,getAllNormativas,searchNormativasByTags, getMostPopularNormatives, searchById}; 

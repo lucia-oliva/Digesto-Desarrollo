@@ -1,9 +1,10 @@
+
 const config = {
   db: {
-    host: "localhost",
-    user: "bs_digesto",
-    password: "admin",
-    database: "bs_digesto",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
     connectTimeout: 600000,
   },
 };

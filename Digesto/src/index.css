@@ -59,6 +59,23 @@
     left: 10%;
   }
 
+  /* Custom button Open SideBar */
+  .btn-custom-reader {
+    position: fixed;
+    top: 50vh;
+    right: 0;
+    padding: 1em 0.5em;
+    writing-mode: sideways-lr;
+    border-radius: 20px 0 0 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+
   /* Custom slide down animation */
   @keyframes slide-down {
     from {
@@ -73,14 +90,6 @@
     animation: slide-down 0.5s ease-in-out;
   }
 
-  .menu {
-    &,
-    &:active {
-      --color-neutral: var(--color-primary-content);
-      --color-neutral-content: var(--color-primary);
-    }
-  }
-
   .button {
     font-family: "Raleway", sans-serif;
   }
@@ -88,6 +97,14 @@
   td {
     font-size: medium;
     font-family: "Raleway", sans-serif;
+  }
+
+  .menu {
+    &,
+    &:active {
+      --color-neutral: var(--color-primary-content);
+      --color-neutral-content: var(--color-primary);
+    }
   }
 }
 

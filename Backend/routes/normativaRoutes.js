@@ -3,6 +3,17 @@ import express from "express";
 
 const router = express.Router();
 
+router.get("/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+        const normativas = await normativaDB.searchById(id);
+        res.json(normativas);
+    } catch (error) {
+        console.log("Error al obtener las normativas", error);
+        res.status(500).json({ error: "Error al obtener las normativas" });
+    }
+});
+
 //Filtrar normativa por parametros
 router.post('/search', async (req, res) => {
     let { numero,emisor, documento, anio} = req.body;
@@ -88,7 +99,6 @@ router.get("/year/:year", async (req, res) => {
     res.status(500).json({ error: "Error al obtener la normativa del año" });   
     }}
 );
-
 
 router.get("/normativas", async (req, res) => {
     try {
