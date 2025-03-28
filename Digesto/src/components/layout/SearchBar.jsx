@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import useAxios from "axios-hooks";
+import PropTypes from "prop-types";
 
 function SearchBar({onSearch}) {
   const [inputValue, setInputValue] = useState('');
@@ -83,7 +84,7 @@ function SearchBar({onSearch}) {
         />
       </label>
       {inputValue && isListVisible && filteredOptions.length > 0 && (
-        <ul ref={listRef} className="options-list mt-2 w-full p-0 m-0 absolute left-0 top-full">
+        <ul ref={listRef} id='options' className="options-list mt-2 w-full p-0 m-0 absolute left-0 top-full">
           {filteredOptions.map((option, index) => (
             <li key={index} className="option-item">
               <button
@@ -99,5 +100,17 @@ function SearchBar({onSearch}) {
     </div>
   );
 }
+
+SearchBar.propTypes = {
+  dependencia: PropTypes.string,
+  onSearch: PropTypes.func.isRequired,
+  dependenciaMap: PropTypes.object.isRequired,
+  anio: PropTypes.number,
+  documento: PropTypes.number,
+  emisor: PropTypes.number,
+  numero: PropTypes.string,
+  onFormChange: PropTypes.func,
+};
+
 
 export default SearchBar;

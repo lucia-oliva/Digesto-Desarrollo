@@ -205,6 +205,12 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
 Form.propTypes = {
   dependencia: PropTypes.string,
   onSearch: PropTypes.func.isRequired,
+  dependenciaMap: PropTypes.object.isRequired,
+  anio: PropTypes.number,
+  documento: PropTypes.number,
+  emisor: PropTypes.number,
+  numero: PropTypes.string,
+  onFormChange: PropTypes.func,
 };
 
 export default Form;

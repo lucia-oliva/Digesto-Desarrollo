@@ -80,6 +80,10 @@
   #navbar{
     z-index: 100;
   }
+
+  #options{
+    z-index: 50;
+  }
   
 }
 
