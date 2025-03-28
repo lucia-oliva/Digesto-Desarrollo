@@ -1,15 +1,15 @@
 import express from "express";
 import db from "../services/db.js";
-import { pdfHandler } from "../utils/fileMiddleware.js";
+import { pdfHandler } from "../Middleware/fileMiddleware.js";
 
 const router = express.Router();
 
 
 //TODO: Agregar validaciones? ( si el estado es eliminado , etc)
 //Download fil
-router.get("/download/:filename", async (req, res) => {
+router.get("/download/", async (req, res) => {
   try {
-    const filename = req.params.filename;
+    const filename = req.query.filename;
     const filePath = `./archivos/${filename}`;
     res.download(filePath);
   } catch (error) {

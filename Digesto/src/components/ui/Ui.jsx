@@ -3,7 +3,7 @@ import { IoExit } from "react-icons/io5";
 
 export const Loading = () => {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row bg-transparent">
       <span className="loading loading-bars self-center w-30 bg-gradient-to-r from-emerald-500 via-cyan-500 to-primary" />
     </div>
   );

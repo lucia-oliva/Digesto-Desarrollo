@@ -1,5 +1,4 @@
 import multer from "multer";
-import path from "path";
 import fs from "fs-extra";
 import db from "../services/db.js";
 
@@ -52,5 +51,4 @@ const storage = multer.diskStorage({
   },
 });
 
-// Exportamos el middleware
 export const pdfHandler = multer({ storage });
