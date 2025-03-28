@@ -9,11 +9,11 @@ function DocumentView() {
   const [pdfUrl, setPdfUrl] = useState("");
 
   const [{ data: normativa, loading }] = useAxios({
-    url: `http://localhost:3000/api/normativa/${id}`,
+    url: `http://localhost:3000/api/normativa/id/${id}`,
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-    },
+    }
   });
 
   return (

@@ -9,7 +9,11 @@ async function query(sql, params) {
     try {
       const [result] = await connection.execute(sql, params);
 
-      if (!result || result.length === 0) {
+      if (result.affectedRows === 0) {
+        return null;
+      }
+
+      if (result.length === 0) {
         return null;
       }
 

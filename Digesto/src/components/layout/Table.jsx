@@ -1,7 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 function Table({ normativas }) {
-  
   return (
     <div className="justify-center flex items-center">
       {/* Section de Normativas mas buscadas */}
@@ -33,13 +32,12 @@ function Table({ normativas }) {
                 <strong>Visitas:</strong> {normativa.visitas}
               </p>
               <div className="flex flex-col items-center gap-2 mt-2">
-                <button
-                  
+                <a
+                  href={`document/${normativa.id}`}
                   className="btn btn-ghost btn-xs"
                 >
-                  Descargar PDF
-                </button>
-                <button className="btn btn-ghost btn-xs">Ver Normativa</button>
+                  Ver Normativa
+                </a>
               </div>
             </div>
           ))}
@@ -61,7 +59,7 @@ function Table({ normativas }) {
               </tr>
             </thead>
             <tbody>
-              {normativas.map((normativa, index) => (
+              {normativas?.map((normativa, index) => (
                 <tr
                   className=" hover:bg-primary-content odd:bg-[#F7F6FE]"
                   key={index}
@@ -74,9 +72,12 @@ function Table({ normativas }) {
                   <td>{normativa.tipo_normativa}</td>
                   <td>{normativa.visitas}</td>
                   <td className="flex flex-col items-center gap-1">
-                    <button className="btn btn-outline btn-primary btn-sm m-3 p-6">
+                    <a
+                      href={`document/${normativa.id}`}
+                      className="btn btn-outline btn-primary btn-sm m-3 p-6"
+                    >
                       Ver Normativa
-                    </button>
+                    </a>
                   </td>
                 </tr>
               ))}

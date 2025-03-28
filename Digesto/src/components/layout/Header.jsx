@@ -13,7 +13,7 @@ function Header() {
     },
     {
       name: "Normativas",
-      href: "#",
+      href: "/busqueda",
       active: location.pathname === "/busqueda" ? true : false,
     },
     {

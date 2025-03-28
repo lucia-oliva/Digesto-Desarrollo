@@ -10,8 +10,11 @@ function Home() {
 
   // Se obtienen las normativas mas buscadas*/
   const [{ data, loading, error }] = useAxios(
-    "http://localhost:3000/api/normativa/normativasMasBuscadas"
-  );
+    {
+      url: "http://localhost:3000/api/normativa/mas-buscadas",
+      method: "GET",
+    }
+  )
 
   useEffect(() => {
     if (data && data.length > 0) {

@@ -1,5 +1,7 @@
 import express from "express";
 import db from "../services/db.js";
+import path from "path";
+import fs from "fs/promises";
 import { pdfHandler } from "../Middleware/fileMiddleware.js";
 
 const router = express.Router();
@@ -7,14 +9,31 @@ const router = express.Router();
 
 //TODO: Agregar validaciones? ( si el estado es eliminado , etc)
 //Download fil
-router.get("/download/", async (req, res) => {
+router.get("/download", async (req, res) => {
   try {
     const filename = req.query.filename;
-    const filePath = `./archivos/${filename}`;
-    res.download(filePath);
+    if (!filename) {
+      return res.status(400).json({ error: "Filename is required" });
+    }
+
+    const filePath = path.resolve("archivos", filename);
+
+    // Check if file exists
+    try {
+      await fs.access(filePath);
+    } catch {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error("Error downloading file:", err);
+        res.status(500).json({ error: "Error downloading file" });
+      }
+    });
   } catch (error) {
-    console.error("Error al descargar el archivo:", error);
-    res.status(500).json({ error: "Error al descargar el archivo" });
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: "Unexpected server error" });
   }
 });
 

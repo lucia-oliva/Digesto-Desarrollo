@@ -8,8 +8,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
     {
       url: `http://localhost:3000/api/file/download`,
       method: "GET",
-      timeout: 10000,
-      responseType: "arraybuffer",
+      responseType: "blob",
     },
     { manual: true }
   );
@@ -23,7 +22,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
         filename,
       },
     }).catch((error) => {
-      console.error(error);
+      console.error(error.message);
     });
   }, [ filename, fetchPdf]);
 

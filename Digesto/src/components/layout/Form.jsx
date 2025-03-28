@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import useAxios from "axios-hooks";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emisor,numero}) {
   const navigate = useNavigate();
@@ -42,19 +42,19 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
     "": "Todas"
   };
 
+  const [{ data: yearsData }] = useAxios(
+    "http://localhost:3000/api/normativa/yearNormativa",
+  );
+  
   useEffect(() => {
-    //Esta funcion solo me trae los años de las normativas, para mostrarlas como opciones. 
-    const fetchYears = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/normativa/yearNormativa");
-        setYears(response.data);
-      } catch (error) {
-        console.error("Error al obtener los años de normativas", error);
-      }
-    };
+    if (yearsData) {
+      setYears(yearsData);
+    }
+  }, [yearsData]);
 
-    fetchYears();
-  }, []);
+
+
+  
 
   useEffect(() => {
     if (dependencia) {

@@ -15,10 +15,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const __filename = fileURLToPath(import.meta.url);  // 
-const __dirname = path.dirname(__filename); 
-app.use(express.static(path.join(__dirname, 'public')));
-
 // rutas de la api
 app.use("/api/usuarios", usuarios);
 app.use("/api/dependencia", dependencia);
@@ -29,7 +25,7 @@ app.use("/api/file", fileRoutes);
 app.use("/api/tag", tag);
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Bienvenido a la api de Digesto!");
 });
 
 // iniciar el servidor

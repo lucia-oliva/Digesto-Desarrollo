@@ -4,11 +4,7 @@ import Pagination from "../components/layout/Pagination";
 import useAxios from "axios-hooks";
 import SearchBar from "../components/layout/SearchBar";
 import Form from "../components/layout/Form";
-import { useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Table from "../components/layout/Table";
-import Pagination from "../components/layout/Pagination";
-import useAxios from "axios-hooks";
+import { useLocation } from "react-router";
 //TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion.
 //TODO: Hay que corregir el front-end de tabla y paginacion.
 
@@ -56,11 +52,13 @@ function NormativasContainer() {
 
   const [{ data, loading, error }, refetch] = useAxios(
     {
-      url: `http://localhost:3000/api/normativa/search?page=${currentPage}`,
+      url: `http://localhost:3000/api/normativa/search`,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      params: {
+        page: currentPage,},
       data: {
         numero: numero,
         emisor: emisor,
@@ -74,14 +72,19 @@ function NormativasContainer() {
   );
 
   useEffect(() => {
-    refetch({
-      numero,
-      emisor,
-      documento,
-      anio,
-      dependencia: newDependencia,
-      tags,
-    });
+    try {
+      refetch({
+        numero,
+        emisor,
+        documento,
+        anio,
+        dependencia: newDependencia,
+        tags,
+      });  
+    } catch (error) {
+      console.error("Error al buscar normativas:", error.message);
+    }
+    
   }, [
     currentPage,
     tags,
