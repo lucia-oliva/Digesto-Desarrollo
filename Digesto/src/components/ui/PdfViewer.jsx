@@ -43,8 +43,8 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
       {loading && <Loading />}
       {error && (
         <Alert
-          message={error.message}
-          title="No se encontro el documento"
+        title="No se encontro el documento "
+        message={error.message}
           error={false}
         />
       )}

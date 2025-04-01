@@ -77,14 +77,13 @@ function DocumentView() {
                 </p>
 
                 {pdfUrl && (
-                  <button
+                  <a
+                    href={pdfUrl}
                     className="btn btn-primary justify-self-end"
-                    onClick={() => {
-                      window.open(pdfUrl, "_blank");
-                    }}
+                    download={normativa?.archivo || "documento.pdf"}
                   >
                     Descargar PDF
-                  </button>
+                  </a>
                 )}
               </div>
             </div>

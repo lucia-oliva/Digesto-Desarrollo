@@ -23,6 +23,10 @@ app.use("/api/tipo_normativa", tipo_normativa);
 app.use("/api/normativa", normativa);
 app.use("/api/file", fileRoutes);
 app.use("/api/tag", tag);
+//endpoints del login
+app.use("/protected", (req,res) => {
+  res.send("Esta es una ruta protegida");
+})
 
 app.get("/", (req, res) => {
   res.send("Bienvenido a la api de Digesto!");

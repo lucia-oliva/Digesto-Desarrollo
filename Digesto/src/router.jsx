@@ -4,7 +4,8 @@ import About from "./pages/About";
 import Header from "./components/layout/Header";
 import Prueba from "./pages/Prueba";
 import DocumentView  from "./pages/documentView";
-
+import Login from "./pages/Login";
+import PaginaPruebaLogin from "./pages/PaginaPruebaLogin";
 // TODO : Agregar rutas y realizar el layout (la sidebar)
 const Router = () => {
   return (
@@ -13,12 +14,17 @@ const Router = () => {
         <Route element={<Header />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
-          <Route path="busqueda" element={<Prueba/>}/>
-          <Route path="document/:id" element={<DocumentView/>} />
+          <Route path="busqueda" element={<Prueba />} />
+          <Route path="document/:id" element={<DocumentView />} />
+          <Route path="admin" element={<PaginaPruebaLogin />} />
         </Route>
+      </Routes>
+      <Routes>
+        <Route path="login" element={<Login/>} />
       </Routes>
     </BrowserRouter>
   );
 };
+
 
 export default Router;

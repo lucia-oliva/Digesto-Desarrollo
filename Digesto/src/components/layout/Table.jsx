@@ -1,60 +1,70 @@
 import PropTypes from "prop-types";
+import { useLocation } from "react-router";
+
 
 function Table({ normativas }) {
+
+  const location = useLocation();
+  const ocultarElemento = location.pathname !== "/busqueda";
+
+
   return (
     <div className="justify-center flex items-center">
       {/* Section de Normativas mas buscadas */}
       <div className="w-auto  text-neutral text-center rounded-lg">
         {/* Vista de Tarjetas en Mobile */}
         <div className="grid grid-cols-1 md:hidden gap-4">
-          {normativas?.map((normativa, index) => (
-            <div
-              key={index}
-              className="p-4 border rounded-lg shadow-md bg-white text-left"
-            >
-              <h2 className="text-lg font-semibold">{normativa.titulo}</h2>
-              <p className="text-sm">
-                <strong>Número:</strong> {normativa.numero}
-              </p>
-              <p className="text-sm">
-                <strong>Fecha:</strong> {normativa.fecha}
-              </p>
-              <p className="text-sm">
-                <strong>Dependencia:</strong> {normativa.dependencia}
-              </p>
-              <p className="text-sm">
-                <strong>Emisor:</strong> {normativa.emisor}
-              </p>
-              <p className="text-sm">
-                <strong>Tipo:</strong> {normativa.tipo_normativa}
-              </p>
-              <p className="text-sm">
-                <strong>Visitas:</strong> {normativa.visitas}
-              </p>
-              <div className="flex flex-col items-center gap-2 mt-2">
-                <a
-                  href={`document/${normativa.id}`}
-                  className="btn btn-ghost btn-xs"
-                >
-                  Ver Normativa
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
+  {normativas?.map((normativa, index) => (
+    <div
+      key={index}
+      className="p-6 border border-gray-200 rounded-lg shadow-lg bg-white transition-all duration-300 hover:shadow-xl"
+    >
+      <h2 className="text-xl font-semibold text-gray-800">{normativa.titulo}</h2>
+      <div className="space-y-2 mt-2">
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Número:</strong> {normativa.numero}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Fecha:</strong> {normativa.fecha}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Dependencia:</strong> {normativa.dependencia}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Emisor:</strong> {normativa.emisor}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Tipo:</strong> {normativa.tipo_normativa}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong className="font-medium">Visitas:</strong> {normativa.visitas}
+        </p>
+      </div>
+      <div className="flex justify-center mt-4">
+        <a
+          href={`document/${normativa.id}`}
+          className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+        >
+          Ver Normativa
+        </a>
+      </div>
+    </div>
+  ))}
+</div>
+
 
         {/* Vista de Tabla en Desktop */}
         <div className="overflow-x-auto hidden md:block rounded-box border border-base-content/5 bg-base-100">
           <table className="table-md">
             <thead>
-              <tr className="bg-[#F2F2F2]">
+              <tr className="bg-primary text-white">
                 <th>Numero</th>
                 <th>Titulo</th>
                 <th>Fecha</th>
                 <th>Dependencia</th>
                 <th>Emisor</th>
                 <th>Tipo</th>
-                <th>Visitas</th>
+               { ocultarElemento && <th>Visitas</th> } 
                 <th>Archivo PDF</th>
               </tr>
             </thead>
@@ -70,10 +80,11 @@ function Table({ normativas }) {
                   <td>{normativa.dependencia}</td>
                   <td>{normativa.emisor}</td>
                   <td>{normativa.tipo_normativa}</td>
-                  <td>{normativa.visitas}</td>
+                  { ocultarElemento && <td>{normativa.visitas}</td> }
+
                   <td className="flex flex-col items-center gap-1">
                     <a
-                      href={`document/${normativa.id}`}
+                      href={`/document/${normativa.id}`}
                       className="btn btn-outline btn-primary btn-sm m-3 p-6"
                     >
                       Ver Normativa

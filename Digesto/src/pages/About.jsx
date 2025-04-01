@@ -20,8 +20,8 @@ function About() {
           </div>
           <div className="w-1/2 gap-4 flex justify-center items-center">
             <img
-              src="https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              alt="Servidores"
+              src="https://www.cellmark.com/wp-content/uploads/2019/10/office-papers.jpg"
+              alt="Persona sosteniendo papeles"
               className="object-cover w-fit rounded-3xl"
             />
           </div>
@@ -37,20 +37,18 @@ function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                Gestión de Normativas
+                Acceso a Normativas
               </h3>
               <p className="text-base font-light text-black">
-                Permite a los usuarios gestionar y actualizar las normativas de
-                la institución de manera eficiente.
+              Consulta fácilmente Ordenanzas, Resoluciones y Actas emitidas por la Institución. Mantente informado sobre la normativa vigente.
               </p>
             </div>
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                Revisión Rápida
+                Convenios Institucionales
               </h3>
               <p className="text-base font-light text-black">
-                Facilita la revisión rápida de las normativas, asegurando que
-                siempre estén actualizadas.
+              Con Digesto podes consultar los acuerdos y convenios firmados con otras instituciones.
               </p>
             </div>
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
@@ -64,29 +62,26 @@ function About() {
             </div>
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                Acceso Seguro
+                Resguardo Digital
               </h3>
               <p className="text-base font-light text-black">
-                Garantiza el acceso seguro a la información, protegiendo los
-                datos sensibles de la institución.
+                Digesto funciona como resguardo digital de toda la documentacion emitida hasta la actualidad.
               </p>
             </div>
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                Soporte Técnico
+                Busqueda Inteligente
               </h3>
               <p className="text-base font-light text-black">
-                Brinda soporte técnico continuo para resolver cualquier problema
-                o duda que pueda surgir.
+              Encuentra documentos fácilmente con un índice de consulta electrónico. Filtra por diferentes criterios y accede a la información que necesitas
               </p>
             </div>
             <div className="feature-card p-6 bg-base-200 rounded-lg shadow-md">
               <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                Actualizaciones Constantes
+              Carácter Informativo
               </h3>
               <p className="text-base font-light text-black">
-                Recibe actualizaciones constantes para mejorar las
-                funcionalidades y la seguridad de la aplicación.
+              Los documentos publicados no tienen validez legal sin autenticación oficial. Consulta con la universidad para obtener copias certificadas.
               </p>
             </div>
           </div>

@@ -2,9 +2,50 @@ import { Outlet } from "react-router";
 import { Link } from "react-router";
 import { IoIosMenu, IoIosClose, IoIosHelpCircleOutline } from "react-icons/io";
 import { useLocation } from "react-router";
+import { FaUserAlt } from "react-icons/fa";
+import { IconContext } from "react-icons/lib";
+
+
 
 function Header() {
   const location = useLocation();
+  console.log(location);
+
+  if(location.pathname === "/admin"){
+    return (
+      <>
+        <div className="navbar bg-primary z-50 fixed top-0 flex items-center justify-between px-4 max-h-18">
+          <div className="navbar-start">
+            <Link to="/" className="hover:opacity-80 transition duration-300">
+              <img
+                src="/src/assets/UnlarLogo.png"
+                alt="UNLaR Logo"
+                className="object-cover max-h-15 mask mask-squircle"
+              />
+            </Link>
+                <h1 className="text-white cls">Digesto - Administracion</h1>
+          </div>
+          <div className="navbar-center hidden md:block">
+
+          </div>
+             <ul className="menu menu-horizontal gap-4">
+              
+              <li className={`menu-item ${location.pathname === "/admin" ? "active" : ""}`}> 
+                <Link to="/admin" className="text-white hover:text-gray-400 transition duration-300">
+                <IconContext.Provider value={{ size: 20, color: "#ffffff"}}>
+                <FaUserAlt/>
+                </IconContext.Provider></Link>
+              </li>
+              
+             </ul>
+        </div>
+        <div className="mx-auto mt-18">
+        <Outlet />
+        </div>
+      </>
+    )
+  }
+
   const navLinks = [
     {
       name: "Inicio",
@@ -26,6 +67,8 @@ function Header() {
       href: "#",
     },
   ];
+
+  
 
   return (
     <>
