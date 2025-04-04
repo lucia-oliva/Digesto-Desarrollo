@@ -5,8 +5,8 @@ import useAxios from "axios-hooks";
 import SearchBar from "../components/layout/SearchBar";
 import Form from "../components/layout/Form";
 import { useLocation } from "react-router";
-//TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion.
-//TODO: Hay que corregir el front-end de tabla y paginacion.
+import ContactModal from "../components/layout/Contact";
+
 
 function NormativasContainer() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -153,6 +153,7 @@ function NormativasContainer() {
           </>
         )}
       </div>
+        <ContactModal />
     </div>
   );
 }
