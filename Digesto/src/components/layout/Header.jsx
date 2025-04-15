@@ -14,7 +14,7 @@ function Header() {
   if(location.pathname === "/admin"){
     return (
       <>
-        <div className="navbar bg-primary z-50 fixed top-0 flex items-center justify-between px-4 max-h-18">
+        <div className="navbar bg-primary z-60 fixed top-0 flex items-center justify-between px-4 max-h-18">
           <div className="navbar-start">
             <Link to="/" className="hover:opacity-80 transition duration-300">
               <img
@@ -23,7 +23,7 @@ function Header() {
                 className="object-cover max-h-15 mask mask-squircle"
               />
             </Link>
-                <h1 className="text-white cls">Digesto - Administracion</h1>
+                <h1 className="text-white cls font-sans">Digesto - Administracion</h1>
           </div>
           <div className="navbar-center hidden md:block">
 

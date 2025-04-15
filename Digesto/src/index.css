@@ -117,6 +117,36 @@
     font-size: medium;
     font-family: "Raleway",sans-serif;
   }
+
+  #sidebar li{
+    padding-bottom: 0.2rem;
+  }
+
+  #button-sidebar{
+    position: relative;
+    display: inline-block;
+  }
+
+  #button-sidebar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 0%;
+    background-color: white;
+    transition: width 0.4s ease-in-out;
+  }
+
+  #button-sidebar:hover::after {
+    width: 100%;
+  }
+
+  #button-sidebar-children:active{
+    background-color: var(--color-base-100);
+    color: var(--color-primary);
+  }
+
   
 }
 
@@ -145,4 +175,6 @@
     font-family: "Raleway", sans-serif;
     background-color: rgb(237, 237, 237)
   }
+
+ 
 }

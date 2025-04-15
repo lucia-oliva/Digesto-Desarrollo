@@ -1,30 +1,104 @@
-function SideBar(){
-    return(
-        <div className="drawer lg:drawer-open">
-        <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col items-center justify-center">
-          {/* Page content here */}
-          <label htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden">
-            Open drawer
-          </label>
-        </div>
-        <div className="drawer-side">
-          <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-          <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-            {/* Sidebar content here */}
-            <li><a>Normativas</a></li>
-            <li><a>Usuarios</a></li>
-            <li><a>Dependencias</a></li>
-            <li><a>Emisores</a></li>
-            <li><a>Auditoria</a></li>
-            <li><a>Palabras Clave</a></li>
-            <li><a>Visitas</a></li>
-            <li><a>Consejo Superior</a></li>
-            <li><a>Salir</a></li>
-          </ul>
-        </div>
-      </div>   
-    )
+import { useState } from "react";
+
+function SideBar() {
+  const [activeItem, setActiveItem] = useState(null); // ítem activo
+  const [openMenu, setOpenMenu] = useState(null); // menú desplegado
+
+  const handleToggle = (title) => {
+    setOpenMenu((prev) => (prev === title ? null : title));
+    setActiveItem(title);
+  };
+
+  const menuItems = [
+    {
+      title: "Normativas",
+      children: ["Nueva Normativa", "Listado", "Normativas Eliminadas"],
+    },
+    {
+      title: "Usuarios",
+      children: ["Crear Usuario", "Listado Usuarios"],
+    },
+    {
+      title: "Dependencias",
+      children: ["Agregar Dependencia", "Listado Dependencias"],
+    },
+    {
+      title: "Emisores",
+      children: ["Agregar Emisor", "Listado Emisores"],
+    },
+    {
+      title: "Auditoria",
+      children: [
+        "Usuarios: Ingresos/Egresos",
+        "Usuarios:Visitas",
+        "Normativas",
+      ],
+    },
+    {
+      title: "Palabras Clave",
+      children: ["Nueva Palabra", "Listado Palabras"],
+    },
+    {
+      title: "Visitas",
+    },
+    {
+      title: "Consejo Superior",
+    },
+    {
+      title: "Salir",
+    },
+  ];
+
+  return (
+    <div className="flex">
+      {/* Sidebar fijo */}
+      <div className="fixed top-0 left-0 h-screen w-50 bg-primary text-white p-4 z-50 pt-20 overflow-y-auto">
+        <ul className="space-y-1">
+          {menuItems.map((item) => (
+            <li key={item.title}>
+              <button
+                id="button-sidebar"
+                onClick={() => handleToggle(item.title)}
+                className={`w-full text-left font-sans px-3 py-2 rounded hover:bg-primary/70 transition ${
+                  activeItem === item.title ? "bg-primary/60 font-semibold" : ""
+                }`}
+              >
+                {item.title}
+              </button>
+
+              {/* Subitems: vertical desplegable */}
+              {item.children && openMenu === item.title && (
+  <ul className="ml-4 mt-1 space-y-1">
+    {item.children.map((subitem) => (
+      <li key={subitem}>
+        <button
+          id="button-sidebar-children"
+          onClick={() => setActiveItem(subitem)}
+          className={`w-full font-sans text-left px-4 py-1 text-sm rounded transition
+            ${
+              activeItem === subitem
+                ? "bg-base-100 text-primary font-semibold"
+                : "hover:bg-base-100 hover:text-primary"
+            }`}
+        >
+          {subitem}
+        </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Contenido principal desplazado */}
+      <div className="ml-60 flex-1 pt-6 px-6">
+        <h1 className="text-2xl font-bold">Perfil Administrador</h1>
+        <p className="text-gray-600">{activeItem || ""}</p>
+      </div>
+    </div>
+  );
 }
 
 export default SideBar;
