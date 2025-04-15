@@ -11,7 +11,7 @@ function Header() {
   const location = useLocation();
   console.log(location);
 
-  if(location.pathname === "/admin"){
+  if(location.pathname === "/administracion"){
     return (
       <>
         <div className="navbar bg-primary z-60 fixed top-0 flex items-center justify-between px-4 max-h-18">

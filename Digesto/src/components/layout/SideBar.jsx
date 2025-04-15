@@ -1,12 +1,19 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function SideBar() {
-  const [activeItem, setActiveItem] = useState(null); // ítem activo
-  const [openMenu, setOpenMenu] = useState(null); // menú desplegado
+  const [activeItem, setActiveItem] = useState(null);
+  const [openMenu, setOpenMenu] = useState(null);
+  const navigate = useNavigate();
 
   const handleToggle = (title) => {
     setOpenMenu((prev) => (prev === title ? null : title));
     setActiveItem(title);
+  };
+
+  const handleSubItemClick = (subitem) => {
+    setActiveItem(subitem);
+    navigate(`/administracion?option=${subitem}`); // Usa la ruta correcta
   };
 
   const menuItems = [
@@ -68,21 +75,21 @@ function SideBar() {
 
               {/* Subitems: vertical desplegable */}
               {item.children && openMenu === item.title && (
-  <ul className="ml-4 mt-1 space-y-1">
-    {item.children.map((subitem) => (
-      <li key={subitem}>
-        <button
-          id="button-sidebar-children"
-          onClick={() => setActiveItem(subitem)}
-          className={`w-full font-sans text-left px-4 py-1 text-sm rounded transition
+                <ul className="ml-4 mt-1 space-y-1">
+                  {item.children.map((subitem) => (
+                    <li key={subitem}>
+                      <button
+                        id="button-sidebar-children"
+                        onClick={() => handleSubItemClick(subitem)} // Pasa el subitem como argumento
+                        className={`w-full font-sans text-left px-4 py-1 text-sm rounded transition
             ${
               activeItem === subitem
                 ? "bg-base-100 text-primary font-semibold"
                 : "hover:bg-base-100 hover:text-primary"
             }`}
-        >
-          {subitem}
-        </button>
+                      >
+                        {subitem}
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -95,7 +102,7 @@ function SideBar() {
       {/* Contenido principal desplazado */}
       <div className="ml-60 flex-1 pt-6 px-6">
         <h1 className="text-2xl font-bold">Perfil Administrador</h1>
-        <p className="text-gray-600">{activeItem || ""}</p>
+        <p className="text-primary">{activeItem || ""}</p>
       </div>
     </div>
   );
