@@ -1,7 +1,17 @@
 import React, { useState } from "react";
+import Table from "./Table";
+import Pagination from "./Pagination";
+import useAxios from "axios-hooks";
 
 function Carga() {
+  const [pasoActual, setPasoActual] = useState(0);
+  const [filteredNormativas, setFilteredNormativas] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const resultsPerPage = 10;
+  const [totalResults, setTotalResults] = useState(0);
+
   const [formData, setFormData] = useState({
+    tipo_normativa: "",
     numero: "",
     anio: "",
     titulo: "",
@@ -9,12 +19,61 @@ function Carga() {
     fecha: "",
     dependencia: "",
     emisor: "",
-    tipo_normativa: "",
     archivo_pdf: null,
     estado: "Publicado",
     cambia_normativa: "NO",
+    normativa_modificada: "",
     palabras_clave: [],
   });
+
+  const [{ loading, error }, refetch] = useAxios(
+    {
+      url: `http://localhost:3000/api/normativa/search`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    { manual: true }
+  );
+
+  const handleSearchNormativas = (numero, page = 1) => {
+    if (numero) {
+      refetch({
+        params: { page, limit: resultsPerPage },
+        data: { numero },
+      })
+        .then((response) => {
+          setFilteredNormativas(response.data.normativas || []);
+          setTotalResults(response.data.totalResults || 0);
+        })
+        .catch((err) => {
+          console.error("Error al buscar normativas:", err.message);
+          setFilteredNormativas([]);
+          setTotalResults(0);
+        });
+    } else {
+      setFilteredNormativas([]);
+      setTotalResults(0);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    handleSearchNormativas(formData.normativa_modificada, page);
+  };
+
+  const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
+  const emisorOptions = ["Decano", "Consejo Superior"];
+  const tipoNormativaOptions = [
+    "Acta",
+    "Resolución",
+    "Convenio",
+    "Nota",
+    "Providencia",
+    "Ordenanza",
+  ];
+  const estadoOptions = ["Publicado", "Despublicado"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,12 +96,12 @@ function Carga() {
       const newTags = value
         .split(/[,|\n]/)
         .map((tag) => tag.trim())
-        .filter(Boolean); // Elimina espacios en blanco y valores vacíos
+        .filter(Boolean);
       setFormData({
         ...formData,
         palabras_clave: [...formData.palabras_clave, ...newTags],
       });
-      e.target.value = ""; // Limpia el input
+      e.target.value = "";
     }
   };
 
@@ -55,309 +114,322 @@ function Carga() {
     });
   };
 
+  const handleTipoSelect = (tipo) => {
+    setFormData({ ...formData, tipo_normativa: tipo });
+    setPasoActual(1);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar el formulario
     console.log(formData);
   };
 
-  const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
-  const emisorOptions = ["Decano", "Consejo Superior"];
-  const tipoNormativaOptions = [
-    "Acta",
-    "Resolución",
-    "Convenio",
-    "Resolucion",
-    "Nota",
-    "Providencia",
-    "Ordenanza",
-  ];
-  const estadoOptions = ["Publicado", "Despublicado"];
-  const cambiaNormativaOptions = ["SI", "NO"];
-
   return (
     <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
-      <h2 className="text-2xl font-semibold mb-4 text-center">
+      <h2 className="text-xl font-semibold mb-4 text-center">
         Agregar Nueva Normativa
       </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Numero y Anio */}
-        <div className="flex space-x-4">
-          <div>
-            <label
-              htmlFor="numero"
-              className="block text-sm font-medium text-gray-700"
+
+      {/* STEPS VISUALES */}
+      <div className="flex justify-center">
+      <ul className="steps mb-6">
+        <li className={`step ${pasoActual >= 0 ? "step-primary" : ""}`}>
+          Seleccionar Normativa
+        </li>
+        <li className={`step ${pasoActual >= 1 ? "step-primary" : ""}`}>
+          Cargar Datos
+        </li>
+        <li className={`step ${pasoActual >= 2 ? "step-primary" : ""}`}>
+          Informacion Extra
+        </li>
+      </ul>
+      </div>
+
+      {/* PASO 1 - Selección de tipo */}
+      {pasoActual === 0 && (
+        <div className=" mb-6">
+        <h3 className="text-lg font-semibold mb-4">
+        Seleccione el tipo de normativa a cargar:</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {tipoNormativaOptions.map((tipo) => (
+            <button
+              key={tipo}
+              onClick={() => handleTipoSelect(tipo)}
+              className={`card p-4 border rounded-md text-center cursor-pointer hover:bg-primary hover:text-white transition ${
+                formData.tipo_normativa === tipo
+                  ? "bg-primary text-white"
+                  : "bg-base-200"
+              }`}
             >
-              Número:
-            </label>
+              {tipo}
+            </button>
+          ))}
+        </div>
+        </div>
+      )}
+
+      {/* PASO 2 - Formulario */}
+      {pasoActual === 1 && (
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+          <div className="flex space-x-4">
+            <div>
+              <label className="block text-sm font-medium">Número:</label>
+              <input
+                type="text"
+                name="numero"
+                value={formData.numero}
+                onChange={handleChange}
+                className="input input-bordered w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium">Año:</label>
+              <input
+                type="text"
+                name="anio"
+                value={formData.anio}
+                onChange={handleChange}
+                className="input input-bordered w-full"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Título:</label>
             <input
               type="text"
-              id="numero"
-              name="numero"
-              value={formData.numero}
+              name="titulo"
+              value={formData.titulo}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+              className="input input-bordered w-full"
             />
           </div>
+
           <div>
-            <label
-              htmlFor="anio"
-              className="block text-sm font-medium text-gray-700"
+            <label className="block text-sm font-medium">Resumen:</label>
+            <textarea
+              name="resumen"
+              value={formData.resumen}
+              onChange={handleChange}
+              className="textarea textarea-bordered w-full"
+              rows={3}
+            ></textarea>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Fecha:</label>
+            <input
+              type="date"
+              name="fecha"
+              value={formData.fecha}
+              onChange={handleChange}
+              className="input input-bordered w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Dependencia:</label>
+            <select
+              name="dependencia"
+              value={formData.dependencia}
+              onChange={handleChange}
+              className="select select-bordered w-full"
             >
-              Año de Normativa:
-            </label>
+              <option value="">Seleccione</option>
+              {dependenciaOptions.map((opt) => (
+                <option key={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Emisor:</label>
+            <select
+              name="emisor"
+              value={formData.emisor}
+              onChange={handleChange}
+              className="select select-bordered w-full"
+            >
+              <option value="">Seleccione</option>
+              {emisorOptions.map((opt) => (
+                <option key={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Archivo PDF:</label>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="file-input file-input-bordered w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Estado:</label>
+            <select
+              name="estado"
+              value={formData.estado}
+              onChange={handleChange}
+              className="select select-bordered w-full"
+            >
+              {estadoOptions.map((opt) => (
+                <option key={opt}>{opt}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Palabras clave:</label>
             <input
               type="text"
-              id="anio"
-              name="anio"
-              value={formData.anio}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+              onKeyDown={handleTagChange}
+              placeholder="Separar con coma o Enter"
+              className="input input-bordered w-full"
             />
-          </div>
-        </div>
-
-        {/* Título */}
-        <div>
-          <label
-            htmlFor="titulo"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Título:
-          </label>
-          <input
-            type="text"
-            id="titulo"
-            name="titulo"
-            value={formData.titulo}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          />
-        </div>
-
-        {/* Resumen */}
-        <div>
-          <label
-            htmlFor="resumen"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Resumen:
-          </label>
-          <textarea
-            id="resumen"
-            name="resumen"
-            value={formData.resumen}
-            onChange={handleChange}
-            rows="3"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          ></textarea>
-        </div>
-
-        {/* Fecha */}
-        <div>
-          <label
-            htmlFor="fecha"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Fecha:
-          </label>
-          <input
-            type="date"
-            id="fecha"
-            name="fecha"
-            value={formData.fecha}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          />
-        </div>
-
-        {/* Dependencia */}
-        <div>
-          <label
-            htmlFor="dependencia"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Dependencia:
-          </label>
-          <select
-            id="dependencia"
-            name="dependencia"
-            value={formData.dependencia}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          >
-            <option value="">Seleccione una dependencia</option>
-            {dependenciaOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Emisor */}
-        <div>
-          <label
-            htmlFor="emisor"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Emisor:
-          </label>
-          <select
-            id="emisor"
-            name="emisor"
-            value={formData.emisor}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          >
-            <option value="">Seleccione un emisor</option>
-            {emisorOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Tipo de Normativa */}
-        <div>
-          <label
-            htmlFor="tipo_normativa"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Tipo de Normativa:
-          </label>
-          <select
-            id="tipo_normativa"
-            name="tipo_normativa"
-            value={formData.tipo_normativa}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          >
-            <option value="">Seleccione un tipo</option>
-            {tipoNormativaOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Archivo PDF */}
-        <div>
-          <label
-            htmlFor="archivo_pdf"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Archivo PDF:
-          </label>
-          <input
-            type="file"
-            id="archivo_pdf"
-            name="archivo_pdf"
-            onChange={handleFileChange}
-            className="mt-1 block w-full text-sm text-slate-500
-      file:mr-4 file:py-2 file:px-4
-      file:rounded-md
-      file:border-0
-      file:text-sm
-      file:font-semibold
-      file:bg-primary file:text-white
-      hover:file:bg-primary-focus
-    "
-          />
-        </div>
-
-        {/* Estado */}
-        <div>
-          <label
-            htmlFor="estado"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Estado:
-          </label>
-          <select
-            id="estado"
-            name="estado"
-            value={formData.estado}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          >
-            {estadoOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Cambia Otra Normativa */}
-        <div>
-          <label
-            htmlFor="cambia_normativa"
-            className="block text-sm font-medium text-gray-700"
-          >
-            ¿Cambia otra normativa?:
-          </label>
-          <select
-            id="cambia_normativa"
-            name="cambia_normativa"
-            value={formData.cambia_normativa}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          >
-            {cambiaNormativaOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Palabras Clave */}
-        <div>
-          <label
-            htmlFor="palabras_clave"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Palabras Clave:
-          </label>
-          <input
-            type="text"
-            id="palabras_clave"
-            name="palabras_clave"
-            onKeyDown={handleTagChange}
-            placeholder="Ingrese palabras clave separadas por coma o Enter"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-          />
-          <div className="mt-2">
-            {formData.palabras_clave.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full bg-primary px-3 py-0.5 text-sm font-medium text-white mr-2 mt-2"
-              >
-                {tag}
-                <button
-                  type="button"
-                  className="ml-2  text-xl text-base-100 hover:text-accent focus:outline-none"
-                  onClick={() => handleRemoveTag(index)}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {formData.palabras_clave.map((tag, i) => (
+                <span
+                  key={i}
+                  className="badge badge-primary gap-1"
                 >
-                  &times;
-                </button>
-              </span>
-            ))}
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveTag(i)}
+                    className="ml-1"
+                  >
+                    &times;
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={() => setPasoActual(0)}
+              className="btn btn-outline"
+            >
+              Volver
+            </button>
+            <button
+              type="button"
+              onClick={() => setPasoActual(2)}
+              className="btn btn-primary"
+            >
+              Siguiente
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* PASO 3 - Pregunta condicional */}
+      {pasoActual === 2 && (
+        <div className="space-y-6 mt-6">
+          <div>
+            <h3 className="text-lg font-semibold">
+              ¿Su normativa modifica, deroga o complementa a otra?
+            </h3>
+            <div className="flex gap-4 mt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData({ ...formData, cambia_normativa: "SI" })
+                }
+                className={`btn ${
+                  formData.cambia_normativa === "SI"
+                    ? "btn-primary"
+                    : "btn-outline"
+                }`}
+              >
+                Sí
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData({
+                    ...formData,
+                    cambia_normativa: "NO",
+                    normativa_modificada: "",
+                  })
+                }
+                className={`btn ${
+                  formData.cambia_normativa === "NO"
+                    ? "btn-primary"
+                    : "btn-outline"
+                }`}
+              >
+                No
+              </button>
+            </div>
+          </div>
+
+          {formData.cambia_normativa === "SI" && (
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Ingrese el número de la normativa que es afectada:
+              </label>
+              <input
+    
+                type="text"
+                name="normativa_modificada"
+                value={formData.normativa_modificada}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData((prev) => ({
+                    ...prev,
+                    normativa_modificada: value,
+                  }));
+                  setCurrentPage(1); // Reset to first page on new search
+                  handleSearchNormativas(value, 1);
+                }}
+                className="input input-bordered w-full mb-3"
+              />
+
+              {formData.normativa_modificada && (
+                <>
+                  {loading ? (
+                    <p>Cargando resultados...</p>
+                  ) : error ? (
+                    <p className="text-red-500">Error al buscar normativas.</p>
+                  ) : filteredNormativas.length > 0 ? (
+                    <>
+                      <Table normativas={filteredNormativas} />
+                      <Pagination
+                        currentPage={currentPage}
+                        totalResults={totalResults}
+                        resultsPerPage={resultsPerPage}
+                        onPageChange={handlePageChange}
+                      />
+                    </>
+                  ) : (
+                    <p className="text-gray-500">No se encontraron normativas.</p>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          <div className="flex justify-between">
+            <button
+              type="button"
+              onClick={() => setPasoActual(1)}
+              className="btn btn-outline mt-5"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              className="btn btn-success mt-5"
+            >
+              Finalizar
+            </button>
           </div>
         </div>
-
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary-focus focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-          >
-            Agregar Normativa
-          </button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }
