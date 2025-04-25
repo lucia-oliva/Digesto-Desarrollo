@@ -9,6 +9,12 @@ async function getAllYears() {
   return results;
 }
 
+async function getEliminatedNormatives(){
+  const sql = "SELECT n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa, n.visitas, d.nombre AS dependencia FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa WHERE n.estado = 'eliminada'";
+  const results = await db.query(sql, []);
+  return results;
+}
+
 async function getAllNormativas() {
   const sql =
     "SELECT n.titulo, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa, n.visitas, d.nombre AS dependencia, COUNT(*) AS total_busqueda FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa GROUP BY n.id, n.titulo, e.nombre, n.numero, n.fecha_normativa, tn.nombre, n.visitas  DESC LIMIT 10";
@@ -158,4 +164,5 @@ export default {
   searchNormativasByTags,
   getMostPopularNormatives,
   searchById,
+  getEliminatedNormatives,
 };

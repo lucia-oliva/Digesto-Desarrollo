@@ -14,6 +14,8 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
+
+
 //Filtrar normativa por parametros
 router.post("/search", async (req, res) => {
   let { numero, emisor, documento, anio, tags } = req.body;
@@ -141,6 +143,20 @@ router.get("/normativas", async (req, res) => {
     console.log("Error al obtener las normativas", error);
     res.status(500).json({ error: "Error al obtener las normativas" });
   }
+});
+
+
+//Normativas eliminadas 
+
+router.get("/deleted", async (req, res) => {
+  try{
+    const normativas = await normativaDB.getEliminatedNormatives();
+    res.json(normativas);
+  }catch (error) {
+    console.log("Error al obtener las normativas eliminadas", error);
+    res.status(500).json({ error: "Error al obtener las normativas eliminadas" });
+  }
+
 });
 
 //Filtrar normativas mas buscadas
