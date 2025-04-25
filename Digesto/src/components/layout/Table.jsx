@@ -2,14 +2,20 @@ import PropTypes from "prop-types";
 import { useLocation } from "react-router";
 import { useState } from "react";
 
-function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas = [], onDeseleccionarNormativas }) {
+function Table({
+  normativas,
+  onSeleccionarNormativas,
+  normativasSeleccionadas = [],
+  onDeseleccionarNormativas,
+}) {
   const location = useLocation();
   const isNuevaNormativa =
     location.pathname === "/administracion" &&
     new URLSearchParams(location.search).get("option") === "Nueva Normativa";
+  const isAdminList = location.pathname === "/administracion";
 
-  const ocultarVisitas =
-    location.pathname === "/busqueda" || isNuevaNormativa;
+
+  const ocultarVisitas = location.pathname === "/busqueda" || isNuevaNormativa;
 
   const [modalData, setModalData] = useState(null);
   const [selectedAction, setSelectedAction] = useState("");
@@ -38,8 +44,7 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
       titulo: modalData.titulo,
       accion: selectedAction,
       comentario: selectedComment,
-
-    }); 
+    });
     closeModal();
   };
 
@@ -48,7 +53,6 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
   };
 
   const isSelected = (id) => normativasSeleccionadas.some((n) => n.id === id);
-
 
   return (
     <div className="justify-center flex items-center">
@@ -59,17 +63,34 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
               key={normativa.id}
               className="p-6 border border-gray-200 rounded-lg shadow-lg bg-white transition-all duration-300 hover:shadow-xl"
             >
-              <h2 className="text-xl font-semibold text-gray-800">{normativa.titulo}</h2>
+              <h2 className="text-xl font-semibold text-gray-800">
+                {normativa.titulo}
+              </h2>
               <div className="space-y-2 mt-2">
-                <p className="text-sm text-gray-600"><strong>Número:</strong> {normativa.numero}</p>
-                <p className="text-sm text-gray-600"><strong>Fecha:</strong> {normativa.fecha}</p>
-                <p className="text-sm text-gray-600"><strong>Dependencia:</strong> {normativa.dependencia}</p>
-                <p className="text-sm text-gray-600"><strong>Emisor:</strong> {normativa.emisor}</p>
-                <p className="text-sm text-gray-600"><strong>Tipo:</strong> {normativa.tipo_normativa}</p>
-                {!ocultarVisitas && <p className="text-sm text-gray-600"><strong>Visitas:</strong> {normativa.visitas}</p>}
+                <p className="text-sm text-gray-600">
+                  <strong>Número:</strong> {normativa.numero}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Fecha:</strong> {normativa.fecha}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Dependencia:</strong> {normativa.dependencia}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Emisor:</strong> {normativa.emisor}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Tipo:</strong> {normativa.tipo_normativa}
+                </p>
+                {!ocultarVisitas && (
+                  <p className="text-sm text-gray-600">
+                    <strong>Visitas:</strong> {normativa.visitas}
+                  </p>
+                )}
               </div>
               <div className="flex justify-center mt-4">
-                {isNuevaNormativa ? (
+                
+                  {isNuevaNormativa ? (
                   isSelected(normativa.id) ? (
                     <button
                       onClick={() => handleDeselect(normativa.id)}
@@ -79,12 +100,33 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
                     </button>
                   ) : (
                     <button
-                      onClick={() => openModal({ id: normativa.id, titulo: normativa.titulo })}
+                      onClick={() =>
+                        openModal({
+                          id: normativa.id,
+                          titulo: normativa.titulo,
+                        })
+                      }
                       className="btn btn-primary btn-md"
                     >
                       Seleccionar
                     </button>
                   )
+                ) : isAdminList ? (
+                  <>
+                    <a
+                    href={`document/${normativa.id}`}
+                    className="btn btn-primary btn-md"
+                  >
+                    Ver Normativa
+                  </a>
+                  
+                  <button className="btn btn-secondary btn-md px-11 m-1">
+                  Editar</button>
+
+                  <button className="btn btn-error btn-md px-11 m-1"
+                  >Eliminar</button>
+
+                  </>
                 ) : (
                   <a
                     href={`document/${normativa.id}`}
@@ -109,19 +151,26 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
                 <th className="py-4">Emisor</th>
                 <th className="py-4">Tipo</th>
                 {!ocultarVisitas && <th className="py-4">Visitas</th>}
-                <th className="py-4">{isNuevaNormativa ? "Seleccionar" : "Archivo PDF"}</th>
+                <th className="py-4">
+                  {isNuevaNormativa ? "Seleccionar" : "Archivo PDF"}
+                </th>
               </tr>
             </thead>
             <tbody>
               {normativas?.map((normativa) => (
-                <tr className="hover:bg-primary-content odd:bg-[#F7F6FE]" key={normativa.id}>
+                <tr
+                  className="hover:bg-primary-content odd:bg-[#F7F6FE]"
+                  key={normativa.id}
+                >
                   <td className="py-9">{normativa.numero}</td>
                   <td className="py-9">{normativa.titulo}</td>
                   <td className="py-9">{normativa.fecha}</td>
                   <td className="py-9">{normativa.dependencia}</td>
                   <td className="py-9">{normativa.emisor}</td>
                   <td className="py-9">{normativa.tipo_normativa}</td>
-                  {!ocultarVisitas && <td className="py-9">{normativa.visitas}</td>}
+                  {!ocultarVisitas && (
+                    <td className="py-9">{normativa.visitas}</td>
+                  )}
                   <td>
                     {isNuevaNormativa ? (
                       isSelected(normativa.id) ? (
@@ -133,13 +182,35 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
                         </button>
                       ) : (
                         <button
-                          onClick={() => openModal({ id: normativa.id, titulo: normativa.titulo, numero: normativa.numero })}
+                          onClick={() =>
+                            openModal({
+                              id: normativa.id,
+                              titulo: normativa.titulo,
+                              numero: normativa.numero,
+                            })
+                          }
                           className="btn btn-outline btn-md  py-6 hover:bg-primary hover:text-white "
                         >
                           Seleccionar
                         </button>
                       )
-                    ) : (
+                    ): isAdminList ? (
+                      <>
+                        <a
+                        href={`document/${normativa.id}`}
+                        className="btn btn-primary btn-md"
+                      >
+                        Ver Normativa
+                      </a>
+                      
+                      <button className="btn btn-secondary btn-md  px-11 m-1">
+                      Editar</button>
+    
+                      <button className="btn btn-error btn-md  px-9 "
+                      >Eliminar</button>
+    
+                      </>
+                    )  : (
                       <a
                         href={`/document/${normativa.id}`}
                         className="btn btn-outline btn-md hover:bg-primary hover:text-white py-6"
@@ -161,7 +232,9 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
           <div className="relative bg-white p-6 rounded-lg shadow-lg w-96 z-50">
             <h2 className="text-sm font-bold mb-4">Normativa afectada</h2>
             <p className="mb-4 text-sm">{modalData?.titulo}</p>
-            <h2 className="text-sm font-bold mb-2">Indique el tipo de acción que se aplica sobre esta normativa</h2>
+            <h2 className="text-sm font-bold mb-2">
+              Indique el tipo de acción que se aplica sobre esta normativa
+            </h2>
             <select
               value={selectedAction}
               onChange={(e) => setSelectedAction(e.target.value)}
@@ -172,7 +245,9 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
               <option value="Modifica">Modificación</option>
               <option value="Complementa">Complementación</option>
             </select>
-            <h2 className="text-sm font-bold mb-2">Detalle de la modificación</h2>
+            <h2 className="text-sm font-bold mb-2">
+              Detalle de la modificación
+            </h2>
             <textarea
               className="textarea textarea-bordered w-full mb-4"
               placeholder="Escriba sus comentarios aquí..."
@@ -181,8 +256,14 @@ function Table({ normativas, onSeleccionarNormativas,  normativasSeleccionadas =
             ></textarea>
 
             <div className="flex justify-end gap-2">
-              <button onClick={closeModal} className="btn btn-outline btn-md">Cancelar</button>
-              <button onClick={handleAccept} className="btn btn-primary btn-md" disabled={!selectedAction}>
+              <button onClick={closeModal} className="btn btn-outline btn-md">
+                Cancelar
+              </button>
+              <button
+                onClick={handleAccept}
+                className="btn btn-primary btn-md"
+                disabled={!selectedAction}
+              >
                 Aceptar
               </button>
             </div>
@@ -209,7 +290,7 @@ Table.propTypes = {
   ).isRequired,
   onSeleccionarNormativas: PropTypes.func.isRequired,
   onDeseleccionarNormativas: PropTypes.func.isRequired,
-  normativasSeleccionadas: PropTypes.array, 
+  normativasSeleccionadas: PropTypes.array,
 };
 
 export default Table;

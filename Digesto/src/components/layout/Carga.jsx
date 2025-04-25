@@ -132,41 +132,43 @@ function Carga() {
 
       {/* STEPS VISUALES */}
       <div className="flex justify-center">
-      <ul className="steps mb-6">
-        <li className={`step ${pasoActual >= 0 ? "step-primary" : ""}`}>
-          Seleccionar Normativa
-        </li>
-        <li className={`step ${pasoActual >= 1 ? "step-primary" : ""}`}>
-          Cargar Datos
-        </li>
-        <li className={`step ${pasoActual >= 2 ? "step-primary" : ""}`}>
-          Informacion Extra
-        </li>
-        <li className={`step ${pasoActual >= 3 ? "step-primary" : ""}`}
-          >Verificación</li>
-      </ul>
+        <ul className="steps mb-6">
+          <li className={`step ${pasoActual >= 0 ? "step-primary" : ""}`}>
+            Seleccionar Normativa
+          </li>
+          <li className={`step ${pasoActual >= 1 ? "step-primary" : ""}`}>
+            Cargar Datos
+          </li>
+          <li className={`step ${pasoActual >= 2 ? "step-primary" : ""}`}>
+            Informacion Extra
+          </li>
+          <li className={`step ${pasoActual >= 3 ? "step-primary" : ""}`}>
+            Verificación
+          </li>
+        </ul>
       </div>
 
       {/* PASO 1 - Selección de tipo */}
       {pasoActual === 0 && (
         <div className=" mb-6">
-        <h3 className="text-lg font-semibold mb-4">
-        Seleccione el tipo de normativa a cargar:</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {tipoNormativaOptions.map((tipo) => (
-            <button
-              key={tipo}
-              onClick={() => handleTipoSelect(tipo)}
-              className={`card p-4 border rounded-md text-center cursor-pointer hover:bg-primary hover:text-white transition ${
-                formData.tipo_normativa === tipo
-                  ? "bg-primary text-white"
-                  : "bg-base-200"
-              }`}
-            >
-              {tipo}
-            </button>
-          ))}
-        </div>
+          <h3 className="text-lg font-semibold mb-4">
+            Seleccione el tipo de normativa a cargar:
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {tipoNormativaOptions.map((tipo) => (
+              <button
+                key={tipo}
+                onClick={() => handleTipoSelect(tipo)}
+                className={`card p-4 border rounded-md text-center cursor-pointer hover:bg-primary hover:text-white transition ${
+                  formData.tipo_normativa === tipo
+                    ? "bg-primary text-white"
+                    : "bg-base-200"
+                }`}
+              >
+                {tipo}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -292,10 +294,7 @@ function Carga() {
             />
             <div className="mt-2 flex flex-wrap gap-2">
               {formData.palabras_clave.map((tag, i) => (
-                <span
-                  key={i}
-                  className="badge badge-primary gap-1"
-                >
+                <span key={i} className="badge badge-primary gap-1">
                   {tag}
                   <button
                     type="button"
@@ -325,7 +324,6 @@ function Carga() {
             >
               Siguiente
             </button>
-
           </div>
         </form>
       )}
@@ -377,7 +375,6 @@ function Carga() {
                 Ingrese el número de la normativa que es afectada:
               </label>
               <input
-    
                 type="text"
                 name="normativa_modificada"
                 value={formData.normativa_modificada}
@@ -400,27 +397,37 @@ function Carga() {
                   ) : error ? (
                     <p className="text-red-500">Error al buscar normativas.</p>
                   ) : filteredNormativas.length > 0 ? (
-                    <> 
-                      <Table 
-                      normativas={filteredNormativas}
-                      normativasSeleccionadas={formData.normativas_modificadas}
-                      onSeleccionarNormativas={(normativa) => {
-                        setFormData((prev) => {
-                          const yaExiste = prev.normativas_modificadas?.some((n) => n.id === normativa.id);
-                          if (yaExiste) return prev;
-                          return {
+                    <>
+                      <Table
+                        normativas={filteredNormativas}
+                        normativasSeleccionadas={
+                          formData.normativas_modificadas
+                        }
+                        onSeleccionarNormativas={(normativa) => {
+                          setFormData((prev) => {
+                            const yaExiste = prev.normativas_modificadas?.some(
+                              (n) => n.id === normativa.id
+                            );
+                            if (yaExiste) return prev;
+                            return {
+                              ...prev,
+                              normativas_modificadas: [
+                                ...(prev.normativas_modificadas || []),
+                                normativa,
+                              ],
+                            };
+                          });
+                        }}
+                        onDeseleccionarNormativas={(id) => {
+                          setFormData((prev) => ({
                             ...prev,
-                            normativas_modificadas: [...(prev.normativas_modificadas || []), normativa],
-                          };
-                        });
-                      }}
-                      onDeseleccionarNormativas={(id) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          normativas_modificadas: prev.normativas_modificadas.filter((n) => n.id !== id)
-                        }));
-                      }}
-                       />
+                            normativas_modificadas:
+                              prev.normativas_modificadas.filter(
+                                (n) => n.id !== id
+                              ),
+                          }));
+                        }}
+                      />
                       <Pagination
                         currentPage={currentPage}
                         totalResults={totalResults}
@@ -429,7 +436,9 @@ function Carga() {
                       />
                     </>
                   ) : (
-                    <p className="text-gray-500">No se encontraron normativas.</p>
+                    <p className="text-gray-500">
+                      No se encontraron normativas.
+                    </p>
                   )}
                 </>
               )}
@@ -455,67 +464,98 @@ function Carga() {
         </div>
       )}
 
-    {pasoActual === 3 && (
-     <div className="space-y-6 mt-6">
-     <h3 className="text-lg font-semibold mb-4 text-center">Verifique los datos ingresados:</h3>
+      {pasoActual === 3 && (
+        <div className="space-y-6 mt-6">
+          <h3 className="text-lg font-semibold mb-4 text-center">
+            Verifique los datos ingresados:
+          </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="bg-base-200 p-4 rounded-lg">
-        <p><strong>Tipo de Normativa:</strong> {formData.tipo_normativa}</p>
-        <p><strong>Número:</strong> {formData.numero}</p>
-        <p><strong>Año:</strong> {formData.anio}</p>
-        <p><strong>Título:</strong> {formData.titulo}</p>
-        <p><strong>Resumen:</strong> {formData.resumen}</p>
-        <p><strong>Fecha:</strong> {formData.fecha}</p>
-        <p><strong>Archivo PDF:</strong> {formData.archivo_pdf ? formData.archivo_pdf.name : "No se ha cargado ningún archivo"}</p>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-base-200 p-4 rounded-lg">
+              <p>
+                <strong>Tipo de Normativa:</strong> {formData.tipo_normativa}
+              </p>
+              <p>
+                <strong>Número:</strong> {formData.numero}
+              </p>
+              <p>
+                <strong>Año:</strong> {formData.anio}
+              </p>
+              <p>
+                <strong>Título:</strong> {formData.titulo}
+              </p>
+              <p>
+                <strong>Resumen:</strong> {formData.resumen}
+              </p>
+              <p>
+                <strong>Fecha:</strong> {formData.fecha}
+              </p>
+              <p>
+                <strong>Archivo PDF:</strong>{" "}
+                {formData.archivo_pdf
+                  ? formData.archivo_pdf.name
+                  : "No se ha cargado ningún archivo"}
+              </p>
+            </div>
 
-      <div className="bg-base-200 p-4 rounded-lg">
-        <p><strong>Dependencia:</strong> {formData.dependencia}</p>
-        <p><strong>Emisor:</strong> {formData.emisor}</p>
-        <p><strong>Estado:</strong> {formData.estado}</p>
-        <p><strong>Modifica otra normativa:</strong> {formData.cambia_normativa}</p>
-        {formData.cambia_normativa === "SI" && formData.normativas_modificadas?.length > 0 && (
-    <>
-      <p><strong>Normativas Afectadas:</strong></p>
-      <ul className="list-disc list-inside">
-        {formData.normativas_modificadas.map((n, i) => (
-          <li key={i}>
-            {n.numero} - {n.accion} {n.comentario && `(${n.comentario})`}
-          </li>
-        ))}
-      </ul>
-    </>
-  )}
+            <div className="bg-base-200 p-4 rounded-lg">
+              <p>
+                <strong>Dependencia:</strong> {formData.dependencia}
+              </p>
+              <p>
+                <strong>Emisor:</strong> {formData.emisor}
+              </p>
+              <p>
+                <strong>Estado:</strong> {formData.estado}
+              </p>
+              <p>
+                <strong>Modifica otra normativa:</strong>{" "}
+                {formData.cambia_normativa}
+              </p>
+              {formData.cambia_normativa === "SI" &&
+                formData.normativas_modificadas?.length > 0 && (
+                  <>
+                    <p>
+                      <strong>Normativas Afectadas:</strong>
+                    </p>
+                    <ul className="list-disc list-inside">
+                      {formData.normativas_modificadas.map((n, i) => (
+                        <li key={i}>
+                          {n.numero} - {n.accion}{" "}
+                          {n.comentario && `(${n.comentario})`}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
 
-  <p><strong>Palabras Clave:</strong> {formData.palabras_clave.join(", ")}</p>
-</div>
-    
-    </div>
+              <p>
+                <strong>Palabras Clave:</strong>{" "}
+                {formData.palabras_clave.join(", ")}
+              </p>
+            </div>
+          </div>
 
-    <div className="flex justify-between mt-6">
-      <button
-        type="button"
-        onClick={() => setPasoActual(2)}
-        className="btn btn-outline"
-      >
-        Volver
-      </button>
-      <button
-        type="submit"
-        onClick={handleSubmit}
-        className="btn btn-success"
-      >
-        Confirmar y Finalizar
-      </button>
-    </div>
-    </div>
-    )}
-
+          <div className="flex justify-between mt-6">
+            <button
+              type="button"
+              onClick={() => setPasoActual(2)}
+              className="btn btn-outline"
+            >
+              Volver
+            </button>
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="btn btn-success"
+            >
+              Confirmar y Finalizar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default Carga;
-
-
