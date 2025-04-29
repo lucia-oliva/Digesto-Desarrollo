@@ -2,6 +2,25 @@ import db from "./db.js";
 
 //BASIC CRUD
 
+//Delete by id
+
+async function deleteNormativaById(id) {
+  try {
+    await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
+    const sql = "DELETE FROM normativa WHERE id = ?";
+    const result = await db.query(sql, [id]);
+    if (result.affectedRows === 0) {
+      console.log(`No se encontró la normativa con el ID ${id}`);
+      return { success: false, message: "Normativa no encontrada" };
+    }
+    return { success: true, message: "Normativa eliminada correctamente" };
+  } catch (error) {
+    console.error("Error al eliminar la normativa:", error);
+    throw error;
+  }
+}
+
+
 //ENDPOINTS ESPECIFICOS
 async function getAllYears() {
   const sql = "SELECT DISTINCT anio FROM normativa";
@@ -24,7 +43,7 @@ async function getAllNormativas() {
 
 async function searchByNumber(number) {
   try {
-    const sql = "SELECT * FROM normativa WHERE numero =?";
+    const sql = "SELECT * FROM normativa WHERE numero = ?";
     const results = await db.query(sql, [number]);
     if (results.length === 0) {
       console.log("No se encontró la normativa con el número", number);
@@ -66,7 +85,7 @@ async function searchNormativaByParameters(
 ) {
   try {
     let sql =
-      "SELECT t.nombre,n.id, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
+      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
     let params = [];
 
     if (numero) {
@@ -165,4 +184,5 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
+  deleteNormativaById
 };

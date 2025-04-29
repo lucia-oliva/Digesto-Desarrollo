@@ -1,6 +1,10 @@
 import normativaDB from "../services/normativa.js";
 import express from "express";
 
+//TODO: A la hora de hacer auditorias, verificar en la funcion de eliminar normativas
+//se se elimina todo lo que corresponde, al igual que la funcion de editar. 
+
+
 const router = express.Router();
 
 router.get("/id/:id", async (req, res) => {
@@ -14,13 +18,27 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
+//Eliminar normativa por id
 
+router.delete("/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await normativaDB.deleteNormativaById(id);
+    if (!result.success) {
+      return res.status(404).json({ error: result.message });
+    }
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error("Error al eliminar la normativa:", error);
+    res.status(500).json({ error: "Error al eliminar la normativa" });
+  }
+});
 
 //Filtrar normativa por parametros
 router.post("/search", async (req, res) => {
   let { numero, emisor, documento, anio, tags } = req.body;
   let { dependencia } = req.query;
-
+  console.log("parametros:", numero,emisor,documento,anio,tags,dependencia);
   if (!dependencia) {
     dependencia = req.body.dependencia;
   }
