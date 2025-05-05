@@ -3,10 +3,9 @@ import { useLocation } from "react-router";
 import { useState } from "react";
 
 // TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
-//TODO: Hay que hacer la funcion en el back para modificacion.
 // TODO: Hay que verificar una manera de implementar las alertas despues de que sea visible los cambios en la tabla por (eliminacion/modificacion)
-//TODO: En el modal para editar faltan datos, lograr recopilar los tags para que el usuario pueda editarlos o eliminar/agregar.
-
+//TODO: los tags se toman como array en la bd y no se guardan a no ser que hay uno solo..
+//TODO: cuando editamos se tiene que seleccionar tofos los campos en el caso de que los select no sean clickeados se mandan como null... 
 function Table({
   normativas,
   onSeleccionarNormativas,
@@ -63,6 +62,38 @@ function Table({
     "Providencia",
     "Ordenanza",
   ];
+
+  const dependenciaMap = {
+    "Aplicadas": 1,
+    "Exactas": 2,
+    "Humanidades": 5,
+    "Salud": 3,
+    "Sociales": 4,
+    "Sede Chepes": 22,
+    "Sede Chamical": 25,
+    "Sede Villa Unión": 26,
+    "Sede Catuna": 23,
+    "Sede Aimogasta": 24,
+    "Consejo Superior": 20,
+  };
+  
+  const tipoNormativaMap = {
+    "Acta": 2,
+    "Resolucion": 5,
+    "Convenio": 3,
+    "Nota": 6,
+    "Providencia": 4,
+    "Ordenanza": 1,
+  };
+  
+  const emisorMap = {
+    "Decano": 1,
+    "Consejo Superior": 4,
+    "Rector": 2,
+    "Concejo Directivo": 3,
+    "Interdepartamental": 5,
+    "Relaciones Institucionales": 11,
+  };
   const estadoOptions = ["Publicado", "Despublicado"];
 
   const openEditModal = async (normativa) => {
@@ -73,16 +104,23 @@ function Table({
       const tags = await responseTags.json();
 
       setEditModalData({
+        id: normativa.id,
         numero: normativa.numero || "",
         anio: normativa.anio || "",
         titulo: normativa.titulo || "",
         resumen: normativa.resumen || "",
         fecha: normativa.fecha || "",
-        dependencia: normativa.dependencia || "",
-        emisor: normativa.emisor || "",
-        tipo_normativa: normativa.tipo_normativa || "",
+        dependencia: Object.keys(dependenciaMap).find(
+          (key) => dependenciaMap[key] === normativa.dependencia
+        ) || "",
+        emisor: Object.keys(emisorMap).find(
+          (key) => emisorMap[key] === normativa.emisor
+        ) || "",
+        tipo_normativa: Object.keys(tipoNormativaMap).find(
+          (key) => tipoNormativaMap[key] === normativa.tipo_normativa
+        ) || "",
         estado: normativa.estado || "",
-        archivo: normativa.archivo || null,
+        archivo: "",
         tags: tags || [],
       });
       setShowEditModal(true);
@@ -91,14 +129,18 @@ function Table({
       setAlertMessage("Error al obtener los tags");
       setAlertType("alert-error");
     }
+    console.log("ID de la normativa:", normativa.id);
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setEditModalData((prev) => ({
-      ...prev,
-      archivo_pdf: file, // Guarda el archivo seleccionado
-    }));
+    if (file) {
+      setEditModalData((prev) => ({
+        ...prev,
+        archivo: file.name, // Actualiza el nombre del archivo
+        archivo_pdf: file,  // Guarda el archivo real para enviarlo si es necesario
+      }));
+    }
   };
 
   const closeEditModal = () => {
@@ -115,17 +157,41 @@ function Table({
   };
 
   const handleSaveEdit = async () => {
+    console.log("Datos enviados al backend (antes de limpiar):", editModalData);
+
+    // Convertir los valores seleccionados a IDs
+    const dataToSend = {
+      ...editModalData,
+      dependencia: dependenciaMap[editModalData.dependencia] || null,
+      tipo_normativa: tipoNormativaMap[editModalData.tipo_normativa] || null,
+      emisor: emisorMap[editModalData.emisor] || null,
+    };
+
+    console.log("Datos enviados al backend (convertidos a IDs):", dataToSend);
+
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("Datos actualizados:", editModalData);
+      const response = await fetch(`http://localhost:3000/api/normativa/update/${editModalData.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend), // Enviar los datos convertidos
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar los cambios");
+      }
+
+      const result = await response.json();
+      console.log("Datos actualizados:", result);
       setIsSuccess(true);
       setTimeout(() => setIsSuccess(false), 3000);
+      closeEditModal();
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
+      setAlertMessage("Error al actualizar los datos");
+      setAlertType("alert-error");
     } finally {
       setIsLoading(false);
-      closeEditModal();
     }
   };
 
@@ -577,7 +643,7 @@ function Table({
                     Tipo de Normativa:
                   </label>
                   <select
-                    name="estado"
+                    name="tipo_normativa"
                     value={editModalData?.tipo_normativa || ""}
                     onChange={handleEditChange}
                     className="select select-bordered w-full"
@@ -609,7 +675,7 @@ function Table({
                   </label>
                   <input
                     type="file"
-                    name="archivo_pdf"
+                    name="archivo"
                     onChange={(e) => handleFileChange(e)}
                     className="file-input file-input-bordered w-full"
                   />

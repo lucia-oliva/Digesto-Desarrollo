@@ -206,4 +206,20 @@ router.get("/tags/:id", async (req, res) => {
   }
 });
 
+
+//Actualizar normativa por id
+
+router.put("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const normativaData = req.body;
+
+  try {
+    const result = await normativaDB.updateNormativa(id, normativaData);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error al actualizar la normativa:", error);
+    res.status(500).json({ error: "Error al actualizar la normativa" });
+  }
+});
+
 export default router;

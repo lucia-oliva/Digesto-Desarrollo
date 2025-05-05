@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
+
+//TODO: No se puede scrollear la informacion por lo que no se ve el boton de descarga a veces...
+
 function DocumentView() {
   const { id } = useParams();
   const [pdfUrl, setPdfUrl] = useState("");

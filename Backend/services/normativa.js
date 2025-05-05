@@ -194,6 +194,80 @@ async function getMostPopularNormatives() {
   return results;
 }
 
+async function updateNormativa(id, normativaData) {
+  const {
+    numero,
+    anio,
+    titulo,
+    resumen,
+    fecha,
+    dependencia,
+    emisor,
+    tipo_normativa,
+    estado,
+    tags,
+  } = normativaData;
+
+    console.log("normativaData", normativaData);
+    console.log("tags", tags);
+    console.log("id", id);
+    
+  try {
+    // Validar que tags sea un array
+    if (!Array.isArray(tags)) {
+      throw new TypeError("El campo 'tags' debe ser un array");
+    }
+
+    // Actualizar los datos de la normativa
+    const sqlUpdateNormativa = `
+      UPDATE normativa
+      SET numero = ?, anio = ?, titulo = ?, resumen = ?, fecha_normativa = ?, 
+          id_dependencia = ?, id_emisor = ?, id_tipo_normativa = ?, estado = ?
+      WHERE id = ?
+    `;
+    await db.query(sqlUpdateNormativa, [
+      numero,
+      anio,
+      titulo,
+      resumen,
+      fecha,
+      dependencia,
+      emisor,
+      tipo_normativa,
+      estado,
+      id,
+    ]);
+
+    // Actualizar los tags asociados
+    await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
+
+    if (tags.length > 0) {
+      const tagInsertPromises = tags.map(async (tag) => {
+        // Verificar si el tag ya existe
+        let [existingTag] = await db.query("SELECT id FROM tag WHERE nombre = ?", [tag]);
+        if (!existingTag) {
+          // Si no existe, insertarlo
+          const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [tag]);
+          existingTag = { id: result.insertId };
+        }
+
+        // Asociar el tag con la normativa
+        await db.query("INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)", [
+          id,
+          existingTag.id,
+        ]);
+      });
+
+      await Promise.all(tagInsertPromises);
+    }
+
+    return { message: "Normativa actualizada correctamente" };
+  } catch (error) {
+    console.error("Error al actualizar la normativa:", error);
+    throw error;
+  }
+}
+
 export default {
   getAllYears,
   searchByNumber,
@@ -203,5 +277,5 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  deleteNormativaById,getTagsByNormativaId
+  deleteNormativaById,getTagsByNormativaId, updateNormativa
 };
