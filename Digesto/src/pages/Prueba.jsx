@@ -148,7 +148,8 @@ function NormativasContainer({ isAdmin = false}) {
           </div>
         ) : (
           <>
-            <Table normativas={normativas} />
+            <Table normativas={normativas}
+            />
             <Pagination
               currentPage={currentPage}
               totalResults={totalResults}

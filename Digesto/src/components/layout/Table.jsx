@@ -3,9 +3,9 @@ import { useLocation } from "react-router";
 import { useState } from "react";
 
 // TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
-//Hay que hacer la funcion en el back para modificacion.
-// Hay que hacer que ver que pasa con la pagina cuando se realiza la modificacion. 
-//En el modal para editar faltan datos, lograr recopilar los tags para que el usuario pueda editarlos o eliminar/agregar.  
+//TODO: Hay que hacer la funcion en el back para modificacion.
+// TODO: Hay que verificar una manera de implementar las alertas despues de que sea visible los cambios en la tabla por (eliminacion/modificacion)
+//TODO: En el modal para editar faltan datos, lograr recopilar los tags para que el usuario pueda editarlos o eliminar/agregar.
 
 function Table({
   normativas,
@@ -65,20 +65,32 @@ function Table({
   ];
   const estadoOptions = ["Publicado", "Despublicado"];
 
-  const openEditModal = (normativa) => {
-    setEditModalData({
-      numero: normativa.numero || "",
-      anio: normativa.anio || "",
-      titulo: normativa.titulo || "",
-      resumen: normativa.resumen || "",
-      fecha: normativa.fecha || "",
-      dependencia: normativa.dependencia || "",
-      emisor: normativa.emisor || "",
-      tipo_normativa: normativa.tipo_normativa || "",
-      estado: normativa.estado || "",
-      archivo: normativa.archivo || null,
-    });
-    setShowEditModal(true);
+  const openEditModal = async (normativa) => {
+    try {
+      const responseTags = await fetch(
+        `http://localhost:3000/api/normativa/tags/${normativa.id}`
+      );
+      const tags = await responseTags.json();
+
+      setEditModalData({
+        numero: normativa.numero || "",
+        anio: normativa.anio || "",
+        titulo: normativa.titulo || "",
+        resumen: normativa.resumen || "",
+        fecha: normativa.fecha || "",
+        dependencia: normativa.dependencia || "",
+        emisor: normativa.emisor || "",
+        tipo_normativa: normativa.tipo_normativa || "",
+        estado: normativa.estado || "",
+        archivo: normativa.archivo || null,
+        tags: tags || [],
+      });
+      setShowEditModal(true);
+    } catch (error) {
+      console.error("Error al obtener los tags:", error);
+      setAlertMessage("Error al obtener los tags");
+      setAlertType("alert-error");
+    }
   };
 
   const handleFileChange = (e) => {
@@ -105,11 +117,10 @@ function Table({
   const handleSaveEdit = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call or backend update
       await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log("Datos actualizados:", editModalData);
       setIsSuccess(true);
-      setTimeout(() => setIsSuccess(false), 3000); // Hide success message after 3 seconds
+      setTimeout(() => setIsSuccess(false), 3000);
     } catch (error) {
       console.error("Error al actualizar los datos:", error);
     } finally {
@@ -603,6 +614,46 @@ function Table({
                     className="file-input file-input-bordered w-full"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Tags:</label>
+                <input
+                  type="text"
+                  placeholder="Agregar tags separados por coma o Enter"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                      e.preventDefault();
+                      const newTag = e.target.value.trim();
+                      if (newTag && !editModalData.tags.includes(newTag)) {
+                        setEditModalData((prev) => ({
+                          ...prev,
+                          tags: [...prev.tags, newTag],
+                        }));
+                      }
+                      e.target.value = "";
+                    }
+                  }}
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {editModalData?.tags?.map((tag, index) => (
+                  <span key={index} className="badge badge-primary gap-1">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setEditModalData((prev) => ({
+                          ...prev,
+                          tags: prev.tags.filter((_, i) => i !== index),
+                        }))
+                      }
+                      className="ml-1"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
               </div>
             </div>
             <div className="flex justify-end gap-2 mt-4">
