@@ -1,25 +1,20 @@
 import PropTypes from "prop-types";
 import { useLocation } from "react-router";
 import { useState } from "react";
+import Pagination from "./Pagination.jsx";
 
 // TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
 // TODO: Hay que verificar una manera de implementar las alertas despues de que sea visible los cambios en la tabla por (eliminacion/modificacion)
-//TODO: los tags se toman como array en la bd y no se guardan a no ser que hay uno solo..
 //TODO: cuando editamos se tiene que seleccionar tofos los campos en el caso de que los select no sean clickeados se mandan como null... 
-function Table({
-  normativas,
-  onSeleccionarNormativas,
-  normativasSeleccionadas = [],
-  onDeseleccionarNormativas,
+//TODO: Ver como integramos la funcionalidad de normativas_modificadas
+
+function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,
 }) {
   const location = useLocation();
   const isNuevaNormativa =
-    location.pathname === "/administracion" &&
-    new URLSearchParams(location.search).get("option") === "Nueva Normativa";
+  location.pathname === "/administracion" &&
+  new URLSearchParams(location.search).get("option") === "Nueva Normativa";
   const isAdminList = location.pathname === "/administracion";
-
-  console.log(normativas);
-
   const ocultarVisitas = location.pathname === "/busqueda" || isNuevaNormativa;
 
   const [modalData, setModalData] = useState(null);
@@ -33,35 +28,42 @@ function Table({
   const [isDeleteSuccess, setIsDeleteSuccess] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState("alert-info");
-  const emisorOptions = [
-    "Decano",
-    "Consejo Superior",
-    "Rector",
-    "Concejo Directivo",
-    "Interdepartamental",
-    "Relaciones Institucionales",
-  ];
-  const dependenciaOptions = [
-    "Aplicadas",
-    "Exactas",
-    "Humanidades",
-    "Salud",
-    "Sociales",
-    "Sede Chepes",
-    "Sede Chamical",
-    "Sede Villa Unión",
-    "Sede Catuna",
-    "Sede Aimogasta",
-    "Consejo Superior",
-  ];
-  const tipoNormativaOptions = [
-    "Acta",
-    "Resolucion",
-    "Convenio",
-    "Nota",
-    "Providencia",
-    "Ordenanza",
-  ];
+  const [cambia_normativa] = useState("NO");
+  const [normativa_modificadas, setNormativaModificadas] = useState([]);
+  const [filteredNormativas, setFilteredNormativas] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [tags, setTags] = useState([]);
+
+  const resultsPerPage = 10;
+
+  const handleSearchNormativas = async (numero, page = 1) => {
+    if (numero) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/normativa/search?page=${page}&limit=${resultsPerPage}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ numero }),
+          }
+        );
+
+        const data = await response.json();
+        setFilteredNormativas(data.normativas || []);
+        setTotalResults(data.totalResults || 0);
+      } catch (err) {
+        console.error("Error al buscar normativas:", err.message);
+        setFilteredNormativas([]);
+        setTotalResults(0);
+      }
+    } else {
+      setFilteredNormativas([]);
+      setTotalResults(0);
+    }
+  };
 
   const dependenciaMap = {
     "Aplicadas": 1,
@@ -94,14 +96,15 @@ function Table({
     "Interdepartamental": 5,
     "Relaciones Institucionales": 11,
   };
-  const estadoOptions = ["Publicado", "Despublicado"];
+  const estadoOptions = ["publicado", "despublicado"];
 
-  const openEditModal = async (normativa) => {
+  const openEditModal = async (normativa,tags) => {
     try {
       const responseTags = await fetch(
         `http://localhost:3000/api/normativa/tags/${normativa.id}`
       );
-      const tags = await responseTags.json();
+      
+      tags = await responseTags.json();
 
       setEditModalData({
         id: normativa.id,
@@ -122,6 +125,9 @@ function Table({
         estado: normativa.estado || "",
         archivo: "",
         tags: tags || [],
+        cambia_normativa: cambia_normativa || "NO",
+        normativa_modificadas: normativa_modificadas || [],
+        
       });
       setShowEditModal(true);
     } catch (error) {
@@ -157,30 +163,31 @@ function Table({
   };
 
   const handleSaveEdit = async () => {
-    console.log("Datos enviados al backend (antes de limpiar):", editModalData);
-
-    // Convertir los valores seleccionados a IDs
     const dataToSend = {
       ...editModalData,
       dependencia: dependenciaMap[editModalData.dependencia] || null,
       tipo_normativa: tipoNormativaMap[editModalData.tipo_normativa] || null,
       emisor: emisorMap[editModalData.emisor] || null,
+      normativa_modificadas,
+      tags: editModalData.tags || [], // Asegúrate de enviar los tags
     };
-
-    console.log("Datos enviados al backend (convertidos a IDs):", dataToSend);
-
-    setIsLoading(true);
+  
+    console.log("Datos a enviar:", dataToSend);
+  
     try {
-      const response = await fetch(`http://localhost:3000/api/normativa/update/${editModalData.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataToSend), // Enviar los datos convertidos
-      });
-
+      const response = await fetch(
+        `http://localhost:3000/api/normativa/update/${editModalData.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+  
       if (!response.ok) {
         throw new Error("Error al guardar los cambios");
       }
-
+  
       const result = await response.json();
       console.log("Datos actualizados:", result);
       setIsSuccess(true);
@@ -207,18 +214,6 @@ function Table({
     setModalData(null);
     setSelectedAction("");
     setSelectedComment("");
-  };
-
-  const handleAccept = () => {
-    if (!selectedAction) return;
-    onSeleccionarNormativas({
-      id: modalData.id,
-      numero: modalData.numero,
-      titulo: modalData.titulo,
-      accion: selectedAction,
-      comentario: selectedComment,
-    });
-    closeModal();
   };
 
   const handleDeselect = (id) => {
@@ -489,44 +484,63 @@ function Table({
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 flex justify-center items-center z-40">
-          <div className="absolute inset-0 backdrop-blur-sm bg-black/20"></div>
-          <div className="relative bg-white p-6 rounded-lg shadow-lg w-96 z-50">
-            <h2 className="text-sm font-bold mb-4">Normativa afectada</h2>
-            <p className="mb-4 text-sm">{modalData?.titulo}</p>
-            <h2 className="text-sm font-bold mb-2">
-              Indique el tipo de acción que se aplica sobre esta normativa
-            </h2>
-            <select
-              value={selectedAction}
-              onChange={(e) => setSelectedAction(e.target.value)}
-              className="select select-bordered w-full mb-4"
-            >
-              <option value="">Seleccione una acción</option>
-              <option value="Deroga">Derogación</option>
-              <option value="Modifica">Modificación</option>
-              <option value="Complementa">Complementación</option>
-            </select>
-            <h2 className="text-sm font-bold mb-2">
-              Detalle de la modificación
-            </h2>
-            <textarea
-              className="textarea textarea-bordered w-full mb-4"
-              placeholder="Escriba sus comentarios aquí..."
-              value={selectedComment}
-              onChange={(e) => setSelectedComment(e.target.value)}
-            ></textarea>
-
+        <div className="fixed inset-0 flex justify-center items-center z-50">
+          <div className="absolute inset-0 backdrop-blur-sm bg-black/30"></div>
+          <div className="relative bg-white p-6 rounded-lg shadow-lg w-96 z-60">
+            <h2 className="text-lg font-bold mb-4">Agregar Acción y Comentario</h2>
+            <p className="mb-4 text-sm">
+              <strong>Normativa:</strong> {modalData?.numero} - {modalData?.titulo}
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Acción:</label>
+              <select
+                value={selectedAction}
+                onChange={(e) => setSelectedAction(e.target.value)}
+                className="select select-bordered w-full"
+              >
+                <option value="">Seleccione una acción</option>
+                <option value="Deroga">Derogación</option>
+                <option value="Modifica">Modificación</option>
+                <option value="Complementa">Complementación</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Comentario:</label>
+              <textarea
+                value={selectedComment}
+                onChange={(e) => setSelectedComment(e.target.value)}
+                className="textarea textarea-bordered w-full"
+                placeholder="Escriba un comentario opcional..."
+              ></textarea>
+            </div>
             <div className="flex justify-end gap-2">
-              <button onClick={closeModal} className="btn btn-outline btn-md">
+              <button
+                onClick={closeModal}
+                className="btn btn-outline btn-md"
+              >
                 Cancelar
               </button>
               <button
-                onClick={handleAccept}
+                onClick={() => {
+                  if (!selectedAction) {
+                    alert("Debe seleccionar una acción.");
+                    return;
+                  }
+                  setNormativaModificadas((prev) => [
+                    ...prev,
+                    {
+                      id: modalData.id,
+                      numero: modalData.numero,
+                      titulo: modalData.titulo,
+                      accion: selectedAction,
+                      comentario: selectedComment,
+                    },
+                  ]);
+                  closeModal();
+                }}
                 className="btn btn-primary btn-md"
-                disabled={!selectedAction}
               >
-                Aceptar
+                Guardar
               </button>
             </div>
           </div>
@@ -615,8 +629,10 @@ function Table({
                   className="select select-bordered w-full"
                 >
                   <option value="">Seleccione</option>
-                  {dependenciaOptions.map((opt) => (
-                    <option key={opt}>{opt}</option>
+                  {Object.keys(dependenciaMap).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -632,8 +648,10 @@ function Table({
                   className="select select-bordered w-full"
                 >
                   <option value="">Seleccione</option>
-                  {emisorOptions.map((opt) => (
-                    <option key={opt}>{opt}</option>
+                  {Object.keys(emisorMap).map((key) => (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -648,8 +666,11 @@ function Table({
                     onChange={handleEditChange}
                     className="select select-bordered w-full"
                   >
-                    {tipoNormativaOptions.map((opt) => (
-                      <option key={opt}>{opt}</option>
+                    <option value="">Seleccione</option>
+                    {Object.keys(tipoNormativaMap).map((key) => (
+                      <option key={key} value={key}>
+                        {key}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -696,7 +717,7 @@ function Table({
                           tags: [...prev.tags, newTag],
                         }));
                       }
-                      e.target.value = "";
+                      e.target.value = ""; // Limpia el input después de agregar el tag
                     }
                   }}
                   className="input input-bordered w-full"
@@ -721,6 +742,140 @@ function Table({
                   </span>
                 ))}
               </div>
+              <div>
+                <h3 className="text-sm font-bold mb-2">
+                  ¿Esta normativa modifica, deroga o complementa a otra?
+                </h3>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditModalData((prev) => ({ ...prev, cambia_normativa: "SI" }))
+                    }
+                    className={`btn ${
+                      editModalData?.cambia_normativa === "SI" ? "btn-primary" : "btn-outline"
+                    }`}
+                  >
+                    Sí
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEditModalData((prev) => ({
+                        ...prev,
+                        cambia_normativa: "NO",
+                        normativa_modificada: [],
+                      }))
+                    }
+                    className={`btn ${
+                      editModalData?.cambia_normativa === "NO" ? "btn-primary" : "btn-outline"
+                    }`}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+              {editModalData?.cambia_normativa === "SI" && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium mb-2">
+                    Ingrese el número de la normativa afectada:
+                  </label>
+                  <input
+                    type="text"
+                    name="normativa_modificada"
+                    value={editModalData?.normativa_modificada || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setEditModalData((prev) => ({
+                        ...prev,
+                        normativa_modificada: value,
+                      }));
+                      setCurrentPage(1); // Reset to first page on new search
+                      handleSearchNormativas(value, 1);
+                    }}
+                    className="input input-bordered w-full mb-3"
+                  />
+
+                  {editModalData.normativa_modificada && (
+                    <>
+                      {filteredNormativas.length > 0 ? (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium mb-2">Resultados:</h4>
+                          <ul className="list-none">
+                            {filteredNormativas.map((normativa) => (
+                              <li
+                                key={normativa.id}
+                                className="flex justify-between items-center p-2 border-b border-gray-200"
+                              >
+                                <span>
+                                  <strong>{normativa.numero}</strong> - {normativa.titulo} -{" "}
+                                  {normativa.dependencia}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setModalData(normativa); // Guardar la normativa seleccionada
+                                    setShowModal(true); // Mostrar el modal para acción y comentario
+                                  }}
+                                  className="btn btn-sm btn-primary"
+                                >
+                                  Seleccionar
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">No se encontraron normativas.</p>
+                      )}
+                    </>
+                  )}
+                  {filteredNormativas.length > 0 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalResults={totalResults}
+                      resultsPerPage={resultsPerPage}
+                      onPageChange={(page) => {
+                        setCurrentPage(page);
+                        handleSearchNormativas(editModalData.normativa_modificada, page);
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+              {normativa_modificadas.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-2">Normativas seleccionadas:</h4>
+                  <ul className="list-none">
+                    {normativa_modificadas.map((normativa, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between items-center p-2 border-b border-gray-200"
+                      >
+                        <div>
+                          <p>
+                            <strong>{normativa.numero}</strong> - {normativa.titulo}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Acción: {normativa.accion} | Comentario: {normativa.comentario}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setNormativaModificadas((prev) =>
+                              prev.filter((n) => n.id !== normativa.id)
+                            )
+                          }
+                          className="btn btn-sm btn-error"
+                        >
+                          Eliminar
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button

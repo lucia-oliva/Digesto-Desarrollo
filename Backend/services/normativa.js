@@ -14,7 +14,7 @@ async function getTagsByNormativaId(id) {
       WHERE tn.id_normativa = ?
     `;
     const results = await db.query(sql, [id]);
-    return results.map((row) => row.tag); // Devuelve un array de nombres de tags
+    return results.map((row) => row.tag); 
   } catch (err) {
     console.error("Error al obtener los tags de la normativa:", err);
     throw err;
@@ -22,7 +22,7 @@ async function getTagsByNormativaId(id) {
 }
 
 //Delete by id
-
+//TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria.
 async function deleteNormativaById(id) {
   try {
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
@@ -194,7 +194,8 @@ async function getMostPopularNormatives() {
   return results;
 }
 
-async function updateNormativa(id, normativaData) {
+//Modificacion de normativas 
+async function updateNormativa(id, dataToSend) {
   const {
     numero,
     anio,
@@ -206,9 +207,10 @@ async function updateNormativa(id, normativaData) {
     tipo_normativa,
     estado,
     tags,
-  } = normativaData;
+    archivo
+  } = dataToSend;
 
-    console.log("normativaData", normativaData);
+    console.log("normativaData", dataToSend);
     console.log("tags", tags);
     console.log("id", id);
     
@@ -222,7 +224,7 @@ async function updateNormativa(id, normativaData) {
     const sqlUpdateNormativa = `
       UPDATE normativa
       SET numero = ?, anio = ?, titulo = ?, resumen = ?, fecha_normativa = ?, 
-          id_dependencia = ?, id_emisor = ?, id_tipo_normativa = ?, estado = ?
+          id_dependencia = ?, id_emisor = ?, id_tipo_normativa = ?, estado = ?, archivo = ?
       WHERE id = ?
     `;
     await db.query(sqlUpdateNormativa, [
@@ -235,32 +237,39 @@ async function updateNormativa(id, normativaData) {
       emisor,
       tipo_normativa,
       estado,
+      archivo,
       id,
     ]);
 
-    // Actualizar los tags asociados
+    //Eliminar los registros existentes en la tabla tag_normativa para el id de esa normativa.
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
-
+    
+    //Insertar los nuevos tags 
     if (tags.length > 0) {
-      const tagInsertPromises = tags.map(async (tag) => {
-        // Verificar si el tag ya existe
-        let [existingTag] = await db.query("SELECT id FROM tag WHERE nombre = ?", [tag]);
-        if (!existingTag) {
-          // Si no existe, insertarlo
-          const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [tag]);
-          existingTag = { id: result.insertId };
+      for (const tag of tags) {
+        if (!tag) {
+          console.error("El valor de 'tag' es inválido:", tag);
+          continue; // Saltar este tag si es inválido
         }
 
-        // Asociar el tag con la normativa
+        const results = await db.query("SELECT id FROM tag WHERE nombre = ?", [tag]) || [];
+        let existingTag = results.length > 0 ? results[0] : null; // Cambiar a `let`
+
+        console.log("Resultados de la consulta para el tag:", tag, results);
+
+        if (!existingTag) {
+          // Si no existe, insertar el tag en la tabla `tag`
+          const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [tag]);
+          existingTag = { id: result.insertId }; // Reasignar el valor
+        }
+
+        // Asociar el tag con la normativa en la tabla `tag_normativa`
         await db.query("INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)", [
           id,
           existingTag.id,
         ]);
-      });
-
-      await Promise.all(tagInsertPromises);
+      }
     }
-
     return { message: "Normativa actualizada correctamente" };
   } catch (error) {
     console.error("Error al actualizar la normativa:", error);

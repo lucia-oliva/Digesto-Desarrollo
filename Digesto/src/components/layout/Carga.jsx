@@ -3,6 +3,9 @@ import Table from "./Table";
 import Pagination from "./Pagination";
 import useAxios from "axios-hooks";
 
+//TODO: implementar la funcionalidad para crear normativas... 
+//TODO: Ver como integramos la funcionalidad de normativas_modificadas
+
 function Carga() {
   const [pasoActual, setPasoActual] = useState(0);
   const [filteredNormativas, setFilteredNormativas] = useState([]);
