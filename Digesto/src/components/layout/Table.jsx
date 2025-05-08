@@ -3,13 +3,15 @@ import { useLocation } from "react-router";
 import { useState } from "react";
 import Pagination from "./Pagination.jsx";
 
+
 // TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
 // TODO: Hay que verificar una manera de implementar las alertas despues de que sea visible los cambios en la tabla por (eliminacion/modificacion)
 //TODO: cuando editamos se tiene que seleccionar tofos los campos en el caso de que los select no sean clickeados se mandan como null... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
 function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,
-}) {
+}){
+  //Uso de rutas para hacer visible o ocultar contenido.
   const location = useLocation();
   const isNuevaNormativa =
   location.pathname === "/administracion" &&
@@ -17,6 +19,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
   const isAdminList = location.pathname === "/administracion";
   const ocultarVisitas = location.pathname === "/busqueda" || isNuevaNormativa;
 
+ // Estado para manejar los modales y la carga de datos.
   const [modalData, setModalData] = useState(null);
   const [selectedAction, setSelectedAction] = useState("");
   const [selectedComment, setSelectedComment] = useState("");
@@ -33,11 +36,19 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
   const [filteredNormativas, setFilteredNormativas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [tags, setTags] = useState([]);
-
   const resultsPerPage = 10;
-
-  const handleSearchNormativas = async (numero, page = 1) => {
+  const estadoOptions = ["publicado", "despublicado"];
+  // Mapas para las dependencias, tipos de normativa y emisores (traducir palabras a valores validos en la BD)
+  const dependenciaMap = {
+    "Aplicadas": 1, "Exactas": 2, "Humanidades": 5,"Salud": 3, "Sociales": 4,"Sede Chepes": 22,"Sede Chamical": 25,
+    "Sede Villa Unión": 26, "Sede Catuna": 23,"Sede Aimogasta": 24,"Consejo Superior": 20,};
+  const tipoNormativaMap = {
+    "Acta": 2,"Resolucion": 5,"Convenio": 3,"Nota": 6,"Providencia": 4,"Ordenanza": 1,};
+  const emisorMap = {
+    "Decano": 1,"Consejo Superior": 4,"Rector": 2,"Concejo Directivo": 3,"Interdepartamental": 5,"Relaciones Institucionales": 11,};
+  
+   //Funcion que muestra las normativas. 
+    const handleSearchNormativas = async (numero, page = 1) => {
     if (numero) {
       try {
         const response = await fetch(
@@ -50,7 +61,6 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
             body: JSON.stringify({ numero }),
           }
         );
-
         const data = await response.json();
         setFilteredNormativas(data.normativas || []);
         setTotalResults(data.totalResults || 0);
@@ -64,48 +74,19 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
       setTotalResults(0);
     }
   };
-
-  const dependenciaMap = {
-    "Aplicadas": 1,
-    "Exactas": 2,
-    "Humanidades": 5,
-    "Salud": 3,
-    "Sociales": 4,
-    "Sede Chepes": 22,
-    "Sede Chamical": 25,
-    "Sede Villa Unión": 26,
-    "Sede Catuna": 23,
-    "Sede Aimogasta": 24,
-    "Consejo Superior": 20,
-  };
-  
-  const tipoNormativaMap = {
-    "Acta": 2,
-    "Resolucion": 5,
-    "Convenio": 3,
-    "Nota": 6,
-    "Providencia": 4,
-    "Ordenanza": 1,
-  };
-  
-  const emisorMap = {
-    "Decano": 1,
-    "Consejo Superior": 4,
-    "Rector": 2,
-    "Concejo Directivo": 3,
-    "Interdepartamental": 5,
-    "Relaciones Institucionales": 11,
-  };
-  const estadoOptions = ["publicado", "despublicado"];
-
+  //Funcion que muestra el modal de edicion de normativa.
   const openEditModal = async (normativa,tags) => {
     try {
+      //Cargar los tags asociados a la normativa
       const responseTags = await fetch(
         `http://localhost:3000/api/normativa/tags/${normativa.id}`
       );
-      
       tags = await responseTags.json();
+      console.log("dependencia traida es:" ,normativa.dependencia);
+      console.log("emisor traido es:" ,normativa.emisor);
+      console.log( "tipo normativa traido es: ",normativa.tipo_normativa);
 
+      //Cargar los datos de la normativa seleccionada
       setEditModalData({
         id: normativa.id,
         numero: normativa.numero || "",
@@ -113,21 +94,14 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
         titulo: normativa.titulo || "",
         resumen: normativa.resumen || "",
         fecha: normativa.fecha || "",
-        dependencia: Object.keys(dependenciaMap).find(
-          (key) => dependenciaMap[key] === normativa.dependencia
-        ) || "",
-        emisor: Object.keys(emisorMap).find(
-          (key) => emisorMap[key] === normativa.emisor
-        ) || "",
-        tipo_normativa: Object.keys(tipoNormativaMap).find(
-          (key) => tipoNormativaMap[key] === normativa.tipo_normativa
-        ) || "",
-        estado: normativa.estado || "",
+        dependencia: normativa.dependencia || "",
+        emisor: normativa.emisor || "",
+        tipo_normativa: normativa.tipo_normativa || "",
+        estado: normativa.estado || "publicado",
         archivo: "",
         tags: tags || [],
         cambia_normativa: cambia_normativa || "NO",
         normativa_modificadas: normativa_modificadas || [],
-        
       });
       setShowEditModal(true);
     } catch (error) {
@@ -136,6 +110,19 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
       setAlertType("alert-error");
     }
     console.log("ID de la normativa:", normativa.id);
+    console.log("Normativa seleccionada:", normativa);
+    console.log("Dependencia mapeada:", Object.keys(dependenciaMap).find(
+      (key) => dependenciaMap[key] === parseInt(normativa.dependencia, 10)
+    ));
+    console.log("Emisor mapeado:", Object.keys(emisorMap).find(
+      (key) => emisorMap[key] === parseInt(normativa.emisor, 10)
+    ));
+    console.log("Tipo Normativa mapeado:", Object.keys(tipoNormativaMap).find(
+      (key) => tipoNormativaMap[key] === parseInt(normativa.tipo_normativa, 10)
+    ));
+
+    console.log("Valor actual en el select de dependencia:", editModalData?.dependencia);
+
   };
 
   const handleFileChange = (e) => {
@@ -628,6 +615,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
                   onChange={handleEditChange}
                   className="select select-bordered w-full"
                 >
+                  {console.log("Valor actual de dependencia:", editModalData?.dependencia)}
                   <option value="">Seleccione</option>
                   {Object.keys(dependenciaMap).map((key) => (
                     <option key={key} value={key}>
@@ -672,7 +660,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
                         {key}
                       </option>
                     ))}
-                  </select>
+                  </select> 
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2 mt-3">

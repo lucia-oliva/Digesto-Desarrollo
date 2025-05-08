@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { MdOutlineLastPage } from "react-icons/md";
+import { MdOutlineFirstPage } from "react-icons/md";
+
 
 
 function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange }) {
@@ -112,18 +115,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
               <span className="sr-only">Primera</span>
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 15.75a.75.75 0 0 1-.53-.22l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 1 1 1.06 1.06L7.31 10l3.97 3.97a.75.75 0 0 1-.53 1.28Z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <MdOutlineFirstPage className='size-5'/>
             </button>
             <button
               onClick={handlePreviousGroup}
@@ -167,19 +159,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
               <span className="sr-only">Última</span>
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                
-                <path
-                  fillRule="evenodd"
-                  d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <MdOutlineLastPage className='size-5'/>              
             </button>
           </nav>
         </div>

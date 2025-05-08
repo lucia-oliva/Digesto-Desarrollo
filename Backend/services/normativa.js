@@ -220,6 +220,16 @@ async function updateNormativa(id, dataToSend) {
       throw new TypeError("El campo 'tags' debe ser un array");
     }
 
+      //Sacar archivo si no viene desde el front
+      let archivoFinal = archivo;
+      if (!archivo || archivo.trim() === "") {
+        const results = await db.query("SELECT archivo FROM normativa WHERE id = ?", [id]);
+        if (!results || results.length === 0) {
+          throw new Error("No se encontró la normativa para conservar el archivo.");
+        }
+        archivoFinal = results[0].archivo; 
+      }
+
     // Actualizar los datos de la normativa
     const sqlUpdateNormativa = `
       UPDATE normativa
@@ -237,9 +247,10 @@ async function updateNormativa(id, dataToSend) {
       emisor,
       tipo_normativa,
       estado,
-      archivo,
+      archivoFinal,
       id,
     ]);
+
 
     //Eliminar los registros existentes en la tabla tag_normativa para el id de esa normativa.
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
