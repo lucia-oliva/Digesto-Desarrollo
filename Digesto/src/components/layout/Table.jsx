@@ -9,7 +9,7 @@ import Pagination from "./Pagination.jsx";
 //TODO: cuando editamos se tiene que seleccionar tofos los campos en el caso de que los select no sean clickeados se mandan como null... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
-function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,
+function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,onSeleccionarNormativas
 }){
   //Uso de rutas para hacer visible o ocultar contenido.
   const location = useLocation();
@@ -514,16 +514,24 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
                     alert("Debe seleccionar una acción.");
                     return;
                   }
-                  setNormativaModificadas((prev) => [
-                    ...prev,
-                    {
-                      id: modalData.id,
-                      numero: modalData.numero,
-                      titulo: modalData.titulo,
-                      accion: selectedAction,
-                      comentario: selectedComment,
-                    },
-                  ]);
+              
+                  const updatedNormativa = {
+                    id: modalData.id,
+                    numero: modalData.numero,
+                    titulo: modalData.titulo,
+                    accion: selectedAction,
+                    comentario: selectedComment,
+                  };
+              
+                  if (showEditModal) {
+                    // Si estamos en el modal de edición
+                    setNormativaModificadas((prev) => [...prev, updatedNormativa]);
+                  } else {
+                    // Si estamos en el contexto de Carga
+                    onSeleccionarNormativas(updatedNormativa);
+                  }
+              
+                  // Cerrar el modal
                   closeModal();
                 }}
                 className="btn btn-primary btn-md"
@@ -875,9 +883,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
               </button>
               <button
                 onClick={handleSaveEdit}
-                className={`btn btn-primary btn-md ${
-                  isLoading ? "loading" : ""
-                }`}
+                className={`btn btn-primary btn-md ${isLoading ? "loading" : ""}`}
                 disabled={isLoading}
               >
                 Guardar

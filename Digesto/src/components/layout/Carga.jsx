@@ -76,7 +76,7 @@ function Carga() {
     "Providencia",
     "Ordenanza",
   ];
-  const estadoOptions = ["Publicado", "Despublicado"];
+  const estadoOptions = ["publicado", "despublicado"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -410,7 +410,16 @@ function Carga() {
                             const yaExiste = prev.normativas_modificadas?.some(
                               (n) => n.id === normativa.id
                             );
-                            if (yaExiste) return prev;
+                            if (yaExiste) {
+                              // Si ya existe, actualizamos la acción y el comentario
+                              return {
+                                ...prev,
+                                normativas_modificadas: prev.normativas_modificadas.map((n) =>
+                                  n.id === normativa.id ? normativa : n
+                                ),
+                              };
+                            }
+                            // Si no existe, la agregamos
                             return {
                               ...prev,
                               normativas_modificadas: [
