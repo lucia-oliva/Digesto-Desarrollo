@@ -139,6 +139,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
   const closeEditModal = () => {
     setShowEditModal(false);
     setEditModalData(null);
+    setNormativaModificadas([]); // Limpiar la lista de normativas modificadas al cerrar el modal
   };
 
   const handleEditChange = (e) => {
