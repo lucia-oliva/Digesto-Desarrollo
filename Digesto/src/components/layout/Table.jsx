@@ -5,8 +5,6 @@ import Pagination from "./Pagination.jsx";
 
 
 // TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
-// TODO: Hay que verificar una manera de implementar las alertas despues de que sea visible los cambios en la tabla por (eliminacion/modificacion)
-//TODO: cuando editamos se tiene que seleccionar tofos los campos en el caso de que los select no sean clickeados se mandan como null... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
 function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,onSeleccionarNormativas
@@ -79,7 +77,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
     try {
       //Cargar los tags asociados a la normativa
       const responseTags = await fetch(
-        `http://localhost:3000/api/normativa/tags/${normativa.id}`
+        `http://localhost:3000/api/tag/tags/${normativa.id}`
       );
       tags = await responseTags.json();
       console.log("dependencia traida es:" ,normativa.dependencia);

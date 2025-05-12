@@ -3,23 +3,6 @@ import db from "./db.js";
 //BASIC CRUD
 
 
-//Get Tags
-
-async function getTagsByNormativaId(id) {
-  try {
-    const sql = `
-      SELECT t.nombre AS tag
-      FROM tag_normativa tn
-      JOIN tag t ON tn.id_tag = t.id
-      WHERE tn.id_normativa = ?
-    `;
-    const results = await db.query(sql, [id]);
-    return results.map((row) => row.tag); 
-  } catch (err) {
-    console.error("Error al obtener los tags de la normativa:", err);
-    throw err;
-  }
-}
 
 //Delete by id
 //TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria.
@@ -297,5 +280,5 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  deleteNormativaById,getTagsByNormativaId, updateNormativa
+  deleteNormativaById, updateNormativa
 };
