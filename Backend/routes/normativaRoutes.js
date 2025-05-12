@@ -4,9 +4,26 @@ import express from "express";
 //TODO: A la hora de hacer auditorias, verificar en la funcion de eliminar normativas
 //se se elimina todo lo que corresponde, al igual que la funcion de editar. 
 
-
 const router = express.Router();
 
+//Crear normativa
+router.post("/create", async (req, res) => {
+  const normativaData = req.body;
+
+  // Validaciones básicas
+  if (!normativaData.numero || !normativaData.titulo || !normativaData.fecha) {
+    return res.status(400).json({ error: "Faltan datos obligatorios" });
+  }
+  try {
+    const result = await normativaDB.createNormativa(normativaData);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("Error al crear la normativa:", error);
+    res.status(500).json({ error: "Error al crear la normativa" });
+  }
+});
+
+//Obtener normativa por id
 router.get("/id/:id", async (req, res) => {
   const id = req.params.id;
   try {

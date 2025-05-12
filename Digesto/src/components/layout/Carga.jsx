@@ -40,6 +40,62 @@ function Carga() {
     { manual: true }
   );
 
+  const [{ loading: creating}, refetchCreate] = useAxios(
+    {
+      url: `http://localhost:3000/api/normativa/create`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    { manual: true }
+  );
+
+  // Crear normativa
+  const handleCreateNormativa = () => {
+    const formDataToSend = {
+      numero: formData.numero,
+      anio: formData.anio,
+      titulo: formData.titulo,
+      resumen: formData.resumen,
+      fecha: formData.fecha,
+      dependencia: formData.dependencia,
+      emisor: formData.emisor,
+      tipo_normativa: formData.tipo_normativa,
+      estado: formData.estado,
+      tags: formData.palabras_clave,
+      archivo: formData.archivo_pdf ? formData.archivo_pdf.name : null,
+    };
+
+    refetchCreate({ data: formDataToSend })
+      .then((response) => {
+        console.log("Normativa creada:", response.data);
+        alert("Normativa creada correctamente");
+
+        // Reiniciar el formulario
+        setFormData({
+          tipo_normativa: "",
+          numero: "",
+          anio: "",
+          titulo: "",
+          resumen: "",
+          fecha: "",
+          dependencia: "",
+          emisor: "",
+          archivo_pdf: null,
+          estado: "Publicado",
+          cambia_normativa: "NO",
+          normativa_modificada: [],
+          palabras_clave: [],
+        });
+        setPasoActual(0); // Volver al paso inicial
+      })
+      .catch((err) => {
+        console.error("Error al crear la normativa:", err.message);
+        alert("Error al crear la normativa");
+      });
+  };
+
   const handleSearchNormativas = (numero, page = 1) => {
     if (numero) {
       refetch({
@@ -61,6 +117,7 @@ function Carga() {
     }
   };
 
+  
   const handlePageChange = (page) => {
     setCurrentPage(page);
     handleSearchNormativas(formData.normativa_modificada, page);
@@ -68,13 +125,7 @@ function Carga() {
 
   const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
   const emisorOptions = ["Decano", "Consejo Superior"];
-  const tipoNormativaOptions = [
-    "Acta",
-    "Resolución",
-    "Convenio",
-    "Nota",
-    "Providencia",
-    "Ordenanza",
+  const tipoNormativaOptions = ["Acta","Resolución","Convenio","Nota","Providencia","Ordenanza",
   ];
   const estadoOptions = ["publicado", "despublicado"];
 
@@ -120,11 +171,6 @@ function Carga() {
   const handleTipoSelect = (tipo) => {
     setFormData({ ...formData, tipo_normativa: tipo });
     setPasoActual(1);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
   };
 
   return (
@@ -177,7 +223,7 @@ function Carga() {
 
       {/* PASO 2 - Formulario */}
       {pasoActual === 1 && (
-        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+        <form className="space-y-4 mt-6">
           <div className="flex space-x-4">
             <div>
               <label className="block text-sm font-medium">Número:</label>
@@ -557,8 +603,8 @@ function Carga() {
             </button>
             <button
               type="submit"
-              onClick={handleSubmit}
-              className="btn btn-success"
+              onClick={handleCreateNormativa}
+              className={`btn btn-success ${creating ? "loading" : ""}`}
             >
               Confirmar y Finalizar
             </button>

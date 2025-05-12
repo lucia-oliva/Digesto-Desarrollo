@@ -4,7 +4,7 @@ import { useState } from "react";
 import Pagination from "./Pagination.jsx";
 
 
-// TODO: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
+// BUG: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
 function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,onSeleccionarNormativas

@@ -63,7 +63,6 @@ function Home() {
       </div>
       <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
         {/* Section de Dependencias */}
-        {/* TODO si trae las dependencias del back actualizar los parametros */}
 
         <Dependencias dependencias={[]} />
 

@@ -1,11 +1,44 @@
 import db from "./db.js";
-
+import tagService from "./tag.js";
 //BASIC CRUD
 
-
+//Crear Normativa
+  //TODO: Ver como aplicar lo de los archivos... (integrar la funcion upload)
+  //TODO: Ver como integramos lo de "creador" (usuario que crea la normativa)
+  async function createNormativa(data) {
+    const {
+      numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,tags,archivo,} = data;
+  
+    try {
+      const fechaSubida = new Date().toISOString().split("T")[0]; 
+      const sqlInsertNormativa = `
+        INSERT INTO normativa (numero, anio, titulo, resumen, fecha_normativa, 
+          id_dependencia, id_emisor, id_tipo_normativa, estado, archivo, fecha_alta)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+      `;
+      const result = await db.query(sqlInsertNormativa, [
+        numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,
+        archivo,fechaSubida
+      ]);
+  
+      const normativaId = result.insertId;
+  
+      // Insertar los tags relacionados en la tabla `tag_normativa`
+      await tagService.insertTagsForNormativa(normativaId, tags);
+  
+      return { success: true, message: "Normativa creada correctamente", id: normativaId };
+    } catch (error) {
+      console.error("Error al crear la normativa:", error);
+      throw error;
+    }
+  }
+  
+ 
+  
 
 //Delete by id
-//TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria.
+  //TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria. 
+  //FIXME: (En realidad no se elimina, sino que se cambia el estado a eliminado - VER ESTO).
 async function deleteNormativaById(id) {
   try {
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
@@ -233,37 +266,10 @@ async function updateNormativa(id, dataToSend) {
       archivoFinal,
       id,
     ]);
-
-
     //Eliminar los registros existentes en la tabla tag_normativa para el id de esa normativa.
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
-    
     //Insertar los nuevos tags 
-    if (tags.length > 0) {
-      for (const tag of tags) {
-        if (!tag) {
-          console.error("El valor de 'tag' es inválido:", tag);
-          continue; // Saltar este tag si es inválido
-        }
-
-        const results = await db.query("SELECT id FROM tag WHERE nombre = ?", [tag]) || [];
-        let existingTag = results.length > 0 ? results[0] : null; // Cambiar a `let`
-
-        console.log("Resultados de la consulta para el tag:", tag, results);
-
-        if (!existingTag) {
-          // Si no existe, insertar el tag en la tabla `tag`
-          const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [tag]);
-          existingTag = { id: result.insertId }; // Reasignar el valor
-        }
-
-        // Asociar el tag con la normativa en la tabla `tag_normativa`
-        await db.query("INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)", [
-          id,
-          existingTag.id,
-        ]);
-      }
-    }
+    await tagService.insertTagsForNormativa(id, tags);
     return { message: "Normativa actualizada correctamente" };
   } catch (error) {
     console.error("Error al actualizar la normativa:", error);
@@ -280,5 +286,5 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  deleteNormativaById, updateNormativa
+  deleteNormativaById, updateNormativa, createNormativa
 };
