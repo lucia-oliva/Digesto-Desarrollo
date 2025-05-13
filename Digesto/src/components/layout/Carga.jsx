@@ -2,11 +2,11 @@ import { useState } from "react";
 import Table from "./Table";
 import Pagination from "./Pagination";
 import useAxios from "axios-hooks";
+import SeleccionTipoNormativa from "./Carga/SeleccionTipoNormativa"; 
 
 //TODO: implementar la funcionalidad para crear normativas... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 //TODO: Las validaciones se pueden mejorar en un nuevo componente. (Visualmente, reactivos y por tipo)
-//Prueba rama..
 function Carga() {
   const [pasoActual, setPasoActual] = useState(0);
   const [filteredNormativas, setFilteredNormativas] = useState([]);
@@ -146,8 +146,6 @@ function Carga() {
 
   const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
   const emisorOptions = ["Decano", "Consejo Superior"];
-  const tipoNormativaOptions = ["Acta","Resolución","Convenio","Nota","Providencia","Ordenanza",
-  ];
   const estadoOptions = ["publicado", "despublicado"];
 
   const handleChange = (e) => {
@@ -189,11 +187,6 @@ function Carga() {
     });
   };
 
-  const handleTipoSelect = (tipo) => {
-    setFormData({ ...formData, tipo_normativa: tipo });
-    setPasoActual(1);
-  };
-
   return (
     <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
@@ -217,29 +210,16 @@ function Carga() {
           </li>
         </ul>
       </div>
-
-      {/* PASO 1 - Selección de tipo */}
+      
+      {/* PASO 1 - Selección de tipo de normativa */}
       {pasoActual === 0 && (
-        <div className=" mb-6">
-          <h3 className="text-lg font-semibold mb-4">
-            Seleccione el tipo de normativa a cargar:
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {tipoNormativaOptions.map((tipo) => (
-              <button
-                key={tipo}
-                onClick={() => handleTipoSelect(tipo)}
-                className={`card p-4 border rounded-md text-center cursor-pointer hover:bg-primary hover:text-white transition ${
-                  formData.tipo_normativa === tipo
-                    ? "bg-primary text-white"
-                    : "bg-base-200"
-                }`}
-              >
-                {tipo}
-              </button>
-            ))}
-          </div>
-        </div>
+          <SeleccionTipoNormativa
+            tipoActual={formData.tipo_normativa}
+            onSelect={(tipo) => {
+              setFormData({ ...formData, tipo_normativa: tipo });
+              setPasoActual(1);
+            }}
+          />
       )}
 
       {/* PASO 2 - Formulario */}
