@@ -61,8 +61,6 @@ async function deleteUsuario(id) {
 
 // Funciones para endpoints especiales
 
-/* TODO - Agregar funciones para endpoints especiales*/
-
 //Filtrar usuarios por departamento
 async function filterUsuariosporDepartament(id){
   const sql = "SELECT * FROM usuario WHERE id_dependencia LIKE ? "; 
