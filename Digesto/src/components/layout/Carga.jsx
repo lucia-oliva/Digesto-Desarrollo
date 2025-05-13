@@ -5,6 +5,7 @@ import useAxios from "axios-hooks";
 
 //TODO: implementar la funcionalidad para crear normativas... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
+//TODO: Las validaciones se pueden mejorar en un nuevo componente. (Visualmente, reactivos y por tipo)
 
 function Carga() {
   const [pasoActual, setPasoActual] = useState(0);
@@ -12,6 +13,8 @@ function Carga() {
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   const [totalResults, setTotalResults] = useState(0);
+  const [errores, setErrores] = useState({});
+
 
   const [formData, setFormData] = useState({
     tipo_normativa: "",
@@ -28,6 +31,24 @@ function Carga() {
     normativa_modificada: [],
     palabras_clave: [],
   });
+
+  const validarPaso2 = () => {
+  const nuevosErrores = {};
+  if (!formData.numero.trim()) nuevosErrores.numero = "Ingrese el número.";
+  if (!formData.anio.trim()) nuevosErrores.anio = "Ingrese el año.";
+  if (!formData.titulo.trim()) nuevosErrores.titulo = "Ingrese el título.";
+  if (!formData.resumen.trim()) nuevosErrores.resumen = "Ingrese el resumen.";
+  if (!formData.fecha) nuevosErrores.fecha = "Seleccione una fecha.";
+  if (!formData.dependencia.trim()) nuevosErrores.dependencia = "Seleccione una dependencia.";
+  if (!formData.emisor.trim()) nuevosErrores.emisor = "Seleccione un emisor.";
+  if (!formData.estado.trim()) nuevosErrores.estado = "Seleccione un estado.";
+  if (!formData.archivo_pdf) nuevosErrores.archivo_pdf = "Adjunte un archivo PDF.";
+  if (!formData.palabras_clave || formData.palabras_clave.length === 0)
+    nuevosErrores.palabras_clave = "Ingrese al menos una palabra clave.";
+  setErrores(nuevosErrores);
+
+  return Object.keys(nuevosErrores).length === 0;
+};
 
   const [{ loading, error }, refetch] = useAxios(
     {
@@ -223,7 +244,13 @@ function Carga() {
 
       {/* PASO 2 - Formulario */}
       {pasoActual === 1 && (
-        <form className="space-y-4 mt-6">
+        <form className="space-y-4 mt-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPasoActual(2);
+          }
+          }
+        >
           <div className="flex space-x-4">
             <div>
               <label className="block text-sm font-medium">Número:</label>
@@ -232,8 +259,9 @@ function Carga() {
                 name="numero"
                 value={formData.numero}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full" required
               />
+              {errores.numero && <p className="text-red-500 text-sm mt-1">{errores.numero}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium">Año:</label>
@@ -242,8 +270,9 @@ function Carga() {
                 name="anio"
                 value={formData.anio}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className="input input-bordered w-full" required
               />
+              {errores.anio && <p className="text-red-500 text-sm mt-1">{errores.anio}</p>}
             </div>
           </div>
 
@@ -254,8 +283,9 @@ function Carga() {
               name="titulo"
               value={formData.titulo}
               onChange={handleChange}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full" required
             />
+            {errores.titulo && <p className="text-red-500 text-sm mt-1">{errores.titulo}</p>}
           </div>
 
           <div>
@@ -264,9 +294,10 @@ function Carga() {
               name="resumen"
               value={formData.resumen}
               onChange={handleChange}
-              className="textarea textarea-bordered w-full"
+              className="textarea textarea-bordered w-full" required
               rows={3}
             ></textarea>
+            {errores.resumen && <p className="text-red-500 text-sm mt-1">{errores.resumen}</p>}
           </div>
 
           <div>
@@ -276,70 +307,71 @@ function Carga() {
               name="fecha"
               value={formData.fecha}
               onChange={handleChange}
-              className="input input-bordered w-full"
+              className="input input-bordered w-full" required
             />
+            {errores.fecha && <p className="text-red-500 text-sm mt-1">{errores.fecha}</p>}
           </div>
-
           <div>
             <label className="block text-sm font-medium">Dependencia:</label>
             <select
               name="dependencia"
               value={formData.dependencia}
               onChange={handleChange}
-              className="select select-bordered w-full"
+              className="select select-bordered w-full" required
             >
               <option value="">Seleccione</option>
               {dependenciaOptions.map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
+            {errores.dependencia && <p className="text-red-500 text-sm mt-1">{errores.dependencia}</p>}
           </div>
-
           <div>
             <label className="block text-sm font-medium">Emisor:</label>
             <select
               name="emisor"
               value={formData.emisor}
               onChange={handleChange}
-              className="select select-bordered w-full"
+              className="select select-bordered w-full" required
             >
               <option value="">Seleccione</option>
               {emisorOptions.map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
+            {errores.emisor && <p className="text-red-500 text-sm mt-1">{errores.emisor}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium">Archivo PDF:</label>
             <input
               type="file"
               onChange={handleFileChange}
-              className="file-input file-input-bordered w-full"
+              className="file-input file-input-bordered w-full" required
             />
+            {errores.archivo_pdf && <p className="text-red-500 text-sm mt-1">{errores.archivo_pdf}</p>}
           </div>
-
           <div>
             <label className="block text-sm font-medium">Estado:</label>
             <select
               name="estado"
               value={formData.estado}
               onChange={handleChange}
-              className="select select-bordered w-full"
+              className="select select-bordered w-full" required
             >
               {estadoOptions.map((opt) => (
                 <option key={opt}>{opt}</option>
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium">Palabras clave:</label>
             <input
               type="text"
               onKeyDown={handleTagChange}
               placeholder="Separar con coma o Enter"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full" required
             />
+            {errores.palabras_clave && <p className="text-red-500 text-sm mt-1">{errores.palabras_clave}</p>}
             <div className="mt-2 flex flex-wrap gap-2">
               {formData.palabras_clave.map((tag, i) => (
                 <span key={i} className="badge badge-primary gap-1">
@@ -366,12 +398,17 @@ function Carga() {
             </button>
 
             <button
-              type="button"
-              onClick={() => setPasoActual(2)}
-              className="btn btn-primary"
-            >
-              Siguiente
+                  type="button"
+                  onClick={() => {
+                    if (validarPaso2()) {
+                      setPasoActual(2);
+                    }
+                  }}
+                  className="btn btn-primary"
+                >
+                  Siguiente
             </button>
+
           </div>
         </form>
       )}

@@ -19,7 +19,7 @@ function SideBar() {
   const menuItems = [
     {
       title: "Normativas",
-      children: ["Nueva Normativa", "Listado", "Normativas Eliminadas"],
+      children: ["Nueva Normativa", "Listado", "Normativas Eliminadas", "Normativas Despublicadas"],
     },
     {
       title: "Usuarios",
