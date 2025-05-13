@@ -3,6 +3,7 @@ import Table from "./Table";
 import Pagination from "./Pagination";
 import useAxios from "axios-hooks";
 import SeleccionTipoNormativa from "./Carga/SeleccionTipoNormativa"; 
+import FormularioDatos from "./Carga/FormularioDatos";
 
 //TODO: implementar la funcionalidad para crear normativas... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
@@ -137,8 +138,6 @@ function Carga() {
       setTotalResults(0);
     }
   };
-
-  
   const handlePageChange = (page) => {
     setCurrentPage(page);
     handleSearchNormativas(formData.normativa_modificada, page);
@@ -147,45 +146,6 @@ function Carga() {
   const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
   const emisorOptions = ["Decano", "Consejo Superior"];
   const estadoOptions = ["publicado", "despublicado"];
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      archivo_pdf: e.target.files[0],
-    });
-  };
-
-  const handleTagChange = (e) => {
-    const value = e.target.value;
-    if (value.includes(",") || e.key === "Enter") {
-      const newTags = value
-        .split(/[,|\n]/)
-        .map((tag) => tag.trim())
-        .filter(Boolean);
-      setFormData({
-        ...formData,
-        palabras_clave: [...formData.palabras_clave, ...newTags],
-      });
-      e.target.value = "";
-    }
-  };
-
-  const handleRemoveTag = (indexToRemove) => {
-    setFormData({
-      ...formData,
-      palabras_clave: formData.palabras_clave.filter(
-        (_, index) => index !== indexToRemove
-      ),
-    });
-  };
 
   return (
     <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
@@ -224,173 +184,17 @@ function Carga() {
 
       {/* PASO 2 - Formulario */}
       {pasoActual === 1 && (
-        <form className="space-y-4 mt-6"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPasoActual(2);
-          }
-          }
-        >
-          <div className="flex space-x-4">
-            <div>
-              <label className="block text-sm font-medium">Número:</label>
-              <input
-                type="text"
-                name="numero"
-                value={formData.numero}
-                onChange={handleChange}
-                className="input input-bordered w-full" required
-              />
-              {errores.numero && <p className="text-red-500 text-sm mt-1">{errores.numero}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Año:</label>
-              <input
-                type="text"
-                name="anio"
-                value={formData.anio}
-                onChange={handleChange}
-                className="input input-bordered w-full" required
-              />
-              {errores.anio && <p className="text-red-500 text-sm mt-1">{errores.anio}</p>}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Título:</label>
-            <input
-              type="text"
-              name="titulo"
-              value={formData.titulo}
-              onChange={handleChange}
-              className="input input-bordered w-full" required
-            />
-            {errores.titulo && <p className="text-red-500 text-sm mt-1">{errores.titulo}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Resumen:</label>
-            <textarea
-              name="resumen"
-              value={formData.resumen}
-              onChange={handleChange}
-              className="textarea textarea-bordered w-full" required
-              rows={3}
-            ></textarea>
-            {errores.resumen && <p className="text-red-500 text-sm mt-1">{errores.resumen}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium">Fecha:</label>
-            <input
-              type="date"
-              name="fecha"
-              value={formData.fecha}
-              onChange={handleChange}
-              className="input input-bordered w-full" required
-            />
-            {errores.fecha && <p className="text-red-500 text-sm mt-1">{errores.fecha}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Dependencia:</label>
-            <select
-              name="dependencia"
-              value={formData.dependencia}
-              onChange={handleChange}
-              className="select select-bordered w-full" required
-            >
-              <option value="">Seleccione</option>
-              {dependenciaOptions.map((opt) => (
-                <option key={opt}>{opt}</option>
-              ))}
-            </select>
-            {errores.dependencia && <p className="text-red-500 text-sm mt-1">{errores.dependencia}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Emisor:</label>
-            <select
-              name="emisor"
-              value={formData.emisor}
-              onChange={handleChange}
-              className="select select-bordered w-full" required
-            >
-              <option value="">Seleccione</option>
-              {emisorOptions.map((opt) => (
-                <option key={opt}>{opt}</option>
-              ))}
-            </select>
-            {errores.emisor && <p className="text-red-500 text-sm mt-1">{errores.emisor}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Archivo PDF:</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="file-input file-input-bordered w-full" required
-            />
-            {errores.archivo_pdf && <p className="text-red-500 text-sm mt-1">{errores.archivo_pdf}</p>}
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Estado:</label>
-            <select
-              name="estado"
-              value={formData.estado}
-              onChange={handleChange}
-              className="select select-bordered w-full" required
-            >
-              {estadoOptions.map((opt) => (
-                <option key={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Palabras clave:</label>
-            <input
-              type="text"
-              onKeyDown={handleTagChange}
-              placeholder="Separar con coma o Enter"
-              className="input input-bordered w-full" required
-            />
-            {errores.palabras_clave && <p className="text-red-500 text-sm mt-1">{errores.palabras_clave}</p>}
-            <div className="mt-2 flex flex-wrap gap-2">
-              {formData.palabras_clave.map((tag, i) => (
-                <span key={i} className="badge badge-primary gap-1">
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(i)}
-                    className="ml-1"
-                  >
-                    &times;
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-between">
-            <button
-              type="button"
-              onClick={() => setPasoActual(0)}
-              className="btn btn-outline"
-            >
-              Volver
-            </button>
-
-            <button
-                  type="button"
-                  onClick={() => {
-                    if (validarPaso2()) {
-                      setPasoActual(2);
-                    }
-                  }}
-                  className="btn btn-primary"
-                >
-                  Siguiente
-            </button>
-
-          </div>
-        </form>
+        <FormularioDatos
+          formData={formData}
+          setFormData={setFormData}
+          errores={errores}
+          validarPaso2={validarPaso2}
+          onBack={() => setPasoActual(0)}
+          onNext={() => setPasoActual(2)}
+          dependenciaOptions={dependenciaOptions}
+          emisorOptions={emisorOptions}
+          estadoOptions={estadoOptions}
+        />
       )}
 
       {/* PASO 3 - Pregunta condicional */}

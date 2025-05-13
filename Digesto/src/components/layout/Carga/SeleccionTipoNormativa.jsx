@@ -1,4 +1,4 @@
-
+import PropTypes from "prop-types";
 const tipos = [
   "Acta",
   "Resolución",
@@ -31,4 +31,11 @@ function SeleccionTipoNormativa({ tipoActual, onSelect }) {
   );
 }
 
+SeleccionTipoNormativa.propTypes = {
+  tipoActual: PropTypes.string.isRequired,
+  onSelect: PropTypes.func.isRequired,
+};
+
 export default SeleccionTipoNormativa;
+
+
