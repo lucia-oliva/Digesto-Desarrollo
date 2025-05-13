@@ -1,16 +1,18 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
+//TODO: Las validaciones se pueden mejorar en un nuevo componente. (Visualmente, reactivos y por tipo)
 
 function FormularioDatos({
   formData,
   setFormData,
-  errores,
-  validarPaso2,
   onBack,
   onNext,
   dependenciaOptions,
   emisorOptions,
   estadoOptions,
 }) {
+  const [errores, setErrores] = useState({});
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -48,6 +50,25 @@ function FormularioDatos({
         (_, index) => index !== indexToRemove
       ),
     });
+  };
+
+  const validarCampos = () => {
+    const nuevosErrores = {};
+
+    if (!formData.numero.trim()) nuevosErrores.numero = "Ingrese el número.";
+    if (!formData.anio.trim()) nuevosErrores.anio = "Ingrese el año.";
+    if (!formData.titulo.trim()) nuevosErrores.titulo = "Ingrese el título.";
+    if (!formData.resumen.trim()) nuevosErrores.resumen = "Ingrese el resumen.";
+    if (!formData.fecha) nuevosErrores.fecha = "Seleccione una fecha.";
+    if (!formData.dependencia.trim()) nuevosErrores.dependencia = "Seleccione una dependencia.";
+    if (!formData.emisor.trim()) nuevosErrores.emisor = "Seleccione un emisor.";
+    if (!formData.estado.trim()) nuevosErrores.estado = "Seleccione un estado.";
+    if (!formData.archivo_pdf) nuevosErrores.archivo_pdf = "Adjunte un archivo PDF.";
+    if (!formData.palabras_clave || formData.palabras_clave.length === 0)
+      nuevosErrores.palabras_clave = "Ingrese al menos una palabra clave.";
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
   return (
@@ -199,7 +220,7 @@ function FormularioDatos({
         <button
           type="button"
           onClick={() => {
-            if (validarPaso2()) {
+            if (validarCampos()) {
               onNext();
             }
           }}
@@ -212,20 +233,26 @@ function FormularioDatos({
   );
 }
 
+export default FormularioDatos;
 
 FormularioDatos.propTypes = {
-  formData: PropTypes.object.isRequired,
+  formData: PropTypes.shape({
+    tipo_normativa: PropTypes.string.isRequired,
+    numero: PropTypes.string.isRequired,
+    anio: PropTypes.string.isRequired,
+    titulo: PropTypes.string.isRequired,
+    resumen: PropTypes.string.isRequired,
+    fecha: PropTypes.string.isRequired,
+    archivo_pdf: PropTypes.object,
+    dependencia: PropTypes.string.isRequired,
+    emisor: PropTypes.string.isRequired,
+    estado: PropTypes.string.isRequired,
+    palabras_clave: PropTypes.arrayOf(PropTypes.string).isRequired
+  }).isRequired,
   setFormData: PropTypes.func.isRequired,
-  errores: PropTypes.object.isRequired,
-  validarPaso2: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
   onNext: PropTypes.func.isRequired,
-  handleTagChange: PropTypes.func.isRequired,
-  handleRemoveTag: PropTypes.func.isRequired,
-  handleFileChange: PropTypes.func.isRequired,
-  dependenciaOptions: PropTypes.array.isRequired,
-  emisorOptions: PropTypes.array.isRequired,
-  estadoOptions: PropTypes.array.isRequired,
+  dependenciaOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  emisorOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  estadoOptions: PropTypes.arrayOf(PropTypes.string).isRequired
 };
-
-export default FormularioDatos;

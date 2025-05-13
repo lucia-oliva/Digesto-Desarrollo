@@ -3,19 +3,20 @@ import useAxios from "axios-hooks";
 import SeleccionTipoNormativa from "./Carga/SeleccionTipoNormativa"; 
 import FormularioDatos from "./Carga/FormularioDatos";
 import InformacionExtra from "./Carga/InformacionExtra";
+import VerificacionFinal from "./Carga/VerificacionFinal";
 
 //TODO: implementar la funcionalidad para crear normativas... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
-//TODO: Las validaciones se pueden mejorar en un nuevo componente. (Visualmente, reactivos y por tipo)
+
 function Carga() {
   const [pasoActual, setPasoActual] = useState(0);
   const [filteredNormativas, setFilteredNormativas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   const [totalResults, setTotalResults] = useState(0);
-  const [errores, setErrores] = useState({});
-
-
+  const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
+  const emisorOptions = ["Decano", "Consejo Superior"];
+  const estadoOptions = ["publicado", "despublicado"];
   const [formData, setFormData] = useState({
     tipo_normativa: "",
     numero: "",
@@ -31,24 +32,6 @@ function Carga() {
     normativa_modificada: [],
     palabras_clave: [],
   });
-
-  const validarPaso2 = () => {
-  const nuevosErrores = {};
-  if (!formData.numero.trim()) nuevosErrores.numero = "Ingrese el número.";
-  if (!formData.anio.trim()) nuevosErrores.anio = "Ingrese el año.";
-  if (!formData.titulo.trim()) nuevosErrores.titulo = "Ingrese el título.";
-  if (!formData.resumen.trim()) nuevosErrores.resumen = "Ingrese el resumen.";
-  if (!formData.fecha) nuevosErrores.fecha = "Seleccione una fecha.";
-  if (!formData.dependencia.trim()) nuevosErrores.dependencia = "Seleccione una dependencia.";
-  if (!formData.emisor.trim()) nuevosErrores.emisor = "Seleccione un emisor.";
-  if (!formData.estado.trim()) nuevosErrores.estado = "Seleccione un estado.";
-  if (!formData.archivo_pdf) nuevosErrores.archivo_pdf = "Adjunte un archivo PDF.";
-  if (!formData.palabras_clave || formData.palabras_clave.length === 0)
-    nuevosErrores.palabras_clave = "Ingrese al menos una palabra clave.";
-  setErrores(nuevosErrores);
-
-  return Object.keys(nuevosErrores).length === 0;
-};
 
   const [{ loading, error }, refetch] = useAxios(
     {
@@ -142,10 +125,6 @@ function Carga() {
     handleSearchNormativas(formData.normativa_modificada, page);
   };
 
-  const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
-  const emisorOptions = ["Decano", "Consejo Superior"];
-  const estadoOptions = ["publicado", "despublicado"];
-
   return (
     <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
@@ -186,8 +165,6 @@ function Carga() {
         <FormularioDatos
           formData={formData}
           setFormData={setFormData}
-          errores={errores}
-          validarPaso2={validarPaso2}
           onBack={() => setPasoActual(0)}
           onNext={() => setPasoActual(2)}
           dependenciaOptions={dependenciaOptions}
@@ -214,95 +191,14 @@ function Carga() {
           />
         )}
 
+      {/* PASO 4 - Verificación final */}
       {pasoActual === 3 && (
-        <div className="space-y-6 mt-6">
-          <h3 className="text-lg font-semibold mb-4 text-center">
-            Verifique los datos ingresados:
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-base-200 p-4 rounded-lg">
-              <p>
-                <strong>Tipo de Normativa:</strong> {formData.tipo_normativa}
-              </p>
-              <p>
-                <strong>Número:</strong> {formData.numero}
-              </p>
-              <p>
-                <strong>Año:</strong> {formData.anio}
-              </p>
-              <p>
-                <strong>Título:</strong> {formData.titulo}
-              </p>
-              <p>
-                <strong>Resumen:</strong> {formData.resumen}
-              </p>
-              <p>
-                <strong>Fecha:</strong> {formData.fecha}
-              </p>
-              <p>
-                <strong>Archivo PDF:</strong>{" "}
-                {formData.archivo_pdf
-                  ? formData.archivo_pdf.name
-                  : "No se ha cargado ningún archivo"}
-              </p>
-            </div>
-
-            <div className="bg-base-200 p-4 rounded-lg">
-              <p>
-                <strong>Dependencia:</strong> {formData.dependencia}
-              </p>
-              <p>
-                <strong>Emisor:</strong> {formData.emisor}
-              </p>
-              <p>
-                <strong>Estado:</strong> {formData.estado}
-              </p>
-              <p>
-                <strong>Modifica otra normativa:</strong>{" "}
-                {formData.cambia_normativa}
-              </p>
-              {formData.cambia_normativa === "SI" &&
-                formData.normativas_modificadas?.length > 0 && (
-                  <>
-                    <p>
-                      <strong>Normativas Afectadas:</strong>
-                    </p>
-                    <ul className="list-disc list-inside">
-                      {formData.normativas_modificadas.map((n, i) => (
-                        <li key={i}>
-                          {n.numero} - {n.accion}{" "}
-                          {n.comentario && `(${n.comentario})`}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-
-              <p>
-                <strong>Palabras Clave:</strong>{" "}
-                {formData.palabras_clave.join(", ")}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-6">
-            <button
-              type="button"
-              onClick={() => setPasoActual(2)}
-              className="btn btn-outline"
-            >
-              Volver
-            </button>
-            <button
-              type="submit"
-              onClick={handleCreateNormativa}
-              className={`btn btn-success ${creating ? "loading" : ""}`}
-            >
-              Confirmar y Finalizar
-            </button>
-          </div>
-        </div>
+        <VerificacionFinal
+          formData={formData}
+          onBack={() => setPasoActual(2)}
+          onSubmit={handleCreateNormativa}
+          loading={creating}
+        />
       )}
     </div>
   );
