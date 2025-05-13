@@ -4,34 +4,21 @@ import SeleccionTipoNormativa from "./Carga/SeleccionTipoNormativa";
 import FormularioDatos from "./Carga/FormularioDatos";
 import InformacionExtra from "./Carga/InformacionExtra";
 import VerificacionFinal from "./Carga/VerificacionFinal";
-
+import {useFormNormativa} from "../layout/Carga/useFormNormativa.js"
 //TODO: implementar la funcionalidad para crear normativas... 
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
 function Carga() {
   const [pasoActual, setPasoActual] = useState(0);
   const [filteredNormativas, setFilteredNormativas] = useState([]);
+  const [toastVisible, setToastVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   const [totalResults, setTotalResults] = useState(0);
   const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
   const emisorOptions = ["Decano", "Consejo Superior"];
   const estadoOptions = ["publicado", "despublicado"];
-  const [formData, setFormData] = useState({
-    tipo_normativa: "",
-    numero: "",
-    anio: "",
-    titulo: "",
-    resumen: "",
-    fecha: "",
-    dependencia: "",
-    emisor: "",
-    archivo_pdf: null,
-    estado: "Publicado",
-    cambia_normativa: "NO",
-    normativa_modificada: [],
-    palabras_clave: [],
-  });
+  const { formData, setFormData, resetForm } = useFormNormativa();
 
   const [{ loading, error }, refetch] = useAxios(
     {
@@ -74,24 +61,9 @@ function Carga() {
     refetchCreate({ data: formDataToSend })
       .then((response) => {
         console.log("Normativa creada:", response.data);
-        alert("Normativa creada correctamente");
-
-        // Reiniciar el formulario
-        setFormData({
-          tipo_normativa: "",
-          numero: "",
-          anio: "",
-          titulo: "",
-          resumen: "",
-          fecha: "",
-          dependencia: "",
-          emisor: "",
-          archivo_pdf: null,
-          estado: "Publicado",
-          cambia_normativa: "NO",
-          normativa_modificada: [],
-          palabras_clave: [],
-        });
+        resetForm();
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 3000) // Resetear el formulario
         setPasoActual(0); // Volver al paso inicial
       })
       .catch((err) => {
@@ -199,6 +171,14 @@ function Carga() {
           onSubmit={handleCreateNormativa}
           loading={creating}
         />
+      )}
+
+      {toastVisible && (
+        <div className="toast toast-end">
+          <div className="alert alert-success">
+            <span>La normativa se agregó exitosamente.</span>
+          </div>
+        </div>
       )}
     </div>
   );
