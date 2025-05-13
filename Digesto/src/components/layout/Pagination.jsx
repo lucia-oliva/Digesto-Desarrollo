@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { MdOutlineLastPage } from "react-icons/md";
+import { MdOutlineFirstPage } from "react-icons/md";
+
+
 
 function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange }) {
   const totalPages = Math.ceil(totalResults / resultsPerPage);
@@ -16,7 +20,6 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
   };
 
   const handleNextGroup = () => {
-    
     if (endPage < totalPages) {
       setPageGroup(pageGroup + 1);
       handlePageChange(startPage + maxPageButtons);
@@ -54,25 +57,36 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
   };
 
   return (
-    
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
       <div className="flex flex-1 justify-between sm:hidden">
+        <button
+          onClick={() => handlePageChange(1)} // Ir a la primera página
+          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+        >
+          Primera
+        </button>
         <button
           onClick={handlePreviousGroup}
           className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
-          Previous
+          Anterior
         </button>
         <button
           onClick={handleNextGroup}
           className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
-          Next
+          Siguiente
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)} // Ir a la última página
+          className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+        >
+          Última
         </button>
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700">
+          <p className="text-xs text-gray-700">
             Mostrando
             <span className="font-medium">
               {" "}
@@ -96,12 +110,18 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
             className="isolate inline-flex -space-x-px rounded-md shadow-xs"
             aria-label="Pagination"
           >
-            
             <button
-              onClick={handlePreviousGroup}
+              onClick={() => handlePageChange(1)} // Ir a la primera página
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">Primera</span>
+              <MdOutlineFirstPage className='size-5'/>
+            </button>
+            <button
+              onClick={handlePreviousGroup}
+              className="relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+            >
+              <span className="sr-only">Anterior</span>
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 20 20"
@@ -118,9 +138,9 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
             {renderPageButtons()}
             <button
               onClick={handleNextGroup}
-              className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+              className="relative inline-flex items-center px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
-              <span className="sr-only">Next</span>
+              <span className="sr-only">Siguiente</span>
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 20 20"
@@ -134,6 +154,13 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
                 />
               </svg>
             </button>
+            <button
+              onClick={() => handlePageChange(totalPages)} // Ir a la última página
+              className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
+            >
+              <span className="sr-only">Última</span>
+              <MdOutlineLastPage className='size-5'/>              
+            </button>
           </nav>
         </div>
       </div>
@@ -141,11 +168,11 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
   );
 }
 
-Pagination.propTypes = { 
+Pagination.propTypes = {
   currentPage: PropTypes.number.isRequired,
   totalResults: PropTypes.number.isRequired,
   resultsPerPage: PropTypes.number.isRequired,
-  onPageChange: PropTypes.func.isRequired
+  onPageChange: PropTypes.func.isRequired,
 };
 
 export default Pagination;

@@ -37,4 +37,14 @@ async function verifyPassword(enteredPassword, storedHash) {
   return { isMatch: false }; // Si no coincide
 }
 
-export { hashPasswordMD5, hashPasswordBcrypt, verifyPassword };
+//validaciones para el login
+
+async function dataValidation(username, password){
+  //1. Validaciones
+  if(typeof username !== 'string') throw new Error('Username must be a string');
+  if(username.length < 3) throw new Error('Username must be at least 3 characters long');
+  if (typeof password !== 'string') throw new Error('Password must be a string');
+
+}
+
+export { hashPasswordMD5, hashPasswordBcrypt, verifyPassword, dataValidation};

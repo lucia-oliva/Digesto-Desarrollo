@@ -1,8 +1,29 @@
 import normativaDB from "../services/normativa.js";
 import express from "express";
 
+//TODO: A la hora de hacer auditorias, verificar en la funcion de eliminar normativas
+//se se elimina todo lo que corresponde, al igual que la funcion de editar. 
+
 const router = express.Router();
 
+//Crear normativa
+router.post("/create", async (req, res) => {
+  const normativaData = req.body;
+
+  // Validaciones básicas
+  if (!normativaData.numero || !normativaData.titulo || !normativaData.fecha) {
+    return res.status(400).json({ error: "Faltan datos obligatorios" });
+  }
+  try {
+    const result = await normativaDB.createNormativa(normativaData);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("Error al crear la normativa:", error);
+    res.status(500).json({ error: "Error al crear la normativa" });
+  }
+});
+
+//Obtener normativa por id
 router.get("/id/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -14,11 +35,27 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
+//Eliminar normativa por id
+
+router.delete("/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await normativaDB.deleteNormativaById(id);
+    if (!result.success) {
+      return res.status(404).json({ error: result.message });
+    }
+    res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error("Error al eliminar la normativa:", error);
+    res.status(500).json({ error: "Error al eliminar la normativa" });
+  }
+});
+
 //Filtrar normativa por parametros
 router.post("/search", async (req, res) => {
   let { numero, emisor, documento, anio, tags } = req.body;
   let { dependencia } = req.query;
-
+  console.log("parametros:", numero,emisor,documento,anio,tags,dependencia);
   if (!dependencia) {
     dependencia = req.body.dependencia;
   }
@@ -143,6 +180,20 @@ router.get("/normativas", async (req, res) => {
   }
 });
 
+
+//Normativas eliminadas 
+
+router.get("/deleted", async (req, res) => {
+  try{
+    const normativas = await normativaDB.getEliminatedNormatives();
+    res.json(normativas);
+  }catch (error) {
+    console.log("Error al obtener las normativas eliminadas", error);
+    res.status(500).json({ error: "Error al obtener las normativas eliminadas" });
+  }
+
+});
+
 //Filtrar normativas mas buscadas
 router.get("/mas-buscadas", function (req, res) {
   normativaDB
@@ -156,6 +207,23 @@ router.get("/mas-buscadas", function (req, res) {
         .status(500)
         .json({ error: "Error al obtener las normativas mas buscadas" });
     });
+});
+
+
+
+//Actualizar normativa por id
+
+router.put("/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const normativaData = req.body;
+
+  try {
+    const result = await normativaDB.updateNormativa(id, normativaData);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error al actualizar la normativa:", error);
+    res.status(500).json({ error: "Error al actualizar la normativa" });
+  }
 });
 
 export default router;

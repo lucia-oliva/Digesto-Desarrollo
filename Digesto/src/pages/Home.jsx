@@ -50,19 +50,19 @@ function Home() {
               normativas y toda documentacion emitada por todas las dependencias
               de la Universidad Nacional de La Rioja.
             </p>
-            <button
+            <a
               className="btn bg-primary
                 border-slate-800 text-base-200 shadow-none 
                 hover:bg-primary hover:border-primary"
+              href="/busqueda"
             >
               Busqueda Avanzada <IoMdSearch size={20} className="ml-2" />
-            </button>
+            </a>
           </div>
         </div>
       </div>
       <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
         {/* Section de Dependencias */}
-        {/* TODO si trae las dependencias del back actualizar los parametros */}
 
         <Dependencias dependencias={[]} />
 

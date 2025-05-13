@@ -11,7 +11,7 @@
   --color-base-200: oklch(98% 0 0);
   --color-base-300: oklch(95% 0 0);
   --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: oklch(8% 0.243 264.376);
+  --color-primary: oklch(26.7% 0.1 267.075);
   --color-primary-content: oklch(97% 0.014 254.604);
   --color-secondary: oklch(86% 0.127 207.078);
   --color-secondary-content: oklch(30% 0.056 229.695);
@@ -36,6 +36,7 @@
   --depth: 1;
   --noise: 0;
   --font-sans: "Montserrat";
+  --color-submit: #13102e;
 }
 
 /* Edited and custom Classes */
@@ -116,6 +117,58 @@
     font-size: medium;
     font-family: "Raleway",sans-serif;
   }
+
+  #sidebar li{
+    padding-bottom: 0.2rem;
+  }
+
+  #button-sidebar{
+    position: relative;
+    display: inline-block;
+  }
+
+  #button-sidebar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 0%;
+    background-color: white;
+    transition: width 0.4s ease-in-out;
+  }
+
+  #button-sidebar:hover::after {
+    width: 100%;
+  }
+
+  #button-sidebar-children:active{
+    background-color: var(--color-base-100);
+    color: var(--color-primary);
+  }
+
+  #editNormativeModal{
+    position: fixed;
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    z-index: 50; 
+    overflow-x: auto; 
+    overflow-y: auto; 
+  
+    /* Tamaño dinámico */
+    width: calc(100% - 240px); /* Resta el ancho del sidebar */
+    height: calc(100% - 72px); /* Resta la altura del header */
+    max-width: 60%; /* Limita el ancho máximo */
+    max-height: 80%; /* Limita la altura máxima */
+  
+    /* Centrado dinámico */
+    top: calc(50% + 36px); /* Ajusta para centrar verticalmente */
+    left: calc(50% + 120px); /* Ajusta para centrar horizontalmente */
+    transform: translate(-50%, -50%);
+  }
+
   
 }
 
@@ -144,4 +197,6 @@
     font-family: "Raleway", sans-serif;
     background-color: rgb(237, 237, 237)
   }
+
+ 
 }

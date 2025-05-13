@@ -5,10 +5,11 @@ import useAxios from "axios-hooks";
 import SearchBar from "../components/layout/SearchBar";
 import Form from "../components/layout/Form";
 import { useLocation } from "react-router";
-//TODO: La paginacion mueve el focus del screen hacia arriba en cada clickeo a los botones, dejar que se actualice pero que la vista quede estatica en el lugar donde se pueda seguir viendo la paginacion.
-//TODO: Hay que corregir el front-end de tabla y paginacion.
+import ContactModal from "../components/layout/Contact";
 
-function NormativasContainer() {
+
+
+function NormativasContainer({ isAdmin = false}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [tags, setTags] = useState("");
   const resultsPerPage = 10;
@@ -21,6 +22,7 @@ function NormativasContainer() {
   const [documento, setDocumento] = useState("");
   const [anio, setAnio] = useState("");
   const [newDependencia, setDependencia] = useState("");
+  
 
   const params = new URLSearchParams(location.search);
   const dependencia = params.get("dependencia");
@@ -66,6 +68,7 @@ function NormativasContainer() {
         anio: anio,
         dependencia: newDependencia,
         tags: tags,
+       
       },
     },
     { manual: true }
@@ -115,7 +118,9 @@ function NormativasContainer() {
   const totalResults = data?.totalResults || 0;
 
   return (
-    <div className="w-screen min-h-screen p-8 flex justify-center items-center">
+    <div className={`min-h-screen p-5 flex justify-center items-start ${isAdmin ? "w-full" : "w-screen items-center"}`}
+    
+    >
       <div className="w-auto bg-gray-100 text-neutral text-center p-10 rounded-lg shadow-lg">
         <Form
           dependencia={dependencia}
@@ -143,7 +148,8 @@ function NormativasContainer() {
           </div>
         ) : (
           <>
-            <Table normativas={normativas} />
+            <Table normativas={normativas}
+            />
             <Pagination
               currentPage={currentPage}
               totalResults={totalResults}
@@ -153,6 +159,7 @@ function NormativasContainer() {
           </>
         )}
       </div>
+        {!isAdmin && <ContactModal />}
     </div>
   );
 }

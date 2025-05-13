@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useParams } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
+
+//BUG: No se puede scrollear la informacion por lo que no se ve el boton de descarga a veces...
+
 function DocumentView() {
   const { id } = useParams();
   const [pdfUrl, setPdfUrl] = useState("");
@@ -77,14 +80,13 @@ function DocumentView() {
                 </p>
 
                 {pdfUrl && (
-                  <button
+                  <a
+                    href={pdfUrl}
                     className="btn btn-primary justify-self-end"
-                    onClick={() => {
-                      window.open(pdfUrl, "_blank");
-                    }}
+                    download={normativa?.archivo || "documento.pdf"}
                   >
                     Descargar PDF
-                  </button>
+                  </a>
                 )}
               </div>
             </div>

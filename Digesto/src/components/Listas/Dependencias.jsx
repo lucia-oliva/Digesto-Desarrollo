@@ -39,7 +39,7 @@ function Dependencias({ dependencias }) {
             text-white font-medium md:text-xl
             ${colors[index] || "bg-slate-400"}
             hover:-translate-y-1 hover:shadow-lg
-            transition-all duration-300 ease-in-out
+            transition-all duration-300 ease-in-out 
             `}
         >
           <figure className="flex items-center self-start justify-start w-10 h-10 rounded-full">
