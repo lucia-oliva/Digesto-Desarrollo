@@ -1,3 +1,4 @@
+//Este componente hace referencia al paso 3 de Carga, que es donde agregamos informacion sobre normativas modificadas.
 import PropTypes from "prop-types";
 import Table from "../Table.jsx";
 import Pagination from "../Pagination.jsx";

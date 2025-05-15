@@ -1,3 +1,5 @@
+//Este componente hace el paso 2 de Carga. Cuando Rellenamos los datos de la nueva normativa.
+
 import PropTypes from "prop-types";
 import { useState } from "react";
 //TODO: Las validaciones se pueden mejorar en un nuevo componente. (Visualmente, reactivos y por tipo)

@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import useAxios from "axios-hooks";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-
+//BUG: Cuando seleccionamos una pagina (Ej: 41) y buscamos por un filtro q no tiene esa cantidad de paginas (Ej: Aplicadas (40 Pags max), se bugea y muestra el mensaje de que no hay normativas).
 function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emisor,numero}) {
   const navigate = useNavigate();
   const [years, setYears] = useState([]);

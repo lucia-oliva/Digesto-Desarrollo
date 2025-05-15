@@ -1,3 +1,5 @@
+//Este componente hace referencia al paso 4 del componente Carga, donde se visualiza los datos ingresados al usuario
+
 import PropTypes from "prop-types";
 
 const tipoNormativaMap = {

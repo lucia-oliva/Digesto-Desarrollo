@@ -1,3 +1,4 @@
+//Este componente hace referencia a la estructura de los datos del formulario de Carga, incluyendo el reseteo del mismo.
 import { useState } from "react";
 
 export function useFormNormativa() {

@@ -1,3 +1,4 @@
+//Este componente hace referencia al paso 1 del componente Carga, donde seleccionamos el tipo de normativa de la normativa nueva.
 import PropTypes from "prop-types";
 
 const tipoNormativaMap = {
