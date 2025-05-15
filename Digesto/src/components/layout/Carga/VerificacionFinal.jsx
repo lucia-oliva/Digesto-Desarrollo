@@ -1,6 +1,31 @@
 import PropTypes from "prop-types";
 
-function VerificacionFinal({ formData, onBack, onSubmit, loading }) {
+const tipoNormativaMap = {
+  "Acta": 2,
+  "Resolución": 5,
+  "Convenio": 3,
+  "Nota": 6,
+  "Providencia": 4,
+  "Ordenanza": 1,
+};
+
+const tipoNormativaTexto = Object.entries(tipoNormativaMap).reduce((acc, [key, value]) => {
+  acc[value] = key;
+  return acc;
+}, {});
+
+function VerificacionFinal({ formData, onBack, onSubmit, loading, dependenciaMap, emisorMap}) {
+
+  const dependenciaMaptexto = Object.entries(dependenciaMap).reduce((acc, [key, value]) => {
+  acc[value] = key;
+  return acc;
+}, {});
+
+  const emisorMaptexto = Object.entries(emisorMap).reduce((acc, [key, value]) => {
+  acc[value] = key;
+  return acc;
+}, {});
+
   return (
     <div className="space-y-6 mt-6">
       <h3 className="text-lg font-semibold mb-4 text-center">
@@ -9,7 +34,7 @@ function VerificacionFinal({ formData, onBack, onSubmit, loading }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-base-200 p-4 rounded-lg">
-          <p><strong>Tipo de Normativa:</strong> {formData.tipo_normativa}</p>
+          <p><strong>Tipo de Normativa:</strong> {tipoNormativaTexto[formData.tipo_normativa]}</p>
           <p><strong>Número:</strong> {formData.numero}</p>
           <p><strong>Año:</strong> {formData.anio}</p>
           <p><strong>Título:</strong> {formData.titulo}</p>
@@ -19,8 +44,8 @@ function VerificacionFinal({ formData, onBack, onSubmit, loading }) {
         </div>
 
         <div className="bg-base-200 p-4 rounded-lg">
-          <p><strong>Dependencia:</strong> {formData.dependencia}</p>
-          <p><strong>Emisor:</strong> {formData.emisor}</p>
+          <p><strong>Dependencia:</strong> {dependenciaMaptexto[formData.dependencia]}</p>
+          <p><strong>Emisor:</strong>{emisorMaptexto[formData.emisor]}</p>
           <p><strong>Estado:</strong> {formData.estado}</p>
           <p><strong>Modifica otra normativa:</strong> {formData.cambia_normativa}</p>
 
@@ -81,7 +106,9 @@ VerificacionFinal.propTypes = {
   }).isRequired,
   onBack: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  dependenciaMap: PropTypes.object.isRequired,
+  emisorMap: PropTypes.object.isRequired
 };
 
 export default VerificacionFinal;

@@ -1,12 +1,7 @@
 import PropTypes from "prop-types";
-const tipos = [
-  "Acta",
-  "Resolución",
-  "Convenio",
-  "Nota",
-  "Providencia",
-  "Ordenanza",
-];
+
+const tipoNormativaMap = {
+    "Acta": 2,"Resolucion": 5,"Convenio": 3,"Nota": 6,"Providencia": 4,"Ordenanza": 1,};
 
 function SeleccionTipoNormativa({ tipoActual, onSelect }) {
   return (
@@ -15,12 +10,12 @@ function SeleccionTipoNormativa({ tipoActual, onSelect }) {
         Seleccione el tipo de normativa a cargar:
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {tipos.map((tipo) => (
+        {Object.keys(tipoNormativaMap).map((tipo) => (
           <button
             key={tipo}
-            onClick={() => onSelect(tipo)}
+            onClick={() => onSelect(tipoNormativaMap[tipo])}
             className={`card p-4 border rounded-md text-center cursor-pointer hover:bg-primary hover:text-white transition ${
-              tipoActual === tipo ? "bg-primary text-white" : "bg-base-200"
+              tipoActual === tipoNormativaMap[tipo] ? "bg-primary text-white" : "bg-base-200"
             }`}
           >
             {tipo}

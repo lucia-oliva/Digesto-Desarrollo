@@ -15,10 +15,16 @@ function Carga() {
   const [currentPage, setCurrentPage] = useState(1);
   const resultsPerPage = 10;
   const [totalResults, setTotalResults] = useState(0);
-  const dependenciaOptions = ["Aplicadas", "Exactas", "Humanas"];
-  const emisorOptions = ["Decano", "Consejo Superior"];
+  const dependenciaMap = {
+    "Aplicadas": 1, "Exactas": 2, "Humanidades": 5,"Salud": 3, "Sociales": 4,"Sede Chepes": 22,"Sede Chamical": 25,
+    "Sede Villa Unión": 26, "Sede Catuna": 23,"Sede Aimogasta": 24,"Consejo Superior": 20,};
+  const emisorMap = {
+    "Decano": 1,"Consejo Superior": 4,"Rector": 2,"Concejo Directivo": 3,"Interdepartamental": 5,"Relaciones Institucionales": 11,};
   const estadoOptions = ["publicado", "despublicado"];
   const { formData, setFormData, resetForm } = useFormNormativa();
+
+
+
 
   const [{ loading, error }, refetch] = useAxios(
     {
@@ -139,8 +145,8 @@ function Carga() {
           setFormData={setFormData}
           onBack={() => setPasoActual(0)}
           onNext={() => setPasoActual(2)}
-          dependenciaOptions={dependenciaOptions}
-          emisorOptions={emisorOptions}
+          dependenciaOptions={dependenciaMap}
+          emisorOptions={emisorMap}
           estadoOptions={estadoOptions}
         />
       )}
@@ -170,6 +176,8 @@ function Carga() {
           onBack={() => setPasoActual(2)}
           onSubmit={handleCreateNormativa}
           loading={creating}
+          dependenciaMap={dependenciaMap}
+          emisorMap={emisorMap}
         />
       )}
 

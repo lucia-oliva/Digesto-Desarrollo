@@ -8,7 +8,7 @@ import tagService from "./tag.js";
   async function createNormativa(data) {
     const {
       numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,tags,archivo,} = data;
-  
+        console.log("normativaData", data);
     try {
       const fechaSubida = new Date().toISOString().split("T")[0]; 
       const sqlInsertNormativa = `

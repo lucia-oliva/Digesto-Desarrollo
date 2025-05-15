@@ -144,8 +144,8 @@ function FormularioDatos({
           className={`select select-bordered w-full ${errores.dependencia ? "select-error" : ""}`}
         >
           <option value="">Seleccione</option>
-          {dependenciaOptions.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
+          {Object.entries(dependenciaOptions).map(([key,value]) => (
+            <option key={key} value={value}>{key}</option>
           ))}
         </select>
         {errores.dependencia && <p className="text-red-500 text-sm">{errores.dependencia}</p>}
@@ -160,8 +160,8 @@ function FormularioDatos({
           className={`select select-bordered w-full ${errores.emisor ? "select-error" : ""}`}
         >
           <option value="">Seleccione</option>
-          {emisorOptions.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
+          {Object.entries(emisorOptions).map(([key,value]) => (
+            <option key={key} value={value}>{key}</option>
           ))}
         </select>
         {errores.emisor && <p className="text-red-500 text-sm">{errores.emisor}</p>}
