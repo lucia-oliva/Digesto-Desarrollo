@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 
 export default function ContactModal() {
   const modalRef = useRef(null);

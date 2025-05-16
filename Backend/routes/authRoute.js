@@ -22,14 +22,12 @@ router.post("/login", async (req, res) => {
     [email]
   );
 
-  console.log(user);
-
-  if (user.length === 0) {
-    return res.status(401).json({ error: "Usuario no encontrado" });
+  if (user== null || user.length === 0  ) {
+    return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
   const { isMatch, newHash } = await verifyPassword(password, user[0].clave);
   if (!isMatch) {
-    return res.status(401).json({ error: "Contraseña incorrecta" });
+    return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
   if (newHash) {
     await db.query("UPDATE usuario SET clave = ? WHERE id = ?", [
@@ -52,20 +50,28 @@ router.post("/login", async (req, res) => {
     .json({ accessToken });
 });
 
+
 router.post("/refresh-token", async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) {
-    return res.status(401);
+    return res.status(403).json({ msg: "Token inválido" });
   }
 
   try {
     const payload = verifyRefreshToken(refreshToken);
+
+    if (!payload.user.id) {
+      return res.status(403).json({ msg: "Token inválido" });
+    }
+
     const [user] = await db.query(
       "SELECT id, email, nombre FROM usuario WHERE id = ?",
-      [payload.id]
+      [payload.user.id]
     );
-    if (user.length === 0) {
-      return res.status(403);
+    
+    if (!user || user.length === 0) {
+      return res.status(401).json({ msg: "Usuario no encontrado" });
     }
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
@@ -87,17 +93,28 @@ router.post("/refresh-token", async (req, res) => {
 
 router.post("/logout", async (req, res) => {
   const token = req.cookies.refreshToken;
+
   if (token) {
     try {
-      const { id } = verifyRefreshToken(token);
-      /* TODO: Crear la columna refreshToken en la tabla usuario
-      await db.query("UPDATE usuario SET refreshToken = NULL WHERE id = ?", [id]);
-      */
+      const {user}  = verifyRefreshToken(token);
+      
+      // Simulación del update, ya que la columna no existe
+      console.log(`Simulando logout para usuario ID ${user}`);
+      
+      // TODO real:
+      // await db.query("UPDATE usuario SET refreshToken = NULL WHERE id = ?", [id]);
+      
     } catch (error) {
-      return res.status(403);
+      console.error("Token inválido:", error);
+      return res.status(403).json({ error: "Token inválido" });
     }
   }
-  res.clearCookie("refreshToken").sendStatus(204);
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true, // solo en producción con HTTPS
+    sameSite: "Strict"
+  }).sendStatus(204);
 });
 
 export default router;

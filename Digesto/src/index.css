@@ -76,7 +76,6 @@
     cursor: pointer;
   }
 
-
   /* Custom slide down animation */
   @keyframes slide-down {
     from {
@@ -107,22 +106,26 @@
       --color-neutral-content: var(--color-primary);
     }
   }
-  
-  .button{
-    font-family: "Raleway" ,sans-serif;
-  
+
+  .navbar-menu .menu:active {
+    --color-neutral: var(--color-primary);
+    --color-neutral-content: var(--color-primary-content);
   }
 
-  td{
+  .button {
+    font-family: "Raleway", sans-serif;
+  }
+
+  td {
     font-size: medium;
-    font-family: "Raleway",sans-serif;
+    font-family: "Raleway", sans-serif;
   }
 
-  #sidebar li{
+  #sidebar li {
     padding-bottom: 0.2rem;
   }
 
-  #button-sidebar{
+  #button-sidebar {
     position: relative;
     display: inline-block;
   }
@@ -142,34 +145,32 @@
     width: 100%;
   }
 
-  #button-sidebar-children:active{
+  #button-sidebar-children:active {
     background-color: var(--color-base-100);
     color: var(--color-primary);
   }
 
-  #editNormativeModal{
+  #editNormativeModal {
     position: fixed;
     background-color: white;
     padding: 1.5rem;
-    border-radius: 0.5rem; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-    z-index: 50; 
-    overflow-x: auto; 
-    overflow-y: auto; 
-  
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    overflow-x: auto;
+    overflow-y: auto;
+
     /* Tamaño dinámico */
     width: calc(100% - 240px); /* Resta el ancho del sidebar */
     height: calc(100% - 72px); /* Resta la altura del header */
     max-width: 60%; /* Limita el ancho máximo */
     max-height: 80%; /* Limita la altura máxima */
-  
+
     /* Centrado dinámico */
     top: calc(50% + 36px); /* Ajusta para centrar verticalmente */
     left: calc(50% + 120px); /* Ajusta para centrar horizontalmente */
     transform: translate(-50%, -50%);
   }
-
-  
 }
 
 /* CSS RESET */
@@ -180,7 +181,6 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    
   }
 
   /* For Firefox. */
@@ -195,8 +195,6 @@
 
   body {
     font-family: "Raleway", sans-serif;
-    background-color: rgb(237, 237, 237)
+    background-color: rgb(237, 237, 237);
   }
-
- 
 }

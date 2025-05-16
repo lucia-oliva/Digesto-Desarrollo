@@ -8,7 +8,6 @@ import tagService from "./tag.js";
   async function createNormativa(data) {
     const {
       numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,tags,archivo,} = data;
-  
     try {
       const fechaSubida = new Date().toISOString().split("T")[0]; 
       const sqlInsertNormativa = `
@@ -25,16 +24,12 @@ import tagService from "./tag.js";
   
       // Insertar los tags relacionados en la tabla `tag_normativa`
       await tagService.insertTagsForNormativa(normativaId, tags);
-  
       return { success: true, message: "Normativa creada correctamente", id: normativaId };
     } catch (error) {
       console.error("Error al crear la normativa:", error);
       throw error;
     }
   }
-  
- 
-  
 
 //Delete by id
   //TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria. 

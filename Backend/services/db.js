@@ -16,7 +16,6 @@ async function query(sql, params) {
       if (result.length === 0) {
         return null;
       }
-
       return result;
     } catch (error) {
       if (error.errno === 1045) {
@@ -33,7 +32,6 @@ async function query(sql, params) {
 
     return `Error al realizar la consulta: ${code}`;
   }
-  // return pool.query(sql, params);
 }
 
 export default { query };
