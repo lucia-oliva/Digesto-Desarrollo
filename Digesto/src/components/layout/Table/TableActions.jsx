@@ -45,7 +45,7 @@ function TableActions({ normativa, isSelected, onSelect, onDeselect, onEdit, onD
           </button>
           <button
             onClick={() => onDelete(normativa.id)}
-            className="btn btn-error btn-md px-9 m-1"
+            className="btn btn-error btn-md px-9 m-1 text-amber-50"
           >
             Eliminar
           </button>
