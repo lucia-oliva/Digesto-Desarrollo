@@ -12,17 +12,17 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
-  
+
   if (!email || !password) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
-  const user = await db.query(
-    "SELECT u.id, u.email, u.clave, u.nombre, tu.permiso, tu.nombre as Rol FROM usuario u JOIN tipo_usuario tu on tu.id = u.id WHERE email = ?"
+ const user = await db.query(
+    "SELECT id, email, clave, nombre FROM usuario WHERE email = ?",
     [email]
   );
-
-  if (user== null || user.length === 0  ) {
+  
+  if (user == null || user.length === 0) {
     return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
   const { isMatch, newHash } = await verifyPassword(password, user[0].clave);
@@ -50,7 +50,6 @@ router.post("/login", async (req, res) => {
     .json({ accessToken });
 });
 
-
 router.post("/refresh-token", async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
@@ -66,10 +65,10 @@ router.post("/refresh-token", async (req, res) => {
     }
 
     const [user] = await db.query(
-      "SELECT id, email, nombre FROM usuario WHERE id = ?",
+      "SELECT u.id, u.email, u.nombre, tu.permiso, tu.nombre as Rol FROM usuario u JOIN tipo_usuario tu ON u.id_tipo_usuario = tu.id WHERE u.id = ?",
       [payload.user.id]
     );
-    
+
     if (!user || user.length === 0) {
       return res.status(401).json({ msg: "Usuario no encontrado" });
     }
@@ -96,25 +95,26 @@ router.post("/logout", async (req, res) => {
 
   if (token) {
     try {
-      const {user}  = verifyRefreshToken(token);
-      
+      const { user } = verifyRefreshToken(token);
+
       // Simulación del update, ya que la columna no existe
       console.log(`Simulando logout para usuario ID ${user}`);
-      
+
       // TODO real:
       // await db.query("UPDATE usuario SET refreshToken = NULL WHERE id = ?", [id]);
-      
     } catch (error) {
       console.error("Token inválido:", error);
       return res.status(403).json({ error: "Token inválido" });
     }
   }
 
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: true, // solo en producción con HTTPS
-    sameSite: "Strict"
-  }).sendStatus(204);
+  res
+    .clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true, // solo en producción con HTTPS
+      sameSite: "Strict",
+    })
+    .sendStatus(204);
 });
 
 export default router;
