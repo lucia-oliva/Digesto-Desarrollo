@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
   }
 
   const user = await db.query(
-    "SELECT id, email, clave, nombre FROM usuario WHERE email = ?",
+    "SELECT u.id, u.email, u.clave, u.nombre, tu.permiso, tu.nombre as Rol FROM usuario u JOIN tipo_usuario tu on tu.id = u.id WHERE email = ?"
     [email]
   );
 
