@@ -54,6 +54,7 @@ async function createUsuario(user) {
   //return results;
 //}
 
+//Falta ver el tema de la contraseña... quizas agregar la funcion de recuperar contraseña via gmail??
 export async function updateUsuario(id, datos) {
   // Construir dinámicamente el SET del SQL
   const campos = [];
@@ -75,17 +76,23 @@ export async function updateUsuario(id, datos) {
     campos.push("id_tipo_usuario=?");
     valores.push(datos.id_tipo_usuario);
   }
+ //Cambiar clave solo si se envia la clave y clave actual_actual
   if (datos.clave && datos.clave_actual) {
-   
-    const nuevaClave = await hashPasswordBcrypt(datos.clave);
-    campos.push("clave=?");
-    valores.push(nuevaClave);
-     const [rows] = await db.query("SELECT clave FROM usuario WHERE id = ?", [id]);
-    if (!rows || rows.length === 0) throw new Error("Usuario no encontrado");
-    const claveGuardada = rows[0].clave;
-
-    const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
-    if (!isMatch) throw new Error("La contraseña actual es incorrecta");
+     //1. traer la clave actual de la BD
+     console.log("ID recibido:", id);
+    const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [id]);
+    if (!result[0] || result.length === 0) {
+    throw new Error("Usuario no encontrado");
+  } 
+const claveGuardada = result[0].clave;
+const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
+if (!isMatch) {
+  console.log("Contraseña actual incorrecta");
+  throw new Error("La contraseña actual es incorrecta");
+}
+const nuevaClave = await hashPasswordBcrypt(datos.clave);
+campos.push("clave=?");
+valores.push(nuevaClave);
   }
 
   if (campos.length === 0) throw new Error("No hay campos para actualizar");
