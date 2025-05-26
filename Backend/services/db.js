@@ -8,6 +8,8 @@ async function query(sql, params) {
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.execute(sql, params);
+      console.log(result);
+      
 
       if (result.affectedRows === 0) {
         return null;

@@ -1,4 +1,5 @@
 import db from "./db.js";
+import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
 // Funciones CRUD basicas
 
@@ -11,9 +12,10 @@ async function getAllUsuarios() {
 
 //Mostrar usuario por ID
 async function getUsuarioById(id) {
-  const sql = "SELECT * FROM usuario WHERE id = ?";
+  const sql ="SELECT id, telefono, estado, email, nombre, id_tipo_usuario FROM usuario WHERE id = ?";
   const results = await db.query(sql, [id]);
-  return results[0];
+  console.log(results);
+  return results;
 }
 
 /*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
@@ -40,16 +42,59 @@ async function createUsuario(user) {
   return results;
 }
 //Modificar usuario
-async function updateUsuario(id, data) {
-  const sql =
-    "UPDATE usuario SET nombre = ?, email = ?, clave = ? WHERE id = ?";
-  const results = await db.query(sql, [
-    data.nombre,
-    data.email,
-    data.clave,
-    id,
-  ]);
-  return results;
+//async function updateUsuario(id, data) {
+  //const sql =
+    //"UPDATE usuario SET nombre = ?, email = ?, clave = ? WHERE id = ?";
+  //const results = await db.query(sql, [
+    //data.nombre,
+    //data.email,
+    //data.clave,
+    //id,
+  //]);
+  //return results;
+//}
+
+export async function updateUsuario(id, datos) {
+  // Construir dinámicamente el SET del SQL
+  const campos = [];
+  const valores = [];
+
+  if (datos.nombre !== undefined) {
+    campos.push("nombre=?");
+    valores.push(datos.nombre);
+  }
+  if (datos.email !== undefined) {
+    campos.push("email=?");
+    valores.push(datos.email);
+  }
+  if (datos.telefono !== undefined) {
+    campos.push("telefono=?");
+    valores.push(datos.telefono);
+  }
+  if (datos.id_tipo_usuario !== undefined) {
+    campos.push("id_tipo_usuario=?");
+    valores.push(datos.id_tipo_usuario);
+  }
+  if (datos.clave && datos.clave_actual) {
+   
+    const nuevaClave = await hashPasswordBcrypt(datos.clave);
+    campos.push("clave=?");
+    valores.push(nuevaClave);
+     const [rows] = await db.query("SELECT clave FROM usuario WHERE id = ?", [id]);
+    if (!rows || rows.length === 0) throw new Error("Usuario no encontrado");
+    const claveGuardada = rows[0].clave;
+
+    const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
+    if (!isMatch) throw new Error("La contraseña actual es incorrecta");
+  }
+
+  if (campos.length === 0) throw new Error("No hay campos para actualizar");
+
+  const sql = `UPDATE usuario SET ${campos.join(", ")} WHERE id=?`;
+  valores.push(id);
+
+  await db.query(sql, valores);
+  return true;
 }
 
 //Eliminar usuario

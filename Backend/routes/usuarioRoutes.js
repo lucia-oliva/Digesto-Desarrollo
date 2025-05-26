@@ -35,21 +35,14 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const id = req.params.id; // Capturamos el ID desde la URL
-  const data = req.body; // Capturamos los datos del usuario desde el cuerpo
-
   try {
-    const result = await UsuariosDB.updateUsuario(id, data);
-    
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Usuario no encontrado o sin cambios" });
-    }
-    
-    res.json({ message: "Usuario actualizado correctamente" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    await UsuariosDB.updateUsuario(req.params.id, req.body);
+    res.json({ success: true, message: "Usuario actualizado" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
+
 
 router.get("/filter/:id", async (req, res) => {
   const id = req.params.id;

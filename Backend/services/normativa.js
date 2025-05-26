@@ -91,6 +91,8 @@ async function searchById(id) {
     const sql =
       "SELECT n.titulo , CONCAT(n.numero, '/', n.anio) AS numero , n.archivo , n.resumen , DATE_FORMAT(n.fecha_normativa, '%d-%m-%Y') AS fecha ,e.nombre AS emisor,d.nombre AS dependencia,tn.nombre AS tipo_normativa FROM normativa n JOIN emisor e ON n.id_emisor = e.id  JOIN dependencia d ON d.id = n.id_dependencia  JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa WHERE n.id = ?";
     const results = await db.query(sql, [id]);
+    console.log(results);
+    
     if (!results) {
       console.log("No se encontró la normativa con el índice", id);
       return null;
