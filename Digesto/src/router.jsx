@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import RequireAuth from "./services/RequireAuth";
 import Logout from "./pages/auth/Logout";
 import EditarUsuario from "./pages/admin/editUser"
+import PaginaPruebaLogin from "./pages/PaginaPruebaLogin";
 const Router = () => {
   return (
     <BrowserRouter>
@@ -27,6 +28,7 @@ const Router = () => {
             <Route index element={<AdminDashboard />} />
             <Route path="logout" element={<Logout />} />
             <Route path="usuario" element={<EditarUsuario />} />
+            <Route path="test" element={<PaginaPruebaLogin />} />
           </Route>
         </Route>
       </Routes>
