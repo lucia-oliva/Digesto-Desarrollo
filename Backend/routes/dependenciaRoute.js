@@ -61,4 +61,37 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+//Filtrar dependencia por parametros
+router.post("/search", async (req, res) => {
+  let {nombre,estado} = req.body;
+  console.log("parametros:",nombre,estado);
+  let { page } = req.query;
+  let limite = 10;
+  page = parseInt(page, 10) || 1;
+  try {
+    // Si hay otros parámetros, filtrar por ellos
+    const offset = (page - 1) * limite;
+    //Get the total count of results
+    const { dependencias, totalResults } =
+      await dependenciaDB.searchDependenciaByParameters(
+        nombre,
+        estado,
+        limite,
+        offset,
+      );
+    if (!dependencias || dependencias.length === 0) {
+      return res
+        .status(404)
+        .json({
+          error: "No se encontró las dependencias que coincidan con su búsqueda",
+        });
+    }
+    res.status(200).json({ dependencias, totalResults });
+  } catch (err) {
+    console.log("Error al buscar la dependencia", err);
+    res.status(500).json({ error: "Error al buscar la dependencia" });
+  }
+});
+
+
 export default router;

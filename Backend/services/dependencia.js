@@ -68,4 +68,46 @@ async function getAllNamesDependencias() {
     return results;
   }
 
-export default {getAllDependencias, getDepenendenciaById, createDependencia, deleteDependencia, getAllNamesDependencias}
+
+//Buscar dependencia por parametros 
+//Buscar usuarios por parametros
+async function searchDependenciaByParameters(
+  nombre,
+  estado, 
+  limite = null,
+  offset = null
+){
+  try{
+    let sql = "SELECT d.id, d.nombre,d.nombre_completo,d.estado,d.codificacion, COUNT(*)OVER() AS total FROM dependencia d WHERE 1=1";
+    const params = [];
+    if (nombre) {
+      sql += " AND d.nombre LIKE ?";
+      params.push(`%${nombre}%`);
+    }
+    if (estado) {
+      sql += " AND d.estado = ?";
+      params.push(estado);
+    }
+    sql += " GROUP BY d.id";
+    if (limite !== null && offset !== null) {
+      sql += " LIMIT ? OFFSET ?";
+      params.push(Number(limite) || 10, Number(offset) || 0);
+    }
+    const results = await db.query(sql, params);
+    const totalResults = results?.length > 0 ? results[0].total : 0;
+    console.log(params,sql);
+     if (!results) {
+      console.log(
+        "No se encontró las dependencias con los parámetros especificados"
+      );
+      return { dependencias: [], totalResults };
+    }
+    return { dependencias: results, totalResults };
+  }catch (error) {
+    console.error("Error al buscar dependencias por parámetros:", error);
+  }
+}
+
+
+
+export default {getAllDependencias, getDepenendenciaById, createDependencia, deleteDependencia, getAllNamesDependencias, searchDependenciaByParameters}
