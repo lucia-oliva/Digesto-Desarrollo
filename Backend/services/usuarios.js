@@ -131,4 +131,53 @@ async function UsuarioByEmailAndEstado(email){
   return results;
 }
 
-export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, deleteUsuario, filterUsuariosporDepartament, UsuarioByEmailAndEstado};
+//Buscar usuarios por parametros
+async function searchUsuariosByParameters(
+  tipoUsuario,
+  nombre,
+  dependencia, 
+  estado,
+  limite = null,
+  offset = null
+){
+  try{
+    let sql = "SELECT u.id,u.nombre, u.telefono, u.email, DATE_FORMAT(u.fecha_alta, '%Y-%m-%d') AS fecha_alta,DATE_FORMAT(u.ultima_visita, '%Y-%m-%d') AS ultima_visita,u.estado, tu.nombre AS rol, d.nombre AS dependencia, COUNT(*)OVER() AS total FROM usuario u JOIN tipo_usuario tu ON tu.id = u.id_tipo_usuario  LEFT JOIN dependencia d ON d.id = u.id_dependencia WHERE 1=1";
+    const params = [];
+    if (tipoUsuario) {
+      sql += " AND id_tipo_usuario = ?";
+      params.push(tipoUsuario);
+    }
+    if (nombre) {
+      sql += " AND u.nombre LIKE ?";
+      params.push(`%${nombre}%`);
+    }
+    if (dependencia) {
+      sql += " AND id_dependencia = ?";
+      params.push(dependencia);
+    }
+    if (estado) {
+      sql += " AND u.estado = ?";
+      params.push(estado);
+    }
+    sql += " GROUP BY u.id";
+    if (limite !== null && offset !== null) {
+      sql += " LIMIT ? OFFSET ?";
+      params.push(Number(limite) || 10, Number(offset) || 0);
+    }
+    const results = await db.query(sql, params);
+    const totalResults = results?.length > 0 ? results[0].total : 0;
+    console.log(params,sql);
+     if (!results) {
+      console.log(
+        "No se encontró los usuarios con los parámetros especificados"
+      );
+      return { usuarios: [], totalResults };
+    }
+    return { usuarios: results, totalResults };
+  }catch (error) {
+    console.error("Error al buscar usuarios por parámetros:", error);
+  }
+}
+
+
+export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, deleteUsuario, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters};

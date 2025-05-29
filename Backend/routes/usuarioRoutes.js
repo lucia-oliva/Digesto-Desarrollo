@@ -77,4 +77,43 @@ router.post("/userEmail", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+//Filtrar usuarios por parametros
+router.post("/search", async (req, res) => {
+  let {tipoUsuario,nombre,estado} = req.body;
+  let {dependencia} = req.query;
+  console.log("parametros:", tipoUsuario,nombre,estado,dependencia);
+  if (!dependencia) {
+    dependencia = req.body.dependencia;
+  }
+  let { page } = req.query;
+  let limite = 10;
+  page = parseInt(page, 10) || 1;
+  try {
+    // Si hay otros parámetros, filtrar por ellos
+    const offset = (page - 1) * limite;
+    //Get the total count of results
+    const { usuarios, totalResults } =
+      await UsuariosDB.searchUsuariosByParameters(
+        tipoUsuario,
+        nombre,
+        dependencia,
+        estado,
+        limite,
+        offset,
+      );
+    if (!usuarios || usuarios.length === 0) {
+      return res
+        .status(404)
+        .json({
+          error: "No se encontró los usuarios que coincidan con su búsqueda",
+        });
+    }
+    res.status(200).json({ usuarios, totalResults });
+  } catch (err) {
+    console.log("Error al buscar el usuario", err);
+    res.status(500).json({ error: "Error al buscar el usuario" });
+  }
+});
+
 export default router;
