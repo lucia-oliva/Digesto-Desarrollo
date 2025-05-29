@@ -63,4 +63,46 @@ async function getTagsByNormativaId(id) {
   }
 }
 
-export default {getAllTags, getTagsByNormativaId,insertTagsForNormativa};
+//Buscar tags por parametros 
+
+async function searchTagsByParameters(
+  nombre,
+  letra, 
+  limite = null,
+  offset = null
+){
+  try{
+    let sql = "SELECT * FROM tag WHERE 1=1";
+    const params = [];
+    if (letra) {
+      sql += " AND tag.nombre LIKE ? ";
+      params.push(`${letra}%`);
+    }
+
+    if (nombre) {
+      sql += " AND tag.nombre LIKE ? ";
+      params.push(`%${nombre}%`);
+    }
+  
+    sql += " ORDER BY nombre ASC";
+    if (limite !== null && offset !== null) {
+      sql += " LIMIT ? OFFSET ?";
+      params.push(Number(limite) || 10, Number(offset) || 0);
+    }
+    const results = await db.query(sql, params);
+    const totalResults = results?.length > 0 ? results[0].total : 0;
+    console.log(params,sql);
+     if (!results) {
+      console.log(
+        "No se encontró los tags con los parámetros especificados"
+      );
+      return { tags: [], totalResults };
+    }
+    return { tags: results, totalResults };
+  }catch (error) {
+    console.error("Error al buscar tags por parámetros:", error);
+  }
+}
+
+
+export default {getAllTags, getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters};

@@ -46,4 +46,39 @@ router.post("/tags/normativa/:id", async (req, res) => {
   }
 });
 
+
+//Filtrar dependencia por parametros
+router.post("/search", async (req, res) => {
+  let {nombre,letra} = req.body;
+  console.log("parametros:",nombre,letra);
+  let { page } = req.query;
+  let limite = 10;
+  page = parseInt(page, 10) || 1;
+  try {
+    // Si hay otros parámetros, filtrar por ellos
+    const offset = (page - 1) * limite;
+    //Get the total count of results
+    const { tags, totalResults } =
+      await tagsDB.searchTagsByParameters(
+        nombre,
+        letra,
+        limite,
+        offset,
+      );
+    if (!tags || tags.length === 0) {
+      return res
+        .status(404)
+        .json({
+          error: "No se encontró los tags que coincidan con su búsqueda",
+        });
+    }
+    res.status(200).json({ tags, totalResults });
+  } catch (err) {
+    console.log("Error al buscar el tag", err);
+    res.status(500).json({ error: "Error al buscar el tag" });
+  }
+});
+
+
+
 export default router;

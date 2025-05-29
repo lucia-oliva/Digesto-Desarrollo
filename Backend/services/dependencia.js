@@ -70,7 +70,6 @@ async function getAllNamesDependencias() {
 
 
 //Buscar dependencia por parametros 
-//Buscar usuarios por parametros
 async function searchDependenciaByParameters(
   nombre,
   estado, 
