@@ -1,11 +1,11 @@
 // components/GenericTable/TableHeader.jsx
 function TableHeader({ columns }) {
   return (
-    <tr>
+    <tr className="bg-primary text-white" >
       {columns.map((col) => (
-        <th key={col.key}>{col.label}</th>
+        <th key={col.key} className="py-4" > {col.label}</th>
       ))}
-      <th>Acciones</th>
+      <th className="py-4">Acciones</th>
     </tr>
   );
 }

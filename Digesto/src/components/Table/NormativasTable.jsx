@@ -6,8 +6,8 @@ function NormativaTable() {
   const { normativas, page, totalPages, onPageChange, onEdit, onDelete } = useNormativas();
 
   const actions = [
-    { label: "Editar", onClick: onEdit },
-    { label: "Eliminar", onClick: onDelete },
+    { label: "Editar", onClick: onEdit, type:"secondary" },
+    { label: "Eliminar", onClick: onDelete, type:"error" },
   ];
 
   return (

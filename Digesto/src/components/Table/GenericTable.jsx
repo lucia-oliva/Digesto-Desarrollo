@@ -5,7 +5,7 @@ import TablePagination from "./TablePagination";
 
 function GenericTable({ data, columns, actions = [], page, totalPages, onPageChange }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto md:block rounded-box border border-base-content/5 bg-base-100">
       <table className="table w-full">
         <thead>
           <TableHeader columns={columns} />
