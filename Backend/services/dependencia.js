@@ -99,9 +99,9 @@ async function searchDependenciaByParameters(
       console.log(
         "No se encontró las dependencias con los parámetros especificados"
       );
-      return { dependencias: [], totalResults };
+      return { data: [], totalResults };
     }
-    return { dependencias: results, totalResults };
+    return { data: results, totalResults };
   }catch (error) {
     console.error("Error al buscar dependencias por parámetros:", error);
   }

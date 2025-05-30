@@ -171,9 +171,9 @@ async function searchUsuariosByParameters(
       console.log(
         "No se encontró los usuarios con los parámetros especificados"
       );
-      return { usuarios: [], totalResults };
+      return { data: [], totalResults };
     }
-    return { usuarios: results, totalResults };
+    return { data: results, totalResults };
   }catch (error) {
     console.error("Error al buscar usuarios por parámetros:", error);
   }

@@ -166,9 +166,9 @@ async function searchNormativaByParameters(
       console.log(
         "No se encontró la normativa con los parámetros especificados"
       );
-      return { normativas: [], totalResults };
+      return { data: [], totalResults };
     }
-    return { normativas: results, totalResults };
+    return { data: results, totalResults };
   } catch (err) {
     console.error("Error al buscar normativa por parámetros: ", err);
     throw err;

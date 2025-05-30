@@ -96,9 +96,9 @@ async function searchTagsByParameters(
       console.log(
         "No se encontró los tags con los parámetros especificados"
       );
-      return { tags: [], totalResults };
+      return { data: [], totalResults };
     }
-    return { tags: results, totalResults };
+    return { data: results, totalResults };
   }catch (error) {
     console.error("Error al buscar tags por parámetros:", error);
   }

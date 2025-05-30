@@ -66,7 +66,7 @@ router.post("/search", async (req, res) => {
     // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
     //Get the total count of results
-    const { normativas, totalResults } =
+    const { data, totalResults } =
       await normativaDB.searchNormativaByParameters(
         numero,
         dependencia,
@@ -78,7 +78,7 @@ router.post("/search", async (req, res) => {
         tags
       );
 
-    if (!normativas || normativas.length === 0) {
+    if (!data || data.length === 0) {
       return res
         .status(404)
         .json({
@@ -86,7 +86,7 @@ router.post("/search", async (req, res) => {
         });
     }
 
-    res.status(200).json({ normativas, totalResults });
+    res.status(200).json({ data, totalResults });
   } catch (err) {
     console.log("Error al buscar la normativa", err);
     res.status(500).json({ error: "Error al buscar la normativa" });

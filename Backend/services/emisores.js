@@ -39,9 +39,9 @@ async function searchEmisorByParameters(
       console.log(
         "No se encontró los emisores con los parámetros especificados"
       );
-      return { emisores: [], totalResults };
+      return { data: [], totalResults };
     }
-    return { emisores: results, totalResults };
+    return { data: results, totalResults };
   }catch (error) {
     console.error("Error al buscar emisores por parámetros:", error);
   }

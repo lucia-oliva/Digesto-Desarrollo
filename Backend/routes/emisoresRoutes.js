@@ -24,21 +24,21 @@ router.post("/search", async (req, res) => {
     // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
     //Get the total count of results
-    const { emisores, totalResults } =
+    const { data, totalResults } =
       await emisoresDB.searchEmisorByParameters(
         nombre,
         estado,
         limite,
         offset,
       );
-    if (!emisores || emisores.length === 0) {
+    if (!data || data.length === 0) {
       return res
         .status(404)
         .json({
           error: "No se encontró los emisores que coincidan con su búsqueda",
         });
     }
-    res.status(200).json({ emisores, totalResults });
+    res.status(200).json({ data, totalResults });
   } catch (err) {
     console.log("Error al buscar el emisor", err);
     res.status(500).json({ error: "Error al buscar el emisor" });

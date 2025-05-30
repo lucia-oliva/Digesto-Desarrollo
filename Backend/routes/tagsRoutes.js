@@ -58,21 +58,21 @@ router.post("/search", async (req, res) => {
     // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
     //Get the total count of results
-    const { tags, totalResults } =
+    const { data, totalResults } =
       await tagsDB.searchTagsByParameters(
         nombre,
         letra,
         limite,
         offset,
       );
-    if (!tags || tags.length === 0) {
+    if (!data || data.length === 0) {
       return res
         .status(404)
         .json({
           error: "No se encontró los tags que coincidan con su búsqueda",
         });
     }
-    res.status(200).json({ tags, totalResults });
+    res.status(200).json({ data, totalResults });
   } catch (err) {
     console.log("Error al buscar el tag", err);
     res.status(500).json({ error: "Error al buscar el tag" });
