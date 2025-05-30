@@ -1,8 +1,8 @@
 // components/Normativas/useNormativas.js
 import { useEffect, useState } from "react";
-import { searchNormativas, deleteNormativa } from "./normativaApi";
+import { searchNormativas, deleteNormativa } from "./NormativaApi";
 
-export function useNormativas() {
+export const useNormativas = (type) => {
   const [normativas, setNormativas] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -18,8 +18,9 @@ export function useNormativas() {
     try {
       setLoading(true);
       setError(null);
-      const res = await searchNormativas("", pageToLoad, 10);
-      setNormativas(res.normativas || []);
+      const res = await searchNormativas(pageToLoad, 8, type);
+      console.log(res);
+      setNormativas(res.normativas || res.usuarios || res.dependencias || []);
       const total = res.totalResults || 1;
       setTotalPages(Math.ceil(total / 10));
     } catch (err) {
@@ -51,6 +52,10 @@ export function useNormativas() {
     }
   };
 
+  const reload = () => {
+    loadNormativas(page);
+  };
+
   return {
     normativas,
     page,
@@ -60,5 +65,6 @@ export function useNormativas() {
     onPageChange,
     onEdit,
     onDelete,
+    reload,
   };
-}
+};

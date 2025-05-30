@@ -1,5 +1,6 @@
 // components/GenericTable/TableRow.jsx
 function TableRow({ item, columns, actions }) {
+  
   return (
     <tr>
       {columns.map((col) => (

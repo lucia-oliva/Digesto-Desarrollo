@@ -59,9 +59,9 @@ router.post("/search", async (req, res) => {
   if (!dependencia) {
     dependencia = req.body.dependencia;
   }
-  let { page } = req.query;
-  let limite = 10;
+  let { page , limite } = req.query;
   page = parseInt(page, 10) || 1;
+  limite = parseInt(limite, 10) || 10;
   try {
     // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
