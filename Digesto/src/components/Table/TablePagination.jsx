@@ -15,7 +15,7 @@ function TablePagination({ page, totalPages, onPageChange }) {
   }
 
   return (
-    <div className="flex flex-wrap justify-center items-center mt-4 mb-2 gap-1">
+    <div className="flex flex-wrap justify-end  items-center mt-4 mr-6 mb-2 gap-1">
       <button
         className="btn btn-md "
         disabled={page === 1}

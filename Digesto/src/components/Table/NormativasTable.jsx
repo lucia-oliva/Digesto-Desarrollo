@@ -1,32 +1,12 @@
 import { useEffect } from "react";
 import GenericTable from "./GenericTable";
-import { normativaColumns, usuarioColumns,depenColumns } from "./dataTable";
 import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
+import { adminConfig } from "./configTable";
 
 const NormativaTable = ({ type }) => {
   const location = useLocation();
-  let tipo = "";
-  let columns = [];
-
-  switch (type) {
-    case "ListadoNormativa":
-      tipo = "normativa";
-      columns = normativaColumns;
-      break;
-    case "ListadoUsuarios":
-      tipo = "usuarios";
-      columns = usuarioColumns;
-      break;
-      case "ListadoDependencias":
-        tipo = "dependencia";
-        columns = depenColumns;
-        break;
-    default:
-      tipo = "";
-      columns = [];
-      break;
-  }
+  const { tipo = "", columns = [] } = adminConfig[type] || {};
 
   const {
     normativas,
@@ -48,7 +28,6 @@ const NormativaTable = ({ type }) => {
   ];
 
   console.log(normativas);
-  
 
   return (
     <GenericTable

@@ -8,7 +8,7 @@ function AdminLayout() {
       <NavBarAdmin />
       <div className="flex flex-1 pt-16">
         <SideBar />
-        <main className="flex-1 p-6 ml-0 md:ml-60 overflow-y-auto">
+        <main className="flex-1 ml-0 md:ml-60">
           <Outlet />
         </main>
       </div>

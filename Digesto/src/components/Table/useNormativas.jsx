@@ -18,9 +18,9 @@ export const useNormativas = (type) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await searchNormativas(pageToLoad, 8, type);
+      const res = await searchNormativas(pageToLoad, 6, type);
       console.log(res);
-      setNormativas(res.normativas || res.usuarios || res.dependencias || []);
+      setNormativas(res.data || []);
       const total = res.totalResults || 1;
       setTotalPages(Math.ceil(total / 10));
     } catch (err) {

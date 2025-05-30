@@ -3,7 +3,7 @@ export const normativaColumns = [
   { key: "titulo", label: "Título" },
   { key: "dependencia", label: "Dependencia" },
   { key: "tipo_normativa", label: "Tipo" },
-  { key: "estado", label: "Estado" },
+  { key: "visitas", label: "Visitas" },
 ];
 
 export const usuarioColumns = [
