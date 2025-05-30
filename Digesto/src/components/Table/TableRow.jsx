@@ -1,5 +1,6 @@
 // components/GenericTable/TableRow.jsx
 function TableRow({ item, columns, actions }) {
+  
   return (
     <tr className="hover:bg-primary-content odd:bg-[#F7F6FE]">
       {columns.map((col) => (

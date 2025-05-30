@@ -86,8 +86,8 @@ router.post("/search", async (req, res) => {
   if (!dependencia) {
     dependencia = req.body.dependencia;
   }
-  let { page } = req.query;
-  let limite = 10;
+  let { page , limite } = req.query;
+  limite = parseInt(limite, 10) || 10;
   page = parseInt(page, 10) || 1;
   try {
     // Si hay otros parámetros, filtrar por ellos

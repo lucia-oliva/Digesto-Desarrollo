@@ -51,8 +51,8 @@ router.post("/tags/normativa/:id", async (req, res) => {
 router.post("/search", async (req, res) => {
   let {nombre,letra} = req.body;
   console.log("parametros:",nombre,letra);
-  let { page } = req.query;
-  let limite = 10;
+  let { page , limite } = req.query;
+  limite = parseInt(limite, 10) || 10;
   page = parseInt(page, 10) || 1;
   try {
     // Si hay otros parámetros, filtrar por ellos
