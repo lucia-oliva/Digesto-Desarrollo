@@ -349,6 +349,76 @@ async function searchNormativaDespublicadas(
 
 //Traer normativas eliminadas
 
+async function searchNormativaEliminadas(
+  numero,
+  dependencia,
+  emisor,
+  documento,
+  anio,
+  limite = null,
+  offset = null,
+  tags,
+) {
+
+  try {
+    let sql =
+      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'eliminada'";
+    let params = [];
+
+    if (numero) {
+      sql += " AND numero = ?";
+      params.push(numero);
+    }
+    if (dependencia) {
+      sql += " AND id_dependencia = ?";
+      params.push(dependencia);
+    }
+    if (emisor) {
+      sql += " AND id_emisor = ?";
+      params.push(emisor);
+    }
+    if (documento) {
+      sql += " AND id_tipo_normativa = ?";
+      params.push(documento);
+    }
+    
+    if (anio) {
+      sql += " AND anio = ?";
+      params.push(anio);
+    }
+
+    console.log("tags", tags);
+
+    if (tags) {
+      sql += ` AND t.nombre = (?)`;
+      params.push(tags);
+    }
+
+    sql += " GROUP BY n.id ";
+
+    if (limite !== null && offset !== null) {
+      sql += " LIMIT ? OFFSET ?";
+      params.push(Number(limite) || 10, Number(offset) || 0);
+    }
+
+    const results = await db.query(sql, params);
+    const totalResults = results?.length > 0 ? results[0].total : 0;
+
+    console.log(params,sql);
+
+    if (!results) {
+      console.log(
+        "No se encontró la normativa con los parámetros especificados"
+      );
+      return { data: [], totalResults };
+    }
+    return { data: results, totalResults };
+  } catch (err) {
+    console.error("Error al buscar normativa por parámetros: ", err);
+    throw err;
+  }
+}
+
 export default {
   getAllYears,
   searchByNumber,
@@ -358,6 +428,6 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  deleteNormativaById, updateNormativa, createNormativa, searchNormativaDespublicadas
+  deleteNormativaById, updateNormativa, createNormativa, searchNormativaDespublicadas, searchNormativaEliminadas
 };
 
