@@ -7,7 +7,6 @@ import { adminConfig } from "./configTable";
 const NormativaTable = ({ type }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
-
   const {
     normativas,
     page,

@@ -1,4 +1,6 @@
-import { normativaColumns, usuarioColumns, depenColumns } from "./dataTable";
+//Falta emisores y tags. 
+
+import { normativaColumns, usuarioColumns, depenColumns, emisorColumns, tagsColumns } from "./dataTable";
 
 export const adminConfig = {
   ListadoNormativa: {
@@ -10,7 +12,16 @@ export const adminConfig = {
     columns: usuarioColumns,
   },
   ListadoDependencias: {
-    tipo: "dependencias",
+    tipo: "dependencia",
     columns: depenColumns,
   },
+  ListadoEmisores:{
+    tipo: "emisores",
+    columns: emisorColumns,
+  },
+  ListadoPalabrasClave:{
+    tipo: "tag",
+    columns: tagsColumns,
+  },
+  
 };

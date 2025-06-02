@@ -1,6 +1,8 @@
 import axios from "axios";
 
+
 export const searchNormativas = async (page, limit, type) => {
+  console.log("tipo:",type)
   try {
     const response = await axios.post(
       `http://localhost:3000/api/${type}/search?page=${page}&limite=${limit}`,

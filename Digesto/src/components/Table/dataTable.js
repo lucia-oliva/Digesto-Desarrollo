@@ -20,3 +20,13 @@ export const depenColumns = [
   { key: "tipo", label: "Tipo" },
 ]
 
+export const emisorColumns = [
+  { key: "id", label: "ID" },
+  { key: "nombre", label: "Nombre" },
+  { key: "estado", label: "Estado" },
+]
+
+export const tagsColumns = [
+  { key: "id", label: "ID" },
+  { key: "nombre", label: "Nombre" },
+]

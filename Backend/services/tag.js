@@ -72,18 +72,17 @@ async function searchTagsByParameters(
   offset = null
 ){
   try{
-    let sql = "SELECT * FROM tag WHERE 1=1";
+    let sql = "SELECT * , COUNT(*) OVER() as total FROM tag t WHERE 1=1";
     const params = [];
     if (letra) {
-      sql += " AND tag.nombre LIKE ? ";
+      sql += " AND t.nombre LIKE ? ";
       params.push(`${letra}%`);
     }
 
     if (nombre) {
-      sql += " AND tag.nombre LIKE ? ";
+      sql += " AND t.nombre LIKE ? ";
       params.push(`%${nombre}%`);
     }
-  
     sql += " ORDER BY nombre ASC";
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
