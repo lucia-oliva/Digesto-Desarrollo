@@ -93,6 +93,49 @@ router.post("/search", async (req, res) => {
   }
 });
 
+//Buscar normativas despublicadas 
+router.post("/searchDespublicadas", async (req, res) => {
+  let { numero, emisor, documento, anio, tags } = req.body;
+  let { dependencia } = req.query;
+  console.log("parametros:", numero,emisor,documento,anio,tags,dependencia);
+  if (!dependencia) {
+    dependencia = req.body.dependencia;
+  }
+  let { page , limite } = req.query;
+  page = parseInt(page, 10) || 1;
+  limite = parseInt(limite, 10) || 10;
+  try {
+    // Si hay otros parámetros, filtrar por ellos
+    const offset = (page - 1) * limite;
+    //Get the total count of results
+    const { data, totalResults } =
+      await normativaDB.searchNormativaDespublicadas(
+        numero,
+        dependencia,
+        emisor,
+        documento,
+        anio,
+        limite,
+        offset,
+        tags
+      );
+
+    if (!data || data.length === 0) {
+      return res
+        .status(404)
+        .json({
+          error: "No se encontró la normativa que coincida con su búsqueda",
+        });
+    }
+
+    res.status(200).json({ data, totalResults });
+  } catch (err) {
+    console.log("Error al buscar la normativa", err);
+    res.status(500).json({ error: "Error al buscar la normativa" });
+  }
+});
+
+
 //Filtrar normativas por tags
 router.get("/search/tag", async (req, res) => {
   let { dependencia } = req.query;
