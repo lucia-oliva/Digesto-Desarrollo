@@ -1,9 +1,8 @@
 export const normativaColumns = [
-  { key: "numero", label: "Número" },
-  { key: "titulo", label: "Título" },
-  { key: "dependencia", label: "Dependencia" },
-  { key: "tipo_normativa", label: "Tipo" },
-  { key: "visitas", label: "Visitas" },
+  { key: "titulo", label: "Título",className:"text-center font-[Montserrat]  text-md sm:text-md" },
+  { key: "dependencia", label: "Dependencia",className:"text-center font-[Montserrat] text-lg sm:text-md" },
+  { key: "tipo_normativa", label: "Tipo",className:"text-center font-[Montserrat] text-lg sm:text-md" },
+  { key: "visitas", label: "Visitas",className:"text-center font-[Montserrat] text-lg sm:text-md" },
 ];
 
 export const usuarioColumns = [
@@ -14,14 +13,12 @@ export const usuarioColumns = [
 ];
 
 export const depenColumns = [
-{key: "id" , label : "Numero"},
   { key: "nombre", label: "Nombre" },
   { key: "estado", label: "Estado" },
   { key: "tipo", label: "Tipo" },
 ]
 
 export const emisorColumns = [
-  { key: "id", label: "ID" },
   { key: "nombre", label: "Nombre" },
   { key: "estado", label: "Estado" },
 ]

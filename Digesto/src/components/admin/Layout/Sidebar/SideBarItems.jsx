@@ -27,7 +27,7 @@ export const SideBarItem = ({
     <li>
       {/* Main item */}
       <button
-        className={`w-full text-left px-3 py-2 rounded transition-colors ${
+        className={`w-full text-left font-[Montserrat] px-3 py-2 rounded transition-colors ${
           activeItem === item.title
             ? "bg-primary-focus font-semibold"
             : "hover:bg-primary-focus"
@@ -51,7 +51,7 @@ export const SideBarItem = ({
               {item.children.map((subitem) => (
                 <li key={subitem.name}>
                   <button
-                    className={`w-full text-left px-3 py-1 rounded transition-colors ${
+                    className={`w-full text-left font-[Montserrat] px-3 py-1 rounded transition-colors ${
                       activeItem === subitem.name
                         ? "bg-base-100 text-primary font-semibold"
                         : "hover:bg-primary-content hover:text-primary"

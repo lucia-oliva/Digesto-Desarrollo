@@ -17,14 +17,14 @@ function TablePagination({ page, totalPages, onPageChange }) {
   return (
     <div className="flex flex-wrap justify-end  items-center mt-4 mr-6 mb-2 gap-1">
       <button
-        className="btn btn-md "
+        className="btn btn-m shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200 border border-gray-300 "
         disabled={page === 1}
         onClick={() => onPageChange(1)}
       >
         <MdOutlineFirstPage className="size-5" />
       </button>
       <button
-        className="btn btn-md"
+        className="btn btn-md shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200 border border-gray-300"
         disabled={page === 1}
         onClick={() => onPageChange(page - 1)}
       >
@@ -35,7 +35,7 @@ function TablePagination({ page, totalPages, onPageChange }) {
         {pagesToShow.map((p) => (
           <button
             key={p}
-            className={`join-item btn btn-md btn-square ${
+            className={`join-item btn btn-md btn-square shadow-md hover:shadow-lg transition-all duration-200 border border-gray-300 ${
               p === page ? "bg-primary text-white" : ""
             }`}
             onClick={() => onPageChange(p)}
@@ -45,14 +45,14 @@ function TablePagination({ page, totalPages, onPageChange }) {
         ))}
       </div>
       <button
-        className="btn btn-md"
+        className="btn btn-md shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200 border border-gray-300"
         disabled={page === totalPages}
         onClick={() => onPageChange(page + 1)}
       >
         <MdOutlineNavigateNext className="size-5" />
       </button>
       <button
-        className="btn btn-md"
+        className="btn btn-md shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200 border border-gray-300"
         disabled={page === totalPages}
         onClick={() => onPageChange(totalPages)}
       >
