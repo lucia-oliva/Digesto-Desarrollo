@@ -75,8 +75,12 @@ async function searchTagsByParameters(
     let sql = "SELECT t.id, t.nombre , count(tn.id_tag) as cantidad_usos, COUNT(*) OVER() as total FROM tag t LEFT JOIN tag_normativa tn on t.id= tn.id_tag  WHERE 1=1";
     const params = [];
     if (letra) {
-      sql += " AND t.nombre LIKE ? ";
-      params.push(`${letra}%`);
+      if(letra === "#"){
+        sql += " AND t.nombre REGEXP '^[^A-Za-z]' ";
+      }else{
+        sql += " AND t.nombre LIKE ? ";
+        params.push(`${letra}%`);
+      }
     }
 
     if (nombre) {

@@ -5,11 +5,20 @@ const AbecedarioFiltro = ({ selectedLetter, onSelect }) => {
 
   return (
     <div className="join flex flex-wrap gap-1">
+    {/* Botón para "símbolos" u "otros caracteres" */}
+      <button
+        className={`join-item btn btn-xs ${
+          selectedLetter === "#" ? "bg-primary text-white" : ""
+        }`}
+        onClick={() => onSelect("#")}
+      >
+        #
+      </button>
       {abecedario.map((letra) => (
         <button
           key={letra}
           className={`join-item btn btn-xs ${
-            selectedLetter === letra ? "btn-active" : ""
+            selectedLetter === letra ? "bg-primary text-white" : ""
           }`}
           onClick={() => onSelect(letra)}
         >
