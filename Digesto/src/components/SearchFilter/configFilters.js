@@ -130,7 +130,7 @@ export const filterConfig = {
     },  
     {
       name: "letra",
-      type: "text",
+      type: "custom",
       label: "Empieza con",
     },  
   
