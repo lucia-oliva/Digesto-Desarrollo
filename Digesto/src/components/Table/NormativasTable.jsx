@@ -4,7 +4,7 @@ import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
-const NormativaTable = ({ type }) => {
+const NormativaTable = ({ type, filtros={} }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
   const {
@@ -15,11 +15,11 @@ const NormativaTable = ({ type }) => {
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo);
+  } = useNormativas(tipo,filtros);
 
   useEffect(() => {
     reload();
-  }, [location.pathname]);
+  }, [location.pathname, JSON.stringify(filtros)]);
 
   const actions = [
     { label: "Editar", onClick: onEdit, type:"secondary" },

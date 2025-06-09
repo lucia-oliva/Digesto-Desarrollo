@@ -1,30 +1,42 @@
 // components/Normativas/useNormativas.js
 import { useEffect, useState } from "react";
 import { searchNormativas, deleteNormativa } from "./NormativaApi";
+import {useRef} from "react";
 
-export const useNormativas = (type) => {
+export const useNormativas = (type,filtros) => {
   const [normativas, setNormativas] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const prevFiltrosRef = useRef(JSON.stringify(filtros));
 
   // Fetch inicial
   useEffect(() => {
-    loadNormativas(page);
-  }, [page]);
+    const currentFiltrosString = JSON.stringify(filtros);
+    if (prevFiltrosRef.current !== currentFiltrosString) {
+      // Filtros cambiaron, reseteamos a página 1
+      setPage(1);
+      prevFiltrosRef.current = currentFiltrosString;
+    }
+  }, [filtros]);
 
+  useEffect(() => {
+    loadNormativas(page);
+  }, [page, type]);
+
+  
   const loadNormativas = async (pageToLoad) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await searchNormativas(pageToLoad, 6, type);
+      const res = await searchNormativas(pageToLoad, 6, type,filtros);
       console.log(res);
       setNormativas(res.data || []);
       const total = res.totalResults || 1;
       setTotalPages(Math.ceil(total / 10));
     } catch (err) {
-      setError("Error al cargar normativas");
+      setError("Error al cargar normativas", err);
     } finally {
       setLoading(false);
     }
@@ -46,7 +58,7 @@ export const useNormativas = (type) => {
       // Refrescar lista
       loadNormativas(page);
     } catch (err) {
-      setError("Error al eliminar la normativa");
+      setError("Error al eliminar la normativa", err);
     } finally {
       setLoading(false);
     }

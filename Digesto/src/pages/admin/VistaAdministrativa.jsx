@@ -1,9 +1,16 @@
 import NormativaTable from "../../components/Table/NormativasTable";
 import { useLocation } from "react-router";
+import GenericFilterSearch from  "../../components/SearchFilter/SearchFilter";
+import { useState } from "react";
 
 function VistaAdministrativa() {
   const location = useLocation();
   const type = location.pathname.split("/")[2];
+  const [filters, setFilters] = useState({});
+
+  const handleSearch = (formData) => {
+    setFilters(formData); // esto se pasa como prop a NormativasTable
+  };
 
   return (
     <div className="container ">
@@ -12,7 +19,8 @@ function VistaAdministrativa() {
       Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consectetur illum accusamus, facere aliquam perspiciatis iste nulla temporibus nam numquam ipsam, asperiores voluptatum. Deserunt corrupti, possimus ea quidem expedita error facilis!
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Error similique sed voluptas? Pariatur vitae error possimus mollitia minima aliquam voluptate. Suscipit beatae voluptate maiores eveniet minus dignissimos ut consequuntur nihil?
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus culpa expedita nisi iste dolorum. Consequuntur tempore tenetur doloremque atque vel iusto, quod cum. Dolorum nulla iure voluptas quod natus aspernatur?
-      <NormativaTable type={type} />
+      <GenericFilterSearch type={type} onSearch={handleSearch} />
+      <NormativaTable type={type} filtros={filters} />
     </div>
   );
 }

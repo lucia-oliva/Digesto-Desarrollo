@@ -72,7 +72,7 @@ async function searchTagsByParameters(
   offset = null
 ){
   try{
-    let sql = "SELECT * , COUNT(*) OVER() as total FROM tag t WHERE 1=1";
+    let sql = "SELECT t.id, t.nombre , count(tn.id_tag) as cantidad_usos, COUNT(*) OVER() as total FROM tag t LEFT JOIN tag_normativa tn on t.id= tn.id_tag  WHERE 1=1";
     const params = [];
     if (letra) {
       sql += " AND t.nombre LIKE ? ";
@@ -83,6 +83,7 @@ async function searchTagsByParameters(
       sql += " AND t.nombre LIKE ? ";
       params.push(`%${nombre}%`);
     }
+    sql += " GROUP BY t.id, t.nombre";
     sql += " ORDER BY nombre ASC";
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";

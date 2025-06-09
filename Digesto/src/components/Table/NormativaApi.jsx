@@ -1,11 +1,12 @@
 import axios from "axios";
 
 
-export const searchNormativas = async (page, limit, type) => {
-  console.log("tipo:",type)
+export const searchNormativas = async (page, limit, type, filtros={}) => {
+  console.log("tipo:",type, "filtros:",filtros);
   try {
     const response = await axios.post(
       `http://localhost:3000/api/${type}/search?page=${page}&limite=${limit}`,
+      filtros,
       {
         headers: { "Content-Type": "application/json" }
       }
