@@ -1,5 +1,7 @@
 import propTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { IoMdArrowDropright } from "react-icons/io";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 export const SideBarItem = ({
   item,
@@ -35,8 +37,15 @@ export const SideBarItem = ({
         onClick={() =>
           hasChildren ? handleToggle(item.title) : handleSubItemClick(item)
         }
+        
       >
-        {item.title}
+        <span>{item.title}</span>
+         {hasChildren &&
+          (isOpen ? (
+            <IoMdArrowDropdown className="h-5 w-5" />
+          ) : (
+            <IoMdArrowDropright className="h-5 w-5" />
+          ))}
       </button>
 
       {/* Submenu */}
