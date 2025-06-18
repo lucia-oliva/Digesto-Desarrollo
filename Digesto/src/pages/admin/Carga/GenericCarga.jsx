@@ -1,113 +1,115 @@
-// GenericCarga.jsx
 import { useState } from "react";
-import GenericForm from "./GenericForm.jsx"; // Este componente se generará con campos dinámicos
-import { formFieldsConfig } from "./formFieldsConfig.js"; // Define los campos por entidad
 import { useLocation } from "react-router";
+import PasoSeleccionTipo from "./Steps/pasoSeleccionTipo.jsx";
+import PasoFormulario from "./Steps/pasoForm.jsx";
+import PasoModifica from "./Steps/pasoNormativasModificadas.jsx";
+import PasoVerificacion from "./Steps/pasoVerificacion.jsx"
+import { flujoPorEntidad } from "./config/flujoSteps.js";
 
-function GenericCarga({ tipoEntidad }) {
-  
-  
-const location = useLocation();
-const type = location.pathname.split("/")[2];   
-console.log(type); 
-const [pasoActual, setPasoActual] = useState(0);
-const [formData, setFormData] = useState({});
-const [errores, setErrores] = useState({});
+function GenericCarga() {
+  const location = useLocation();
+  const pathSegment = location.pathname.split("/").find((s) => s.startsWith("Nueva") || s.startsWith("Nuevo"));
+  const entidad = pathSegment ? pathSegment.replace("Nueva", "").replace("Nuevo", "").toLowerCase() : null;
 
-  const campos = formFieldsConfig[type] || [];
+  const pasos = flujoPorEntidad[entidad] || [];
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState({});
+  const [errores, setErrores] = useState({});
 
-  const validar = () => {
-    const nuevosErrores = {};
-    campos.forEach(({ name, required }) => {
-      if (required && !formData[name]) {
-        nuevosErrores[name] = "Este campo es obligatorio";
+  const handleNext = () => setCurrentStep((prev) => prev + 1);
+  const handleBack = () => setCurrentStep((prev) => prev - 1);
+
+  const handleSubmit = () => {
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value instanceof File) {
+        data.append(key, value);
+      } else {
+        data.append(key, JSON.stringify(value));
       }
     });
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
+
+    fetch(`http://localhost:3000/api/${entidad}/create`, {
+      method: "POST",
+      body: data,
+    })
+      .then((res) => res.json())
+      .then(() => {
+        alert(`${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado correctamente`);
+        setFormData({});
+        setErrores({});
+        setCurrentStep(0);
+      })
+      .catch(() => alert("Error al crear registro"));
   };
 
-  const handleNext = () => {
-    if (pasoActual === 1 && !validar()) return;
-    setPasoActual(pasoActual + 1);
-  };
-
-  const handleBack = () => setPasoActual(pasoActual - 1);
-
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/${type}/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) throw new Error("Error al guardar");
-      alert("Registro creado correctamente");
-      setPasoActual(0);
-      setFormData({});
-    } catch (err) {
-      console.error(err);
-      alert("Error al guardar el registro");
+  const renderPaso = () => {
+    const paso = pasos[currentStep];
+    switch (paso) {
+      case "seleccionTipo":
+        return (
+          <PasoSeleccionTipo
+            entidad={entidad}
+            formData={formData}
+            setFormData={setFormData}
+            onNext={handleNext}
+          />
+        );
+      case "formulario":
+        return (
+          <PasoFormulario
+            entidad={entidad}
+            formData={formData}
+            setFormData={setFormData}
+            onNext={handleNext}
+            onBack={handleBack}
+            errores={errores}
+            setErrores={setErrores}
+          />
+        );
+      case "modificaNormativa":
+        return (
+          <PasoModifica
+            formData={formData}
+            setFormData={setFormData}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        );
+      case "verificacion":
+        return (
+          <PasoVerificacion
+            formData={formData}
+            onBack={handleBack}
+            onSubmit={handleSubmit}
+          />
+        );
+      default:
+        return <p>No hay pasos configurados para esta entidad.</p>;
     }
   };
 
   return (
     <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
-        Agregar Nuevo {tipoEntidad}
+        Crear nueva {entidad}
       </h2>
 
+      {/* Steps visuales */}
       <div className="flex justify-center">
         <ul className="steps mb-6">
-          <li className={`step ${pasoActual >= 0 ? "step-primary" : ""}`}>Paso 1</li>
-          <li className={`step ${pasoActual >= 1 ? "step-primary" : ""}`}>Paso 2</li>
-          <li className={`step ${pasoActual >= 2 ? "step-primary" : ""}`}>Verificación</li>
+          {pasos.map((paso, i) => (
+            <li
+              key={paso}
+              className={`step ${i <= currentStep ? "step-primary" : ""}`}
+            >
+              {paso.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}
+            </li>
+          ))}
         </ul>
       </div>
 
-      {pasoActual === 0 && (
-        <div className="mb-6">
-          <p className="text-lg">¿Deseás comenzar a cargar un nuevo registro?</p>
-          <button onClick={handleNext} className="btn btn-primary mt-4">
-            Comenzar
-          </button>
-        </div>
-      )}
-
-      {pasoActual === 1 && (
-        <GenericForm
-          entityName={tipoEntidad}
-          fields={campos}
-          onSubmit={() => handleNext()}
-          initialData={formData}
-        />
-      )}
-
-      {pasoActual === 2 && (
-        <div className="space-y-6 mt-6">
-          <h3 className="text-lg font-semibold mb-4 text-center">
-            Verifique los datos ingresados:
-          </h3>
-          <div className="bg-base-200 p-4 rounded-lg">
-            {campos.map((campo) => (
-              <p key={campo.name}>
-                <strong>{campo.label}:</strong> {String(formData[campo.name] || "-")}
-              </p>
-            ))}
-          </div>
-
-          <div className="flex justify-between mt-6">
-            <button onClick={handleBack} className="btn btn-outline">
-              Volver
-            </button>
-            <button onClick={handleSubmit} className="btn btn-success">
-              Confirmar y Finalizar
-            </button>
-          </div>
-        </div>
-      )}
+      {renderPaso()}
     </div>
   );
 }
