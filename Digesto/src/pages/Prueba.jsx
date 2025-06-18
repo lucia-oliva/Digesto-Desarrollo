@@ -74,6 +74,8 @@ function NormativasContainer({ isAdmin = false}) {
     { manual: true }
   );
 
+  console.log("data: ",data?.data);
+
   useEffect(() => {
     try {
       refetch({
@@ -114,8 +116,11 @@ function NormativasContainer({ isAdmin = false}) {
 
  
 
-  const normativas = data?.normativas || [];
+  const normativas = data?.data || [];
   const totalResults = data?.totalResults || 0;
+
+  console.log("Normativas: ", normativas);
+  console.log("Total resultados: ", totalResults);
 
   return (
     <div className={`min-h-screen p-5 flex justify-center items-start ${isAdmin ? "w-full" : "w-screen items-center"}`}

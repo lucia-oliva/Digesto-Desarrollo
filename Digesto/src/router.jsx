@@ -12,6 +12,8 @@ import Logout from "./pages/auth/Logout";
 import EditarUsuario from "./pages/admin/editUser"
 import PaginaPruebaLogin from "./pages/PaginaPruebaLogin";
 import { VistaAdministrativa } from "./pages/admin/VistaAdministrativa";
+import GenericCarga from "./pages/admin/Carga/GenericCarga";
+
 const Router = () => {
   return (
     <BrowserRouter>
@@ -34,6 +36,7 @@ const Router = () => {
             <Route path="ListadoDependencias" element={<VistaAdministrativa />} />
             <Route path="ListadoEmisores" element={<VistaAdministrativa />} />
             <Route path="ListadoPalabrasClave" element={<VistaAdministrativa />} />
+            <Route path="NuevaNormativa" element={<GenericCarga />} />
           </Route>
         </Route>
       </Routes>
