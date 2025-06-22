@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:5173', // <--- Dirección de tu frontend
-  credentials: true               // <--- Para permitir cookies como el refresh token
+  credentials: true              // <--- Para permitir cookies como el refresh token
 }));
 app.use(express.urlencoded({ extended: true }));
 

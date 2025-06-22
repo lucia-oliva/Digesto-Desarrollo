@@ -3,13 +3,17 @@ import { useLocation } from "react-router";
 import PasoSeleccionTipo from "./Steps/pasoSeleccionTipo.jsx";
 import PasoFormulario from "./Steps/pasoForm.jsx";
 import PasoModifica from "./Steps/pasoNormativasModificadas.jsx";
-import PasoVerificacion from "./Steps/pasoVerificacion.jsx"
+import PasoVerificacion from "./Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "./config/flujoSteps.js";
 
 function GenericCarga() {
   const location = useLocation();
-  const pathSegment = location.pathname.split("/").find((s) => s.startsWith("Nueva") || s.startsWith("Nuevo"));
-  const entidad = pathSegment ? pathSegment.replace("Nueva", "").replace("Nuevo", "").toLowerCase() : null;
+  const pathSegment = location.pathname
+    .split("/")
+    .find((s) => s.startsWith("Nueva") || s.startsWith("Nuevo"));
+  const entidad = pathSegment
+    ? pathSegment.replace("Nueva", "").replace("Nuevo", "").toLowerCase()
+    : null;
 
   const pasos = flujoPorEntidad[entidad] || [];
   const [currentStep, setCurrentStep] = useState(0);
@@ -35,7 +39,11 @@ function GenericCarga() {
     })
       .then((res) => res.json())
       .then(() => {
-        alert(`${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado correctamente`);
+        alert(
+          `${
+            entidad.charAt(0).toUpperCase() + entidad.slice(1)
+          } creado correctamente`
+        );
         setFormData({});
         setErrores({});
         setCurrentStep(0);
@@ -90,7 +98,7 @@ function GenericCarga() {
   };
 
   return (
-    <div className="w-full p-6 rounded-lg shadow-lg bg-base-100 text-neutral">
+    <div className="w-full p-6 rounded-lg text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
         Crear nueva {entidad}
       </h2>
@@ -103,7 +111,9 @@ function GenericCarga() {
               key={paso}
               className={`step ${i <= currentStep ? "step-primary" : ""}`}
             >
-              {paso.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}
+              {paso
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase())}
             </li>
           ))}
         </ul>

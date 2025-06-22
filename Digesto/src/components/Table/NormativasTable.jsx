@@ -4,9 +4,11 @@ import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
-const NormativaTable = ({ type, filtros={} }) => {
+const NormativaTable = ({ type, filtros={}, onSeleccionar }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
+  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa");
+  console.log(isSeleccionarContext);
   const {
     normativas,
     page,
@@ -21,10 +23,26 @@ const NormativaTable = ({ type, filtros={} }) => {
     reload();
   }, [location.pathname, JSON.stringify(filtros)]);
 
-  const actions = [
-    { label: "Editar", onClick: onEdit, type:"secondary" },
-    { label: "Eliminar", onClick: onDelete, type:"error" },
-  ];
+ 
+
+ const actions = isSeleccionarContext
+  ? [
+      {
+        label: "Seleccionar",
+        onClick: onSeleccionar,
+        type: "primary",
+      },
+    ]
+  : [
+      { label: "Editar", onClick: onEdit, type: "secondary" },
+      { label: "Eliminar", onClick: onDelete, type: "error" },
+    ];
+
+ 
+  // const actions = [
+   // { label: "Editar", onClick: onEdit, type:"secondary" },
+   // { label: "Eliminar", onClick: onDelete, type:"error" },
+  //];
 
   console.log(normativas);
 

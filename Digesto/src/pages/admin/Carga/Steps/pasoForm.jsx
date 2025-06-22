@@ -1,7 +1,15 @@
 import PropTypes from "prop-types";
 import { camposPorEntidad } from "../config/formFields";
 
-function PasoForm({ entidad, formData, setFormData, onNext, onBack, errores, setErrores }) {
+function PasoForm({
+  entidad,
+  formData,
+  setFormData,
+  onNext,
+  onBack,
+  errores,
+  setErrores,
+}) {
   const campos = camposPorEntidad[entidad] || [];
 
   const handleChange = (e) => {
@@ -43,7 +51,9 @@ function PasoForm({ entidad, formData, setFormData, onNext, onBack, errores, set
             >
               <option value="">Seleccione</option>
               {options.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           ) : (
