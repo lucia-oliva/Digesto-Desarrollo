@@ -10,7 +10,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="align w-5xl bg-base-300 p-4 rounded-lg">
           {Object.entries(formData).map(([key, value]) => {
-            if (key === "normativas_modificadas") {
+            if (key === "normativas_modificadas" && value.length > 0) {
               return (
                 <div key={key}>
                   <strong>Normativas modificadas:</strong>
@@ -31,6 +31,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                 "modalSeleccionarNormativa",
                 "accionSeleccionada",
                 "comentarioSeleccionado",
+                "normativas_modificadas"
               ].includes(key)
             ) {
               return null;
@@ -43,7 +44,6 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
               anio: "Año",
               titulo: "Título",
               cambia_normativa: "¿Esta normativa modifica a otra?",
-    
             };
 
             return (

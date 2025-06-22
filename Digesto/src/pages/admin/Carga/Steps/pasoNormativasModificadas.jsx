@@ -111,6 +111,7 @@ console.log("Datoooos",formData);
             setFormData({
               ...formData,
               cambia_normativa: "NO",
+              normativas_modificadas: []
             })
           }
           className={`btn ${formData.cambia_normativa === "NO" ? "btn-primary" : "btn-outline"}`}

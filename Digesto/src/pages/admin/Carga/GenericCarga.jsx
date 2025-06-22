@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import PasoSeleccionTipo from "./Steps/pasoSeleccionTipo.jsx";
 import PasoFormulario from "./Steps/pasoForm.jsx";
@@ -20,8 +20,13 @@ function GenericCarga() {
   const [formData, setFormData] = useState({});
   const [errores, setErrores] = useState({});
 
+  useEffect(() => {
+    setCurrentStep(0);
+}, [location.pathname]);
+
   const handleNext = () => setCurrentStep((prev) => prev + 1);
   const handleBack = () => setCurrentStep((prev) => prev - 1);
+
 
   const handleSubmit = () => {
     const data = new FormData();
