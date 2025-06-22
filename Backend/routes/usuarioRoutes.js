@@ -67,7 +67,6 @@ router.post("/userEmail", async (req, res) => {
 
   try{
   const result = await UsuariosDB.UsuarioByEmailAndEstado(email);
-  console.log("Resultado de la consulta:", result);
 
     if(result.affectedRows === 0){
       return res.status(404).json({ error: "Usuario no encontrado" });
@@ -82,7 +81,6 @@ router.post("/userEmail", async (req, res) => {
 router.post("/search", async (req, res) => {
   let {tipoUsuario,nombre,estado} = req.body;
   let {dependencia} = req.query;
-  console.log("parametros:", tipoUsuario,nombre,estado,dependencia);
   if (!dependencia) {
     dependencia = req.body.dependencia;
   }

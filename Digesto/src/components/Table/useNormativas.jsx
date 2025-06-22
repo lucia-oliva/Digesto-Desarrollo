@@ -1,6 +1,6 @@
 // components/Normativas/useNormativas.js
 import { useEffect, useState } from "react";
-import { searchNormativas, deleteNormativa } from "./NormativaApi";
+import { searchNormativas, deleteApi } from "./NormativaApi";
 import {useRef} from "react";
 
 export const useNormativas = (type,filtros) => {
@@ -51,9 +51,10 @@ export const useNormativas = (type,filtros) => {
 
   const onDelete = async (item) => {
     if (!window.confirm("¿Eliminar normativa?")) return;
+
     try {
       setLoading(true);
-      const response = await deleteNormativa(item.id);
+      const response = await deleteApi(item.id,type);
       if (!response.ok) throw new Error("No se pudo eliminar");
       // Refrescar lista
       loadNormativas(page);

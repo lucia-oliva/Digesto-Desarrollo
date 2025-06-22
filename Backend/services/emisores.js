@@ -9,6 +9,13 @@ async function getAllEmisoresName() {
   return results;
 }
 
+async function eliminar(id){
+  const sql = "DELETE FROM emisor WHERE id = ?";
+  const results = await db.query(sql, [id]);
+  return results;
+}
+
+
 //Buscar dependencia por parametros
 async function searchEmisorByParameters(
   nombre, 
@@ -49,4 +56,4 @@ async function searchEmisorByParameters(
 
 
 
-export default {getAllEmisoresName, searchEmisorByParameters};
+export default {getAllEmisoresName, searchEmisorByParameters,eliminar};

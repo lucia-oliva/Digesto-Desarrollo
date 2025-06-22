@@ -108,5 +108,17 @@ async function searchTagsByParameters(
   }
 }
 
+async function eliminar(id){
+  await db.query("DELETE FROM tag_normativa WHERE id_tag = ?", [id]);
+  const sql = "DELETE FROM tag WHERE id = ?";
+  if (result.affectedRows === 0) {
+      console.log(`No se encontró el tag con el ID ${id}`);
+      return { success: false, message: "Tag no encontrad" };
+    }
+  const results = await db.query(sql, [id]);
+  return results;
+}
 
-export default {getAllTags, getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters};
+
+
+export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters};

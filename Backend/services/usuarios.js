@@ -14,7 +14,6 @@ async function getAllUsuarios() {
 async function getUsuarioById(id) {
   const sql ="SELECT id, telefono, estado, email, nombre, id_tipo_usuario FROM usuario WHERE id = ?";
   const results = await db.query(sql, [id]);
-  console.log(results);
   return results;
 }
 
@@ -105,7 +104,7 @@ valores.push(nuevaClave);
 }
 
 //Eliminar usuario
-async function deleteUsuario(id) {
+async function eliminar(id){
   const sql = "DELETE FROM usuario WHERE id = ?";
   const results = await db.query(sql, [id]);
   return results;
@@ -166,7 +165,6 @@ async function searchUsuariosByParameters(
     }
     const results = await db.query(sql, params);
     const totalResults = results?.length > 0 ? results[0].total : 0;
-    console.log(params,sql);
      if (!results) {
       console.log(
         "No se encontró los usuarios con los parámetros especificados"
@@ -180,4 +178,4 @@ async function searchUsuariosByParameters(
 }
 
 
-export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, deleteUsuario, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters};
+export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters};

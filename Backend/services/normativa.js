@@ -34,7 +34,7 @@ import tagService from "./tag.js";
 //Delete by id
   //TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria. 
   //FIXME: (En realidad no se elimina, sino que se cambia el estado a eliminado - VER ESTO).
-async function deleteNormativaById(id) {
+async function eliminar(id) {
   try {
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
     const sql = "DELETE FROM normativa WHERE id = ?";
@@ -428,6 +428,6 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  deleteNormativaById, updateNormativa, createNormativa, searchNormativaDespublicadas, searchNormativaEliminadas
+  eliminar, updateNormativa, createNormativa, searchNormativaDespublicadas, searchNormativaEliminadas
 };
 

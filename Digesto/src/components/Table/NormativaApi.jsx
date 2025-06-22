@@ -19,9 +19,11 @@ export const searchNormativas = async (page, limit, type, filtros={}) => {
 };
 
 
-export const deleteNormativa = async (id) => {
+export const deleteApi = async (id,type) => {
   try {
-    const response = await fetch(`http://localhost:3000/api/normativa/delete/${id}`, {
+    console.log(id , type);
+    debugger
+    const response = await fetch(`http://localhost:3000/api/${type}/eliminar/${id}`, {
       method: "DELETE",
     });
     return response.json();

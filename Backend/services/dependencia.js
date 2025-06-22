@@ -51,8 +51,8 @@ async function updateDependencia(id, data) {
   return results;
 }
 
-//Eliminar usuario
-async function deleteDependencia(id) {
+
+async function eliminar(id) {
   const sql = "DELETE FROM dependencia WHERE id = ?";
   const results = await db.query(sql, [id]);
   return results;
@@ -109,4 +109,4 @@ async function searchDependenciaByParameters(
 
 
 
-export default {getAllDependencias, getDepenendenciaById, createDependencia, deleteDependencia, getAllNamesDependencias, searchDependenciaByParameters}
+export default {getAllDependencias, getDepenendenciaById, createDependencia, eliminar, getAllNamesDependencias, searchDependenciaByParameters}

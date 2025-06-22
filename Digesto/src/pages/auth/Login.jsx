@@ -5,7 +5,7 @@ import { Alert, Loading } from "../../components/ui/Ui";
 import { useNavigate } from "react-router";
 
 function Login() {
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
   const [form, setForm] = useState({
@@ -32,10 +32,9 @@ function Login() {
       );
       setResponse(response.data.msg);
       setAccessToken(response.data.accessToken);
-      console.log("navigate");
-      Navigate("/admin");
+      navigate("/admin");
     } catch (error) {
-      console.error(error?.response?.data?.msg);
+      setForm({ email: "", password: "" });
       setResponse(error?.response?.data?.msg);
     } finally {
       setLoading(false);
@@ -68,6 +67,7 @@ function Login() {
               type="email"
               className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
               placeholder="example@dominio.com"
+              value={ form.email }
               onChange={handleChange}
             />
           </div>
@@ -83,6 +83,7 @@ function Login() {
               type="password"
               className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
               placeholder="********"
+              value={ form.password }
               onChange={handleChange}
             />
           </div>
