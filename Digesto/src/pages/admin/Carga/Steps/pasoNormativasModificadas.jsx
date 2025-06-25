@@ -28,9 +28,9 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
         }
       >
         <option value="">Seleccionar</option>
-        <option value="modifica">Modifica</option>
-        <option value="deroga">Deroga</option>
-        <option value="complementa">Complementa</option>
+        <option value="1">Modifica</option>
+        <option value="2">Deroga</option>
+        <option value="3">Complementa</option>
       </select>
 
       <label className="label mt-4">Comentario</label>

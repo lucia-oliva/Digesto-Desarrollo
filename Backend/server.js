@@ -22,6 +22,14 @@ app.use(cors({
   credentials: true              // <--- Para permitir cookies como el refresh token
 }));
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  const originalJson = res.json;
+  res.json = function (body) {
+    console.log(`[${req.method}] ${req.originalUrl} =>`, body);
+    return originalJson.call(this, body);
+  };
+  next();
+});
 
 // rutas de la api
 app.use("/api/usuarios", usuarios);

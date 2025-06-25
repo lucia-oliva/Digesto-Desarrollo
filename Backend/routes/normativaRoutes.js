@@ -6,16 +6,20 @@ import express from "express";
 
 const router = express.Router();
 
+
+
+
 //Crear normativa
 router.post("/create", async (req, res) => {
+  console.log("lo que llega del front...", req.body);
   const normativaData = req.body;
-
+  console.log("Datos recibidos para crear normativa:", normativaData);
   // Validaciones básicas
   if (!normativaData.numero || !normativaData.titulo || !normativaData.fecha) {
     return res.status(400).json({ error: "Faltan datos obligatorios" });
   }
   try {
-    const result = await normativaDB.createNormativa(normativaData);
+    const result = await normativaDB.create(normativaData);
     res.status(201).json(result);
   } catch (error) {
     console.error("Error al crear la normativa:", error);

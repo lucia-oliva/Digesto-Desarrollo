@@ -20,6 +20,31 @@ function PasoForm({
     });
   };
 
+  const handleTagChange = (e) => {
+    const value = e.target.value;
+    if (value.includes(",") || e.key === "Enter") {
+      
+      const newTags = value
+        .split(/[,|\n]/)
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+      setFormData({
+        ...formData,
+        tags: [...(formData.tags || []), ...newTags],
+      });
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveTag = (indexToRemove) => {
+    setFormData({
+      ...formData,
+      tags: (formData.tags || []).filter(
+        (_, index) => index !== indexToRemove
+      ),
+    });
+  };
+
   const validar = () => {
     const nuevosErrores = {};
     campos.forEach(({ name, required }) => {
@@ -32,17 +57,66 @@ function PasoForm({
   };
 
   return (
-    <form
-      className="space-y-4"
-      onSubmit={(e) => {
+  <form
+    className="space-y-4"
+    onSubmit={(e) => {
+      e.preventDefault();
+      if (validar()) onNext();
+    }}
+    onKeyDown={(e) => {
+      if (
+        e.key === "Enter" &&
+        e.target.tagName === "INPUT" &&
+        e.target.type !== "textarea" &&
+        e.target.type !== "submit" &&
+        e.target.type !== "button"
+      ) {
         e.preventDefault();
-        if (validar()) onNext();
-      }}
-    >
-      {campos.map(({ name, label, type, options }) => (
+      }
+    }}
+  >
+    {campos.map(({ name, label, type, options, required }) => {
+      // Ocultar dependencia si no corresponde (solo para usuario)
+      if (
+        entidad === "usuario" &&
+        name === "dependencia" &&
+        !["Administrador de Dependencia", "Supervisor"].includes(formData.rol)
+      ) {
+        return null;
+      }
+
+      return (
         <div key={name}>
-          <label className="block text-sm font-medium mb-1">{label}</label>
-          {type === "select" ? (
+          <label className="block text-sm font-medium mb-1">
+            {label}
+            {required && (
+              <span className="text-red-500 ml-1">*</span>
+            )}
+          </label>
+          {entidad === "normativa" && name === "tags" ? (
+            <>
+              <input
+                type="text"
+                placeholder="Separar con coma o Enter"
+                className="input input-bordered w-full"
+                onKeyDown={handleTagChange}
+              />
+              <div className="mt-2 flex flex-wrap gap-2">
+                {(formData.tags || []).map((tag, i) => (
+                  <span key={i} className="badge badge-primary gap-1">
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(i)}
+                      className="ml-1"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : type === "select" ? (
             <select
               name={name}
               value={formData[name] || ""}
@@ -69,17 +143,18 @@ function PasoForm({
             <p className="text-red-500 text-sm mt-1">{errores[name]}</p>
           )}
         </div>
-      ))}
-      <div className="flex justify-between">
-        <button type="button" onClick={onBack} className="btn btn-outline">
-          Volver
-        </button>
-        <button type="submit" className="btn btn-primary">
-          Siguiente
-        </button>
-      </div>
-    </form>
-  );
+      );
+    })}
+    <div className="flex justify-between">
+      <button type="button" onClick={onBack} className="btn btn-outline">
+        Volver
+      </button>
+      <button type="submit" className="btn btn-primary">
+        Siguiente
+      </button>
+    </div>
+  </form>
+);
 }
 
 PasoForm.propTypes = {

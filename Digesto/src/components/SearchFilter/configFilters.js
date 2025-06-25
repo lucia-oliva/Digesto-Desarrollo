@@ -1,5 +1,14 @@
 // configFilter.js
 
+export const tipoNormativaOptions = [
+  { label: "Acta", value: 1 },
+  { label: "Resolución", value: 2 },
+  { label: "Convenio", value: 3 },
+  { label: "Nota", value: 4 },
+  { label: "Providencia", value: 5 },
+  { label: "Ordenanza", value: 6 },
+];
+
 export const filterConfig = {
   ListadoNormativa: [
     {

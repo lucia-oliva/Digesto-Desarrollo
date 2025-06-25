@@ -39,7 +39,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
 
             // Etiquetas legibles
             const etiquetas = {
-              tipo: "Tipo de Normativa",
+              tipo_normativa: "Tipo de Normativa",
               numero: "Número",
               anio: "Año",
               titulo: "Título",

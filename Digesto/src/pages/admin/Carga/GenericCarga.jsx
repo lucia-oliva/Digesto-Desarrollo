@@ -29,18 +29,20 @@ function GenericCarga() {
 
 
   const handleSubmit = () => {
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value instanceof File) {
-        data.append(key, value);
-      } else {
-        data.append(key, JSON.stringify(value));
-      }
-    });
-
+    const dataToSend = {...formData};
+     if (dataToSend.archivo instanceof File) {
+      dataToSend.archivo = dataToSend.archivo.name;
+    }
+    try{
+      const json = JSON.stringify(dataToSend);
+      console.log("JSON VALIDO", json);
     fetch(`http://localhost:3000/api/${entidad}/create`, {
+      
       method: "POST",
-      body: data,
+      headers:{"Content-Type": "application/json"
+
+      },
+      body: JSON.stringify(dataToSend),
     })
       .then((res) => res.json())
       .then(() => {
@@ -52,8 +54,12 @@ function GenericCarga() {
         setFormData({});
         setErrores({});
         setCurrentStep(0);
+        console.log("datos que se enviaron al back", dataToSend);
       })
       .catch(() => alert("Error al crear registro"));
+    }catch(err){
+      console.log("Error al serializar JSON:",err);
+    }
   };
 
   const renderPaso = () => {
@@ -105,7 +111,9 @@ function GenericCarga() {
   return (
     <div className="w-full p-6 rounded-lg text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
-        Crear nueva {entidad}
+        {entidad === "palabraclave"
+          ? "Crear Palabra Clave"
+          : `Crear ${entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""}`}
       </h2>
 
       {/* Steps visuales */}
@@ -114,7 +122,7 @@ function GenericCarga() {
           {pasos.map((paso, i) => (
             <li
               key={paso}
-              className={`step ${i <= currentStep ? "step-primary" : ""}`}
+              className={` mr-4 step ${i <= currentStep ? "step-primary" : ""}`}
             >
               {paso
                 .replace(/([A-Z])/g, " $1")

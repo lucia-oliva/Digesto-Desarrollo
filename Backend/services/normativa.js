@@ -5,9 +5,35 @@ import tagService from "./tag.js";
 //Crear Normativa
   //TODO: Ver como aplicar lo de los archivos... (integrar la funcion upload)
   //TODO: Ver como integramos lo de "creador" (usuario que crea la normativa)
-  async function createNormativa(data) {
+
+
+  async function registrarModificacion({ id, accion, comentario,fechaSubida, normativaId}) {
+
+    console.log("registrarModificacion:", id, accion, comentario, fechaSubida, normativaId);
+
+  try {
+    // Suponemos que tenés una columna `accion` y `comentario_modificacion` en la tabla
+    const result = await db.query(
+      `INSERT INTO relacion (normativa_original, normativa_complementaria, comentario, fecha, id_acciones)
+      VALUES (?, ?, ?, ?, ?)`,
+      [normativaId, id, comentario, fechaSubida, accion]
+    );
+
+    if (result.affectedRows === 0) {
+      return { success: false, message: "No se encontró la normativa con ese ID" };
+    }
+
+    return { success: true, message: "Modificación registrada correctamente" };
+  } catch (error) {
+    console.error("Error en registrarModificacion:", error);
+    return { success: false, message: "Error al registrar la modificación" };
+  }
+}
+ 
+
+  async function create(data) {
     const {
-      numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,tags,archivo,} = data;
+      numero,anio,titulo,resumen,fecha,dependencia,emisor,tipo_normativa,estado,tags,archivo, normativas_modificadas} = data;
     try {
       const fechaSubida = new Date().toISOString().split("T")[0]; 
       const sqlInsertNormativa = `
@@ -21,10 +47,28 @@ import tagService from "./tag.js";
       ]);
   
       const normativaId = result.insertId;
-  
+      const modificacionesAplicadas = [];
+
+      if (Array.isArray(normativas_modificadas) && normativas_modificadas.length > 0) {
+      for (const mod of normativas_modificadas) {
+        const { id, accion, comentario } = mod;
+        console.log("datos para laotra funcion:", id, accion, comentario, fechaSubida, normativaId);
+        if (id && accion) {
+          const resultado = await registrarModificacion({ id, accion, comentario, fechaSubida, normativaId });
+          modificacionesAplicadas.push({ id, ...resultado });
+        } else {
+          modificacionesAplicadas.push({
+            id: id || null,
+            success: false,
+            message: "Faltan datos obligatorios",
+          });
+        }
+      }
+    }  
       // Insertar los tags relacionados en la tabla `tag_normativa`
       await tagService.insertTagsForNormativa(normativaId, tags);
       return { success: true, message: "Normativa creada correctamente", id: normativaId };
+  
     } catch (error) {
       console.error("Error al crear la normativa:", error);
       throw error;
@@ -428,6 +472,6 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-  eliminar, updateNormativa, createNormativa, searchNormativaDespublicadas, searchNormativaEliminadas
+  eliminar, updateNormativa, create, searchNormativaDespublicadas, searchNormativaEliminadas
 };
 
