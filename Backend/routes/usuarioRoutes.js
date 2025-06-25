@@ -3,6 +3,19 @@ import express from "express";
 
 const router = express.Router();
 
+router.post("/create", async (req, res) => {
+    const usuarioData = req.body;
+    try{
+      const result = await UsuariosDB.create(usuarioData);
+      res.status(201).json(result);
+    }catch(error){
+      console.error("Error al crear el usuario:", error);
+      res.status(500).json({ error: "Error al crear el usuario" });
+    }
+});
+
+
+
 router.get("/", async (req, res) => {
   const users = await UsuariosDB.getAllUsuarios();
   res.json(users);

@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { getLabel } from "../config/mapeo.js"
 
 function PasoVerificacion({ formData, onBack, onSubmit }) {
   return (
@@ -44,6 +45,12 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
               anio: "Año",
               titulo: "Título",
               cambia_normativa: "¿Esta normativa modifica a otra?",
+              email: "Correo",
+              password: "Contraseña",
+              rol: "Rol de Usuario",
+              dependencia: "Dependencia",
+              nombre: "Nombre",
+              telefono: "Telefono"
             };
 
             return (
@@ -53,7 +60,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                   ? value.join(", ")
                   : typeof value === "object" && value?.name
                   ? value.name
-                  : value?.toString()}
+                  : getLabel(key,value)}
               </p>
             );
           })}

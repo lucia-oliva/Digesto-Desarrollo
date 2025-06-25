@@ -24,6 +24,31 @@ campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ]
 //FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
 //FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
+
+async function create(data) {
+  const { nombre, telefono, email, password, rol, id_dependencia} = data;
+  const dependenciaFinal = id_dependencia ?? 0; // Si no se proporciona, usar 0 como valor por defecto
+
+  try{
+    const fechaSubida = new Date().toISOString().split("T")[0]; 
+    const estado = "activo";
+    const claveHasheada = await hashPasswordBcrypt(password);
+    const sqlInsertUser = ` INSERT INTO usuario (nombre, telefono, email, clave, fecha_alta, id_dependencia, estado, id_tipo_usuario, ultima_visita) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)`;
+
+    const result = await db.query(sqlInsertUser, [
+      nombre, telefono, email, claveHasheada, fechaSubida, dependenciaFinal, estado,rol,fechaSubida]);
+    const userId = result.insertId;
+
+    return {succeso: true, mensaje: "Usuario creado correctamente", id: userId};
+
+  }catch (error) {
+    console.error("Error al crear el usuario:", error);
+    throw error;
+  }
+}
+
+
+//BUG  no estoy segura si la funcion de create es usada en otra parte del codigo, por las dudas replico la funcionalidad...y si no esta quedaria para borrar.
 async function createUsuario(user) {
   const sql =
     "INSERT INTO usuario (nombre , telefono , email , clave , id_tipo_usuario, id_dependencia, fecha_alta,ultima_visita) VALUES (?,?,?,?,?,?,?,?)";
@@ -178,4 +203,4 @@ async function searchUsuariosByParameters(
 }
 
 
-export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters};
+export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters,create};

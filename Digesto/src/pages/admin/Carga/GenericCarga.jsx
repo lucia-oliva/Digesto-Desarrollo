@@ -5,6 +5,7 @@ import PasoFormulario from "./Steps/pasoForm.jsx";
 import PasoModifica from "./Steps/pasoNormativasModificadas.jsx";
 import PasoVerificacion from "./Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "./config/flujoSteps.js";
+import { getRuta } from "./config/mapeo.js";
 
 function GenericCarga() {
   const location = useLocation();
@@ -27,40 +28,70 @@ function GenericCarga() {
   const handleNext = () => setCurrentStep((prev) => prev + 1);
   const handleBack = () => setCurrentStep((prev) => prev - 1);
 
-
+  
   const handleSubmit = () => {
-    const dataToSend = {...formData};
-     if (dataToSend.archivo instanceof File) {
-      dataToSend.archivo = dataToSend.archivo.name;
-    }
-    try{
-      const json = JSON.stringify(dataToSend);
-      console.log("JSON VALIDO", json);
-    fetch(`http://localhost:3000/api/${entidad}/create`, {
-      
-      method: "POST",
-      headers:{"Content-Type": "application/json"
+  const dataToSend = { ...formData };
+  const ruta = getRuta(entidad);
 
-      },
-      body: JSON.stringify(dataToSend),
+  try {
+    //Ruta generica
+    fetch(`http://localhost:3000/api/${ruta}/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...dataToSend,
+        archivo: dataToSend.archivo?.name || "", // solo nombre
+      }),
     })
       .then((res) => res.json())
-      .then(() => {
+      .then(async (data) => {
+        console.log(`[POST] /api/${ruta}/create =>`, data);
+
+        // Paso 2: subir el archivo solo si es normativa
+        if (
+          entidad === "normativa" &&
+          dataToSend.archivo instanceof File &&
+          data?.id
+        ) {
+          const formDataUpload = new FormData();
+          formDataUpload.append("file", dataToSend.archivo);
+          formDataUpload.append("resolucion", dataToSend.numero);
+          formDataUpload.append("anio", dataToSend.anio);
+          formDataUpload.append("titulo", dataToSend.titulo);
+          formDataUpload.append("id_dependencia", dataToSend.dependencia);
+          formDataUpload.append("id_emisor", dataToSend.emisor);
+          formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
+
+          const resUpload = await fetch(
+            `http://localhost:3000/api/file/upload/${data.id}`,
+            {
+              method: "POST",
+              body: formDataUpload,
+            }
+          );
+
+          const resJson = await resUpload.json();
+          console.log("Resultado de subida de archivo:", resJson);
+
+          if (!resUpload.ok) {
+            alert("Error al subir archivo PDF");
+          }
+        }
+
         alert(
           `${
             entidad.charAt(0).toUpperCase() + entidad.slice(1)
-          } creado correctamente`
+          } creado/a correctamente`
         );
         setFormData({});
         setErrores({});
         setCurrentStep(0);
-        console.log("datos que se enviaron al back", dataToSend);
       })
       .catch(() => alert("Error al crear registro"));
-    }catch(err){
-      console.log("Error al serializar JSON:",err);
-    }
-  };
+  } catch (err) {
+    console.log("Error al serializar JSON:", err);
+  }
+};
 
   const renderPaso = () => {
     const paso = pasos[currentStep];

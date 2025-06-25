@@ -80,7 +80,7 @@ function PasoForm({
       if (
         entidad === "usuario" &&
         name === "dependencia" &&
-        !["Administrador de Dependencia", "Supervisor"].includes(formData.rol)
+        !["2","4"].includes(formData.rol)
       ) {
         return null;
       }
@@ -124,11 +124,17 @@ function PasoForm({
               className="select select-bordered w-full"
             >
               <option value="">Seleccione</option>
-              {options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
+              {options.map((opt) =>
+                  typeof opt === "object" ? (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ) : (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  )
+                )}
             </select>
           ) : (
             <input

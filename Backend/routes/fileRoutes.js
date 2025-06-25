@@ -37,6 +37,49 @@ router.get("/download", async (req, res) => {
   }
 });
 
+//endpoint agregado de upload para usarse en administracion
+router.post("/upload/:id", pdfHandler.single("file"), async (req, res) => {
+  try {
+    const normativaId = req.params.id;
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ error: "No se ha proporcionado un archivo" });
+    }
+
+    // Verificar que la normativa exista
+    const normativaExistente = await db.query(
+      "SELECT * FROM normativa WHERE id = ?",
+      [normativaId]
+    );
+
+    if (!normativaExistente || normativaExistente.length === 0) {
+      return res.status(404).json({ error: "Normativa no encontrada" });
+    }
+
+    // Actualizar solo el campo archivo
+    const result = await db.query(
+      "UPDATE normativa SET archivo = ? WHERE id = ?",
+      [req.file.filename, normativaId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("No se pudo actualizar la normativa.");
+    }
+
+    res.status(200).json({
+      message: "Archivo subido y normativa actualizada correctamente",
+      id: normativaId,
+      filename: req.file.filename,
+    });
+  } catch (error) {
+    console.error("Error al subir y asociar el archivo:", error);
+    res.status(500).json({ error: "Error al subir y asociar el archivo" });
+  }
+});
+
+
 
 /* FIXME: Se Requiere Mejorar RUTA UPLOAD 
     A Mejorar: 
@@ -61,7 +104,7 @@ router.post("/upload", pdfHandler.single("file"), async (req, res) => {
       anio,
     } = req.body;
 
-    // Valida si ya existe un archivo con los mismos parámetros
+    // Valida si ya existe una normativa con los mismos parámetros
     const existingNormativa = await db.query(
       "SELECT * FROM normativa WHERE id_dependencia = ? AND numero = ? AND anio = ?",
       [id_dependencia, resolucion, anio]
