@@ -15,6 +15,22 @@ router.post("/create", async (req, res) => {
   }
 });
 
+router.post("/edit", async (req, res) => {
+  console.log("Cuerpo de la solicitud:", req.body);
+  const dependenciaDataEdit = req.body;
+  try {
+    const result = await dependenciaDB.edit(dependenciaDataEdit);
+    if (result.success) {
+      res.status(200).json({ message: "Dependencia editada correctamente." });
+    } else {
+      res.status(400).json({ error: result.mensaje });
+    }
+  } catch (error) {
+    console.error("Error al editar la dependencia:", error);
+    res.status(500).json({ error: "Error al editar la dependencia" });
+  }
+});
+
 router.get("/", async (req, res) => {
   const dependencias = await dependenciaDB.getAllDependencias();
   res.json(dependencias);

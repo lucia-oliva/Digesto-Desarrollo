@@ -12,6 +12,21 @@ try{
 }}
 );
 
+router.post("/edit", async (req, res) => {
+  console.log("Cuerpo de la solicitud:", req.body);
+  const dataTagEdit = req.body; 
+  try {
+    const result = await tagsDB.edit(dataTagEdit);
+    if (result.success) {
+      res.status(200).json({ message: "Tag editado correctamente." });
+    } else {
+      res.status(400).json({ error: result.mensaje });
+    }
+  } catch (error) {
+    console.error("Error al editar el tag:", error);
+    res.status(500).json({ error: "Error al editar el tag" });
+  }
+});
 
 router.post("/create", async (req, res) => {
   const tagData = req.body; // Array de tags

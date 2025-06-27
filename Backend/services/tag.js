@@ -1,5 +1,30 @@
 import db from "./db.js";
 
+async function edit(data){
+  const {id, nombre} = data;
+  try {
+    // Verificar si ya existe un tag con ese nombre
+    const existing = await db.query("SELECT id FROM tag WHERE nombre = ? AND id != ?", [nombre, id]);
+    if (existing && existing.length > 0) {
+      // Ya existe, no actualizar
+      console.log({ mensaje: `Tag '${nombre}' ya existe`});
+      return { success: false, message: `Tag '${nombre}' ya existe` };
+    } else {
+      // Actualizar el tag
+      const result = await db.query("UPDATE tag SET nombre = ? WHERE id = ?", [nombre, id]);
+      if (result.affectedRows > 0) {
+        console.log({ mensaje: `Tag '${nombre}' actualizado correctamente` });
+        return { success: true, message: `Tag '${nombre}' actualizado correctamente` };
+      } else {
+        console.log({ mensaje: `No se encontró el tag con ID ${id}` });
+        return { success: false, message: `No se encontró el tag con ID ${id}` };
+      }
+    }
+  }catch(error) {
+    console.error("Error al editar el tag:", error);
+    throw error;
+  }
+}
 
 async function getAllTags(){
     const sql = "SELECT nombre FROM tag";
@@ -29,7 +54,7 @@ async function create(data) {
 //Obtener tags de normativa
 
 //Insertar Tags en normativa - Verificar si existe tags en normativas
-async function insertTagsForNormativa(normativaId, tags) {
+async function insertTagsForNormativa(normativaId, tags){
   if (!Array.isArray(tags) || tags.length === 0) {
     console.warn("No se proporcionaron tags válidos.");
     return;
@@ -140,4 +165,4 @@ async function eliminar(id){
 
 
 
-export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters,create};
+export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters,create,edit};

@@ -14,6 +14,22 @@ router.get("/name", async (req, res) => {
 );
 
 
+router.post("/edit", async (req, res) => {
+  console.log("Cuerpo de la solicitud:", req.body);
+  const emisorDataEdit = req.body; 
+  try {
+    const result = await emisoresDB.edit(emisorDataEdit);
+    if (result.success) {
+      res.status(200).json({ message: "Emisor editado correctamente." });
+    } else {
+      res.status(400).json({ error: result.mensaje });
+    }
+  } catch (error) {
+    console.error("Error al editar el emisor:", error);
+    res.status(500).json({ error: "Error al editar el emisor" });
+  }
+});
+
 router.post("/create", async (req, res) => {
   const emisorData = req.body;
   try {

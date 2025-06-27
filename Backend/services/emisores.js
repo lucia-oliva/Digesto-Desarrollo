@@ -9,6 +9,27 @@ async function getAllEmisoresName() {
   return results;
 }
 
+async function edit(data){
+  const{id, nombre, estado} = data;
+  const existing = await db.query("SELECT id FROM emisor WHERE nombre = ? AND id != ?", [nombre, id]);
+  if( existing && existing.length > 0) {
+    // Ya existe, no actualizar
+    console.log({ mensaje: `Emisor '${nombre}' ya existe`});
+    return { success: false, message: `Emisor '${nombre}' ya existe` };
+  }else{
+    // Actualizar el emisor
+    const sqlUpdate = "UPDATE emisor SET nombre = ?, estado = ? WHERE id = ?";
+    const result = await db.query(sqlUpdate, [nombre, estado, id]);
+    if (result.affectedRows > 0) {
+      console.log({ mensaje: `Emisor '${nombre}' actualizado correctamente` });
+      return { success: true, message: `Emisor '${nombre}' actualizado correctamente` };
+    } else {
+      console.log({ mensaje: `No se encontró el emisor con ID ${id}` });
+      return { success: false, message: `No se encontró el emisor con ID ${id}` };
+    }
+  }
+}
+
 async function create(data){
   const{
     nombre
@@ -74,4 +95,4 @@ async function searchEmisorByParameters(
 
 
 
-export default {getAllEmisoresName, searchEmisorByParameters,eliminar, create};
+export default {getAllEmisoresName, searchEmisorByParameters,eliminar, create, edit};

@@ -45,18 +45,31 @@ try{
 }
 
 //Modificar dependencia
-async function updateDependencia(id, data) {
-  const sql =
-    "UPDATE dependencia SET nombre = ?, estado = ?, color = ? codificacion = ?, nombre_completo = ? WHERE id = ?";
-  const results = await db.query(sql, [
-    data.nombre,
-    data.estado,
-    data.color,
-    data.codificacion,
-    data.nombre_completo,
-    id,,
-  ]);
-  return results;
+async function edit(data){
+  const {id,nombre, nombre_completo, estado, codificacion} = data;
+  try {
+    // Verificar si ya existe una dependencia con ese nombre
+    const existing = await db.query("SELECT id FROM dependencia WHERE nombre = ? AND id != ?", [nombre, id]);
+    if (existing && existing.length > 0) {
+      // Ya existe, no actualizar
+      console.log({ mensaje: `Dependencia '${nombre}' ya existe`});
+      return { success: false, message: `Dependencia '${nombre}' ya existe` };
+    } else {
+      // Actualizar la dependencia
+      const sqlUpdate = "UPDATE dependencia SET nombre = ?, nombre_completo = ?, estado = ?, codificacion = ? WHERE id = ?";
+      const result = await db.query(sqlUpdate, [nombre, nombre_completo, estado, codificacion, id]);
+      if (result.affectedRows > 0) {
+        console.log({ mensaje: `Dependencia '${nombre}' actualizada correctamente` });
+        return { success: true, message: `Dependencia '${nombre}' actualizada correctamente` };
+      } else {
+        console.log({ mensaje: `No se encontró la dependencia con ID ${id}` });
+        return { success: false, message: `No se encontró la dependencia con ID ${id}` };
+      }
+    }
+  } catch (error) {
+    console.error("Error al editar la dependencia:", error);
+    throw error;
+  }
 }
 
 
@@ -117,4 +130,4 @@ async function searchDependenciaByParameters(
 
 
 
-export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters}
+export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit}
