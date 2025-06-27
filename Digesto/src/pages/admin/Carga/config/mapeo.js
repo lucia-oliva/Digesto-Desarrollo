@@ -1,7 +1,11 @@
 
+
 export const rutasPorEntidad = {
     usuario: "usuarios",
     normativa: "normativa",
+    dependencia: "dependencia",
+    emisor: "emisores",
+    palabraclave: "tag",
 }
 
 export const tipoNormativaOptions = [

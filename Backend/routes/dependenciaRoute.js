@@ -3,6 +3,18 @@ import express from "express";
 
 const router = express.Router();
 
+
+router.post("/create", async (req, res) => {
+  const dependenciaData = req.body;
+  try {
+    const result = await dependenciaDB.create(dependenciaData);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("Error al crear la dependencia:", error);
+    res.status(500).json({ error: "Error al crear la dependencia" });
+  }
+});
+
 router.get("/", async (req, res) => {
   const dependencias = await dependenciaDB.getAllDependencias();
   res.json(dependencias);

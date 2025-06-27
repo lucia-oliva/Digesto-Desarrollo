@@ -13,6 +13,17 @@ try{
 );
 
 
+router.post("/create", async (req, res) => {
+  const tagData = req.body; // Array de tags
+  try {
+    await tagsDB.create(tagData);
+    res.status(200).json({ message: "Tags insertados correctamente." });
+  } catch (error) {
+    console.error("Error al insertar los tags:", error);
+    res.status(500).json({ error: "Error al insertar los tags" });
+  }
+});
+
 //Obtener tags de normativa 
 
 router.get("/tags/:id", async (req, res) => {

@@ -22,21 +22,29 @@ campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ]
 //FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
 //FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
-async function createDependencia(user) {
-  console.log(user);
-
-  const sql =
-    "INSERT INTO dependencia (nombre , nombre_completo ,estado ,color,codificacion) VALUES (?,?,?,?,?)";
-  const results = await db.query(sql, [
-    user.nombre,
-    user.nombre_completo,
-    user.estado,
-    user.color,
-    user.codificacion,
+async function create(data) {
+ const { nombre, Estado, codificacion, nombre_completo } = data;
+ const color = "null";
+ 
+try{
+  const sqlInsert = `INSERT INTO dependencia (nombre, estado, color, codificacion, nombre_completo) VALUES (?, ?, ?, ?, ?)`;
+  const result = await db.query(sqlInsert, [
+    nombre,
+    Estado,
+    color,
+    codificacion,
+    nombre_completo
   ]);
-  return results;
+  const dependenciaId = result.insertId;
+
+  return { success: true, mensaje: "Dependencia creada correctamente", id: dependenciaId };
+}catch (error) {
+  console.error("Error al crear la dependencia:", error);
+  throw error;
+ }
 }
-//Modificar usuario
+
+//Modificar dependencia
 async function updateDependencia(id, data) {
   const sql =
     "UPDATE dependencia SET nombre = ?, estado = ?, color = ? codificacion = ?, nombre_completo = ? WHERE id = ?";
@@ -109,4 +117,4 @@ async function searchDependenciaByParameters(
 
 
 
-export default {getAllDependencias, getDepenendenciaById, createDependencia, eliminar, getAllNamesDependencias, searchDependenciaByParameters}
+export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters}

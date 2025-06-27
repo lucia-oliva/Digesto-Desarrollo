@@ -7,6 +7,25 @@ async function getAllTags(){
     return results;
 }
 
+async function create(data) {
+  console.log(data);
+  const {Tag} = data;
+  try {
+          // Verificar si ya existe un tag con ese nombre
+          const existing = await db.query("SELECT id FROM tag WHERE nombre = ?", [Tag]);
+          if (existing && existing.length > 0) {
+            // Ya existe, no insertar
+            console.log({ mensaje: `Tag '${Tag}' ya existe`});
+          }else{
+          const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [Tag]);
+          console.log({ id: result.insertId, mensaje: `Tag '${Tag}' creado correctamente`});
+        }}catch (error) {
+    console.error("Error al crear el tag:", error);
+    throw error;
+  }
+}
+
+
 //Obtener tags de normativa
 
 //Insertar Tags en normativa - Verificar si existe tags en normativas
@@ -121,4 +140,4 @@ async function eliminar(id){
 
 
 
-export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters};
+export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters,create};

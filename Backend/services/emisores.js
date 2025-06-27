@@ -9,6 +9,24 @@ async function getAllEmisoresName() {
   return results;
 }
 
+async function create(data){
+  const{
+    nombre
+  } = data;
+
+  const estado = "publicado"; // Estado por defecto al crear un emisor
+try{
+  const sqlInsert = `INSERT INTO emisor (nombre, estado) VALUES (?, ?)`;
+  const result = await db.query(sqlInsert, [nombre, estado]);
+  const emisorId = result.insertId;
+  return { success: true, mensaje: "Emisor creado correctamente", id: emisorId };
+} catch (error) {
+  console.error("Error al crear el emisor:", error);
+  throw error;
+  }
+
+}
+
 async function eliminar(id){
   const sql = "DELETE FROM emisor WHERE id = ?";
   const results = await db.query(sql, [id]);
@@ -56,4 +74,4 @@ async function searchEmisorByParameters(
 
 
 
-export default {getAllEmisoresName, searchEmisorByParameters,eliminar};
+export default {getAllEmisoresName, searchEmisorByParameters,eliminar, create};

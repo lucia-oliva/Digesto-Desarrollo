@@ -13,6 +13,18 @@ router.get("/name", async (req, res) => {
   }}
 );
 
+
+router.post("/create", async (req, res) => {
+  const emisorData = req.body;
+  try {
+    const result = await emisoresDB.create(emisorData);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("Error al crear el emisor:", error);
+    res.status(500).json({ error: "Error al crear el emisor" });
+  }
+});
+
 //Filtrar dependencia por parametros
 router.post("/search", async (req, res) => {
   let {nombre,estado} = req.body;
