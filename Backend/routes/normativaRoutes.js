@@ -7,7 +7,22 @@ import express from "express";
 const router = express.Router();
 
 
-
+//editar normativa
+router.post("/edit", async (req, res) => {
+  console.log("Cuerpo de la solicitud:", req.body);
+  const normativaDataEdit = req.body;
+  try {
+    const result = await normativaDB.edit(normativaDataEdit);
+    if (result.success) {
+      res.status(200).json({ message: "Normativa editada correctamente." });
+    } else {
+      res.status(400).json({ error: result.mensaje });
+    }
+  } catch (error) {
+    console.error("Error al editar la normativa:", error);
+    res.status(500).json({ error: "Error al editar la normativa" });
+  }
+});
 
 //Crear normativa
 router.post("/create", async (req, res) => {
@@ -315,5 +330,22 @@ router.put("/update/:id", async (req, res) => {
     res.status(500).json({ error: "Error al actualizar la normativa" });
   }
 });
+
+//edit normativa
+router.put("/edit", async (req, res) => {
+  const normativaData = req.body;
+  try {
+    const result = await normativaDB.edit(normativaData);
+    if (result.success) {
+      res.status(200).json({ message: "Normativa editada correctamente." });
+    } else {
+      res.status(400).json({ error: result.mensaje });
+    }
+  } catch (error) {
+    console.error("Error al editar la normativa:", error);
+    res.status(500).json({ error: "Error al editar la normativa" });
+  }
+});
+
 
 export default router;

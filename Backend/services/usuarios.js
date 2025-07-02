@@ -3,11 +3,31 @@ import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
 // Funciones CRUD basicas
 
-//Mostrar todos los usuarios
-async function getAllUsuarios() {
-  const sql = "SELECT nombre,email,telefono,id_dependencia  FROM usuario";
-  const results = await db.query(sql);
-  return results;
+//Editar usuario. 
+async function edit(data){
+  const{id,id_tipo_usuario, nombre, telefono, email, clave, estado, id_dependencia} = data;
+  //verificar si id_dependencia es undefined, si lo es, asignar 0 como valor por defecto
+  const dependenciaFinal = id_dependencia ?? 0; // Si no se proporciona, usar
+
+  const fechaSubida = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD 
+  const claveHasheada= await hashPasswordBcrypt(clave); // Hashear la clave
+  console.log("clave hasheada:", claveHasheada);
+  try{
+    //Actualizar el usuario 
+    const sqlUpdate = "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
+    const result = await db.query(sqlUpdate, [nombre, id_tipo_usuario, telefono, email, claveHasheada, estado, fechaSubida, fechaSubida, dependenciaFinal, id]);
+    
+    if(result.affectedRows > 0) {
+      console.log({ mensaje: `Usuario '${nombre}' actualizado correctamente` });
+      return { success: true, message: `Usuario '${nombre}' actualizado correctamente` };
+    } else {
+      console.log({ mensaje: `No se encontró el usuario con ID ${id}` });
+      return { success: false, message: `No se encontró el usuario con ID ${id}` };
+    }
+  }catch (error) {
+    console.error("Error al editar el usuario:", error);
+    throw error;
+  }
 }
 
 //Mostrar usuario por ID
@@ -203,4 +223,4 @@ async function searchUsuariosByParameters(
 }
 
 
-export default { getAllUsuarios, getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters,create};
+export default { getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters,create, edit};

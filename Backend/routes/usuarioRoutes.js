@@ -14,6 +14,28 @@ router.post("/create", async (req, res) => {
     }
 });
 
+//Editar usuario
+router.post("/edit", async (req, res) => {
+  console.log("Cuerpo de la solicitud:", req.body);
+  const usuarioDataEdit = req.body;
+  try {
+    const result = await UsuariosDB.edit(usuarioDataEdit);
+    if (result) {
+      res.status(200).json({ message: "Usuario editado correctamente." });
+    } else {
+      res.status(400).json({ error: "No se pudo editar el usuario." });
+    }
+  } catch (error) {
+    console.error("Error al editar el usuario:", error);
+    res.status(500).json({ error: "Error al editar el usuario" });
+}});
+
+//Mostrar todos los usuarios
+async function getAllUsuarios() {
+  const sql = "SELECT nombre,email,telefono,id_dependencia  FROM usuario";
+  const results = await db.query(sql);
+  return results;
+}
 
 
 router.get("/", async (req, res) => {
