@@ -1,12 +1,9 @@
 import multer from "multer";
 import fs from "fs-extra";
-import db from "../services/db.js";
 
-/*MULTER es un middleware para subir archivos - fs es un modulo de node para manejar archivos */
-
-// Configuración de Multer
+// Configuración de Multer
 const storage = multer.diskStorage({
-  // Fijamos la ubicación de los archivos y con fs creamos la carpeta
+  // 📁 Carpeta donde se guarda el archivo
   destination: async (req, file, cb) => {
     try {
       const uploadsDir = "./archivos";
@@ -17,38 +14,22 @@ const storage = multer.diskStorage({
     }
   },
 
-  // Alteramos el nombre de los pdf
-  filename: async (req, file, cb) => {
+  // 📝 Nombre temporal del archivo (se renombra después en el controlador)
+  filename: (req, file, cb) => {
     try {
-      // Verificamos si el archivo es un PDF
+      // Solo permitimos PDF
       if (file.mimetype !== "application/pdf") {
         return cb(new Error("Solo se permiten archivos PDF"));
       }
 
-      // Validamos los datos
-      const { id_dependencia, resolucion, anio } = req.body;
-      if (!id_dependencia || !resolucion || !anio) {
-        return cb(new Error("Faltan parámetros"));
-      }
-
-      // Generamos el nombre del archivo
-      const [{ codificacion }] = await db.query(
-        "SELECT codificacion FROM dependencia WHERE id = ?",
-        [id_dependencia]
-      );
-
-      if (!codificacion) {
-        return cb(new Error("Dependencia no existe"));
-      }
-
       const timestamp = Date.now();
-      const fileName = `${codificacion}_${resolucion}_${anio}_${timestamp}.pdf`;
-
+      const fileName = `temp_${timestamp}.pdf`; // nombre temporal
       cb(null, fileName);
     } catch (error) {
       cb(error);
     }
-  },
+  }
 });
 
+// Exportamos el middleware de multer
 export const pdfHandler = multer({ storage });

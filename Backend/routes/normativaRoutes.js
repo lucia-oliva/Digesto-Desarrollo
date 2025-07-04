@@ -1,6 +1,7 @@
 import normativaDB from "../services/normativa.js";
 import express from "express";
 
+
 //TODO: A la hora de hacer auditorias, verificar en la funcion de eliminar normativas
 //se se elimina todo lo que corresponde, al igual que la funcion de editar. 
 
@@ -26,6 +27,7 @@ router.post("/edit", async (req, res) => {
 
 //Crear normativa
 router.post("/create", async (req, res) => {
+   // Obtener el ID 
   console.log("lo que llega del front...", req.body);
   const normativaData = req.body;
   console.log("Datos recibidos para crear normativa:", normativaData);

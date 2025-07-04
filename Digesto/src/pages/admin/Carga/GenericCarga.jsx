@@ -6,8 +6,11 @@ import PasoModifica from "./Steps/pasoNormativasModificadas.jsx";
 import PasoVerificacion from "./Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "./config/flujoSteps.js";
 import { getRuta } from "./config/mapeo.js";
+import { useAuth } from "../../../context/useAuth.jsx";
 
 function GenericCarga() {
+  const { auth } = useAuth();
+    const user = auth.user;
   const location = useLocation();
   const pathSegment = location.pathname
     .split("/")
@@ -41,6 +44,7 @@ function GenericCarga() {
       body: JSON.stringify({
         ...dataToSend,
         archivo: dataToSend.archivo?.name || "", // solo nombre
+        user,
       }),
     })
       .then((res) => res.json())
@@ -55,10 +59,10 @@ function GenericCarga() {
         ) {
           const formDataUpload = new FormData();
           formDataUpload.append("file", dataToSend.archivo);
-          formDataUpload.append("resolucion", dataToSend.numero);
-          formDataUpload.append("anio", dataToSend.anio);
+          formDataUpload.append("resolucion", String(dataToSend.numero));
+          formDataUpload.append("anio", String(dataToSend.anio));
           formDataUpload.append("titulo", dataToSend.titulo);
-          formDataUpload.append("id_dependencia", dataToSend.dependencia);
+          formDataUpload.append("id_dependencia", String(dataToSend.dependencia));
           formDataUpload.append("id_emisor", dataToSend.emisor);
           formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
 

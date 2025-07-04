@@ -1,9 +1,8 @@
 import db from "./db.js";
 import tagService from "./tag.js";
+
 //BASIC CRUD
 
-//Crear Normativa
-//TODO: Ver como integramos lo de "creador" (usuario que crea la normativa)
 
 //funciona!
 async function updateModificacion({ id_relacion, accion, comentario }) {
@@ -300,6 +299,8 @@ async function registrarModificacion({
 }
 
 async function create(data) {
+
+  
   const {
     numero,
     anio,
@@ -313,13 +314,16 @@ async function create(data) {
     tags,
     archivo,
     normativas_modificadas,
+    user
+    
   } = data;
+
   try {
     const fechaSubida = new Date().toISOString().split("T")[0];
     const sqlInsertNormativa = `
         INSERT INTO normativa (numero, anio, titulo, resumen, fecha_normativa, 
-          id_dependencia, id_emisor, id_tipo_normativa, estado, archivo, fecha_alta)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+          id_dependencia, id_emisor, id_tipo_normativa, estado, archivo, fecha_alta, id_creador)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
     const result = await db.query(sqlInsertNormativa, [
       numero,
@@ -333,6 +337,7 @@ async function create(data) {
       estado,
       archivo,
       fechaSubida,
+      user.id, // ID del usuario que crea la normativa
     ]);
 
     const normativaId = result.insertId;
