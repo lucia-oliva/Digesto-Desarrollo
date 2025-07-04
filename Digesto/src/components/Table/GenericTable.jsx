@@ -3,7 +3,14 @@ import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TablePagination from "./TablePagination";
 
-function GenericTable({ data, columns, actions = [], page, totalPages, onPageChange }) {
+function GenericTable({
+  data,
+  columns,
+  actions = [],
+  page,
+  totalPages,
+  onPageChange,
+}) {
   return (
     <div className="overflow-x-auto md:block rounded-box border border-base-content/30 bg-base-100  mt-3 mb-3 shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200">
       <table className="table w-full ">
@@ -11,14 +18,23 @@ function GenericTable({ data, columns, actions = [], page, totalPages, onPageCha
           <TableHeader columns={columns} />
         </thead>
         <tbody>
-          {data.map((item) => (
-            <TableRow key={item.id} item={item} columns={columns} actions={actions} />
+          {data?.map((item) => (
+            <TableRow
+              key={item.id}
+              item={item}
+              columns={columns}
+              actions={actions}
+            />
           ))}
         </tbody>
       </table>
 
       {totalPages && (
-        <TablePagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
+        <TablePagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
       )}
     </div>
   );
