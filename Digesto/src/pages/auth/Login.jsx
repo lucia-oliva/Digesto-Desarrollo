@@ -1,41 +1,43 @@
-import api from "../../api/axiosPrivate";
 import { useState } from "react";
-import { setAccessToken } from "../../services/authservices";
-import { Alert, Loading } from "../../components/ui/Ui";
 import { useNavigate } from "react-router";
+import { useAuth } from "../../context/useAuth";
+import { Alert, Loading } from "../../components/ui/Ui";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState(null);
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [response, setResponse] = useState({ msg: null, isError: false });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.password) {
-      return alert("Por favor, complete todos los campos.");
+    const { email, password } = form;
+
+    if (!email || !password) {
+      setResponse({
+        msg: "Por favor, complete todos los campos.",
+        isError: true,
+      });
+      return;
     }
 
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const response = await api.post(
-        "http://localhost:3000/api/auth/login",
-        form,
-        { withCredentials: true }
-      );
-      setResponse(response.data.msg);
-      setAccessToken(response.data.accessToken);
+      const data = await login(email, password); // use context login
+      setResponse({ msg: data.msg, isError: false });
       navigate("/admin");
     } catch (error) {
+      const msg = error?.response?.data?.msg || "Error al iniciar sesión.";
       setForm({ email: "", password: "" });
-      setResponse(error?.response?.data?.msg);
+      setResponse({ msg, isError: true });
     } finally {
       setLoading(false);
     }
@@ -63,12 +65,13 @@ function Login() {
               Correo electrónico
             </label>
             <input
+              id="email"
               name="email"
               type="email"
-              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
-              placeholder="example@dominio.com"
-              value={ form.email }
+              value={form.email}
               onChange={handleChange}
+              placeholder="example@dominio.com"
+              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
             />
           </div>
           <div>
@@ -79,12 +82,13 @@ function Login() {
               Contraseña
             </label>
             <input
+              id="password"
               name="password"
               type="password"
-              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
-              placeholder="********"
-              value={ form.password }
+              value={form.password}
               onChange={handleChange}
+              placeholder="********"
+              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
             />
           </div>
           <button
@@ -100,14 +104,17 @@ function Login() {
           </a>
         </div>
       </div>
-      {response && (
-        <div className="absolute top-0 z-50 w-fit h-fit ">
-          <Alert message={response} title="Login" error={false} />
+      {response.msg && (
+        <div className="absolute top-0 z-50 w-fit h-fit">
+          <Alert
+            message={response.msg}
+            title="Login"
+            error={response.isError}
+          />
         </div>
       )}
-
       {loading && (
-        <div className="absolute top-1/2 z-50 w-fit h-fit ">
+        <div className="absolute top-1/2 z-50 w-fit h-fit">
           <Loading />
         </div>
       )}

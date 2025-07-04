@@ -17,14 +17,18 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
- const user = await db.query(
+  const user = await db.query(
     "SELECT id, email, clave, nombre FROM usuario WHERE email = ?",
     [email]
   );
-  
+  console.log(user);
+
+  console.log(user == null);
+
   if (user == null || user.length === 0) {
     return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
+
   const { isMatch, newHash } = await verifyPassword(password, user[0].clave);
   if (!isMatch) {
     return res.status(401).json({ msg: "Email o contraseña Incorrectos" });

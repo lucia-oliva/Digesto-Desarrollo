@@ -1,11 +1,17 @@
-let accessToken = '';
+const TOKEN_KEY = "accessToken";
 
 export const setAccessToken = (token) => {
-  accessToken = token;
+  localStorage.setItem(TOKEN_KEY, token);
 };
 
-export const getAccessToken = () => accessToken;
+export const getAccessToken = () => {
+  return localStorage.getItem(TOKEN_KEY);
+};
 
 export const clearAccessToken = () => {
-  accessToken = '';
+  localStorage.removeItem(TOKEN_KEY);
+};
+
+export const isLoggedIn = () => {
+  return !!getAccessToken();
 };
