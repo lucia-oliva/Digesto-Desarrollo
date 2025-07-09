@@ -1,8 +1,10 @@
+import { FaFileLines } from "react-icons/fa6";
+
 export const menuItems = [
   {
     title: "Normativas",
     children: [
-      { name: "Nueva Normativa", path: "./NuevaNormativa" },
+      { name: "Nueva Normativa", path: "./NuevaNormativa", },
       { name: "Listado", path: "./ListadoNormativa" },
       { name: "Normativas Eliminadas", path: "./ListadoNormativa?filter=deleted" },
       { name: "Normativas Despublicadas", path: "./ListadoNormativa?filter=unpublish" },

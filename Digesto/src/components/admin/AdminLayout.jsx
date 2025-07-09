@@ -4,15 +4,10 @@ import SideBar from './Layout/Sidebar/Sidebar';
 
 function AdminLayout() {
   return (
-    <div className="min-h-screen bg-base-100 text-base-content flex flex-col">
-      <NavBarAdmin />
-      <div className="flex flex-1 pt-16">
+    <main className="min-h-screen w-full bg-base-100  flex flex-row">
         <SideBar />
-        <main className="flex-1 ml-0 md:ml-60">
           <Outlet />
-        </main>
-      </div>
-    </div>
+    </main>
   );
 }
 

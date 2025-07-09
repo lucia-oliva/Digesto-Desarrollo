@@ -2,8 +2,8 @@ import SidebarMenuContent from "./SideBarContent";
 
 function SideBar() {
   return (
-    <aside className="hidden md:block w-60 bg-blue-900 text-white pt-20 fixed top-0 left-0 h-full z-40">
-      <SidebarMenuContent className="p-4" />
+    <aside className="group rounded-tr-4xl z-40 bg-blue-900 text-white pt-20 transition-all duration-300 w-16 hover:w-60">
+      <SidebarMenuContent className="p-2" />
     </aside>
   );
 }

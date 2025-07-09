@@ -27,3 +27,4 @@ dist/
 
 # Windows
 Thumbs.db
+*.pdf

@@ -19,6 +19,8 @@ function DocumentView() {
     }
   });
 
+  console.log(normativa);
+  
   return (
     <div className="container">
       <div className="drawer drawer-end fixed lg:drawer-open">
