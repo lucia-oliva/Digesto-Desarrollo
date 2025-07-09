@@ -1,13 +1,15 @@
-import { Outlet } from 'react-router';
-import NavBarAdmin from './Layout/NavBarAdmin'
-import SideBar from './Layout/Sidebar/Sidebar';
+import { Outlet } from "react-router";
+import SideBarWrapper from "./Layout/Sidebar/SideBarWrapper";
 
 function AdminLayout() {
   return (
-    <main className="min-h-screen w-full bg-base-100  flex flex-row">
-        <SideBar />
-          <Outlet />
-    </main>
+    <div className="min-h-screen  w-full bg-base-100 relative flex flex-row">
+      <SideBarWrapper />
+
+      <div className=" transition-all duration-300 ml-0 md:ml-16">
+        <Outlet />
+      </div>
+    </div>
   );
 }
 

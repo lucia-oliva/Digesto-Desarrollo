@@ -1,8 +1,9 @@
-import { FaFileLines } from "react-icons/fa6";
+import { FaAdn, FaBuilding, FaBuildingColumns, FaFileLines, FaHammer, FaUser, FaUserGroup, FaUserMinus, FaUsersLine } from "react-icons/fa6";
 
 export const menuItems = [
   {
     title: "Normativas",
+    icon: <FaFileLines className="text-2xl" />,
     children: [
       { name: "Nueva Normativa", path: "./NuevaNormativa", },
       { name: "Listado", path: "./ListadoNormativa" },
@@ -12,6 +13,7 @@ export const menuItems = [
   },
   {
     title: "Usuarios",
+    icon: <FaUserGroup className="text-2xl" />,
     children: [
       { name: "Crear Usuario", path: "./NuevoUsuario" },
       { name: "Listado Usuarios", path: "./ListadoUsuarios" },
@@ -19,6 +21,7 @@ export const menuItems = [
   },
   {
     title: "Dependencias",
+    icon : <FaBuilding className="text-2xl" />,
     children: [
       { name: "Agregar Dependencia", path: "./NuevaDependencia" },
       { name: "Listado Dependencias", path: "./ListadoDependencias" },
@@ -26,6 +29,7 @@ export const menuItems = [
   },
   {
     title: "Emisores",
+    icon: <FaUser className="text-2xl" />,
     children: [
       { name: "Agregar Emisor", path: "./NuevoEmisor" },
       { name: "Listado Emisores", path: "./ListadoEmisores" },
@@ -33,6 +37,7 @@ export const menuItems = [
   },
   {
     title: "Auditoria",
+    icon: <FaHammer className="text-2xl" />,
     children: [
       { name: "Usuarios: Ingresos/Egresos", path: "./AuditoriaUsuariosIngresosEgresos" },
       { name: "Usuarios:Visitas", path: "./AuditoriaUsuariosVisitas" },
@@ -41,6 +46,7 @@ export const menuItems = [
   },
   {
     title: "Palabras Clave",
+    icon: <FaAdn className="text-2xl" />,
     children: [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },
@@ -48,7 +54,7 @@ export const menuItems = [
   },
 
   // Elementos especiales sin hijos
-  { title: "Visitas", path: "./Visitas" },
-  { title: "Consejo Superior", path: "./ConsejoSuperior" },
-  { title: "Salir", path: "./logout" },
+  { title: "Visitas", path: "./Visitas", icon: <FaUsersLine className="text-2xl" /> },
+  { title: "Consejo Superior", path: "./ConsejoSuperior", icon: <FaBuildingColumns className="text-2xl" /> },
+  { title: "Salir", path: "./logout", icon: <FaUserMinus className="text-2xl" /> },
 ];
