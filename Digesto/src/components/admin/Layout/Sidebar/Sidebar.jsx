@@ -3,12 +3,20 @@ import PropTypes from "prop-types";
 
 function SideBar({ isOpen, closeSidebar }) {
   return (
+    
     <div className="flex flex-col bg-base-100 gap-4 cursor-default h-screen">
-    {/* Logo */}
+      {/* Logo */}
+      <div>
+        <img
+      src="/src/assets/unlar-oscuro.png"
+      alt="UNLaR Logo"
+      className="object-cover max-h-14 mt-1"
+    />
+      </div>
 
-    <div className="flex items-center justify-center h-16">
-      <h1 className="text-2xl font-bold p-8">Digesto</h1>
-    </div>
+  
+
+   
 
     <aside
       className={`
