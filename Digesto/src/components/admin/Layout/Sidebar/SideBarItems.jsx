@@ -1,89 +1,95 @@
-import propTypes from "prop-types";
-import { useEffect, useState } from "react";
-import { IoMdArrowDropright } from "react-icons/io";
-import { IoMdArrowDropdown } from "react-icons/io";
+import PropTypes from "prop-types";
+import { useState } from "react";
+import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
 
-export const SideBarItem = ({
-  item,
-  activeItem,
-  openMenu,
-  handleToggle,
-  handleSubItemClick,
-}) => {
+export const SideBarItem = ({ item, activeItem, handleSubItemClick }) => {
   const hasChildren = item.children?.length > 0;
-  const isOpen = openMenu === item.title;
-  const [visible, setVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) setVisible(true);
-    else {
-      const timeout = setTimeout(() => setVisible(false), 300);
-      return () => clearTimeout(timeout);
+  const toggleMenu = () => {
+    if (hasChildren) {
+      setIsOpen((prev) => !prev);
+    } else {
+      handleSubItemClick(item);
     }
-  }, [isOpen]);
+  };
+
+  const closeMenu = () => setIsOpen(false);
 
   return (
     <li className="relative">
-      <button
-        className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded transition-colors
-          ${activeItem === item.title ? "bg-primary-focus font-semibold" : "hover:bg-primary-focus"}
-        `}
-        onClick={() =>
-          hasChildren ? handleToggle(item.title) : handleSubItemClick(item)
-        }
-      >
-        {/* Icon */}
-        <span className="text-xl">{item.icon}</span>
-
-        {/* Label (only visible on expand) */}
-        <span className="truncate transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:ml-0 ml-[-100%] whitespace-nowrap">
-          {item.title}
-        </span>
-
-        {/* Arrow icon if has children */}
-        {hasChildren &&
-          (isOpen ? (
-            <IoMdArrowDropdown className="ml-auto text-xl hidden group-hover:inline" />
-          ) : (
-            <IoMdArrowDropright className="ml-auto text-xl hidden group-hover:inline" />
-          ))}
-      </button>
-
-      {/* Submenu */}
-      {hasChildren && (
-        <div
-          className={`ml-3 overflow-hidden transition-all duration-300 ease-in-out
-            ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
+      <div onMouseLeave={closeMenu} className="w-full">
+        <button
+          onClick={toggleMenu}
+          className={`flex items-center gap-3 w-full text-left py-2 rounded transition-colors
+            ${
+              activeItem === item.title
+                ? "bg-primary-focus font-semibold"
+                : "hover:bg-primary-focus"
+            }
           `}
         >
-          {visible && (
-            <ul className="menu pl-6">
+          {/* Icon */}
+          <span className="text-xl">{item.icon}</span>
+
+          {/* Label (only visible in expanded view) */}
+          <span
+            className="truncate transition-all duration-300 
+  opacity-100 ml-0 
+  md:opacity-0 md:group-hover:opacity-100 
+  md:ml-[-20%] md:group-hover:ml-0 
+  whitespace-nowrap"
+          >
+            {item.title}
+          </span>
+          {/* Agrega una flecha */}
+          {hasChildren && (
+            <IoMdArrowDropright
+              className="text-xl transition-all duration-300 
+      opacity-100 ml-0 
+      md:opacity-0 md:group-hover:opacity-100 
+      md:ml-[-20%] md:group-hover:ml-0"
+            />
+          )}
+        </button>
+
+        {/* Submenu */}
+        {hasChildren && isOpen && (
+          <div
+            className="absolute top-0 left-full z-10 w-48
+                       bg-primary shadow-lg rounded
+                       transition-opacity duration-300 opacity-100"
+          >
+            <ul className="menu p-2">
               {item.children.map((subitem) => (
                 <li key={subitem.name}>
                   <button
+                    onClick={() => {
+                      handleSubItemClick(subitem);
+                      closeMenu();
+                    }}
                     className={`w-full text-left px-2 py-1 rounded transition-colors text-sm
-                      ${activeItem === subitem.name
-                        ? "bg-base-100 text-primary font-semibold"
-                        : "hover:bg-primary-content hover:text-primary"}
+                      ${
+                        activeItem === subitem.name
+                          ? "bg-base-200 text-primary font-semibold"
+                          : "hover:bg-primary-content hover:text-primary"
+                      }
                     `}
-                    onClick={() => handleSubItemClick(subitem)}
                   >
                     {subitem.name}
                   </button>
                 </li>
               ))}
             </ul>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </li>
   );
 };
 
 SideBarItem.propTypes = {
-  item: propTypes.object.isRequired,
-  activeItem: propTypes.string,
-  openMenu: propTypes.string,
-  handleToggle: propTypes.func.isRequired,
-  handleSubItemClick: propTypes.func.isRequired,
+  item: PropTypes.object.isRequired,
+  activeItem: PropTypes.string,
+  handleSubItemClick: PropTypes.func.isRequired,
 };

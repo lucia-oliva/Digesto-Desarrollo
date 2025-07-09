@@ -54,7 +54,6 @@ export const menuItems = [
   },
 
   // Elementos especiales sin hijos
-  { title: "Visitas", path: "./Visitas", icon: <FaUsersLine className="text-2xl" /> },
   { title: "Consejo Superior", path: "./ConsejoSuperior", icon: <FaBuildingColumns className="text-2xl" /> },
   { title: "Salir", path: "./logout", icon: <FaUserMinus className="text-2xl" /> },
 ];

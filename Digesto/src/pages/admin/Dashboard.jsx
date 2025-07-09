@@ -9,7 +9,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black p-6">
+    <div className="min-h-screen text-black p-6">
       <h1 className="text-3xl font-bold mb-6 text-primary">Panel Principal</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

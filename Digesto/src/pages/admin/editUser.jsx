@@ -92,7 +92,7 @@ export default function EditarUsuario() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200 p-4">
-      <div className="w-full max-w-xl bg-white rounded-2xl shadow-md p-8 space-y-6">
+      <div className="w-full max-w-xl rounded-2xl shadow-md p-8 space-y-6">
         <h2 className="text-2xl font-bold text-center text-primary">
            <FaUserCircle className="mx-auto text-5xl text-primary mb-4"/>
           Editar Perfil

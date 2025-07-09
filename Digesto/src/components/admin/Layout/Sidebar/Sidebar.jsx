@@ -21,10 +21,10 @@ function SideBar({ isOpen, closeSidebar }) {
     <aside
       className={`
     group fixed top-0 left-0 z-50 bg-blue-900 text-white pt-10
-    transition-all duration-300 rounded-tr-[8rem]
+    transition-all duration-300 md:rounded-tr-4xl
     ${isOpen ? "translate-x-0" : "-translate-x-full"} 
     md:translate-x-0 md:relative md:block
-    w-60 hover:w-60 md:w-24 md:hover:w-60
+    w-60 hover:w-60 md:w-30 md:hover:w-60
     h-screen
   `}
     >

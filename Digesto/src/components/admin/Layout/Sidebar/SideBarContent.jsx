@@ -21,7 +21,7 @@ function SidebarMenuContent({ className = ""}) {
   };
 
   return (
-    <ul className={`menu ${className}`}>
+    <ul className={`menu ${className} flex flex-col justify-around h-full `}>
       {menuItems.map((item) => (
         <SideBarItem
           key={item.title}
