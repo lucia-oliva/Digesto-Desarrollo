@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     const { user } = jwtDecode(accessToken);
     setAuth({ user, loading: false, sessionExpired: false });
 
-    return res.data; // for messages or navigation
+    return res.data; 
   };
 
   useEffect(() => {

@@ -10,6 +10,8 @@ import fileRoutes from "./routes/fileRoutes.js";
 import tag from "../Backend/routes/tagsRoutes.js";
 import authRoutes from "./routes/authRoute.js";
 import contactoRoutes from "../Backend/routes/mailroute.js";
+import dashboardRoutes from "../Backend/routes/dashboardRoute.js";
+
 
 // crear el servidor
 const app = express();
@@ -41,6 +43,7 @@ app.use("/api/file", fileRoutes);
 app.use("/api/tag", tag);
 app.use("/api/auth", authRoutes);
 app.use("/api/contacto", contactoRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 //endpoints del login
 app.use("/protected", (req,res) => {
   res.send("Esta es una ruta protegida");
