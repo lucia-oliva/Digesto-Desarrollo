@@ -1,27 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
 import { menuItems } from "./MenuItems";
 import { SideBarItem } from "./SideBarItems";
 import PropTypes from "prop-types";
 
-
-function SidebarMenuContent({ className = ""}) {
-  const [activeItem, setActiveItem] = useState(null);
-  const [openMenu, setOpenMenu] = useState(null);
-  const navigate = useNavigate();
-
-  const handleToggle = (title) => {
-    setOpenMenu((prev) => (prev === title ? null : title));
-    setActiveItem(title);
-  };
-
-  const handleSubItemClick = (subitem) => {
-    setActiveItem(subitem.name || subitem.title);
-    if (subitem.path) navigate(subitem.path);
-  };
-
+function SidebarMenuContent({
+  className = "",
+  openMenu,
+  activeItem,
+  handleToggle,
+  handleSubItemClick,
+  isTouch,
+}) {
   return (
-    <ul className={`menu ${className} flex flex-col justify-around h-full `}>
+    <ul className={`menu ${className} flex flex-col flex-nowrap h-full space-y-4`}>
       {menuItems.map((item) => (
         <SideBarItem
           key={item.title}
@@ -30,6 +20,7 @@ function SidebarMenuContent({ className = ""}) {
           openMenu={openMenu}
           handleToggle={handleToggle}
           handleSubItemClick={handleSubItemClick}
+          isTouch={isTouch}
         />
       ))}
     </ul>
@@ -38,7 +29,11 @@ function SidebarMenuContent({ className = ""}) {
 
 export default SidebarMenuContent;
 
-
-SidebarMenuContent.propTypes= {
-    className: PropTypes.string
+SidebarMenuContent.propTypes = {
+  className: PropTypes.string,
+  openMenu: PropTypes.string,
+  activeItem: PropTypes.string,
+  handleToggle: PropTypes.func.isRequired,
+  handleSubItemClick: PropTypes.func.isRequired,
+  isTouch: PropTypes.bool.isRequired,
 };

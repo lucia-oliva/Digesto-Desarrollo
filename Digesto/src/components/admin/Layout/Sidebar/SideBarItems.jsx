@@ -1,89 +1,93 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { IoMdArrowDropright, IoMdArrowDropdown } from "react-icons/io";
 
-export const SideBarItem = ({ item, activeItem, handleSubItemClick }) => {
+export const SideBarItem = ({
+  item,
+  activeItem,
+  openMenu,
+  handleToggle,
+  handleSubItemClick,
+  isTouch,
+}) => {
   const hasChildren = item.children?.length > 0;
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = openMenu === item.title;
+  const submenuRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState("0px");
+  
 
-  const toggleMenu = () => {
-    if (hasChildren) {
-      setIsOpen((prev) => !prev);
+  useEffect(() => {
+    if (isOpen && submenuRef.current) {
+      setMaxHeight(`${submenuRef.current.scrollHeight}px`);
     } else {
-      handleSubItemClick(item);
+      setMaxHeight("0px");
     }
-  };
-
-  const closeMenu = () => setIsOpen(false);
+  }, [isOpen]);
 
   return (
-    <li className="relative">
-      <div onMouseLeave={closeMenu} className="w-full">
-        <button
-          onClick={toggleMenu}
-          className={`flex items-center gap-3 w-full text-left py-2 rounded transition-colors
-            ${
-              activeItem === item.title
-                ? "bg-primary-focus font-semibold"
-                : "hover:bg-primary-focus"
-            }
-          `}
-        >
-          {/* Icon */}
-          <span className="text-xl">{item.icon}</span>
-
-          {/* Label (only visible in expanded view) */}
+    <li className="w-full">
+      <button
+        onClick={() => handleToggle(item.title)}
+        className={`btn btn-ghost w-full justify-between text-sm px-3 py-2 rounded ${
+          activeItem === item.title ? "bg-primary text-white font-semibold" : ""
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{item.icon}</span>
           <span
-            className="truncate transition-all duration-300 
-  opacity-100 ml-0 
-  md:opacity-0 md:group-hover:opacity-100 
-  md:ml-[-20%] md:group-hover:ml-0 
-  whitespace-nowrap"
+            className={`
+    truncate transition-all duration-300
+    ${isTouch ? "inline" : "hidden md:group-hover:inline md:inline"}
+  `}
           >
             {item.title}
           </span>
-          {/* Agrega una flecha */}
-          {hasChildren && (
-            <IoMdArrowDropright
-              className="text-xl transition-all duration-300 
-      opacity-100 ml-0 
-      md:opacity-0 md:group-hover:opacity-100 
-      md:ml-[-20%] md:group-hover:ml-0"
+        </div>
+        {hasChildren &&
+          (isOpen ? (
+            <IoMdArrowDropdown
+              className={`text-lg transition-all duration-300
+    ${isTouch ? "inline" : "hidden md:group-hover:inline md:inline"}
+  `}
             />
-          )}
-        </button>
+          ) : (
+            <IoMdArrowDropright
+              className={`text-lg transition-all duration-300
+    ${isTouch ? "inline" : "hidden md:group-hover:inline md:inline"}
+  `}
+            />
+          ))}
+      </button>
 
-        {/* Submenu */}
-        {hasChildren && isOpen && (
-          <div
-            className="absolute top-0 left-full z-10 w-48
-                       bg-primary shadow-lg rounded
-                       transition-opacity duration-300 opacity-100"
-          >
-            <ul className="menu p-2">
-              {item.children.map((subitem) => (
-                <li key={subitem.name}>
-                  <button
-                    onClick={() => {
-                      handleSubItemClick(subitem);
-                      closeMenu();
-                    }}
-                    className={`w-full text-left px-2 py-1 rounded transition-colors text-sm
-                      ${
-                        activeItem === subitem.name
-                          ? "bg-base-200 text-primary font-semibold"
-                          : "hover:bg-primary-content hover:text-primary"
-                      }
-                    `}
-                  >
-                    {subitem.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      {hasChildren && (
+        <div
+          ref={submenuRef}
+          style={{
+            maxHeight,
+            overflow: "hidden",
+            transition: "max-height 0.3s ease, opacity 0.3s ease",
+            backgroundColor: "var(--bg-base-primary)",
+            opacity: isOpen ? 1 : 0,
+          }}
+        >
+          <ul className="menu menu-sm pl-6 py-1 space-y-1 bg-base-100 rounded-box">
+            {item.children.map((subitem) => (
+              <li key={subitem.name}>
+                <button
+                  onClick={() => handleSubItemClick(subitem)}
+                  className={`w-full text-left text-sm px-2 py-1.5 text-primary font-medium rounded btn-ghost justify-start ${
+                    activeItem === subitem.name
+                      ? "bg-base-200 text-primary font-semibold"
+                      : "hover:bg-base-300"
+                  }`}
+                >
+                  {subitem.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </li>
   );
 };
@@ -91,5 +95,8 @@ export const SideBarItem = ({ item, activeItem, handleSubItemClick }) => {
 SideBarItem.propTypes = {
   item: PropTypes.object.isRequired,
   activeItem: PropTypes.string,
+  openMenu: PropTypes.string,
+  handleToggle: PropTypes.func.isRequired,
   handleSubItemClick: PropTypes.func.isRequired,
+  isTouch: PropTypes.bool.isRequired,
 };
