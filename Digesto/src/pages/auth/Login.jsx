@@ -31,7 +31,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const data = await login(email, password); // use context login
+      const data = await login(email, password);
       setResponse({ msg: data.msg, isError: false });
       navigate("/admin");
     } catch (error) {
@@ -44,77 +44,99 @@ function Login() {
   };
 
   return (
-    <div
-      className="h-screen flex justify-center items-center bg-cover bg-center"
-      style={{
-        backgroundImage:
-          "url('https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg')",
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-b from-primary to-transparent"></div>
-      <div className="w-full max-w-md p-8 bg-base-100 bg-opacity-80 rounded-3xl shadow-lg relative z-10">
-        <h2 className="text-center text-4xl font-bold text-primary mb-6">
-          Iniciar sesión
-        </h2>
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-primary"
-            >
-              Correo electrónico
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="example@dominio.com"
-              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Imagen o presentación izquierda */}
+      <div
+  className="md:w-3/5 w-full bg-primary text-primary-content flex flex-col justify-center items-center px-10 py-12 relative"
+  style={{
+    backgroundImage:
+      "url('https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}
+>
+  {/* Overlay oscuro */}
+  <div className="absolute inset-0 bg-black opacity-50
+
+ z-0"></div>
+
+  {/* Contenido sobre la imagen */}
+  <div className="p-10 text-center max-w-xl w-full relative z-10">
+    <div className="mb-6">
+      <div className="text-white flex justify-center font-bold text-3xl">
+        <img
+              src="src\assets\unlar-white.png"
+              alt="Unlar logo"
             />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-primary"
-            >
-              Contraseña
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="********"
-              className="mt-2 block w-full px-6 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-3 px-6 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary-content hover:text-primary transition-all ease-in-out"
-          >
+
+      </div>
+    </div>
+    <h1 className="text-4xl md:text-5xl font-bold mb-4">¡Hola, bienvenido!</h1>
+  </div>
+</div>
+
+
+      {/* Formulario derecho */}
+      <div className="md:w-2/5 w-full bg-base-100 flex items-center justify-center p-8">
+        <div className="w-full max-w-sm">
+          <h2 className="text-center text-3xl font-bold text-primary mb-6">
             Iniciar sesión
-          </button>
-        </form>
-        <div className="flex flex-col justify-center mt-4">
-          <a href="#" className="text-sm text-primary hover:after-line">
-            ¿Olvidaste tu contraseña?
-          </a>
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-primary">
+                Correo electrónico
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="example@dominio.com"
+                className="mt-2 block w-full px-4 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-primary">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="********"
+                className="mt-2 block w-full px-4 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
+              />
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <label className="inline-flex items-center">
+                <input type="checkbox" className="form-checkbox mr-2" />
+                Recuérdame
+              </label>
+              <a href="#" className="text-primary hover:underline">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+            <button
+              type="submit"
+              className="w-full py-3 px-6 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary-content hover:text-primary transition-all"
+            >
+              Iniciar sesión
+            </button>
+          </form>
         </div>
       </div>
+
       {response.msg && (
-        <div className="absolute top-0 z-50 w-fit h-fit">
-          <Alert
-            message={response.msg}
-            title="Login"
-            error={response.isError}
-          />
+        <div className="absolute top-0 left-0 right-0 z-50 flex justify-center">
+          <Alert message={response.msg} title="Login" error={response.isError} />
         </div>
       )}
       {loading && (
-        <div className="absolute top-1/2 z-50 w-fit h-fit">
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
           <Loading />
         </div>
       )}
