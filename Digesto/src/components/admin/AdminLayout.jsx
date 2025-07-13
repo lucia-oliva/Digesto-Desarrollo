@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
-import Sidebar2 from "./Layout/Sidebar2/Sidebar2";
-import Navbar from "./Layout/Sidebar2/Navbar";
+import Sidebar from "./Layout/Sidebar/Sidebar";
+import Navbar from "./Layout/Sidebar/Navbar";
 
 export default function AdminLayout() {
   return (
@@ -30,7 +30,7 @@ export default function AdminLayout() {
       {/* Sidebar lateral */}
       <div className="drawer-side">
         <label htmlFor="drawer-sidebar" className="drawer-overlay"></label>
-        <Sidebar2 />
+        <Sidebar />
       </div>
     </div>
   );
