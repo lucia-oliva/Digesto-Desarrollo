@@ -14,7 +14,6 @@ export default function EditarUsuario() {
     clave_actual: "",
     clave_nueva: "",
     tipo_usuario_id: "",
-
   });
 
   

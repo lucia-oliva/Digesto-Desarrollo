@@ -123,7 +123,7 @@ function PasoForm({
               onChange={handleChange}
               className="select select-bordered w-full"
             >
-              <option value="">Seleccione</option>
+              <option value="" disabled>Seleccione</option>
               {options.map((opt) =>
                   typeof opt === "object" ? (
                     <option key={opt.value} value={opt.value}>
