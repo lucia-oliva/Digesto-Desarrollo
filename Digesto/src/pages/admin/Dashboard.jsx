@@ -107,7 +107,6 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#f4f7fa] text-gray-800 p-8">
-      {/* Bienvenida */}
       <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col md:flex-row items-center justify-between mb-10">
         <div className="mb-6 md:mb-0 md:mr-6 max-w-xl">
           <h1 className="text-2xl font-bold mb-2">Hola, {user.nombre} 👋</h1>
@@ -121,7 +120,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {stats.map((item, index) => (
           <StatCard
@@ -140,7 +138,6 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Footer */}
       <footer className="mt-12 text-center text-sm text-gray-500 max-w-xl mx-auto">
         Sistema desarrollado para la Universidad Nacional de La Rioja. Para soporte técnico, comunicate con el área correspondiente.
         <div className="mt-4 text-xs text-gray-400">

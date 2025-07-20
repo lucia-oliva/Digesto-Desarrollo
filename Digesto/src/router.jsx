@@ -13,6 +13,13 @@ import EditarUsuario from "./pages/admin/editUser";
 import { VistaAdministrativa } from "./pages/admin/VistaAdministrativa";
 import GenericCarga from "./pages/admin/Carga/GenericCarga";
 import RouteGuard from "./services/RouteGuard";
+import ConsejoPage from "./pages/consejo-superior/consejoPage.jsx";
+import ConsejoComisiones from "./pages/consejo-superior/ConsejoComisiones.jsx";
+import ConsejoIntegrantes from "./pages/consejo-superior/ConsejoIntegrantes.jsx";
+import ConsejoNormativas from "./pages/consejo-superior/ConsejoNormativas.jsx";
+import ConsejoReglamento from "./pages/consejo-superior/ConsejoReglamento.jsx";
+import ConsejoSesiones from "./pages/consejo-superior/ConsejoSesiones.jsx";
+import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
 
 const Router = () => {
   return (
@@ -23,6 +30,14 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="busqueda" element={<Prueba />} />
           <Route path="document/:id" element={<DocumentView />} />
+          <Route path="/consejo-superior" element={<ConsejoPage />}>
+            <Route path="normativas" element={<ConsejoNormativas />} />
+            <Route path="sesiones" element={<ConsejoSesiones />} />
+            <Route path="integrantes" element={<ConsejoIntegrantes />} />
+            <Route path="reglamento" element={<ConsejoReglamento />} />
+            <Route path="comisiones" element={<ConsejoComisiones />} />
+            <Route path="inicio" element={<ConsejoInicio />}/>
+          </Route>
         </Route>
 
         <Route element={<RouteGuard mode="guest" />}>
