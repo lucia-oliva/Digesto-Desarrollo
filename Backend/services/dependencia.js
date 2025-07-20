@@ -2,7 +2,13 @@ import db from "./db.js";
 
 // Funciones CRUD basicas
 
+//Mostrar sesiones del consejo superior
 
+async function getSesiones(){
+  const sql = "SELECT fecha_sesion, nombre_orden, nombre_acta FROM sesiones"
+  const results = await db.query(sql);
+  return results;
+}
 
 //Mostrar todos las dependencias
 async function getAllDependencias() {
@@ -132,4 +138,4 @@ async function searchDependenciaByParameters(
 
 
 
-export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit}
+export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit, getSesiones}

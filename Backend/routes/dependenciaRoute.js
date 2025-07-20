@@ -1,3 +1,4 @@
+
 import dependenciaDB from "../services/dependencia.js";
 import express from "express";
 
@@ -14,6 +15,7 @@ router.post("/create", async (req, res) => {
     res.status(500).json({ error: "Error al crear la dependencia" });
   }
 });
+
 
 router.post("/edit", async (req, res) => {
   console.log("Cuerpo de la solicitud:", req.body);
@@ -34,6 +36,12 @@ router.post("/edit", async (req, res) => {
 router.get("/", async (req, res) => {
   const dependencias = await dependenciaDB.getAllDependencias();
   res.json(dependencias);
+});
+
+//obtener sesiones consejo-superior
+router.get("/sesiones", async (req, res) => {
+  const sesiones = await dependenciaDB.getSesiones();
+  res.json(sesiones)
 });
 
 router.get("/name", async (req, res) => {
