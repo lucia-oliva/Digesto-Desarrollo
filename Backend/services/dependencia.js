@@ -2,6 +2,8 @@ import db from "./db.js";
 
 // Funciones CRUD basicas
 
+
+
 //Mostrar todos las dependencias
 async function getAllDependencias() {
   const sql = "SELECT * FROM dependencia";

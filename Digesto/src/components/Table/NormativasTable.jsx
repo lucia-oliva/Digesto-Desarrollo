@@ -4,7 +4,7 @@ import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
-const NormativaTable = ({ type, filtros={}, onSeleccionar }) => {
+const NormativaTable = ({ type, filtros={}, onSeleccionar, modo }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
   const isSeleccionarContext = location.pathname.includes("/NuevaNormativa");
@@ -25,7 +25,18 @@ const NormativaTable = ({ type, filtros={}, onSeleccionar }) => {
 
  
 
- const actions = isSeleccionarContext
+ const actions = 
+ modo ==="ver" ? [
+          {
+            label: "Ver Normativa",
+            onClick: (item) => {
+              // Redirige a la vista de la normativa
+              window.location.href = `/document/${item.id}`;
+            },
+            type: "primary",
+          },
+        ]
+      : isSeleccionarContext
   ? [
       {
         label: "Seleccionar",
