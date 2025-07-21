@@ -32,6 +32,11 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
            onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
             type: "primary",
           },
+          {
+            label: "Eliminar",
+            onClick: onDelete,
+            type: "error",
+          },
         ]
       : modo === "ver"
       ? [

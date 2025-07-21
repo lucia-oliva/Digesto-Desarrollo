@@ -3,10 +3,13 @@ import { useAuth } from "../../context/useAuth";
 import useAxios from "axios-hooks";
 import { useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { useParams } from "react-router";
 
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
-  const userId = user.id;
+  const { id } = useParams();
+  // Si se pasa un ID, se asume que es para editar un usuario específico
+  const userId = id || user.id; // Si no se pasa ID, usar el del usuario autenticado
   const [usuario, setUsuario] = useState({
     nombre: "",
     email: "",
@@ -14,8 +17,10 @@ export default function EditarUsuario() {
     clave_actual: "",
     clave_nueva: "",
     tipo_usuario_id: "",
-
   });
+
+  console.log(`Editando usuario con ID: ${userId}`);
+  
 
   
     const [{ data: usuario2 }] = useAxios({
@@ -25,9 +30,6 @@ export default function EditarUsuario() {
         "Content-Type": "application/json",
       },
     });
-
-    console.log(usuario2);
-    console.log(userId);
     
     
     useEffect(() => {
@@ -76,7 +78,6 @@ export default function EditarUsuario() {
 
     if (response.ok) {
       alert("Usuario actualizado correctamente");
-      // Opcional: limpiar campos de contraseña
       setUsuario((prev) => ({
         ...prev,
         clave_actual: "",
@@ -91,8 +92,8 @@ export default function EditarUsuario() {
 };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200 p-4">
-      <div className="w-full max-w-xl bg-white rounded-2xl shadow-md p-8 space-y-6">
+    <div className="min-h-screen w-full flex items-center justify-center ">
+      <div className="w-full rounded-2xl shadow-md p-8 space-y-6">
         <h2 className="text-2xl font-bold text-center text-primary">
            <FaUserCircle className="mx-auto text-5xl text-primary mb-4"/>
           Editar Perfil

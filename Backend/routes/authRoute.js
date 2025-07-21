@@ -11,16 +11,16 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
 
   if (!email || !password) {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
-  const user = await db.query(
-    "SELECT id, email, clave, nombre FROM usuario WHERE email = ?",
-    [email]
-  );
+const user = await db.query(
+  "SELECT usuario.id, usuario.email, usuario.nombre, usuario.id_tipo_usuario, usuario.clave, tu.nombre AS tipo_usuario, de.nombre AS dependencia FROM usuario LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario LEFT JOIN dependencia de ON de.id = usuario.id_dependencia WHERE usuario.email = ?",
+  [email]
+);
+
   console.log(user);
 
   console.log(user == null);

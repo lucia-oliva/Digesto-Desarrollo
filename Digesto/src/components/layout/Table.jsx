@@ -7,9 +7,10 @@ import Pagination from "./Pagination.jsx";
 // BUG: Hay que desactivar el scroll del fondo cuando los modales estan activos porque si no molestan...
 //TODO: Ver como integramos la funcionalidad de normativas_modificadas
 
-function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativas,onSeleccionarNormativas
+function Table({normativas = [],normativasSeleccionadas = [],onDeseleccionarNormativas,onSeleccionarNormativas
 }){
   //Uso de rutas para hacer visible o ocultar contenido.
+  
   const location = useLocation();
   const isNuevaNormativa =
   location.pathname === "/administracion" &&
@@ -289,7 +290,7 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
         )}
 
         <div className="grid grid-cols-1 md:hidden gap-4">
-          {normativas?.map((normativa) => (
+          {normativas?.length > 0 && normativas?.map((normativa) => (
             <div
               key={normativa.id}
               className="p-6 border border-gray-200 rounded-lg shadow-lg bg-white transition-all duration-300 hover:shadow-xl"
@@ -791,13 +792,13 @@ function Table({normativas,normativasSeleccionadas = [],onDeseleccionarNormativa
                     className="input input-bordered w-full mb-3"
                   />
 
-                  {editModalData.normativa_modificada && (
+                  {editModalData?.normativa_modificada && (
                     <>
                       {filteredNormativas.length > 0 ? (
                         <div className="mt-4">
                           <h4 className="text-sm font-medium mb-2">Resultados:</h4>
                           <ul className="list-none">
-                            {filteredNormativas.map((normativa) => (
+                            {filteredNormativas?.map((normativa) => (
                               <li
                                 key={normativa.id}
                                 className="flex justify-between items-center p-2 border-b border-gray-200"

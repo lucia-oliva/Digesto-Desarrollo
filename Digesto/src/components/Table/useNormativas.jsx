@@ -1,7 +1,8 @@
 // components/Normativas/useNormativas.js
-import { useEffect, useState } from "react";
+import { useEffect, useState , useRef } from "react";
 import { searchNormativas, deleteApi } from "./NormativaApi";
-import {useRef} from "react";
+import { useNavigate } from "react-router";
+
 import axios from "axios"; 
 
 export const useNormativas = (type,filtros) => {
@@ -11,6 +12,7 @@ export const useNormativas = (type,filtros) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const prevFiltrosRef = useRef(JSON.stringify(filtros));
+  const navigate = useNavigate();
 
   // Fetch inicial
   useEffect(() => {
@@ -55,17 +57,40 @@ export const useNormativas = (type,filtros) => {
 
   const onPageChange = (newPage) => setPage(newPage);
 
-  const onEdit = (item) => {
-    // Implementa tu lógica para abrir modal o navegación
-    console.log("Editar:", item);
+  const onEdit = async({id}) => {
+    console.log(`Editando normativa con ID: ${id} de tipo ${type}`);
+    
+    try{
+      switch (type) {
+        case "normativa":
+          navigate(`/admin/EditarNormativa/${id}`);
+          break;
+        case "usuarios":
+          navigate(`/admin/EditarUsuario/${id}`);
+          break;
+        case "dependencia":
+          navigate(`/admin/EditarDependencia/${id}`);
+          break;
+        case "emisore":
+          navigate(`/admin/EditarEmisor/${id}`);
+          break;
+        case "tag":
+          navigate(`/admin/EditarPalabraClave/${id}`);
+          break;
+      }
+    }
+    catch (err) {
+      setError("Error al redirigir a la edición", err);
+    }
   };
 
   const onDelete = async (item) => {
-    if (!window.confirm("¿Eliminar normativa?")) return;
+    if (!window.confirm("¿Eliminar?")) return;
+    console.log(item);
 
     try {
       setLoading(true);
-      const response = await deleteApi(item.id,type);
+      const response = await deleteApi(item.id || item.id_sesion,type);
       if (!response.ok) throw new Error("No se pudo eliminar");
       // Refrescar lista
       loadNormativas(page);
