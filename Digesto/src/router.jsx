@@ -66,7 +66,11 @@ const Router = () => {
             <Route path="NuevaDependencia" element={<GenericCarga />} />
             <Route path="NuevoEmisor" element={<GenericCarga />} />
             <Route path="NuevaPalabraClave" element={<GenericCarga />} />
-            
+             <Route path="EditarUsuario/:id" element={<EditarUsuario />} />
+            <Route path="EditarNormativa/:id" element={<EditarUsuario />} />
+            <Route path="EditarDependencia/:id" element={<GenericCarga />} />
+            <Route path="EditarEmisor/:id" element={<GenericCarga />} />
+            <Route path="EditarPalabraClave/:id" element={<GenericCarga />} />
           </Route>
         </Route>
       </Routes>

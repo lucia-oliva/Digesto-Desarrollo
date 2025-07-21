@@ -1,7 +1,8 @@
 // components/Normativas/useNormativas.js
-import { useEffect, useState } from "react";
+import { useEffect, useState , useRef } from "react";
 import { searchNormativas, deleteApi, editApi} from "./NormativaApi";
-import {useRef} from "react";
+import { useNavigate } from "react-router";
+
 import axios from "axios"; 
 import {useAuth} from '../../context/useAuth';
 
@@ -16,6 +17,7 @@ export const useNormativas = (type,filtros) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const prevFiltrosRef = useRef(JSON.stringify(filtros));
+  const navigate = useNavigate();
 
   // Fetch inicial
   useEffect(() => {
@@ -86,7 +88,7 @@ export const useNormativas = (type,filtros) => {
     try {
       setLoading(true);
       console.log("prueba usuario eliminaaaar",user.id);
-      const response = await deleteApi(item.id,type,user.id);
+      const response = await deleteApi(item.id || item.id_sesion,type,user.id);
       if (!response.ok) throw new Error("No se pudo eliminar");
       // Refrescar lista
       loadNormativas(page);

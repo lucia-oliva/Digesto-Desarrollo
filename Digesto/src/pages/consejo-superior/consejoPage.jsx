@@ -1,54 +1,53 @@
-import { Outlet, Link } from "react-router";
+import { Outlet, Link, useLocation } from "react-router";
+import { useAuth } from "../../context/useAuth";
 
+const NAV_LINKS = [
+  { to: "/consejo-superior", label: "Inicio" },
+  { to: "/consejo-superior/normativas", label: "Normativas" },
+  { to: "/consejo-superior/sesiones", label: "Sesiones" },
+  { to: "/consejo-superior/integrantes", label: "Integrantes" },
+  { to: "/consejo-superior/reglamento", label: "Reglamento" },
+  { to: "/consejo-superior/comisiones", label: "Comisiones" },
+];
 
 function ConsejoPage() {
-  return (
-  <main id="main">
-      <div className="bg-white shadow-sm border-b border-gray-200 not-sm:hidden">
-  <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <ul className="flex flex-wrap justify-center gap-6 py-3 text-sm sm:text-base font-medium text-gray-800 font-sans ">
-      <li>
-        <Link to="/consejo-superior" className="hover:text-primary transition-colors">
-          Inicio
-        </Link>
-      </li>
-      <li>
-        <Link to="/consejo-superior/normativas" className="hover:text-primary transition-colors">
-          Normativas
-        </Link>
-      </li>
-      <li>
-        <Link to="/consejo-superior/sesiones" className="hover:text-primary transition-colors">
-          Sesiones
-        </Link>
-      </li>
-      <li>
-        <Link to="/consejo-superior/integrantes" className="hover:text-primary transition-colors">
-          Integrantes
-        </Link>
-      </li>
-      <li>
-        <Link to="/consejo-superior/reglamento" className="hover:text-primary transition-colors">
-          Reglamento
-        </Link>
-      </li>
-      <li>
-        <Link to="/consejo-superior/comisiones" className="hover:text-primary transition-colors">
-          Comisiones
-        </Link>
-      </li>
-    </ul>
-  </nav>
-</div>
+  const location = useLocation();
+  const { auth } = useAuth();
+  console.log(auth);
+  
 
-      <Outlet/>
+  return (
+    <main id="main">
+      <header className="bg-white shadow-sm border-b border-gray-200 hidden sm:block">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ul className="flex flex-wrap justify-center gap-6 py-3 text-sm sm:text-base font-medium text-gray-800 font-sans">
+            {NAV_LINKS.map(({ to, label }) => (
+              <li key={to}>
+                <Link
+                  to={to}
+                  className={`hover:text-primary transition-colors ${
+                    location.pathname === to ? "text-primary font-semibold" : ""
+                  }`}
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <section className="min-h-[60vh]">
+        <Outlet />
+      </section>
+
       <footer className="footer footer-horizontal footer-center bg-primary text-primary-content font-sans p-11">
-  <aside className="flex flex-col items-center">
-    <p className="font-medium text-xs md:text-xs lg:text-base text-center pl-10">
-      Consejo Superior | UNLaR
-    </p>
-  </aside>
-</footer>
+        <aside className="flex flex-col items-center">
+          <p className="font-medium text-xs md:text-xs lg:text-base text-center pl-10">
+            Consejo Superior | UNLaR
+          </p>
+        </aside>
+      </footer>
     </main>
   );
 }
