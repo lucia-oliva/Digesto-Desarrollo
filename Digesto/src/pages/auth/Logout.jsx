@@ -1,14 +1,29 @@
-import { clearAccessToken } from '../../services/authservices';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../../context/useAuth';
 import axiosPrivate from '../../api/axiosPrivate';
 
-const logout = async () => {
-    try {
-        await axiosPrivate.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
-        clearAccessToken();
-        window.location.href = '/login';
-    } catch (error) {
+const Logout = () => {
+  const {auth,logout} = useAuth();
+  const user = auth.user;
+  
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const doLogout = async () => {
+      try {
+        await axiosPrivate.post('/auth/logout', {}, { withCredentials: true });
+        logout();
+      } catch (error) {
         console.error(error?.response?.data);
-    }
+      } finally {
+        navigate('/login', { replace: true });
+      }
+    };
+    doLogout();
+  }, [navigate]);
+
+  return null; // O puedes mostrar un spinner o mensaje de "Cerrando sesión..."
 };
 
-export default logout;
+export default Logout;

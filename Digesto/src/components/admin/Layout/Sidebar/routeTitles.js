@@ -15,6 +15,5 @@
     "/admin/AuditoriaNormativas": "Auditoría de Normativas",
     "/admin/NuevaPalabraClave": "Nueva Palabra Clave",
     "/admin/ListadoPalabrasClave": "Palabras Clave",
-    "/admin/ConsejoSuperior": "Consejo Superior",
     "/admin/perfil": "Perfil de Usuario",
   }; 
