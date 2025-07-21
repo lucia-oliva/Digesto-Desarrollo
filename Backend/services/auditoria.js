@@ -1,23 +1,5 @@
 import db from "./db.js";
 
-export async function getAuditoriasPaginado(page = 1, limite = 10) {
-  const offset = (page - 1) * limite;
-  const sql = `
-    SELECT 
-      a.*, DATE_FORMAT(a.fecha,'%Y-%m-%d') AS fecha, n.numero AS numero_normativa, n.titulo AS titulo_normativa, u.nombre AS nombre_usuario, u.email, d.nombre AS nombre_dependencia
-    FROM auditoria_normativa a
-    INNER JOIN normativa n ON n.id = a.id_normativa
-    INNER JOIN usuario u ON u.id = a.id_usuario
-    LEFT JOIN dependencia d ON d.id = u.id_dependencia
-    ORDER BY a.fecha DESC
-    LIMIT ? OFFSET ?;
-  `;
-  const auditorias = await db.query(sql, [limite, offset]);
-  const totalSql = `SELECT COUNT(*) as total FROM auditoria_normativa;`;
-  const totalResult = await db.query(totalSql);
-  const totalResults = totalResult[0].total;
-  return { data: auditorias, totalResults };
-}
 
 async function searchAuditoriaByParameters(
   titulo,
@@ -68,4 +50,19 @@ async function searchAuditoriaByParameters(
   }
 }
 
-export default { getAuditoriasPaginado, searchAuditoriaByParameters };
+async function crearRegistroAuditoria({ id_normativa, id_usuario, tipo }) {
+  try {
+    const fecha = new Date().toISOString().split("T")[0];
+    const sql = `
+      INSERT INTO auditoria_normativa (id_normativa, id_usuario, fecha, tipo)
+      VALUES (?, ?, ?, ?)
+    `;
+    await db.query(sql, [id_normativa, id_usuario, fecha, tipo]);
+    return { success: true, message: "Registro de auditoría creado" };
+  } catch (error) {
+    console.error("Error al crear registro de auditoría:", error);
+    return { success: false, message: "Error al crear registro de auditoría" };
+  }
+}
+
+export default {searchAuditoriaByParameters, crearRegistroAuditoria };

@@ -1,5 +1,6 @@
 import db from "./db.js";
 import tagService from "./tag.js";
+import auditoriaService from "./auditoria.js";
 
 //BASIC CRUD
 
@@ -140,6 +141,7 @@ async function edit(data) {
     cambia_normativa,
     tags,
     normativas_modificadas,
+    userId
   } = data;
 
   const id_interdependencia = 0;
@@ -211,7 +213,14 @@ async function edit(data) {
         }
         await eliminarRelacionesDeNormativa(id);
       }
-
+      //Crear registro de auditoría
+      if (userId) {
+        await auditoriaService.crearRegistroAuditoria({
+          id_normativa: id,
+          id_usuario: userId,
+          tipo: "modificacion"
+        });
+      }
       return {
         success: true,
         message: `Normativa con ID ${id} editada correctamente`,
@@ -377,6 +386,14 @@ async function create(data) {
     }
     // Insertar los tags relacionados en la tabla `tag_normativa`
     await tagService.insertTagsForNormativa(normativaId, tags);
+    //Crear registro de auditoría
+    if(user && user.id) {
+      await auditoriaService.crearRegistroAuditoria({
+      id_normativa: normativaId, 
+      id_usuario: user.id,
+      tipo: "alta"
+      });
+    }
     return {
       success: true,
       message: "Normativa creada correctamente",
@@ -391,7 +408,9 @@ async function create(data) {
 //Delete by id
 //TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria.
 //FIXME: (En realidad no se elimina, sino que se cambia el estado a eliminado - VER ESTO).
-async function eliminar(id) {
+async function eliminar(id, userId) {
+  console.log("backend user",userId)
+  debugger
   try {
     await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
     const sql = "DELETE FROM normativa WHERE id = ?";
@@ -400,6 +419,13 @@ async function eliminar(id) {
       console.log(`No se encontró la normativa con el ID ${id}`);
       return { success: false, message: "Normativa no encontrada" };
     }
+      if (userId) {
+        await auditoriaService.crearRegistroAuditoria({
+          id_normativa: id,
+          id_usuario: userId,
+          tipo: "baja"
+        });
+      }
     return { success: true, message: "Normativa eliminada correctamente" };
   } catch (error) {
     console.error("Error al eliminar la normativa:", error);

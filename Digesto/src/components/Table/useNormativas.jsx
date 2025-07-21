@@ -1,10 +1,15 @@
 // components/Normativas/useNormativas.js
 import { useEffect, useState } from "react";
-import { searchNormativas, deleteApi } from "./NormativaApi";
+import { searchNormativas, deleteApi, editApi} from "./NormativaApi";
 import {useRef} from "react";
 import axios from "axios"; 
+import {useAuth} from '../../context/useAuth';
+
 
 export const useNormativas = (type,filtros) => {
+  const {auth} = useAuth();
+  const user = auth.user;
+  
   const [normativas, setNormativas] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -55,17 +60,33 @@ export const useNormativas = (type,filtros) => {
 
   const onPageChange = (newPage) => setPage(newPage);
 
-  const onEdit = (item) => {
-    // Implementa tu lógica para abrir modal o navegación
-    console.log("Editar:", item);
+  const onEdit = async (item) => {
+    if (!user || !user.id) {
+    console.error("Usuario no autenticado.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const response = await editApi(item, type, user.id); // 👈 type es "normativa" u otro
+    console.log("✅ Entidad editada:", response.message);
+    reload();
+  } catch (err) {
+    console.error("Error al editar entidad:", err);
+    setError("Error al editar");
+  } finally {
+    setLoading(false);
+  }
   };
 
   const onDelete = async (item) => {
+    
     if (!window.confirm("¿Eliminar normativa?")) return;
 
     try {
       setLoading(true);
-      const response = await deleteApi(item.id,type);
+      console.log("prueba usuario eliminaaaar",user.id);
+      const response = await deleteApi(item.id,type,user.id);
       if (!response.ok) throw new Error("No se pudo eliminar");
       // Refrescar lista
       loadNormativas(page);

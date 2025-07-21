@@ -3,20 +3,6 @@ import auditoriaDB from "../services/auditoria.js";
 const router = express.Router();
 
 
-router.post("/seaaarch", async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limite = parseInt(req.query.limite) || 10;
-    try {
-        const { data, totalResults } = await auditoriaDB.getAuditoriasPaginado(page, limite);
-        res.status(200).json({ data, totalResults });
-    } catch (error) {
-        console.error("Error al obtener auditorías:", error);
-        res.status(500).json({ error: "Error al obtener auditorías" });
-    }
-});
-
-
-// En auditoriaRoute.js
 router.post("/search", async (req, res) => {
   const { titulo, usuario, accion, dependencia } = req.body;
   const page = parseInt(req.query.page) || 1;
@@ -34,6 +20,23 @@ router.post("/search", async (req, res) => {
     res.status(200).json({ data, totalResults });
   } catch (error) {
     res.status(500).json({ error: "Error al buscar auditorías" });
+  }
+});
+
+router.post("/create", async (req, res) => {
+  const { id_normativa, id_usuario, tipo } = req.body;
+  if (!id_normativa || !id_usuario || !tipo) {
+    return res.status(400).json({ error: "Faltan datos obligatorios" });
+  }
+  try {
+    const result = await auditoriaDB.crearRegistroAuditoria({ id_normativa, id_usuario, tipo });
+    if (result.success) {
+      res.status(201).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error al crear registro de auditoría" });
   }
 });
 

@@ -19,12 +19,15 @@ export const searchNormativas = async (page, limit, type, filtros={}) => {
 };
 
 
-export const deleteApi = async (id,type) => {
+export const deleteApi = async (id,type,userId) => {
   try {
-    console.log(id , type);
-    debugger
+    console.log(id , type, userId);
     const response = await fetch(`http://localhost:3000/api/${type}/eliminar/${id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": userId,  // 👈 lo mandamos por header
+      },
     });
     return response.json();
   } catch (error) {
@@ -33,3 +36,26 @@ export const deleteApi = async (id,type) => {
   }
 }
   
+
+export const editApi = async (dataToEdit, type, userId) => {
+  try {
+    const payload = {
+      ...dataToEdit,
+      userId, 
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/api/${type}/edit`,
+      payload,
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error al editar ${type}:`, error);
+    throw error;
+  }
+};
+

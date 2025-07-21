@@ -58,10 +58,15 @@ router.get("/id/:id", async (req, res) => {
 
 //Eliminar normativa por id
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/eliminar/:id", async (req, res) => {
   const id = req.params.id;
+  const userId = req.headers["x-user-id"]; 
+  console.log(userId);
+  if (!userId) {
+    return res.status(401).json({ error: "Usuario no autenticado" });
+  }
   try {
-    const result = await normativaDB.deleteNormativaById(id);
+    const result = await normativaDB.eliminar(id,userId);
     if (!result.success) {
       return res.status(404).json({ error: result.message });
     }
