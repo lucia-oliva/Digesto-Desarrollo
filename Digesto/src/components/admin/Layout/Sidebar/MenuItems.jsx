@@ -39,9 +39,7 @@ export const menuItems = [
     title: "Auditoria",
     icon: <FaHammer className="text-2xl" />,
     children: [
-      { name: "Usuarios: Ingresos/Egresos", path: "./AuditoriaUsuariosIngresosEgresos" },
-      { name: "Usuarios:Visitas", path: "./AuditoriaUsuariosVisitas" },
-      { name: "Normativas", path: "./AuditoriaNormativas" },
+      { name: "Normativas", path: "./ListadoAuditoria" },
     ],
   },
   {

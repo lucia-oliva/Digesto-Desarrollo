@@ -51,6 +51,7 @@ const Router = () => {
             <Route path="usuario" element={<EditarUsuario />} />
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
             <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
+            <Route path="ListadoAuditoria" element={<VistaAdministrativa />} />
             <Route
               path="ListadoDependencias"
               element={<VistaAdministrativa />}
@@ -65,6 +66,7 @@ const Router = () => {
             <Route path="NuevaDependencia" element={<GenericCarga />} />
             <Route path="NuevoEmisor" element={<GenericCarga />} />
             <Route path="NuevaPalabraClave" element={<GenericCarga />} />
+            
           </Route>
         </Route>
       </Routes>

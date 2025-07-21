@@ -1,6 +1,5 @@
-//Falta emisores y tags. 
 
-import { normativaColumns, usuarioColumns, depenColumns, emisorColumns, tagsColumns, sesionesColumns } from "./dataTable";
+import { normativaColumns, usuarioColumns, depenColumns, emisorColumns, tagsColumns, sesionesColumns, auditoriaColums } from "./dataTable";
 
 export const adminConfig = {
   ListadoNormativa: {
@@ -24,8 +23,12 @@ export const adminConfig = {
     columns: tagsColumns,
   },
   SesionesConsejo: {
-    tipo: "sesiones", // este será el tipo que usarás en la tabla
+    tipo: "sesiones", 
     columns: sesionesColumns,
   },
+  ListadoAuditoria: {
+    tipo: "auditoria",
+    columns: auditoriaColums ,
+  }
   
 };

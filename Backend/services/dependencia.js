@@ -2,6 +2,11 @@ import db from "./db.js";
 
 // Funciones CRUD basicas
 
+
+//eliminer sesiones del consejo superior
+
+
+
 //Mostrar sesiones del consejo superior
 
 async function getSesionesPaginado(page = 1, limite = 10) {

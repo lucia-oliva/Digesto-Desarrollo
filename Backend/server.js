@@ -11,6 +11,7 @@ import tag from "../Backend/routes/tagsRoutes.js";
 import authRoutes from "./routes/authRoute.js";
 import contactoRoutes from "../Backend/routes/mailroute.js";
 import dashboardRoutes from "../Backend/routes/dashboardRoute.js";
+import auditoriaRoutes from "../Backend/routes/auditoriaRoute.js";
 
 
 // crear el servidor
@@ -44,6 +45,8 @@ app.use("/api/tag", tag);
 app.use("/api/auth", authRoutes);
 app.use("/api/contacto", contactoRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/auditoria", auditoriaRoutes);
+app.use
 //endpoints del login
 app.use("/protected", (req,res) => {
   res.send("Esta es una ruta protegida");

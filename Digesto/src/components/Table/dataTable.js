@@ -33,3 +33,13 @@ export const sesionesColumns = [
   { key: "nombre_orden", label: "Orden del Día", className: "text-center font-[Montserrat] text-md" },
   { key: "nombre_acta", label: "Acta", className: "text-center font-[Montserrat] text-md" },
 ];
+
+export const auditoriaColums = [
+{key: "fecha", label: "Fecha", className: "text-center font-[Montserrat] text-md"},
+{key: "tipo", label: "Accion", className: "text-center font-[Montserrat] text-md"},
+{key: "numero_normativa", label: "Numero", className: "text-center font-[Montserrat] text-md"},
+{key: "titulo_normativa", label: "Titulo", className: "text-center font-[Montserrat] text-md"},
+{key: "nombre_usuario", label: "Usuario", className: "text-center font-[Montserrat] text-md"},
+{key: "email", label: "Email", className: "text-center font-[Montserrat] text-md"},
+{key: "nombre_dependencia", label: "Dependencia", className: "text-center font-[Montserrat] text-md"},
+]

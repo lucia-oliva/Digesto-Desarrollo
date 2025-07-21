@@ -73,6 +73,48 @@ export const filterConfig = {
     },
   ],
 
+  ListadoAuditoria:[
+    {
+      name: "titulo",
+      type: "text",
+      label: "Titulo Normativa"
+    },
+    {
+      name: "usuario",
+      type: "text",
+      label: "Nombre Usuario"
+    },
+    {
+      name: "accion",
+      type: "select",
+      label: "Accion",
+      options: [
+        {label: "Alta", value: "alta"},
+        {label: "Baja", value: "baja"},
+        {label: "Edicion", value: "modificacion"}
+      ]
+    },
+    {
+      name: "dependencia",
+      type: "select",
+      label: "Dependencia",
+      options: [
+        { label: "Todas", value: "" },
+        { label: "Exactas", value: "2" },
+        { label: "Aplicadas", value: "1" },
+        { label: "Salud", value: "3" },
+        { label: "Sociales", value: "4" },
+        { label: "Humanas", value: "5" },
+        { label: "Consejo Superior", value: "20" },
+        { label: "Sede Chepes", value: "22" },
+        { label: "Sede Villa Unión", value: "26" },
+        { label: "Sede Chamical", value: "25" },
+        { label: "Sede Aimogasta", value: "24" },
+        { label: "Sede Catuna", value: "23" },
+      ],
+    },
+  ],
+
   ListadoUsuarios: [
     {
       name: "nombre",

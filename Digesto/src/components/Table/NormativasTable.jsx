@@ -24,6 +24,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
   }, [location.pathname, JSON.stringify(filtros)]);
 
   const actions =
+  type === "ListadoAuditoria" ? [] :
     type === "SesionesConsejo"
       ? [
           {
@@ -58,6 +59,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
       data={normativas}
       columns={columns}
       actions={actions}
+      showActions={type !== "auditoria"}
       page={page}
       totalPages={totalPages}
       onPageChange={onPageChange}
