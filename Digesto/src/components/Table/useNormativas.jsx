@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { searchNormativas, deleteApi } from "./NormativaApi";
 import {useRef} from "react";
+import axios from "axios"; 
 
 export const useNormativas = (type,filtros) => {
   const [normativas, setNormativas] = useState([]);
@@ -30,11 +31,21 @@ export const useNormativas = (type,filtros) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await searchNormativas(pageToLoad, 6, type,filtros);
-      console.log(res);
+      let res;
+      let total;
+      if(type=== "sesiones"){
+        res = await axios.get("http://localhost:3000/api/dependencia/sesiones", {params: {page:pageToLoad, limite: 6}});
+        setNormativas(res.data.data);
+        total = res.data.totalResults || 1;
+        setTotalPages(Math.ceil(total / 6));
+      }else{
+        res = await searchNormativas(pageToLoad, 6, type,filtros);
+        console.log(res);
       setNormativas(res.data || []);
-      const total = res.totalResults || 1;
+      total = res.totalResults || 1;
       setTotalPages(Math.ceil(total / 10));
+      }
+      
     } catch (err) {
       setError("Error al cargar normativas", err);
     } finally {

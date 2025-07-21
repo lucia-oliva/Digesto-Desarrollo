@@ -27,3 +27,9 @@ export const tagsColumns = [
   { key: "nombre", label: "Nombre",className:"text-center font-[Montserrat]  text-md sm:text-md" },
   { key: "cantidad_usos", label: "Cantidad de Usos",className:"text-center font-[Montserrat]  text-md sm:text-md" },
 ]
+
+export const sesionesColumns = [
+  { key: "fecha_sesion", label: "Fecha", className: "text-center font-[Montserrat] text-md" },
+  { key: "nombre_orden", label: "Orden del Día", className: "text-center font-[Montserrat] text-md" },
+  { key: "nombre_acta", label: "Acta", className: "text-center font-[Montserrat] text-md" },
+];

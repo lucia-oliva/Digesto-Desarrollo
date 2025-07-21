@@ -1,6 +1,10 @@
+import NormativaTable from "../../components/Table/NormativasTable";
+
 function ConsejoSesiones(){
     return (
-        <h2>Sesiones</h2>
+        <div className="m-5">
+      <NormativaTable type="SesionesConsejo" />
+    </div>
     )
 }
 

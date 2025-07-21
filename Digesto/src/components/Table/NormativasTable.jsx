@@ -26,7 +26,18 @@ const NormativaTable = ({ type, filtros={}, onSeleccionar, modo }) => {
  
 
  const actions = 
- modo ==="ver" ? [
+type === "SesionesConsejo"
+    ? [
+        {
+          label: "Ver Orden",
+          onClick: (item) => {
+            // Cambia esto por la ruta que corresponda a la vista de sesión
+            window.location.href = `/consejo-superior/sesiones/${item.id}`;
+          },
+          type: "primary",
+        },
+       
+      ]:modo ==="ver" ? [
           {
             label: "Ver Normativa",
             onClick: (item) => {

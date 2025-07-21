@@ -40,8 +40,14 @@ router.get("/", async (req, res) => {
 
 //obtener sesiones consejo-superior
 router.get("/sesiones", async (req, res) => {
-  const sesiones = await dependenciaDB.getSesiones();
-  res.json(sesiones)
+  const page = parseInt(req.query.page) || 1;
+  const limite = parseInt(req.query.limite) || 10;
+  try {
+    const { data, totalResults } = await dependenciaDB.getSesionesPaginado(page, limite);
+    res.json({ data, totalResults });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 router.get("/name", async (req, res) => {

@@ -4,10 +4,19 @@ import db from "./db.js";
 
 //Mostrar sesiones del consejo superior
 
-async function getSesiones(){
-  const sql = "SELECT fecha_sesion, nombre_orden, nombre_acta FROM sesiones"
-  const results = await db.query(sql);
-  return results;
+async function getSesionesPaginado(page = 1, limite = 10) {
+  const offset = (page - 1) * limite;
+  const sql = `
+    SELECT 
+      s.*, 
+      DATE_FORMAT(s.fecha_sesion, '%Y-%m-%d') AS fecha_sesion
+    FROM sesiones s
+    ORDER BY s.fecha_sesion DESC
+    LIMIT ? OFFSET ?;
+  `;
+  const sesiones = await db.query(sql, [limite, offset]);
+  const totalRows = await db.query("SELECT FOUND_ROWS() as total");
+  return { data: sesiones, totalResults: totalRows[0].total};
 }
 
 //Mostrar todos las dependencias
@@ -138,4 +147,4 @@ async function searchDependenciaByParameters(
 
 
 
-export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit, getSesiones}
+export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit, getSesionesPaginado}
