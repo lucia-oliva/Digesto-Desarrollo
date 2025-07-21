@@ -23,6 +23,9 @@ router.get("/download", async (req, res) => {
     // Check if file exists
     try {
       await fs.access(filePath);
+      //Sumar una visita a la normativa. 
+      await db.query("UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?", [filename]);
+
     } catch {
       return res.status(404).json({ error: "File not found" });
     }
