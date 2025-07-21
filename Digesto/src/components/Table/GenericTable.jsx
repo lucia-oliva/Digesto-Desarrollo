@@ -10,12 +10,13 @@ function GenericTable({
   page,
   totalPages,
   onPageChange,
+  showActions = true,
 }) {
   return (
     <div className="overflow-x-auto md:block rounded-box border border-base-content/30 bg-base-100  mt-3 mb-3 shadow-md hover:shadow-lg hover:bg-gray-100 transition-all duration-200">
       <table className="table w-full ">
         <thead>
-          <TableHeader columns={columns} />
+          <TableHeader columns={columns} showActions={actions.length > 0 && showActions} />
         </thead>
         <tbody>
           {data?.map((item) => (

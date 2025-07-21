@@ -8,6 +8,7 @@ function TableRow({ item, columns, actions }) {
           {col.render ? col.render(item[col.key], item) : item[col.key]}
         </td>
       ))}
+      {actions.length > 0 && (
       <td className="flex flex-col gap-2 py-6">
         {actions.map((action) => (
           <button
@@ -25,6 +26,7 @@ function TableRow({ item, columns, actions }) {
           </button>
         ))}
       </td>
+      )}
     </tr>
   );
 }
