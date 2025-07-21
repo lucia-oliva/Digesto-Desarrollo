@@ -306,13 +306,11 @@ router.get("/mas-buscadas", function (req, res) {
   normativaDB
     .getMostPopularNormatives()
     .then((getMostPopularNormatives) => {
-      res.json(getMostPopularNormatives);
+      res.status(200).json(getMostPopularNormatives);
     })
     .catch((error) => {
       console.error("Error al obtener las normativas más buscadas:", error);
-      res
-        .status(500)
-        .json({ error: "Error al obtener las normativas mas buscadas" });
+      res.status(500).json({ error: "Error al obtener las normativas más buscadas" });
     });
 });
 

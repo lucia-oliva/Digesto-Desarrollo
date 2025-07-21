@@ -12,6 +12,8 @@ const router = express.Router();
 router.get("/download", async (req, res) => {
   try {
     const filename = req.query.filename;
+    console.log("Filename:", filename);
+    
     if (!filename) {
       return res.status(400).json({ error: "Filename is required" });
     }

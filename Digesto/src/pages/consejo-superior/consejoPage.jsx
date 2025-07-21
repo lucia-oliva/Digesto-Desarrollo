@@ -8,7 +8,7 @@ function ConsejoPage() {
   <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <ul className="flex flex-wrap justify-center gap-6 py-3 text-sm sm:text-base font-medium text-gray-800 font-sans ">
       <li>
-        <Link to="/consejo-superior/inicio" className="hover:text-primary transition-colors">
+        <Link to="/consejo-superior" className="hover:text-primary transition-colors">
           Inicio
         </Link>
       </li>

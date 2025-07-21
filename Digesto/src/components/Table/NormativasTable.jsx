@@ -1,14 +1,14 @@
 import { useEffect } from "react";
+import {abrirPdfDesdeBlobUrl} from "./AbrirPdf";
 import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
-const NormativaTable = ({ type, filtros={}, onSeleccionar, modo }) => {
+const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
   const isSeleccionarContext = location.pathname.includes("/NuevaNormativa");
-  console.log(isSeleccionarContext);
   const {
     normativas,
     page,
@@ -17,56 +17,41 @@ const NormativaTable = ({ type, filtros={}, onSeleccionar, modo }) => {
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo,filtros);
-
+  } = useNormativas(tipo, filtros);  
+  
   useEffect(() => {
     reload();
   }, [location.pathname, JSON.stringify(filtros)]);
 
- 
-
- const actions = 
-type === "SesionesConsejo"
-    ? [
-        {
-          label: "Ver Orden",
-          onClick: (item) => {
-            // Cambia esto por la ruta que corresponda a la vista de sesión
-            window.location.href = `/consejo-superior/sesiones/${item.id}`;
-          },
-          type: "primary",
-        },
-       
-      ]:modo ==="ver" ? [
+  const actions =
+    type === "SesionesConsejo"
+      ? [
           {
-            label: "Ver Normativa",
-            onClick: (item) => {
-              // Redirige a la vista de la normativa
-              window.location.href = `/document/${item.id}`;
-            },
+            label: "Ver Orden",
+           onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
+            type: "primary",
+          },
+        ]
+      : modo === "ver"
+      ? [
+          {
+            label: "Ver PDF",
+            onClick: (item) => abrirPdfDesdeBlobUrl(item.archivo),
             type: "primary",
           },
         ]
       : isSeleccionarContext
-  ? [
-      {
-        label: "Seleccionar",
-        onClick: onSeleccionar,
-        type: "primary",
-      },
-    ]
-  : [
-      { label: "Editar", onClick: onEdit, type: "secondary" },
-      { label: "Eliminar", onClick: onDelete, type: "error" },
-    ];
-
- 
-  // const actions = [
-   // { label: "Editar", onClick: onEdit, type:"secondary" },
-   // { label: "Eliminar", onClick: onDelete, type:"error" },
-  //];
-
-  console.log(normativas);
+      ? [
+          {
+            label: "Seleccionar",
+            onClick: onSeleccionar,
+            type: "primary",
+          },
+        ]
+      : [
+          { label: "Editar", onClick: onEdit, type: "secondary" },
+          { label: "Eliminar", onClick: onDelete, type: "error" },
+        ];
 
   return (
     <GenericTable

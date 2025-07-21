@@ -31,12 +31,12 @@ const Router = () => {
           <Route path="busqueda" element={<Prueba />} />
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
+            <Route index element={<ConsejoInicio />}/>
             <Route path="normativas" element={<ConsejoNormativas />} />
             <Route path="sesiones" element={<ConsejoSesiones />} />
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
             <Route path="reglamento" element={<ConsejoReglamento />} />
             <Route path="comisiones" element={<ConsejoComisiones />} />
-            <Route path="inicio" element={<ConsejoInicio />}/>
           </Route>
         </Route>
 
