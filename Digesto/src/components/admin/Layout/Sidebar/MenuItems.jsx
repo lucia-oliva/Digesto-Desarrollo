@@ -26,7 +26,7 @@ export const menuItems = [
         path: "./ListadoNormativa?filter=unpublish",
       },
     ],
-    roles: ["superadministrador", "Supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
   },
   {
     title: "Usuarios",
@@ -35,7 +35,7 @@ export const menuItems = [
       { name: "Crear Usuario", path: "./NuevoUsuario" },
       { name: "Listado Usuarios", path: "./ListadoUsuarios" },
     ],
-    roles: ["superadministrador"],
+    roles: ["SuperAdministrador"],
   },
   {
     title: "Dependencias",
@@ -44,7 +44,7 @@ export const menuItems = [
       { name: "Agregar Dependencia", path: "./NuevaDependencia" },
       { name: "Listado Dependencias", path: "./ListadoDependencias" },
     ],
-    roles: ["superadministrador", "supervisor"],
+    roles: ["SuperAdministrador", "supervisor"],
   },
   {
     title: "Emisores",
@@ -53,20 +53,16 @@ export const menuItems = [
       { name: "Agregar Emisor", path: "./NuevoEmisor" },
       { name: "Listado Emisores", path: "./ListadoEmisores" },
     ],
-    roles: ["superadministrador"],
+    roles: ["SuperAdministrador"],
   },
   {
     title: "Auditoria",
     icon: <FaHammer className="text-lg" />,
     children: [
-      {
-        name: "Usuarios: Ingresos/Egresos",
-        path: "./AuditoriaUsuariosIngresosEgresos",
-      },
-      { name: "Usuarios:Visitas", path: "./AuditoriaUsuariosVisitas" },
-      { name: "Normativas", path: "./AuditoriaNormativas" },
+    
+      { name: "Normativas", path: "./ListadoAuditoria" },
     ],
-    roles: ["superadministrador"],
+    roles: ["SuperAdministrador"],
   },
   {
     title: "Palabras Clave",
@@ -75,7 +71,7 @@ export const menuItems = [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },
     ],
-    roles: ["superadministrador", "supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "supervisor", "administradordependencia"],
   },
 
   // Elementos especiales sin hijos
@@ -83,6 +79,6 @@ export const menuItems = [
     title: "Consejo Superior",
     path: "./ConsejoSuperior",
     icon: <FaBuildingColumns className="text-2lg" />,
-    roles: ["superadministrador", "Supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
   },
 ];
