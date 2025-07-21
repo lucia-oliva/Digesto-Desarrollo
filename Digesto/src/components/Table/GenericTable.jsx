@@ -20,7 +20,7 @@ function GenericTable({
         <tbody>
           {data?.map((item) => (
             <TableRow
-              key={item.id}
+              key={item.id || item.id_sesion}
               item={item}
               columns={columns}
               actions={actions}

@@ -15,8 +15,9 @@ async function getSesionesPaginado(page = 1, limite = 10) {
     LIMIT ? OFFSET ?;
   `;
   const sesiones = await db.query(sql, [limite, offset]);
-  const totalRows = await db.query("SELECT FOUND_ROWS() as total");
-  return { data: sesiones, totalResults: totalRows[0].total};
+  const totalRowsResult = await db.query("SELECT COUNT(*) as total FROM sesiones");
+  const totalRows = totalRowsResult[0].total;
+  return { data: sesiones, totalResults: totalRows};
 }
 
 //Mostrar todos las dependencias
