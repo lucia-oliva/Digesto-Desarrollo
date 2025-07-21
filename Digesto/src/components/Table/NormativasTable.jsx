@@ -38,14 +38,6 @@ const NormativaTable = ({ type, filtros={}, onSeleccionar }) => {
       { label: "Eliminar", onClick: onDelete, type: "error" },
     ];
 
- 
-  // const actions = [
-   // { label: "Editar", onClick: onEdit, type:"secondary" },
-   // { label: "Eliminar", onClick: onDelete, type:"error" },
-  //];
-
-  console.log(normativas);
-
   return (
     <GenericTable
       data={normativas}
