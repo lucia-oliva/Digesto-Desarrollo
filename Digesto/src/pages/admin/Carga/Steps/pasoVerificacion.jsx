@@ -1,7 +1,21 @@
 import PropTypes from "prop-types";
 import { getLabel } from "../config/mapeo.js"
+import { camposOcultosVerificacion } from "../../Edit/VerificacionIgnoreFields.js"
+import { useLocation } from "react-router";
 
 function PasoVerificacion({ formData, onBack, onSubmit }) {
+    
+  const location = useLocation();
+  const pathSegment = location.pathname
+    .split("/")
+    .find((s) => s.startsWith("Editar") || s.startsWith("Nuevo"));
+
+  const entidad = pathSegment
+    ? pathSegment.replace("Editar", "").replace("Nuevo", "").toLowerCase()
+    : null;
+
+  const camposIgnorados = entidad ? camposOcultosVerificacion[entidad] || [] : [];
+
   return (
     <div className="space-y-6 mt-6">
       <h3 className="text-lg font-semibold mb-4 text-center">
@@ -11,6 +25,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="align w-5xl bg-base-300 p-4 rounded-lg">
           {Object.entries(formData).map(([key, value]) => {
+            
             if (key === "normativas_modificadas" && value.length > 0) {
               return (
                 <div key={key}>
@@ -33,10 +48,12 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                 "accionSeleccionada",
                 "comentarioSeleccionado",
                 "normativas_modificadas"
-              ].includes(key)
+              ].includes(key) || camposIgnorados.includes(key)
             ) {
               return null;
             }
+
+            console.log("campos ignorados",camposIgnorados);
 
             // Etiquetas legibles
             const etiquetas = {

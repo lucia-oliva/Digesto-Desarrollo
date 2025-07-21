@@ -45,7 +45,7 @@ router.post("/create", async (req, res) => {
 });
 
 //Obtener normativa por id
-router.get("/id/:id", async (req, res) => {
+router.get("/traer/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const normativas = await normativaDB.searchById(id);
@@ -79,7 +79,7 @@ router.delete("/eliminar/:id", async (req, res) => {
 
 //Filtrar normativa por parametros
 router.post("/search", async (req, res) => {
-  let { numero, emisor, documento, anio, tags } = req.body;
+  let { id,numero, emisor, documento, anio, tags } = req.body;
   let { dependencia } = req.query;
   console.log("parametros:", numero,emisor,documento,anio,tags,dependencia);
   if (!dependencia) {
@@ -101,7 +101,7 @@ router.post("/search", async (req, res) => {
         anio,
         limite,
         offset,
-        tags
+        tags,
       );
 
     if (!data || data.length === 0) {

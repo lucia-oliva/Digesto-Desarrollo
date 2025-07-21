@@ -77,7 +77,7 @@ export const menuItems = [
   // Elementos especiales sin hijos
   {
     title: "Consejo Superior",
-    path: "./ConsejoSuperior",
+    path: "../consejo-superior",
     icon: <FaBuildingColumns className="text-2lg" />,
     roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
   },

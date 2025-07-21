@@ -2,6 +2,7 @@
 import { useEffect, useState , useRef } from "react";
 import { searchNormativas, deleteApi, editApi} from "./NormativaApi";
 import { useNavigate } from "react-router";
+import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
 
 import axios from "axios"; 
 import {useAuth} from '../../context/useAuth';
@@ -62,25 +63,13 @@ export const useNormativas = (type,filtros) => {
 
   const onPageChange = (newPage) => setPage(newPage);
 
-  const onEdit = async (item) => {
-    if (!user || !user.id) {
-    console.error("Usuario no autenticado.");
-    return;
+  const onEdit = (item) => {
+      const rutaEntidad = nombreRutaPorEntidad[type] || type; 
+    navigate(`/admin/Editar${rutaEntidad}/${item.id}`);
   }
+  
 
-  try {
-    setLoading(true);
-    const response = await editApi(item, type, user.id); // 👈 type es "normativa" u otro
-    console.log("✅ Entidad editada:", response.message);
-    reload();
-  } catch (err) {
-    console.error("Error al editar entidad:", err);
-    setError("Error al editar");
-  } finally {
-    setLoading(false);
-  }
-  };
-
+  
   const onDelete = async (item) => {
     
     if (!window.confirm("¿Eliminar normativa?")) return;

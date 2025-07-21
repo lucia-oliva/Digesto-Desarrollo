@@ -496,13 +496,13 @@ async function searchNormativaByParameters(
   anio,
   limite = null,
   offset = null,
-  tags
+  tags,
 ) {
   try {
     let sql =
       "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
     let params = [];
-
+    
     if (numero) {
       sql += " AND numero = ?";
       params.push(numero);
@@ -524,7 +524,6 @@ async function searchNormativaByParameters(
       sql += " AND anio = ?";
       params.push(anio);
     }
-
     console.log("tags", tags);
 
     if (tags) {

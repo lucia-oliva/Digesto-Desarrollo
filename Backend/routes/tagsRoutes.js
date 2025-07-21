@@ -2,6 +2,40 @@ import tagsDB from '../services/tag.js';
 import express from "express";
 const router = express.Router();
 
+router.delete("/eliminar/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await tagsDB.eliminar(id);
+
+    if (!result) {
+      return res.status(404).json({ error: "Tag no encontrado" });
+    }
+
+    res.json({ message: "Tag eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar tag:", error);
+    res.status(500).json({ error: "Error interno al eliminar el tag" });
+  }
+});
+
+
+//traer datos para la funcion de editar
+router.get("/datos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const tag = await tagsDB.getById(id);
+    if (!tag) {
+      return res.status(404).json({ error: "Tag no encontrada" });
+    }
+    res.json(tag);
+  } catch (error) {
+    console.error("Error al obtener tag:", error);
+    res.status(500).json({ error: "Error al obtener tag" });
+  }
+});
+
 router.get("/tags", async (req, res) => {
 try{
     const tags = await tagsDB.getAllTags(); 

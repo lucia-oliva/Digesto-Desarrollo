@@ -1,5 +1,18 @@
 import db from "./db.js";
 
+async function getById(id) {
+  try {
+    const [result] = await db.query(
+      "SELECT id, nombre AS Tag FROM tag WHERE id = ?",
+      [id]
+    );
+    return result || null;
+  } catch (error) {
+    console.error("Error en getById:", error);
+    throw error;
+  }
+}
+
 async function edit(data){
   const {id, nombre} = data;
   try {
@@ -152,17 +165,28 @@ async function searchTagsByParameters(
   }
 }
 
-async function eliminar(id){
-  await db.query("DELETE FROM tag_normativa WHERE id_tag = ?", [id]);
-  const sql = "DELETE FROM tag WHERE id = ?";
-  if (result.affectedRows === 0) {
+
+async function eliminar(id) {
+  try {
+    // Primero eliminar relaciones
+    await db.query("DELETE FROM tag_normativa WHERE id_tag = ?", [id]);
+
+    // Luego eliminar el tag en sí
+    const result = await db.query("DELETE FROM tag WHERE id = ?", [id]);
+
+    if (!result || result.affectedRows === 0) {
       console.log(`No se encontró el tag con el ID ${id}`);
-      return { success: false, message: "Tag no encontrad" };
+      return null;
     }
-  const results = await db.query(sql, [id]);
-  return results;
+
+    console.log(`Tag con ID ${id} eliminado correctamente.`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error al eliminar tag:", error);
+    throw error;
+  }
 }
 
 
 
-export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters,create,edit};
+export default {getAllTags,eliminar,getTagsByNormativaId,insertTagsForNormativa, searchTagsByParameters,create,edit, getById};

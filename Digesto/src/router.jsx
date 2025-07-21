@@ -20,6 +20,7 @@ import ConsejoNormativas from "./pages/consejo-superior/ConsejoNormativas.jsx";
 import ConsejoReglamento from "./pages/consejo-superior/ConsejoReglamento.jsx";
 import ConsejoSesiones from "./pages/consejo-superior/ConsejoSesiones.jsx";
 import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
+import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
 
 const Router = () => {
   return (
@@ -67,10 +68,11 @@ const Router = () => {
             <Route path="NuevoEmisor" element={<GenericCarga />} />
             <Route path="NuevaPalabraClave" element={<GenericCarga />} />
              <Route path="EditarUsuario/:id" element={<EditarUsuario />} />
-            <Route path="EditarNormativa/:id" element={<EditarUsuario />} />
             <Route path="EditarDependencia/:id" element={<GenericCarga />} />
             <Route path="EditarEmisor/:id" element={<GenericCarga />} />
-            <Route path="EditarPalabraClave/:id" element={<GenericCarga />} />
+            
+            <Route path="EditarNormativa/:id" element={ <GenericEdit /> } />
+            <Route path="EditarPalabraClave/:id" element={ <GenericEdit /> } />
           </Route>
         </Route>
       </Routes>
