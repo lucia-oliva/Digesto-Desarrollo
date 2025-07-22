@@ -51,7 +51,7 @@ export const useNormativas = (type,filtros) => {
         console.log(res);
       setNormativas(res.data || []);
       total = res.totalResults || 1;
-      setTotalPages(Math.ceil(total / 10));
+      setTotalPages(Math.ceil(total / 6));
       }
       
     } catch (err) {

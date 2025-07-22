@@ -167,8 +167,8 @@ export const filterConfig = {
       type: "select",
       label: "Estado",
       options: [
-        { label: "publicado", value: "" },
-        { label: "despublicado", value: "" },
+        { label: "publicado", value: "publicado" },
+        { label: "despublicado", value: "despublicado" },
       ],
     },
   
