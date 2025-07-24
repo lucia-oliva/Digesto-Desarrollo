@@ -38,6 +38,7 @@ function GenericCarga() {
 
   try {
     //Ruta generica
+    console.log("verificando data to Send:",dataToSend)
     fetch(`http://localhost:3000/api/${ruta}/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -1,6 +1,7 @@
 export const camposOcultosVerificacion = {
   palabraclave: ["id"],
   usuario: ["id", "clave"],
-  dependencia: ["id"],
+  dependencia: ["id","color"],
+  emisor: ["id"],
   // otras entidades...
 };

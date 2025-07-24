@@ -4,7 +4,7 @@ export const nombreRutaPorEntidad = {
   normativa: "Normativa",
   usuario: "Usuario",
   dependencia: "Dependencia",
-  // ... otras entidades
+  emisores: "Emisor"
 };
 
 // Mapea los campos del formData antes de enviarlos al backend

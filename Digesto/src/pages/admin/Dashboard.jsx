@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/useAuth";
 import StatCard from "../../components/layout/StatCard"
-import { FaAdn, FaBuilding,FaFileLines, FaUser, FaUserGroup } from "react-icons/fa6";;
+import { FaTags, FaBuilding,FaFileLines, FaTag, FaUser, FaUserGroup } from "react-icons/fa6";;
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -83,8 +83,8 @@ function Dashboard() {
       title: "Palabras Clave",
       description: "Mantené actualizadas las etiquetas del sistema.",
       value: totales.palabras_clave,
-      iconFront: <FaAdn className="text-6xl" />,
-      iconBg: <FaAdn className="mb-2"/>,
+      iconFront: <FaTags className="text-6xl" />, 
+      iconBg: <FaTags className="mb-2"/>,
       color: "bg-gray-700",
       toList: "/admin/ListadoPalabrasClave",
       toCreate: "/admin/NuevaPalabraClave",

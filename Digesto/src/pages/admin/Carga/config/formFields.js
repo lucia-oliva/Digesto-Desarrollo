@@ -64,11 +64,12 @@ export const camposPorEntidad = {
   dependencia: [
     { name: "nombre", label: "Nombre de la dependencia", type: "text", required: true },
     { name: "nombre_completo", label: "Nombre Completo", type: "text" },
-    {name: "Estado", label: "Estado", type: "select", options: ["Activo", "Inactivo"]},
+    {name: "estado", label: "Estado", type: "select", options: ["publicado", "despublicado"]},
     {name: "codificacion", label: "Codificacion", type: "text"}
   ],
   emisor: [
     { name: "nombre", label: "Nombre del emisor", type: "text", required: true },
+    {name: "estado", label: "Estado", type: "text"}
   ],
   palabraclave: [
     { name: "Tag", label: "Nombre de la palabra clave", type: "text", required: true },

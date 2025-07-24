@@ -46,14 +46,14 @@ campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ]
 //FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
 async function create(data) {
- const { nombre, Estado, codificacion, nombre_completo } = data;
- const color = "null";
+ const { nombre, estado, codificacion, nombre_completo } = data;
+ const color = "#00000";
  
 try{
   const sqlInsert = `INSERT INTO dependencia (nombre, estado, color, codificacion, nombre_completo) VALUES (?, ?, ?, ?, ?)`;
   const result = await db.query(sqlInsert, [
     nombre,
-    Estado,
+    estado,
     color,
     codificacion,
     nombre_completo

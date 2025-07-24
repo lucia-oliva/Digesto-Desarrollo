@@ -2,6 +2,17 @@ import db from "./db.js";
 
 //BASIC CRUD
 
+async function getById(id){
+  try{
+   const [result] = await db.query("SELECT id, nombre, estado FROM emisor WHERE id = ?", [id]);
+   return result || null;
+  }catch(e){
+    console.error("Error en obtener ID de emisor",e)
+    throw error;
+  }
+}
+
+
 //ENDPOINTS ESPECIFICOS
 async function getAllEmisoresName() {
   const sql = "SELECT nombre FROM emisor";
@@ -95,4 +106,4 @@ async function searchEmisorByParameters(
 
 
 
-export default {getAllEmisoresName, searchEmisorByParameters,eliminar, create, edit};
+export default {getAllEmisoresName, searchEmisorByParameters,eliminar, create, edit, getById};

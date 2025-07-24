@@ -8,7 +8,9 @@ import {
   FaUserGroup,
   FaUserMinus,
   FaUsersLine,
+  FaTags
 } from "react-icons/fa6";
+
 
 export const menuItems = [
   {
@@ -66,7 +68,7 @@ export const menuItems = [
   },
   {
     title: "Palabras Clave",
-    icon: <FaAdn className="text-lg" />,
+    icon: <FaTags className="text-lg" />, 
     children: [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },

@@ -5,6 +5,21 @@ import express from "express";
 const router = express.Router();
 
 
+
+router.get("/datos/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const dependencia = await dependenciaDB.getDepenendenciaById(id);
+    if (!dependencia) {
+      return res.status(404).json({ error: "Dependencia no encontrada" });
+    }
+    res.json(dependencia);
+  } catch (error) {
+    console.error("Error al obtener la dependencia:", error);
+    res.status(500).json({ error: "Error al obtener la dependencia" });
+  }
+});
+
 router.post("/create", async (req, res) => {
   const dependenciaData = req.body;
   try {
@@ -135,5 +150,19 @@ router.post("/search", async (req, res) => {
   }
 });
 
+
+router.delete("/eliminar/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await dependenciaDB.eliminar(id);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Dependencia no encontrada" });
+    }
+    res.json({ message: "Dependencia eliminada correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar la dependencia:", error);
+    res.status(500).json({ error: "Error al eliminar la dependencia" });
+  }
+});
 
 export default router;

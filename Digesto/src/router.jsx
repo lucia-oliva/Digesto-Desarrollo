@@ -68,9 +68,8 @@ const Router = () => {
             <Route path="NuevoEmisor" element={<GenericCarga />} />
             <Route path="NuevaPalabraClave" element={<GenericCarga />} />
              <Route path="EditarUsuario/:id" element={<EditarUsuario />} />
-            <Route path="EditarDependencia/:id" element={<GenericCarga />} />
-            <Route path="EditarEmisor/:id" element={<GenericCarga />} />
-            
+            <Route path="EditarDependencia/:id" element={<GenericEdit />} />
+            <Route path="EditarEmisor/:id" element={<GenericEdit />} />
             <Route path="EditarNormativa/:id" element={ <GenericEdit /> } />
             <Route path="EditarPalabraClave/:id" element={ <GenericEdit /> } />
           </Route>

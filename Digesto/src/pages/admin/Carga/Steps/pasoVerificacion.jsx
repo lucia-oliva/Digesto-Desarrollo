@@ -67,7 +67,10 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
               rol: "Rol de Usuario",
               dependencia: "Dependencia",
               nombre: "Nombre",
-              telefono: "Telefono"
+              telefono: "Telefono",
+              estado: "Estado",
+              nombre_completo: "Nombre Completo",
+              codificacion: "Codificacion"
             };
 
             return (

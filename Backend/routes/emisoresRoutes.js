@@ -3,6 +3,20 @@ import express from "express";
 
 const router = express.Router();
 
+router.get("/datos/:id", async (req,res) =>{
+  const {id} = req.params;
+  try{
+    const emisor = await emisoresDB.getById(id);
+    if(!emisor){
+      return res.status(404).json({error: "Emisor no encontrado"});
+    }
+    res.json(emisor);
+  }catch(error){
+    console.error("Error al obtener emisor: ", error);
+    res.status(500).json({error: "Error al obtener emisor"});
+  }
+});
+
 router.get("/name", async (req, res) => {
   try{
     const emisores = await emisoresDB.getAllEmisoresName(); 
@@ -70,6 +84,20 @@ router.post("/search", async (req, res) => {
   } catch (err) {
     console.log("Error al buscar el emisor", err);
     res.status(500).json({ error: "Error al buscar el emisor" });
+  }
+});
+
+router.delete("/eliminar/:id", async (req, res) => {
+  const {id} = req.params;
+  try{
+  const result = await emisoresDB.eliminar(id);
+  if (!result) {
+    return res.status(404).json({ error: "Emisor no encontrado" });
+    }
+  res.status(200).json({ message: "Emisor eliminado correctamente" });
+  }catch(e){
+    console.error("Error al eliminar el emisor:", e);
+    res.status(500).json({ error: "Error al eliminar el emisor" });
   }
 });
 
