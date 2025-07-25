@@ -5,17 +5,18 @@ import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
 //Editar usuario. 
 async function edit(data){
-  const{id,id_tipo_usuario, nombre, telefono, email, clave, estado, id_dependencia} = data;
+  console.log("password", password);
+  const{id,rol, nombre, telefono, email, password, estado, dependencia} = data;
   //verificar si id_dependencia es undefined, si lo es, asignar 0 como valor por defecto
-  const dependenciaFinal = id_dependencia ?? 0; // Si no se proporciona, usar
+  const dependenciaFinal = dependencia ?? 0; // Si no se proporciona, usar
 
   const fechaSubida = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD 
-  const claveHasheada= await hashPasswordBcrypt(clave); // Hashear la clave
+  const claveHasheada= await hashPasswordBcrypt(password); // Hashear la clave
   console.log("clave hasheada:", claveHasheada);
   try{
     //Actualizar el usuario 
     const sqlUpdate = "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
-    const result = await db.query(sqlUpdate, [nombre, id_tipo_usuario, telefono, email, claveHasheada, estado, fechaSubida, fechaSubida, dependenciaFinal, id]);
+    const result = await db.query(sqlUpdate, [nombre, rol, telefono, email, claveHasheada, estado, fechaSubida, fechaSubida, dependenciaFinal, id]);
     
     if(result.affectedRows > 0) {
       console.log({ mensaje: `Usuario '${nombre}' actualizado correctamente` });
@@ -35,6 +36,12 @@ async function getUsuarioById(id) {
   const sql ="SELECT id, telefono, estado, email, nombre, id_tipo_usuario FROM usuario WHERE id = ?";
   const results = await db.query(sql, [id]);
   return results;
+}
+
+async function getUsuarioByIdDatos(id) {
+  const sql ="SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, clave as password, id_dependencia as dependencia FROM usuario WHERE id = ?";
+  const results = await db.query(sql, [id]);
+  return results[0];
 }
 
 /*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
@@ -223,4 +230,4 @@ async function searchUsuariosByParameters(
 }
 
 
-export default { getUsuarioById, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters,create, edit};
+export default { getUsuarioById,  getUsuarioByIdDatos, createUsuario, updateUsuario, eliminar, filterUsuariosporDepartament, UsuarioByEmailAndEstado, searchUsuariosByParameters,create, edit};

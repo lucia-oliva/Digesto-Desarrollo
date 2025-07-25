@@ -49,6 +49,13 @@ router.get("/:id", async (req, res) => {
   res.json(users);
 });
 
+router.get("/datos/:id", async (req, res) => {
+  const id = req.params.id;
+  const users = await UsuariosDB.getUsuarioByIdDatos(id);
+  res.json(users);
+});
+
+
 router.post("/", async (req, res) => {
   const data = req.body;
   try {
@@ -59,10 +66,10 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/eliminar/:id", async (req, res) => {
   const data = req.params.id;
   try {
-    const users = await UsuariosDB.deleteUsuario(data);
+    const users = await UsuariosDB.eliminar(data);
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });

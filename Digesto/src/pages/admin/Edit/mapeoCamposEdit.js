@@ -2,7 +2,7 @@
 export const nombreRutaPorEntidad = {
   tag: "PalabraClave",
   normativa: "Normativa",
-  usuario: "Usuario",
+  usuarios: "Usuario",
   dependencia: "Dependencia",
   emisores: "Emisor"
 };

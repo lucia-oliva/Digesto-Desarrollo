@@ -15,6 +15,7 @@ function PasoForm({
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     setFormData({
+      
       ...formData,
       [name]: type === "file" ? files[0] : value,
     });
@@ -77,10 +78,12 @@ function PasoForm({
   >
     {campos.map(({ name, label, type, options, required }) => {
       // Ocultar dependencia si no corresponde (solo para usuario)
+      const rolStr = String(formData.rol ?? "");
+
       if (
         entidad === "usuario" &&
         name === "dependencia" &&
-        !["2","4"].includes(formData.rol)
+        !["2","4"].includes(rolStr)
       ) {
         return null;
       }
