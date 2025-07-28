@@ -128,17 +128,29 @@ console.log("Datoooos",formData);
           </h3>
           <GenericFilterSearch type={type} onSearch={handleSearch} />
           <NormativaTable
-            type="ListadoNormativa"
-            filtros={{ numero: formData.normativa_modificada }}
-            onSeleccionar={(item) =>
-              setFormData((prev) => ({
-                ...prev,
-                modalSeleccionarNormativa: item,
-                accionSeleccionada: "",
-                comentarioSeleccionado: "",
-              }))
-            }
-          />
+  type="ListadoNormativa"
+  filtros={{ numero: formData.normativa_modificada }}
+  onSeleccionar={(item) => {
+    const yaSeleccionada = (formData.normativas_modificadas || []).some((n) => n.id === item.id);
+    if (yaSeleccionada) {
+      // Deseleccionar
+      setFormData((prev) => ({
+        ...prev,
+        normativas_modificadas: prev.normativas_modificadas.filter((n) => n.id !== item.id)
+      }));
+    } else {
+      // Abrir modal
+      setFormData((prev) => ({
+        ...prev,
+        modalSeleccionarNormativa: item,
+        accionSeleccionada: "",
+        comentarioSeleccionado: "",
+      }));
+    }
+  }}
+  formData={formData} // 👈 PASAR formData como prop extra
+/>
+
 
           
         </>

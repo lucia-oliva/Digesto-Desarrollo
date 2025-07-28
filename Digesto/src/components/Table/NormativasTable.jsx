@@ -5,7 +5,7 @@ import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
-const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
+const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
   const isSeleccionarContext = location.pathname.includes("/NuevaNormativa");
@@ -25,39 +25,46 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo }) => {
 
   const actions =
   type === "ListadoAuditoria" ? [] :
-    type === "SesionesConsejo"
-      ? [
-          {
-            label: "Ver Orden",
-           onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
-            type: "primary",
-          },
-          {
-            label: "Eliminar",
-            onClick: onDelete,
-            type: "error",
-          },
-        ]
-      : modo === "ver"
-      ? [
-          {
-            label: "Ver PDF",
-            onClick: (item) => abrirPdfDesdeBlobUrl(item.archivo),
-            type: "primary",
-          },
-        ]
-      : isSeleccionarContext
-      ? [
-          {
-            label: "Seleccionar",
-            onClick: onSeleccionar,
-            type: "primary",
-          },
-        ]
-      : [
-          { label: "Editar", onClick: onEdit, type: "secondary" },
-          { label: "Eliminar", onClick: onDelete, type: "error" },
-        ];
+  type === "SesionesConsejo"
+    ? [
+        {
+          label: "Ver Orden",
+          onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
+          type: "primary",
+        },
+        {
+          label: "Eliminar",
+          onClick: onDelete,
+          type: "error",
+        },
+      ]
+    : modo === "ver"
+    ? [
+        {
+          label: "Ver PDF",
+          onClick: (item) => abrirPdfDesdeBlobUrl(item.archivo),
+          type: "primary",
+        },
+      ]
+  : isSeleccionarContext
+  ? [
+      {
+        getLabel: (item) =>
+          (formData.normativas_modificadas || []).some((n) => n.id === item.id)
+            ? "Seleccionado"
+            : "Seleccionar",
+        onClick: onSeleccionar,
+        getType: (item) =>
+          (formData.normativas_modificadas || []).some((n) => n.id === item.id)
+            ? "secondary"
+            : "primary",
+      },
+    ]
+
+    : [
+        { label: "Editar", onClick: onEdit, type: "secondary" },
+        { label: "Eliminar", onClick: onDelete, type: "error" },
+      ];
 
   return (
     <GenericTable

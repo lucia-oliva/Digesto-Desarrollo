@@ -10,21 +10,33 @@ function TableRow({ item, columns, actions }) {
       ))}
       {actions.length > 0 && (
       <td className="flex flex-col gap-2 py-6">
-        {actions.map((action) => (
-          <button
-            key={action.label}
-            className={`btn btn-md md:w-[140px] font-[Montserrat]  ${
-          action.type === 'primary'
-            ? 'btn-primary'
-            : action.type === 'error'
-            ? 'btn-error text-white' 
-            : 'btn-secondary'
-        }`}
-            onClick={() => action.onClick(item)}
-          >
-            {action.label}
-          </button>
-        ))}
+        {actions.map((action) => {
+  const label = typeof action.getLabel === "function"
+    ? action.getLabel(item)
+    : action.label;
+
+    const type = typeof action.getType === "function"
+              ? action.getType(item)
+              : action.type;
+
+
+  return (
+    <button
+      key={label + item.id}
+      className={`btn btn-md md:w-[140px] font-[Montserrat] ${
+  type === 'primary'
+    ? 'btn-primary'
+    : type === 'error'
+    ? 'btn-error text-white'
+    : 'btn-secondary'
+}`}
+      onClick={() => action.onClick(item)}
+    >
+      {label}
+    </button>
+  );
+})}
+
       </td>
       )}
     </tr>
