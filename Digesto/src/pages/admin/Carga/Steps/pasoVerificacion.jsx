@@ -47,7 +47,9 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                 "modalSeleccionarNormativa",
                 "accionSeleccionada",
                 "comentarioSeleccionado",
-                "normativas_modificadas"
+                "normativas_modificadas",
+                "editingSelectedId",
+                "normativas_bajas"
               ].includes(key) || camposIgnorados.includes(key)
             ) {
               return null;
@@ -70,7 +72,12 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
               telefono: "Telefono",
               estado: "Estado",
               nombre_completo: "Nombre Completo",
-              codificacion: "Codificacion"
+              codificacion: "Codificacion",
+              resumen: "Resumen",
+              archivo: "Archivo",
+              fecha: "Fecha",
+              emisor: "Emisor",
+              tags: "Palabras Clave"
             };
 
             return (

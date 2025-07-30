@@ -4,6 +4,61 @@ import auditoriaService from "./auditoria.js";
 
 //BASIC CRUD
 
+//para la funcion de editar
+async function getNormativaCompletaById(id) {
+  try {
+   
+    const normativaSql = `
+      SELECT n.id, n.numero, n.anio, n.titulo, n.resumen, n.archivo,
+             DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha,
+             d.nombre AS dependencia,
+             e.nombre AS emisor,
+             tn.id AS tipo_normativa,
+             n.estado
+      FROM normativa n
+      JOIN dependencia d ON d.id = n.id_dependencia
+      JOIN emisor e ON e.id = n.id_emisor
+      JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa
+      WHERE n.id = ?
+    `;
+    const [normativa] = await db.query(normativaSql, [id]);
+    if (!normativa) return null;
+
+    
+    const tagsSql = `
+      SELECT t.nombre
+      FROM tag t
+      JOIN tag_normativa tn ON t.id = tn.id_tag
+      WHERE tn.id_normativa = ?
+    `;
+    const tagsResults = await db.query(tagsSql, [id]);
+    const tags = tagsResults.map(tag => tag.nombre);
+    
+    const relacionesSql = `
+      SELECT
+             r.normativa_original AS id,
+             r.id AS id_relacion,
+             no.titulo AS titulo,
+             r.comentario,
+             a.nombre AS accion
+      FROM relacion r
+      JOIN normativa no ON no.id = r.normativa_original
+      JOIN acciones_normativa a ON a.id = r.id_acciones
+      WHERE r.normativa_complementaria = ?
+    `;
+    const normativas_modificadas = await db.query(relacionesSql, [id]);
+
+    return {
+      ...normativa,
+      tags,
+      normativas_modificadas
+    };
+  } catch (error) {
+    console.error("Error en getNormativaCompletaById:", error);
+    throw error;
+  }
+}
+
 
 //funciona!
 async function updateModificacion({ id_relacion, accion, comentario }) {
@@ -822,5 +877,5 @@ export default {
   updateModificacion,
   registrarModificacion,
   editNormativaModificada,
-  eliminarRelacionesDeNormativa,
+  eliminarRelacionesDeNormativa,getNormativaCompletaById
 };

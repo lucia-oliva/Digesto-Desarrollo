@@ -7,7 +7,6 @@ export const nombreRutaPorEntidad = {
   emisores: "Emisor"
 };
 
-// Mapea los campos del formData antes de enviarlos al backend
 export const mapCamposEditar = (entidad, formData) => {
   const nuevoData = { ...formData };
 
@@ -15,16 +14,22 @@ export const mapCamposEditar = (entidad, formData) => {
     palabraclave: {
       Tag: "nombre"
     },
-    // Agregá aquí más entidades si necesitás
-    // usuario: { email: "correo_electronico" },
-    // dependencia: { nombre_dependencia: "nombre" }
+    normativa: {
+      emisor: "id_emisor",
+      dependencia: "id_dependencia",
+      tipo_normativa: "id_tipo_normativa",
+      fecha: "fecha_normativa"
+    }
   };
 
   if (reglas[entidad]) {
     const reemplazos = reglas[entidad];
     for (const clave in reemplazos) {
-      if (nuevoData[clave]) {
-        nuevoData[reemplazos[clave]] = nuevoData[clave];
+      if (nuevoData[clave] !== undefined) {
+        const valor = nuevoData[clave];
+        nuevoData[reemplazos[clave]] = ["emisor", "dependencia", "tipo_normativa"].includes(clave)
+          ? Number(valor)
+          : valor;
         delete nuevoData[clave];
       }
     }

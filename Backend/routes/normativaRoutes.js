@@ -8,6 +8,23 @@ import express from "express";
 const router = express.Router();
 
 
+//para la funcion de editar
+router.get("/datos/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await normativaDB.getNormativaCompletaById(id);
+    if (!result) {
+      return res.status(404).json({ error: "Normativa no encontrada" });
+    }
+    res.json(result);
+  } catch (error) {
+    console.error("Error al obtener normativa completa:", error);
+    res.status(500).json({ error: "Error al obtener normativa completa" });
+  }
+});
+
+
+
 //editar normativa
 router.post("/edit", async (req, res) => {
   console.log("Cuerpo de la solicitud:", req.body);

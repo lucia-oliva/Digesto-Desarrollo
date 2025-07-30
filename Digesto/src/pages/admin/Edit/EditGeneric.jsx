@@ -8,6 +8,9 @@ import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
 import { getRuta } from "../Carga/config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
 import {mapCamposEditar} from "./mapeoCamposEdit.js";
+import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
+import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
+
 
 
 function GenericEdit() {
@@ -30,6 +33,10 @@ function GenericEdit() {
   const [formData, setFormData] = useState(null);
   const [errores, setErrores] = useState({});
 
+const getValueFromLabel = (options, label) => {
+  const found = options.find((opt) => opt.label === label);
+  return found ? found.value : label;
+}
 
   useEffect(() => {
     setCurrentStep(0);
@@ -49,7 +56,20 @@ function GenericEdit() {
         if (!data) {
           alert("No se encontraron datos para editar.");
         } else {
-          setFormData(data);
+          setFormData({
+            ...data,
+            emisor: getValueFromLabel(emisorOptions, data.emisor),
+            dependencia: getValueFromLabel(dependenciaOptions, data.dependencia),
+            archivo: data.archivo ?? "", 
+             cambia_normativa:
+             Array.isArray(data.normativas_modificadas) && data.normativas_modificadas.length > 0
+      ? "SI"
+      : data.cambia_normativa || "NO",
+      _originalesNormativas: data.normativas_modificadas || [],
+      normativas_bajas: [],
+      
+
+          });
         }
       })
       .catch(() => alert("Error al cargar los datos para editar"));
@@ -67,25 +87,75 @@ function GenericEdit() {
     alert("Faltan datos clave para editar.");
     return;
   }
+ 
+  
+
+  ["dependencia", "emisor", "tipo_normativa"].forEach((campo) => {
+    if (formData[campo] !== undefined && formData[campo] !== null) {
+      formData[campo] = String(formData[campo]);
+    }
+  });
+
     const ruta = getRuta(entidad);
+    const cambios = buildRelacionesNormativas(formData);
+    
+    const {
+    accionSeleccionada,
+    comentarioSeleccionado,
+    editingSelectedId,
+    modalSeleccionarNormativa,
+    normativas_bajas,         
+    _originalesNormativas,    
+    ...formClean              
+  } = formData;
+
+  const archivoNombre =
+  formClean.archivo instanceof File
+    ? formClean.archivo.name
+    : (typeof formClean.archivo === "string" ? formClean.archivo : "");
+
       const dataToSend = {
-    ...mapCamposEditar(entidad, formData),
+    ...mapCamposEditar(entidad, formClean),
+    archivo: archivoNombre,
     userId: user.id,
+    normativas_modificadas: cambios,
   };
 
-  console.log("datppppppppppps",dataToSend);
+    
+fetch(`http://localhost:3000/api/${ruta}/edit`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(dataToSend),
+})
+  .then((res) => res.json())
+  .then((data) => {
+    console.log(`[POST] /api/${ruta}/edit =>`, data);
+    console.log("FORMDATAAAAAAAAAAAAAA:",formData);
+    console.log("DataTOSEND", dataToSend);
 
-    fetch(`http://localhost:3000/api/${ruta}/edit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dataToSend),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(`[POST] /api/${ruta}/edit =>`, data);
-        alert(`Entidad ${entidad} editada correctamente.`);
+    if (entidad === "normativa" && formData.archivo instanceof File && formData.id) {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", formData.archivo);      formDataUpload.append("resolucion", String(formData.numero));
+      formDataUpload.append("anio", String(formData.anio));
+      formDataUpload.append("titulo", formData.titulo);
+      formDataUpload.append("id_dependencia", String(formData.dependencia));
+      formDataUpload.append("id_emisor", formData.emisor);
+      formDataUpload.append("tipo_normativa", formData.tipo_normativa);
+
+      return fetch(`http://localhost:3000/api/file/upload/${formData.id}`, {
+        method: "POST",
+        body: formDataUpload, // NO setees Content-Type
       })
-      .catch(() => alert("Error al editar registro"));
+        .then((resUpload) => {
+          if (!resUpload.ok) throw new Error("Error al subir archivo PDF.");
+          return resUpload.json();
+        })
+        .then((resJson) => {
+          console.log("Resultado de subida de archivo:", resJson);
+          alert(`Entidad ${entidad} editada correctamente.`);
+        });
+    }
+    alert(`Entidad ${entidad} editada correctamente.`);})
   };
 
   const renderPaso = () => {

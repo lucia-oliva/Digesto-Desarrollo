@@ -5,10 +5,13 @@ import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
 
+
+
+
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
-  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa");
+  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa")|| location.pathname.includes("EditarNormativa"); ;
   const {
     normativas,
     page,

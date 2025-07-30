@@ -140,13 +140,22 @@ function PasoForm({
                 )}
             </select>
           ) : (
-            <input
-              type={type}
-              name={name}
-              value={type === "file" ? undefined : formData[name] || ""}
-              onChange={handleChange}
-              className="input input-bordered w-full"
-            />
+           
+           <>
+  <input
+    type={type}
+    name={name}
+    value={type === "file" ? undefined : formData[name] || ""}
+    onChange={handleChange}
+    className="input input-bordered w-full"
+  />
+  {type === "file" && formData[name] && (
+    <p className="text-xs text-gray-500 mt-1">
+      Archivo seleccionado: {formData[name]?.name || formData[name]}
+    </p>
+  )}
+</>
+ 
           )}
           {errores?.[name] && (
             <p className="text-red-500 text-sm mt-1">{errores[name]}</p>

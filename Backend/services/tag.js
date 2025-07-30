@@ -66,8 +66,7 @@ async function create(data) {
 
 //Obtener tags de normativa
 
-//Insertar Tags en normativa - Verificar si existe tags en normativas
-async function insertTagsForNormativa(normativaId, tags){
+async function insertTagsForNormativa(normativaId, tags) {
   if (!Array.isArray(tags) || tags.length === 0) {
     console.warn("No se proporcionaron tags válidos.");
     return;
@@ -76,30 +75,49 @@ async function insertTagsForNormativa(normativaId, tags){
   for (const tag of tags) {
     if (!tag) {
       console.error("El valor de 'tag' es inválido:", tag);
-      continue; // Saltar este tag si es inválido
+      continue;
     }
 
     try {
-      // Verificar si el tag ya existe
-      const results = await db.query("SELECT id FROM tag WHERE nombre = ?", [tag]) || [];
-      let existingTag = results.length > 0 ? results[0] : null;
+      // Buscar si el tag ya existe
+      const [existingTagRow] = await db.query(
+        "SELECT id FROM tag WHERE nombre = ?",
+        [tag]
+      );
+      let tagId;
 
-      if (!existingTag) {
-        // Si no existe, insertar el tag en la tabla `tag`
-        const result = await db.query("INSERT INTO tag (nombre) VALUES (?)", [tag]);
-        existingTag = { id: result.insertId };
+      if (!existingTagRow) {
+        // Insertar el tag si no existe
+        const result = await db.query(
+          "INSERT INTO tag (nombre) VALUES (?)",
+          [tag]
+        );
+        tagId = result.insertId;
+      } else {
+        tagId = existingTagRow.id;
       }
 
-      // Asociar el tag con la normativa en la tabla `tag_normativa`
-      await db.query("INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)", [
-        normativaId,
-        existingTag.id,
-      ]);
+      // Verificar si ya está asociada la normativa con ese tag
+      const [existingLink] = await db.query(
+        "SELECT 1 FROM tag_normativa WHERE id_normativa = ? AND id_tag = ?",
+        [normativaId, tagId]
+      );
+
+      if (!existingLink) {
+        // Insertar la relación solo si no existe
+        await db.query(
+          "INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)",
+          [normativaId, tagId]
+        );
+      } else {
+        console.log(`Ya existe la relación normativa=${normativaId}, tag=${tag}`);
+      }
     } catch (error) {
       console.error(`Error al procesar el tag '${tag}':`, error);
     }
   }
 }
+
 
 
 
