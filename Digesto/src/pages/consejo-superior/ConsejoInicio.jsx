@@ -1,4 +1,3 @@
-import React from 'react';
 import consejoImg from '/src/assets/consejo.jpg';
 
 const ConsejoInicio = () => {

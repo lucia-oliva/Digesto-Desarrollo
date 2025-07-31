@@ -3,6 +3,8 @@ import NormativaTable from "../../../../components/Table/NormativasTable";
 import GenericFilterSearch from "../../../../components/SearchFilter/SearchFilter";
 import PropTypes from "prop-types";
 import { toAccionText, isChanged, toAccionId } from "../config/mapeo";
+import { PiPencilSimpleLineFill } from "react-icons/pi";
+import { FaTrash } from "react-icons/fa";
 
 
 
@@ -33,14 +35,15 @@ function ResumenSeleccionadas({ items = [], onEdit, onRemove }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center shrink-0">
                   <button
                     type="button"
                     className="btn btn-ghost btn-sm"
                     title="Editar"
                     onClick={() => onEdit(n)}
                   >
-                    ✏️
+                   <PiPencilSimpleLineFill className="text-2xl mb-3 text-grey" />
+
                   </button>
                   <button
                     type="button"
@@ -48,7 +51,7 @@ function ResumenSeleccionadas({ items = [], onEdit, onRemove }) {
                     title="Eliminar"
                     onClick={() => onRemove(n)}
                   >
-                    🗑️
+                     <FaTrash className="text-lg mb-3 text-error"  />
                   </button>
                 </div>
               </div>

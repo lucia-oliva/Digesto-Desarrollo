@@ -1,8 +1,10 @@
 export const normativaColumns = [
+  { key: "fecha", label: "Fecha",className:"text-center font-[Montserrat] text-md sm:text-sm" },
   { key: "titulo", label: "Título",className:"text-center font-[Montserrat]  text-md sm:text-md" },
   { key: "dependencia", label: "Dependencia",className:"text-center font-[Montserrat] text-lg sm:text-md" },
   { key: "tipo_normativa", label: "Tipo",className:"text-center font-[Montserrat] text-lg sm:text-md" },
   { key: "visitas", label: "Visitas",className:"text-center font-[Montserrat] text-lg sm:text-md" },
+  
 ];
 
 export const usuarioColumns = [
@@ -43,3 +45,5 @@ export const auditoriaColums = [
 {key: "email", label: "Email", className: "text-center font-[Montserrat] text-md"},
 {key: "nombre_dependencia", label: "Dependencia", className: "text-center font-[Montserrat] text-md"},
 ]
+
+

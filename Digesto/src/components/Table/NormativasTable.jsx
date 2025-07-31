@@ -4,6 +4,9 @@ import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
 import { useLocation } from "react-router";
 import { adminConfig } from "./configTable";
+import PropTypes from "prop-types";
+import { PiPencilSimpleLineFill } from "react-icons/pi";
+import { FaTrash } from "react-icons/fa";
 
 
 
@@ -28,7 +31,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
 
   const actions =
   type === "ListadoAuditoria" ? [] :
-  type === "SesionesConsejo"
+  type === "SesionesConsejo" 
     ? [
         {
           label: "Ver Orden",
@@ -36,9 +39,9 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
           type: "primary",
         },
         {
-          label: "Eliminar",
-          onClick: onDelete,
-          type: "error",
+          label: "Ver Acta",
+          onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
+          type: "primary",
         },
       ]
     : modo === "ver"
@@ -81,5 +84,11 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     />
   );
 };
+
+
+NormativaTable.PropTypes = {
+   type: PropTypes.any,
+
+}
 
 export default NormativaTable;
