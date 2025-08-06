@@ -21,6 +21,8 @@ import ConsejoReglamento from "./pages/consejo-superior/ConsejoReglamento.jsx";
 import ConsejoSesiones from "./pages/consejo-superior/ConsejoSesiones.jsx";
 import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
 import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
+import AgregarSesion from "./pages/consejo-superior/AgregarSesion.jsx"
+import EditarSesion from "./pages/consejo-superior/EditarSesion.jsx";
 
 const Router = () => {
   return (
@@ -38,6 +40,8 @@ const Router = () => {
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
             <Route path="reglamento" element={<ConsejoReglamento />} />
             <Route path="comisiones" element={<ConsejoComisiones />} />
+            <Route path="addsesion" element={<AgregarSesion />} />
+            <Route path="EditarSesion/:id" element={<EditarSesion />} />
           </Route>
         </Route>
 

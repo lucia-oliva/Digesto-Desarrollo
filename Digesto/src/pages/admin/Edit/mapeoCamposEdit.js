@@ -4,7 +4,8 @@ export const nombreRutaPorEntidad = {
   normativa: "Normativa",
   usuarios: "Usuario",
   dependencia: "Dependencia",
-  emisores: "Emisor"
+  emisores: "Emisor",
+  sesiones: "Sesion"
 };
 
 export const mapCamposEditar = (entidad, formData) => {

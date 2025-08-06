@@ -1,4 +1,5 @@
 import db from "./db.js";
+
 async function eliminar(id) {
     console.log(id);
     
@@ -7,4 +8,50 @@ async function eliminar(id) {
   return results;
 }
 
-export default { eliminar };
+//crear una sesion
+
+async function create(data) {
+  const { fecha_sesion, orden_url, nombre_orden } = data;
+  if (!fecha_sesion || !orden_url || !nombre_orden) {
+    throw new Error("Faltan datos obligatorios para la sesión");
+  }
+  const fechaEditado = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const nombre_acta = "Acta " + fecha_sesion; 
+  const sql = `
+    INSERT INTO sesiones (fecha_sesion, orden_url, nombre_orden, editado, acta_url, nombre_acta)
+    VALUES (?, ?, ?, ? , ? , ?)
+  `;
+  try {
+    const result = await db.query(sql, [
+      fecha_sesion,
+      orden_url,
+      nombre_orden,
+      fechaEditado,
+      orden_url,
+      nombre_acta
+    ]);
+    return {
+      success: true,
+      message: "Sesión creada correctamente",
+      id_sesion: result.insertId,
+    };
+  } catch (error) {
+    console.error("Error al crear la sesión:", error);
+    throw error;
+  }
+}
+
+//adjuntar el acta de una sesion
+
+
+//traer una sesion por id
+
+async function getSesionById(id) {
+  const sql = "SELECT  id_sesion, DATE_FORMAT(fecha_sesion, '%Y-%m-%d') AS fecha_sesion, nombre_orden, nombre_acta, orden_url, acta_url FROM sesiones WHERE id_sesion = ?";
+  const results = await db.query(sql, [id]);
+  return results[0];
+}
+
+
+
+export default { eliminar, getSesionById, create };

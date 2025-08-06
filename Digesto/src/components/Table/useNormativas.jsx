@@ -64,8 +64,18 @@ export const useNormativas = (type,filtros) => {
   const onPageChange = (newPage) => setPage(newPage);
 
   const onEdit = (item) => {
+    
       const rutaEntidad = nombreRutaPorEntidad[type] || type; 
-    navigate(`/admin/Editar${rutaEntidad}/${item.id}`);
+      console.log(rutaEntidad);
+      console.log("id item: ", item.id);
+      console.log("id item sesion: ", item.id_sesion);
+
+    if(rutaEntidad === "Sesion"){
+      item.id = item.id_sesion
+      navigate(`/consejo-superior/Editar${rutaEntidad}/${item.id}`);
+    }else{
+       navigate(`/admin/Editar${rutaEntidad}/${item.id}`);
+    }
   }
   
 
