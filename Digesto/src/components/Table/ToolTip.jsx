@@ -12,7 +12,8 @@ function ResumenTooltip({ texto }) {
       <div className="truncate">{truncado}</div>
 
       {/* Tooltip al hacer hover */}
-      <div className="absolute z-10 hidden group-hover:block bg-white border border-gray-300 p-2 shadow-lg w-[300px] text-xs rounded-md left-0 top-full mt-1">
+      <div className="absolute z-10 hidden group-hover:block bg-white border border-gray-300 p-2 shadow-lg w-[300px] text-xs rounded-md right-0 top-full mt-1">
+
         {texto}
       </div>
     </div>
