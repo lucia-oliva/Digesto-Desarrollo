@@ -1,10 +1,17 @@
+import {renderResumen} from "./ResumeRender";
+
 export const normativaColumns = [
   { key: "fecha", label: "Fecha",className:"text-center font-[Montserrat] text-md sm:text-sm" },
   { key: "titulo", label: "Título",className:"text-center font-[Montserrat]  text-md sm:text-md" },
   { key: "dependencia", label: "Dependencia",className:"text-center font-[Montserrat] text-lg sm:text-md" },
   { key: "tipo_normativa", label: "Tipo",className:"text-center font-[Montserrat] text-lg sm:text-md" },
+   {
+    key: "resumen",
+    label: "Resumen",
+    className: "text-left font-[Montserrat] text-sm max-w-[300px]",
+    render: renderResumen,
+  },
   { key: "visitas", label: "Visitas",className:"text-center font-[Montserrat] text-lg sm:text-md" },
-  
 ];
 
 export const usuarioColumns = [
