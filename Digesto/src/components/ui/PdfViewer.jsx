@@ -12,8 +12,6 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
     },
     { manual: true }
   );
-
-  // Descarga el archivo PDF
   useEffect(() => {
     if (!filename) return;
 
@@ -25,8 +23,6 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
       console.error(error.message);
     });
   }, [ filename, fetchPdf]);
-
-  // Cargar el PDF en el iframe y limpiar la URL
   useEffect(() => {
     if (data) {
       const blobUrl = URL.createObjectURL(
@@ -54,7 +50,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
           width="100%"
           height="100%"
           title="PDF"
-          className="w-screen lg:w-[calc(100vw-24rem)] h-screen sm:p-2 bg-base-300"
+          className="w-full h-[100vh] block bg-base-300"
         />
       )}
     </div>

@@ -42,6 +42,7 @@ const Router = () => {
             <Route path="comisiones" element={<ConsejoComisiones />} />
             <Route path="addsesion" element={<AgregarSesion />} />
             <Route path="EditarSesion/:id" element={<EditarSesion />} />
+            <Route path="document/:id" element={<DocumentView />} />
           </Route>
         </Route>
 
@@ -76,6 +77,7 @@ const Router = () => {
             <Route path="EditarEmisor/:id" element={<GenericEdit />} />
             <Route path="EditarNormativa/:id" element={ <GenericEdit /> } />
             <Route path="EditarPalabraClave/:id" element={ <GenericEdit /> } />
+            <Route path="document/:id" element={<DocumentView />} />
           </Route>
         </Route>
       </Routes>

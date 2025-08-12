@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import {abrirPdfDesdeBlobUrl} from "./AbrirPdf";
 import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
-import { useLocation } from "react-router";
+import { useLocation,useNavigate  } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
 import { PiPencilSimpleLineFill } from "react-icons/pi";
@@ -12,9 +12,16 @@ import { FaTrash } from "react-icons/fa";
 
 
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
-  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa")|| location.pathname.includes("EditarNormativa"); ;
+  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa")|| location.pathname.includes("EditarNormativa"); 
+  const baseDocPath = location.pathname.startsWith("/admin")
+  ? "/admin/document"
+  : location.pathname.startsWith("/consejo-superior")
+  ? "/consejo-superior/document"
+  : "/document";
+
   const {
     normativas,
     page,
@@ -58,7 +65,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     ? [
         {
           label: "Ver PDF",
-          onClick: (item) => abrirPdfDesdeBlobUrl(item.archivo),
+          onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
           type: "primary",
         },
       ]
@@ -78,6 +85,11 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     ]
 
     : [
+        { 
+        label: "Ver Normativa", 
+        onClick: (item) => navigate(`${baseDocPath}/${item.id}`), 
+        type: "primary" 
+        },
         { label: "Editar", onClick: onEdit, type: "secondary" },
         { label: "Eliminar", onClick: onDelete, type: "error" },
       ];

@@ -17,7 +17,7 @@ function ConsejoPage() {
   
 
   return (
-    <main id="main">
+    <main id="main" className="bg-white" >
       <header className="bg-white shadow-sm border-b border-gray-200 hidden sm:block">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <ul className="flex flex-wrap justify-center gap-6 py-3 text-sm sm:text-base font-medium text-gray-800 font-sans">
@@ -41,13 +41,7 @@ function ConsejoPage() {
         <Outlet />
       </section>
 
-      <footer className="footer footer-horizontal footer-center bg-primary text-primary-content font-sans p-11">
-        <aside className="flex flex-col items-center">
-          <p className="font-medium text-xs md:text-xs lg:text-base text-center pl-10">
-            Consejo Superior | UNLaR
-          </p>
-        </aside>
-      </footer>
+      
     </main>
   );
 }
