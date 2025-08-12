@@ -1,4 +1,4 @@
-// components/ToolTip.jsx
+
 
 function ResumenTooltip({ texto }) {
   if (!texto) return <span className="text-gray-400 italic">Sin resumen</span>;
