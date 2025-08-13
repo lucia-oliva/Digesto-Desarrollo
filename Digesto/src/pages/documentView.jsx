@@ -4,12 +4,41 @@ import { useState } from "react";
 import { useLocation, useParams } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
+import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
+
+
+
+const tipoNormativaLabel = (valor) => {
+  if (valor == null || valor === "") return "—";
+  const str = String(valor).trim();
+
+ 
+  if (/^\d+$/.test(str)) {
+    const found = tipoNormativaOptions.find(opt => String(opt.value) === str);
+    return found?.label ?? str;
+  }
+
+
+  const normalize = (s) =>
+    String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+  const txt = normalize(str);
+  const exact = tipoNormativaOptions.find(opt => normalize(opt.label) === txt);
+  if (exact) return exact.label;
+
+
+  const starts = tipoNormativaOptions.filter(opt => normalize(opt.label).startsWith(txt));
+  if (starts.length === 1) return starts[0].label;
+
+  return str; 
+};
 
 function DocumentView() {
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
   const { id } = useParams();
   const [pdfUrl, setPdfUrl] = useState("");
+ 
 
   const [{ data: normativa, loading }] = useAxios({
     url: `http://localhost:3000/api/normativa/datos/${id}`,
@@ -59,13 +88,12 @@ if (isAdmin) {
         </div>
       </div>
 
-      {/* Meta en grid responsiva */}
+
       <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <div className="rounded-lg p-3 sm:p-4 border border-base-200">
           <div className="text-[10px] sm:text-xs uppercase text-gray-500">Tipo y número</div>
-          <div className="text-sm sm:text-base font-medium">
-            {normativa?.tipo_normativa || "—"}{" "}
-            {normativa?.numero ? `N° ${normativa.numero}` : ""}
+          <div className="text-sm sm:text-base font-medium font-[Montserrat]">
+            {tipoNormativaLabel(normativa?.tipo_normativa ?? normativa?.id_tipo_normativa)} {normativa?.numero ? `N° ${normativa.numero}` : ""}
           </div>
         </div>
 
@@ -168,8 +196,7 @@ if (isAdmin) {
               </div>
 
               <h3 className="text-lg font-sans font-medium text-gray-500">
-                {normativa?.tipo_normativa} N° {normativa?.numero} <br />
-                {normativa?.dependencia}
+                {tipoNormativaLabel(normativa?.tipo_normativa ?? normativa?.id_tipo_normativa)} N° {normativa?.numero} <br />
               </h3>
 
               <h2 className="text-lg font-medium font-sans text-gray-500">

@@ -8,12 +8,12 @@ export const rutasPorEntidad = {
 }
 
 export const tipoNormativaOptions = [
-  { label: "Acta", value: "1" },
-  { label: "Resolución", value: "2" },
+  { label: "Acta", value: "2" },
+  { label: "Resolución", value: "5" },
   { label: "Convenio", value: "3" },
-  { label: "Nota", value: "4" },
-  { label: "Providencia", value: "5" },
-  { label: "Ordenanza", value: "6" },
+  { label: "Nota", value: "6" },
+  { label: "Providencia", value: "4" },
+  { label: "Ordenanza", value: "1" },
 ];
 
 export const dependenciaOptions = [

@@ -19,7 +19,7 @@ export const useNormativas = (type,filtros) => {
   const [error, setError] = useState(null);
   const prevFiltrosRef = useRef(JSON.stringify(filtros));
   const navigate = useNavigate();
-
+  const [emptyMessage, setEmptyMessage] = useState("No se encontraron resultados. Probá cambiar los filtros.");
   // Fetch inicial
   useEffect(() => {
     const currentFiltrosString = JSON.stringify(filtros);
@@ -46,6 +46,17 @@ export const useNormativas = (type,filtros) => {
         setNormativas(res.data.data);
         total = res.data.totalResults || 1;
         setTotalPages(Math.ceil(total / 6));
+        if (res?.error) {
+          setNormativas([]);
+          setTotalPages(0);
+          setEmptyMessage(res.error || "No se encontraron resultados. Probá cambiar los filtros.");
+        } else {
+          setNormativas(res.data || []);
+          total = res.totalResults || 0;
+          setTotalPages(Math.ceil(total / 6));
+          setEmptyMessage("No se encontraron resultados. Probá cambiar los filtros.");
+        }
+
       }else{
         res = await searchNormativas(pageToLoad, 6, type,filtros);
         console.log(res);
@@ -56,6 +67,11 @@ export const useNormativas = (type,filtros) => {
       
     } catch (err) {
       setError("Error al cargar normativas", err);
+       setError("Error al cargar normativas");
+      const msg = err?.response?.data?.error || "No se encontraron resultados. Probá cambiar los filtros.";
++      setNormativas([]);
++      setTotalPages(1);
++      setEmptyMessage(msg);
     } finally {
       setLoading(false);
     }
