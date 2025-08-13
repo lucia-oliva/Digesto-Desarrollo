@@ -1,4 +1,6 @@
 // components/Normativas/useNormativas.js
+
+//algo se buggeo aca, revisar commit anterior
 import { useEffect, useState , useRef } from "react";
 import { searchNormativas, deleteApi, editApi} from "./NormativaApi";
 import { useNavigate } from "react-router";
@@ -48,7 +50,7 @@ export const useNormativas = (type,filtros) => {
         setTotalPages(Math.ceil(total / 6));
         if (res?.error) {
           setNormativas([]);
-          setTotalPages(0);
+          setTotalPages(1);
           setEmptyMessage(res.error || "No se encontraron resultados. Probá cambiar los filtros.");
         } else {
           setNormativas(res.data || []);
