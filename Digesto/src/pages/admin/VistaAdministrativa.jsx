@@ -12,10 +12,12 @@ function VistaAdministrativa() {
     setFilters(formData); // esto se pasa como prop a NormativasTable
   };
 
+  const modo = "admin";
+
   return (
     <div className="container ">
       <GenericFilterSearch type={type} onSearch={handleSearch} />
-      <NormativaTable type={type} filtros={filters} />
+      <NormativaTable type={type} filtros={filters} modo={modo}/>
     </div>
   );
 }

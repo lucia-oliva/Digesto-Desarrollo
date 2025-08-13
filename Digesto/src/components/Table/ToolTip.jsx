@@ -4,7 +4,7 @@ function ResumenTooltip({ texto }) {
   if (!texto) return <span className="text-gray-400 italic">Sin resumen</span>;
 
   const palabras = texto.split(" ");
-  const primerPalabra = palabras.slice(0, 1).join(" ");
+  const primerPalabra = palabras.slice(0, 2).join(" ");
   const truncado = palabras.length > 3 ? primerPalabra + "..." : texto;
 
   return (

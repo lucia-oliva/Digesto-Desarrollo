@@ -1,8 +1,9 @@
+// ContactModal.jsx
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
 
-export default function ContactModal() {
+export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const modalRef = useRef(null);
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
@@ -27,25 +28,24 @@ export default function ContactModal() {
     Catuna: "lucia222lr@gmail.com",
   };
 
-  const validParams = [
-    "dependencia=Aplicadas", "dependencia=Exactas", "dependencia=Salud",
-    "dependencia=Sociales", "dependencia=Humanas", "dependencia=C.%20Superior",
-    "dependencia=Chepes", "dependencia=Villa%20Union", "dependencia=Chamical",
-    "dependencia=Aimogasta", "dependencia=Catuna"
-  ];
-
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const dependencia = searchParams.get("dependencia");
-    const decoded = decodeURIComponent(dependencia || "");
-    
-    setIsVisible(validParams.some(param => location.search.includes(param)));
-    setNombreDependencia(decoded);
-  }, [location]);
+    // 1) Si viene por prop (desde filtros), úsala
+    if (dependenciaProp && dependenciaProp.trim() !== "") {
+      setIsVisible(true);
+      setNombreDependencia(dependenciaProp.trim());
+      return;
+    }
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+    // 2) Fallback: leer de la URL (comportamiento anterior)
+    const searchParams = new URLSearchParams(location.search);
+    const depFromUrl = searchParams.get("dependencia") || "";
+    const decoded = decodeURIComponent(depFromUrl);
+
+    setIsVisible(Boolean(decoded));
+    setNombreDependencia(decoded);
+  }, [location.search, dependenciaProp]);
+
+  const openModal = () => setIsModalOpen(true);
 
   const closeModal = (event) => {
     if (modalRef.current && event.target === modalRef.current) {
@@ -56,24 +56,15 @@ export default function ContactModal() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    const destinatario =
+      dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
 
-    const searchParams = new URLSearchParams(location.search);
-    const dependencia = searchParams.get("dependencia");
-    const destinatario = dependenciaEmails[dependencia] || "default@unlar.edu.ar";
-
-    const payload = {
-      nombre,
-      email,
-      mensaje,
-      destinatario
-    };
+    const payload = { nombre, email, mensaje, destinatario };
 
     try {
       const res = await fetch("http://localhost:3000/api/contacto", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -82,7 +73,6 @@ export default function ContactModal() {
         setNombre("");
         setEmail("");
         setMensaje("");
-
         setTimeout(() => {
           setSuccess(false);
           setIsModalOpen(false);
@@ -142,7 +132,7 @@ export default function ContactModal() {
                 placeholder="Nombre"
                 className="w-full p-2 border border-gray-300 rounded mb-2"
                 required
-                pattern="[A-Za-z\s]{3,}"
+                pattern="[A-Za-z\\s]{3,}"
                 title="El nombre debe tener al menos 3 caracteres y solo letras."
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}

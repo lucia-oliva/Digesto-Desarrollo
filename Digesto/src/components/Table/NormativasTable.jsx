@@ -1,26 +1,30 @@
 import { useEffect } from "react";
-import {abrirPdfDesdeBlobUrl} from "./AbrirPdf";
+import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
-import { useLocation,useNavigate  } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
-import { PiPencilSimpleLineFill } from "react-icons/pi";
-import { FaTrash } from "react-icons/fa";
-
-
-
 
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { tipo = "", columns = [] } = adminConfig[type] || {};
-  const isSeleccionarContext = location.pathname.includes("/NuevaNormativa")|| location.pathname.includes("EditarNormativa"); 
+
+  const isSeleccionarContext =
+    location.pathname.includes("/NuevaNormativa") ||
+    location.pathname.includes("EditarNormativa");
+
   const baseDocPath = location.pathname.startsWith("/admin")
-  ? "/admin/document"
-  : location.pathname.startsWith("/consejo-superior")
-  ? "/consejo-superior/document"
-  : "/document";
+    ? "/admin/document"
+    : location.pathname.startsWith("/consejo-superior")
+    ? "/consejo-superior/document"
+    : "/document";
+
+
+  const filteredColumns = columns.filter(
+    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(modo))
+  );
 
   const {
     normativas,
@@ -30,76 +34,103 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtros);  
-  
+  } = useNormativas(tipo, filtros);
+
   useEffect(() => {
     reload();
   }, [location.pathname, JSON.stringify(filtros)]);
 
-  const actions =
-  type === "ListadoAuditoria" ? [] :
-  type === "SesionesConsejo" 
-    ? [
-        {
-          label: "Ver Orden",
-          onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
-          type: "primary",
-        },
-        {
-          label: "Ver Acta",
-          onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
-          type: "primary",
-        },
-         {
-            label: "Editar", // Sin texto
-            type: "secondary",
-            onClick: onEdit,
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const isAdmin = isAdminRoute || modo === "admin";
+
+ const actions =
+  type === "ListadoAuditoria"
+    ? []
+    : type === "SesionesConsejo"
+    ? (() => {
+        const base = [
+          {
+            label: "Ver Orden",
+            onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
+            type: "primary",
+            className: "btn-outline btn-primary",
           },
           {
-            label: "Eliminar",
-            type: "error",
-            onClick: onDelete,
+            label: "Ver Acta",
+            onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
+            type: "primary",
+            className: "btn-outline btn-primary",
           },
-      ]
+        ];
+        if (isAdmin) {
+          base.push(
+            { label: "Editar", type: "secondary", onClick: onEdit },
+            { label: "Eliminar", type: "error", onClick: onDelete }
+          );
+        }
+        return base;
+      })()
     : modo === "ver"
     ? [
         {
           label: "Ver PDF",
           onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
           type: "primary",
+          className: "btn-outline btn-primary",
         },
       ]
-  : isSeleccionarContext
-  ? [
-      {
-        getLabel: (item) =>
-          (formData.normativas_modificadas || []).some((n) => n.id === item.id)
-            ? "Seleccionado"
-            : "Seleccionar",
-        onClick: onSeleccionar,
-        getType: (item) =>
-          (formData.normativas_modificadas || []).some((n) => n.id === item.id)
-            ? "secondary"
-            : "primary",
-      },
-    ]
-
-    : [
-        { 
-        label: "Ver Normativa", 
-        onClick: (item) => navigate(`${baseDocPath}/${item.id}`), 
-        type: "primary" 
+    : isSeleccionarContext
+    ? [
+        {
+          getLabel: (item) =>
+            (formData.normativas_modificadas || []).some((n) => n.id === item.id)
+              ? "Seleccionado"
+              : "Seleccionar",
+          onClick: onSeleccionar,
+          getType: (item) =>
+            (formData.normativas_modificadas || []).some((n) => n.id === item.id)
+              ? "secondary"
+              : "primary",
         },
-        { label: "Editar", onClick: onEdit, type: "secondary" },
-        { label: "Eliminar", onClick: onDelete, type: "error" },
-      ];
+      ]
+    : (() => {
+       
+        const base = [];
+
+        if (isAdmin) {
+       
+          if (tipo === "normativa") {
+            base.push({
+              label: "Ver Normativa",
+              onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+              type: "primary",
+              className: "btn-outline btn-primary",
+            });
+          }
+          
+          base.push(
+            { label: "Editar", onClick: onEdit, type: "secondary" },
+            { label: "Eliminar", onClick: onDelete, type: "error" }
+          );
+        } else {
+         
+          base.push({
+            label: "Ver PDF",
+            onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+            type: "primary",
+            className: "btn-outline btn-primary",
+          });
+        }
+
+        return base;
+      })();
 
   return (
     <GenericTable
       data={normativas}
-      columns={columns}
+      columns={filteredColumns}
       actions={actions}
-      showActions={type !== "auditoria"}
       page={page}
       totalPages={totalPages}
       onPageChange={onPageChange}
@@ -107,10 +138,8 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
   );
 };
 
-
 NormativaTable.PropTypes = {
-   type: PropTypes.any,
-
-}
+  type: PropTypes.any,
+};
 
 export default NormativaTable;

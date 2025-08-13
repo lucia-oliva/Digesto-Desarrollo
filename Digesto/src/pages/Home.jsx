@@ -1,33 +1,45 @@
 import { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import useAxios from "axios-hooks";
+import { useNavigate } from "react-router";
+
 import Dependencias from "../components/Listas/Dependencias";
-import Table from "../components/layout/Table";
+import GenericTable from "../components/Table/GenericTable";
+import { adminConfig } from "../components/Table/configTable";
 import { Alert, Loading } from "../components/ui/Ui";
 
 function Home() {
+  const navigate = useNavigate();
   const [normativas, setNormativas] = useState([]);
 
-  // Se obtienen las normativas mas buscadas*/
-  const [{ data, loading, error }] = useAxios(
-    {
-      url: "http://localhost:3000/api/normativa/mas-buscadas",
-      method: "GET",
-    }
-  )
+  // 🚀 Normativas más consultadas
+  const [{ data, loading, error }] = useAxios({
+    url: "http://localhost:3000/api/normativa/mas-buscadas",
+    method: "GET",
+  });
 
   useEffect(() => {
-    if (data && data.length > 0) {
+    if (Array.isArray(data) && data.length > 0) {
       setNormativas(data);
-      console.log(data);
     }
-    if (error) {
-      console.error(
-        "Error al obtener las normativas mas buscadas",
-        error.message
-      );
-    }
-  }, [data, error]);
+  }, [data]);
+
+  // 📋 Columnas base de normativas desde tu config
+  const columnsBase = adminConfig["ListadoNormativa"]?.columns ?? [];
+
+  // 🧱 Modo "inicio": ocultar número y emisor
+  const hideKeys = ["resumen"];
+  const columnsInicio = columnsBase.filter((c) => !hideKeys.includes(c.key));
+
+  // 🔘 Acción "Ver PDF" con outline y hover azul
+  const actions = [
+    {
+      label: "Ver PDF",
+      type: "primary",
+      className: "btn-outline btn-primary",
+      onClick: (item) => navigate(`/document/${item.id}`),
+    },
+  ];
 
   return (
     <div>
@@ -47,35 +59,39 @@ function Home() {
             </h1>
             <p className=" mb-4 text-xl font-sans font-light text-base-100">
               La plataforma que sirve como espacio digital para consultar las
-              normativas y toda documentacion emitada por todas las dependencias
+              normativas y toda documentación emitida por todas las dependencias
               de la Universidad Nacional de La Rioja.
             </p>
             <a
-              className="btn bg-primary
-                border-slate-800 text-base-200 shadow-none 
-                hover:bg-primary hover:border-primary"
+              className="btn bg-primary border-slate-800 text-base-200 shadow-none hover:bg-primary hover:border-primary"
               href="/busqueda"
             >
-              Busqueda Avanzada <IoMdSearch size={20} className="ml-2" />
+              Búsqueda Avanzada <IoMdSearch size={20} className="ml-2" />
             </a>
           </div>
         </div>
       </div>
-      <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
-        {/* Section de Dependencias */}
 
+      <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
+        {/* Dependencias */}
         <Dependencias dependencias={[]} />
 
-        {/* Section de Normativas mas buscadas */}
-        <div className=" text-center border-b pb-4 mb-4 mt-10">
-        <h2 className="text-xl font-bold">Normativas mas consultadas</h2>
+        {/* Normativas más consultadas */}
+        <div className="text-center border-b pb-4 mb-4 mt-10">
+          <h2 className="text-xl font-bold">Normativas más consultadas</h2>
         </div>
-        <Table normativas={normativas} />
+
+        {/* 🔄 Tabla genérica sin paginación (no pasamos totalPages) */}
+        <GenericTable
+          data={normativas}
+          columns={columnsInicio}
+          actions={actions}
+        />
 
         {loading && <Loading />}
         {error && (
           <Alert
-            title="Error al obtener las dependencias"
+            title="Error al obtener las normativas más consultadas"
             message={error?.message}
             error={!error}
           />

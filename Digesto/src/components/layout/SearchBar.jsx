@@ -54,24 +54,36 @@ function SearchBar({onSearch}) {
   }, []);
 
   return (
-    <div className="flex flex-col items-start relative">
-      <label className="input">
-        <svg
-          className="h-[1em] opacity-50"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
+    <div className="flex flex-col items-start relative z-10">
+      <label className="input flex items-center gap-2">
+        <button
+          type="button"
+          className="text-gray-500 hover:text-primary"
+          onClick={() => {
+            if (inputValue.trim() !== "") {
+              onSearch(inputValue);
+              setIsListVisible(false);
+            }
+          }}
         >
-          <g
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            strokeWidth="2.5"
-            fill="none"
-            stroke="currentColor"
+          <svg
+            className="h-[1.2em] w-[1.2em]"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
           >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </g>
-        </svg>
+            <g
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+        </button>
+
         <input
           ref={inputRef}
           type="text"
@@ -81,6 +93,7 @@ function SearchBar({onSearch}) {
           onKeyPress={handleKeyPress}
           required
           placeholder="Buscar por tags..."
+          className="flex-1"
         />
       </label>
       {inputValue && isListVisible && filteredOptions.length > 0 && (
