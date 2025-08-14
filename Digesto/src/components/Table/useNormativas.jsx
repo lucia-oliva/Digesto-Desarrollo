@@ -43,22 +43,28 @@ export const useNormativas = (type,filtros) => {
       setError(null);
       let res;
       let total;
-      if(type=== "sesiones"){
-        res = await axios.get("http://localhost:3000/api/dependencia/sesiones", {params: {page:pageToLoad, limite: 6}});
-        setNormativas(res.data.data);
-        total = res.data.totalResults || 1;
-        setTotalPages(Math.ceil(total / 6));
-        if (res?.error) {
+      if (type === "sesiones") {
+        const response = await axios.get(
+          "http://localhost:3000/api/dependencia/sesiones",
+          { params: { page: pageToLoad, limite: 6 } }
+        );
+
+        const payload = response?.data ?? {}; 
+
+        if (payload.error) {
           setNormativas([]);
-          setTotalPages(1);
-          setEmptyMessage(res.error || "No se encontraron resultados. Probá cambiar los filtros.");
+          setTotalPages(0);
+          setEmptyMessage(payload.error || "No se encontraron resultados. Probá cambiar los filtros.");
         } else {
-          setNormativas(res.data || []);
-          total = res.totalResults || 0;
-          setTotalPages(Math.ceil(total / 6));
+          const list = Array.isArray(payload.data) ? payload.data : [];
+          const total = Number(payload.totalResults) || 0;
+
+          setNormativas(list);
+          setTotalPages(Math.max(1, Math.ceil(total / 6)));
           setEmptyMessage("No se encontraron resultados. Probá cambiar los filtros.");
         }
 
+        return; 
       }else{
         res = await searchNormativas(pageToLoad, 6, type,filtros);
         console.log(res);
