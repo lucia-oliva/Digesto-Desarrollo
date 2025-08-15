@@ -17,7 +17,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className="menu  bg-primary text-base-100 justify-around p-4 w-3/4 sm:w-1/2 md:w-1/4 lg:w-52 min-h-full"
+      className="menu  bg-primary text-base-100 justify-around p-4 w-3/4 sm:w-1/2 md:w-1/4 lg:w-52 min-h-full "
       onClick={(e) => e.stopPropagation()}
       onMouseLeave={() => setOpenSection(null)}
     >
