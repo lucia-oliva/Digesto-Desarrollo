@@ -3,7 +3,15 @@ import useAxios from "axios-hooks";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emisor,numero}) {
+function Form({
+  dependencia,
+  onFormChange,
+  dependenciaMap,
+  anio,
+  documento,
+  emisor,
+  numero,
+}) {
   const navigate = useNavigate();
   const [years, setYears] = useState([]);
   const [selectedDependencia, setSelectedDependencia] = useState(dependencia);
@@ -28,40 +36,36 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
   ];
 
   const dependenciaMapInverted = {
-    "2": "Exactas",
-    "1": "Aplicadas",
-    "3": "Salud",
-    "4": "Sociales",
-    "5": "Humanas",
-    "20": "C. Superior",
-    "22": "Chepes",
-    "26": "Villa Union",
-    "25": "Chamical",
-    "24": "Aimogasta",
-    "23": "Catuna",
-    "": "Todas"
+    2: "Exactas",
+    1: "Aplicadas",
+    3: "Salud",
+    4: "Sociales",
+    5: "Humanas",
+    20: "C. Superior",
+    22: "Chepes",
+    26: "Villa Union",
+    25: "Chamical",
+    24: "Aimogasta",
+    23: "Catuna",
+    "": "Todas",
   };
 
   const [{ data: yearsData }] = useAxios(
-    "http://localhost:3000/api/normativa/yearNormativa",
+    "http://localhost:3000/api/normativa/yearNormativa"
   );
-  
+
   useEffect(() => {
     if (yearsData) {
       setYears(yearsData);
     }
   }, [yearsData]);
 
-
-
-  
-
   useEffect(() => {
     if (dependencia) {
       if (dependenciaEnum.includes(dependencia)) {
         setSelectedDependencia(dependenciaMap[dependencia]);
       } else {
-        setSelectedDependencia(""); 
+        setSelectedDependencia("");
       }
     }
   }, [dependencia]);
@@ -97,21 +101,21 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
       numero: selectedNumero,
       emisor: selectedEmisor,
       documento: selectedTipoDocumento,
-      anio: selectedAnio
+      anio: selectedAnio,
     });
   };
 
-  
-
   return (
     <div className="w-full p-6 rounded-box mb-7">
-      <h2 className="text-lg font-bold font-[Montserrat] mb-4">Busqueda Avanzada</h2>
+      <h2 className="text-lg font-bold font-[Montserrat] mb-4">
+        Busqueda Avanzada
+      </h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 items-end">
         <div className="flex flex-col">
           <label className="text-sm font-medium">Número</label>
-          <input 
-            type="text" 
-            className="input input-bordered w-full" 
+          <input
+            type="text"
+            className="input input-bordered w-full"
             placeholder="Buscar por numero"
             value={selectedNumero}
             onChange={(e) => handleInputChange(e, setSelectedNumero)}
@@ -195,7 +199,12 @@ function Form({ dependencia, onFormChange, dependenciaMap, anio, documento, emis
         </div>
 
         <div className="flex items-end">
-          <button className="btn btn-primary w-full" onClick={handleBuscarClick}>Buscar</button>
+          <button
+            className="btn btn-primary w-full"
+            onClick={handleBuscarClick}
+          >
+            Buscar
+          </button>
         </div>
       </div>
     </div>
