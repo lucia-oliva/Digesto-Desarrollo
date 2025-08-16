@@ -2,12 +2,12 @@ import consejoImg from "/src/assets/consejo.jpg";
 
 const ConsejoInicio = () => {
   return (
-    <section className="relative w-full min-h-screen overflow-hidden pt-16">
+    <section className="w-full min-h-screen overflow-hidden pt-16">
       {/* Imagen de fondo */}
       <img
         src={consejoImg}
         alt="Consejo Superior"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-auto object-cover"
       />
       {/* Capa oscura ligera para resaltar el texto */}
       <div className="absolute inset-0 bg-black/20 z-10" />

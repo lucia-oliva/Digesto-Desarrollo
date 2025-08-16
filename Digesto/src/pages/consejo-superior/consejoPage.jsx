@@ -39,7 +39,7 @@ function ConsejoPage() {
   return (
     <main id="main" className="bg-white text-primary-content min-h-screen">
       {/* NAVBAR */}
-      <header className="bg-primary shadow-sm border-gray-200">
+      <header className="bg-primary shadow-sm border-gray-200 fixed top-0 w-full z-30">
         {/* Desktop / Tablet */}
         <nav
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden border-b-1 sm:flex items-center h-16"
@@ -141,7 +141,7 @@ function ConsejoPage() {
       </header>
 
       {/* CONTENIDO */}
-      <section className="min-h-[60vh]">
+      <section className="min-h-[60vh] lg:py-16 ">
         <Outlet />
       </section>
     </main>

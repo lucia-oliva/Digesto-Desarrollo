@@ -7,7 +7,6 @@ import DocumentView from "./pages/documentView";
 import Login from "./pages/auth/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
-import RequireAuth from "./services/RouteGuard";
 import Logout from "./pages/auth/Logout";
 import EditarUsuario from "./pages/admin/editUser";
 import { VistaAdministrativa } from "./pages/admin/VistaAdministrativa";
@@ -21,7 +20,7 @@ import ConsejoReglamento from "./pages/consejo-superior/ConsejoReglamento.jsx";
 import ConsejoSesiones from "./pages/consejo-superior/ConsejoSesiones.jsx";
 import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
 import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
-import AgregarSesion from "./pages/consejo-superior/AgregarSesion.jsx"
+import AgregarSesion from "./pages/consejo-superior/AgregarSesion.jsx";
 import EditarSesion from "./pages/consejo-superior/EditarSesion.jsx";
 
 const Router = () => {
@@ -34,7 +33,7 @@ const Router = () => {
           <Route path="busqueda" element={<Prueba />} />
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
-            <Route index element={<ConsejoInicio />}/>
+            <Route index element={<ConsejoInicio />} />
             <Route path="normativas" element={<ConsejoNormativas />} />
             <Route path="sesiones" element={<ConsejoSesiones />} />
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
@@ -42,7 +41,6 @@ const Router = () => {
             <Route path="comisiones" element={<ConsejoComisiones />} />
             <Route path="addsesion" element={<AgregarSesion />} />
             <Route path="EditarSesion/:id" element={<EditarSesion />} />
-            <Route path="document/:id" element={<DocumentView />} />
           </Route>
         </Route>
 
@@ -75,9 +73,8 @@ const Router = () => {
             <Route path="EditarUsuario/:id" element={<GenericEdit />} />
             <Route path="EditarDependencia/:id" element={<GenericEdit />} />
             <Route path="EditarEmisor/:id" element={<GenericEdit />} />
-            <Route path="EditarNormativa/:id" element={ <GenericEdit /> } />
-            <Route path="EditarPalabraClave/:id" element={ <GenericEdit /> } />
-            <Route path="document/:id" element={<DocumentView />} />
+            <Route path="EditarNormativa/:id" element={<GenericEdit />} />
+            <Route path="EditarPalabraClave/:id" element={<GenericEdit />} />
           </Route>
         </Route>
       </Routes>
