@@ -104,7 +104,8 @@ router.post("/refresh-token", async (req, res) => {
       return res.status(401).json({ msg: "Usuario no encontrado" });
     }
 
-    if (user.estado != "activo") {
+    if (user.estado !== "activo") {
+      res.clearCookie("refreshToken", cookieOpts);
       return res.status(403).json({
         msg: "Usuario Inactivo contactese con la Secretaria Informatica",
       });
