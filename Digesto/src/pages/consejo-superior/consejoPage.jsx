@@ -25,7 +25,7 @@ function ConsejoPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const links = useMemo(() => {
-    if (!auth) return BASE_LINKS;
+    if (auth.user?.tipo_usuario !== "SuperAdministrador") return BASE_LINKS;
     return [...BASE_LINKS, { type: "separator" }, ...ADMIN_LINKS];
   }, [auth]);
 

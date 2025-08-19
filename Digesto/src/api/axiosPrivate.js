@@ -4,11 +4,19 @@ import {
   setAccessToken,
   clearAccessToken,
 } from "../services/authservices";
-import { setGlobalLogout } from "../context/globalLogout";
+import { getGlobalLogout } from "../context/globalLogout";
+
+const API_BASE = "http://localhost:3000/api";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
-  withCredentials: true, // importante para enviar cookie con refresh token
+  baseURL: API_BASE,
+  withCredentials: true, // se envía la cookie HttpOnly del refresh token
+});
+
+//cliente separado para refresh/logout
+export const refreshClient = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -29,6 +37,7 @@ const processQueue = (error, token = null) => {
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
+    config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -37,16 +46,15 @@ api.interceptors.request.use((config) => {
 // Esta funcion se ejecuta después de cada solicitud para
 // manejar errores de refresco de token
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    const isUnauthorized = error.response?.status === 401;
+  (res) => res,
+  async (err) => {
+    const originalRequest = err.config || {};
+    const status = err.response?.status;
     const isLoginRequest = originalRequest?.url?.includes("/auth/login");
     const hasRetried = originalRequest?._retry;
 
     // Si es un error 401 y no es una solicitud de login, intentamos refrescar
-    if (isUnauthorized && !hasRetried && !isLoginRequest) {
+    if (status === 401 && !hasRetried && !isLoginRequest) {
       originalRequest._retry = true;
 
       // Si ya estamos refrescando el token, encolamos la solicitud
@@ -54,32 +62,38 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+          if (token) {
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+          }
           return api(originalRequest);
         });
       }
 
       isRefreshing = true;
-
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/auth/refresh-token",
-          {},
-          { withCredentials: true }
-        );
+        const { data } = await refreshClient.post("/auth/refresh-token");
+        const newToken = data.accessToken;
 
-        const newAccessToken = response.data.accessToken;
-        setAccessToken(newAccessToken);
-        processQueue(null, newAccessToken);
+        setAccessToken(newToken);
+        processQueue(null, newToken);
 
         // Reintentar solicitud original con el nuevo token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // Si falla el refresh, limpiamos y forzamos logout
         processQueue(refreshError, null);
         clearAccessToken();
-        setGlobalLogout(true);
+        const logout = getGlobalLogout?.();
+        if (typeof logout === "function") {
+          try {
+            await logout(true);
+          } catch (logoutError) {
+            console.error("Error during global logout:", logoutError);
+          }
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -87,7 +101,7 @@ api.interceptors.response.use(
     }
 
     // Si no es un 401 o no califica para refresh, rechazamos normalmente
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 

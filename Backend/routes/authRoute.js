@@ -9,6 +9,16 @@ import {
 
 const router = express.Router();
 
+const isProd = process.env.NODE_ENV === "production";
+
+const cookieOpts = {
+  httpOnly: true,
+  secure: isProd ? true : false, // true en prod (HTTPS)
+  sameSite: isProd ? "none" : "strict", // none en prod para cookies cross-site
+  path: "/api/auth", // limita el scope
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+};
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -16,109 +26,129 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ error: "Faltan datos" });
   }
 
-  const user = await db.query(
-    "SELECT usuario.id, usuario.email, usuario.nombre, usuario.clave, tu.nombre AS tipo_usuario, de.nombre AS dependencia FROM usuario LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario LEFT JOIN dependencia de ON de.id = usuario.id_dependencia WHERE usuario.email = ?",
+  const rows = await db.query(
+    "SELECT usuario.id, usuario.email, usuario.nombre,usuario.estado, usuario.clave, tu.nombre AS tipo_usuario, de.nombre AS dependencia FROM usuario LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario LEFT JOIN dependencia de ON de.id = usuario.id_dependencia WHERE usuario.email = ?",
     [email]
   );
 
-  console.log(user);
-
-  console.log(user == null);
-
-  if (user == null || user.length === 0) {
+  if (rows == null || rows.length === 0) {
     return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
 
-  const { isMatch, newHash } = await verifyPassword(password, user[0].clave);
+  const user = rows[0];
+
+  console.log(user);
+
+  if (user.estado != "activo") {
+    return res.status(403).json({
+      msg: "Usuario Inactivo contactese con la Secretaria Informatica",
+    });
+  }
+
+  const { isMatch, newHash } = await verifyPassword(password, user.clave);
   if (!isMatch) {
     return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
   }
+
   if (newHash) {
     await db.query("UPDATE usuario SET clave = ? WHERE id = ?", [
       newHash,
-      user[0].id,
+      user.id,
     ]);
   }
 
-  const accessToken = generateAccessToken(user[0]);
-  const refreshToken = generateRefreshToken(user[0]);
+  // Creamos los claims del usuario para el token
+  const userClaims = {
+    id: user.id,
+    email: user.email,
+    nombre: user.nombre,
+    tipo_usuario: user.tipo_usuario,
+    dependencia: user.dependencia,
+  };
 
-  /* TODO: Crear la columna refreshToken en la tabla usuario
-  await db.query("UPDATE usuario SET refreshToken = ? WHERE id = ?", [
-    refreshToken,
-    user[0].id,
-  ]);*/
+  // Generamos los tokens de acceso y refresh
+  const accessToken = generateAccessToken({
+    id: user.id,
+    rol: user.tipo_usuario,
+  });
+  const refreshToken = generateRefreshToken({
+    id: user.id,
+    rol: user.tipo_usuario,
+  });
 
   res
-    .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
-    .json({ accessToken });
+    .cookie("refreshToken", refreshToken, cookieOpts)
+    .json({ accessToken, user: userClaims });
 });
 
 router.post("/refresh-token", async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-
-  if (!refreshToken) {
-    return res.status(403).json({ msg: "Token inválido" });
-  }
+  const token = req.cookies?.refreshToken;
+  if (!token) return res.status(401).json({ msg: "No hay refresh token" });
 
   try {
-    const payload = verifyRefreshToken(refreshToken);
+    const payload = verifyRefreshToken(token); // { sub, roles }
+    const userId = payload.sub;
 
-    if (!payload.user.id) {
-      return res.status(403).json({ msg: "Token inválido" });
-    }
-
+    // Buscar usuario en DB
     const [user] = await db.query(
-      "SELECT u.id, u.email, u.nombre, tu.permiso, tu.nombre as Rol FROM usuario u JOIN tipo_usuario tu ON u.id_tipo_usuario = tu.id WHERE u.id = ?",
-      [payload.user.id]
+      "SELECT usuario.id, usuario.email, usuario.estado , usuario.nombre, tu.nombre AS tipo_usuario, de.nombre AS dependencia " +
+        "FROM usuario " +
+        "LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario " +
+        "LEFT JOIN dependencia de ON de.id = usuario.id_dependencia " +
+        "WHERE usuario.id = ?",
+      [userId]
     );
 
-    if (!user || user.length === 0) {
+    if (!user) {
+      res.clearCookie("refreshToken", cookieOpts);
       return res.status(401).json({ msg: "Usuario no encontrado" });
     }
-    const newAccessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
 
-    /* TODO: Crear la columna refreshToken en la tabla usuario
-    await db.query("UPDATE usuario SET refreshToken = ? WHERE id = ?", [
-      newRefreshToken,
-      user[0].id,
-    ]);
-    */
+    if (user.estado != "activo") {
+      return res.status(403).json({
+        msg: "Usuario Inactivo contactese con la Secretaria Informatica",
+      });
+    }
+
+    // Construir claims
+    const userClaims = {
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      tipo_usuario: user.tipo_usuario,
+      dependencia: user.dependencia,
+    };
+
+    const newAccess = generateAccessToken({
+      id: user.id,
+      roles: [user.tipo_usuario],
+    });
+    const newRefresh = generateRefreshToken({
+      id: user.id,
+      roles: [user.tipo_usuario],
+    });
 
     res
-      .cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: true })
-      .json({ accessToken: newAccessToken });
-  } catch (error) {
-    return res.status(403);
+      .cookie("refreshToken", newRefresh, cookieOpts)
+      .json({ accessToken: newAccess, user: userClaims });
+  } catch (e) {
+    res.clearCookie("refreshToken", cookieOpts);
+    return res.status(401).json({ msg: "Refresh inválido o vencido" });
   }
 });
 
 router.post("/logout", async (req, res) => {
-  const token = req.cookies.refreshToken;
+  const isProd = process.env.NODE_ENV === "production";
 
-  if (token) {
-    try {
-      const { user } = verifyRefreshToken(token);
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: isProd ? true : false,
+    sameSite: isProd ? "none" : "strict",
+    path: "/api/auth",
+    maxAge: 0, // Elimina la cookie inmediatamente
+  });
 
-      // Simulación del update, ya que la columna no existe
-      console.log(`Simulando logout para usuario ID ${user}`);
-
-      // TODO real:
-      // await db.query("UPDATE usuario SET refreshToken = NULL WHERE id = ?", [id]);
-    } catch (error) {
-      console.error("Token inválido:", error);
-      return res.status(403).json({ error: "Token inválido" });
-    }
-  }
-
-  res
-    .clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true, // solo en producción con HTTPS
-      sameSite: "Strict",
-    })
-    .sendStatus(204);
+  return res.status(200).json({ msg: "Sesión cerrada correctamente" });
 });
 
 export default router;

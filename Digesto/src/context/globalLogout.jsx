@@ -1,8 +1,7 @@
-let globalLogout = () => {};
+let globalLogout = null;
 
-export const useGlobalLogout = () => globalLogout;
+export const getGlobalLogout = () => globalLogout;
 
-export const setGlobalLogout = (logoutFn) => {
-  globalLogout = logoutFn;
+export const setGlobalLogout = (fn) => {
+  globalLogout = fn;
 };
-

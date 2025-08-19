@@ -1,17 +1,14 @@
-const TOKEN_KEY = "accessToken";
+// Mantiene el access token solo en memoria
+let accessToken = null;
 
 export const setAccessToken = (token) => {
-  localStorage.setItem(TOKEN_KEY, token);
+  accessToken = token || null;
 };
 
-export const getAccessToken = () => {
-  return localStorage.getItem(TOKEN_KEY);
-};
+export const getAccessToken = () => accessToken;
 
 export const clearAccessToken = () => {
-  localStorage.removeItem(TOKEN_KEY);
+  accessToken = null;
 };
 
-export const isLoggedIn = () => {
-  return !!getAccessToken();
-};
+export const isLoggedIn = () => !!accessToken;
