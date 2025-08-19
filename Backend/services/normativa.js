@@ -558,6 +558,7 @@ async function searchById(id) {
 }
 
 //Busqueda avanzada de normativas
+// Busqueda avanzada de normativas (publicadas) SIN perder por tags
 async function searchNormativaByParameters(
   numero,
   dependencia,
@@ -570,38 +571,53 @@ async function searchNormativaByParameters(
 ) {
   try {
     let sql =
-      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
+      "SELECT " +
+      "  n.id, n.resumen, n.archivo, n.anio, n.titulo, n.visitas, " +
+      "  e.nombre AS emisor, n.numero, " +
+      "  DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, " +
+      "  tn.nombre AS tipo_normativa, d.nombre AS dependencia, " +
+      "  COUNT(*) OVER() as total " +
+      "FROM normativa n " +
+      "JOIN emisor e ON n.id_emisor = e.id " +
+      "JOIN dependencia d ON d.id = n.id_dependencia " +
+      "JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa " +
+      "WHERE 1 = 1 AND n.estado = 'publicado'";
+
     let params = [];
-    
+
     if (numero) {
-      sql += " AND numero = ?";
+      sql += " AND n.numero = ?";
       params.push(numero);
     }
     if (dependencia) {
-      sql += " AND id_dependencia = ?";
+      sql += " AND n.id_dependencia = ?";
       params.push(dependencia);
     }
     if (emisor) {
-      sql += " AND id_emisor = ?";
+      sql += " AND n.id_emisor = ?";
       params.push(emisor);
     }
     if (documento) {
-      sql += " AND id_tipo_normativa = ?";
+      sql += " AND n.id_tipo_normativa = ?";
       params.push(documento);
     }
-
     if (anio) {
-      sql += " AND anio = ?";
+      sql += " AND n.anio = ?";
       params.push(anio);
     }
-    console.log("tags", tags);
 
     if (tags) {
-      sql += ` AND t.nombre = (?)`;
+      sql +=
+        " AND EXISTS (" +
+        "   SELECT 1 FROM tag_normativa tn2 " +
+        "   JOIN tag t ON t.id = tn2.id_tag " +
+        "   WHERE tn2.id_normativa = n.id AND t.nombre = ?" +
+        " )";
       params.push(tags);
     }
 
-    sql += " GROUP BY n.id ";
+    // Una fila por normativa
+    sql += " GROUP BY n.id";
 
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
@@ -614,9 +630,6 @@ async function searchNormativaByParameters(
     console.log(params, sql);
 
     if (!results) {
-      console.log(
-        "No se encontró la normativa con los parámetros especificados"
-      );
       return { data: [], totalResults };
     }
     return { data: results, totalResults };
@@ -625,6 +638,7 @@ async function searchNormativaByParameters(
     throw err;
   }
 }
+
 
 
 //Busqueda avanzada de normativas eliminadas!
