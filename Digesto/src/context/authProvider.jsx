@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContext";
-import {
-  getAccessToken,
-  setAccessToken,
-  clearAccessToken,
-} from "../services/authservices";
-import { jwtDecode } from "jwt-decode";
+import { setAccessToken, clearAccessToken } from "../services/authservices";
 import { setGlobalLogout } from "./globalLogout";
-import api from "../api/axiosPrivate";
+import api, { refreshClient } from "../api/axiosPrivate";
 
 // eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
@@ -17,66 +12,59 @@ export const AuthProvider = ({ children }) => {
     sessionExpired: false,
   });
 
-  const logout = (expired = false) => {
+  const hardLogout = async (expired = false) => {
+    try {
+      await refreshClient.post("/auth/logout");
+    } catch {
+      return null;
+    }
     clearAccessToken();
     setAuth({ user: null, loading: false, sessionExpired: expired });
   };
 
+  const logout = () => {
+    hardLogout(false);
+  };
+
   const login = async (email, password) => {
-    const res = await api.post(
-      "http://localhost:3000/api/auth/login",
+    const { data } = await api.post(
+      "/auth/login",
       { email, password },
       { withCredentials: true }
     );
+    setAccessToken(data.accessToken);
+    setAuth({ user: data.user, loading: false, sessionExpired: false });
 
-    const { accessToken } = res.data;
-    setAccessToken(accessToken);
-
-    const { user } = jwtDecode(accessToken);
-    setAuth({ user, loading: false, sessionExpired: false });
-
-    return res.data; 
+    return data;
   };
 
   useEffect(() => {
-    setGlobalLogout(logout);
-
-    const initAuth = async () => {
-      let token = getAccessToken();
-      console.log("initAuth: token desde storage:", token);
-
-      if (!token) {
-        try {
-          const res = await api.post(
-            "http://localhost:3000/api/auth/refresh-token",
-            {},
-            { withCredentials: true }
-          );
-          token = res.data.accessToken;
-          setAccessToken(token);
-          console.log("initAuth: token nuevo desde refresh:", token);
-        } catch (err) {
-          console.warn("No se pudo refrescar token");
-          return logout(true);
-        }
-      }
-
-      try {
-        const { user } = jwtDecode(token);
-        console.log("initAuth: usuario decodificado:", user);
-        setAuth({ user, loading: false, sessionExpired: false });
-      } catch (err) {
-        console.error("Token inválido al decodificar");
-        logout(true);
-      }
-    };
-
-    initAuth();
+    setGlobalLogout(hardLogout);
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ auth, logout, login }}>
-      {children}
-    </AuthContext.Provider>
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await refreshClient.post("/auth/refresh-token");
+        setAccessToken(data.accessToken);
+
+        setAuth({ user: data.user, loading: false, sessionExpired: false });
+      } catch {
+        clearAccessToken();
+        setAuth({ user: null, loading: false, sessionExpired: true });
+      }
+    })();
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      auth,
+      logout,
+      login,
+      api,
+    }),
+    [auth]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

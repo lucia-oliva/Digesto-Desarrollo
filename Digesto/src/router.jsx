@@ -40,8 +40,10 @@ const Router = () => {
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
             <Route path="reglamento" element={<ConsejoReglamento />} />
             <Route path="comisiones" element={<ConsejoComisiones />} />
-            <Route path="addsesion" element={<AgregarSesion />} />
-            <Route path="EditarSesion/:id" element={<EditarSesion />} />
+            <Route element={<RouteGuard mode="consejo" />}>
+              <Route path="addsesion" element={<AgregarSesion />} />
+              <Route path="EditarSesion/:id" element={<EditarSesion />} />
+            </Route>
           </Route>
         </Route>
 

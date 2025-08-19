@@ -14,17 +14,18 @@ import contactoRoutes from "../Backend/routes/mailroute.js";
 import dashboardRoutes from "../Backend/routes/dashboardRoute.js";
 import auditoriaRoutes from "../Backend/routes/auditoriaRoute.js";
 
-
 // crear el servidor
 const app = express();
 
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:5173',  // <--- Dirección de tu frontend
-  credentials: true              // <--- Para permitir cookies como el refresh token
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // <--- Dirección de tu frontend
+    credentials: true, // <--- Para permitir cookies como el refresh token
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   const originalJson = res.json;
@@ -48,11 +49,11 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contacto", contactoRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/auditoria", auditoriaRoutes);
-app.use
+app.use;
 //endpoints del login
-app.use("/protected", (req,res) => {
+app.use("/protected", (req, res) => {
   res.send("Esta es una ruta protegida");
-})
+});
 
 app.get("/", (req, res) => {
   res.send("Bienvenido a la api de Digesto!");

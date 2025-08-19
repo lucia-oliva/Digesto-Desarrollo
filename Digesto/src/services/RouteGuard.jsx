@@ -5,6 +5,7 @@ import { useAuth } from "../context/useAuth";
 const RouteGuard = ({
   mode = "auth",
   redirectTo = "/login",
+  redirectTo2 = "/consejo-superior",
   fallbackTo = "/admin",
 }) => {
   const { auth } = useAuth();
@@ -14,7 +15,6 @@ const RouteGuard = ({
     return <div className="text-gray-600 text-center p-8">Cargando...</div>;
   }
 
-
   // Si el modo es "guest", redirigimos si el usuario está autenticado
   if (mode === "guest" && isLoggedIn) {
     return <Navigate to={fallbackTo} replace />;
@@ -22,6 +22,10 @@ const RouteGuard = ({
   // Si el modo es "auth", redirigimos si el usuario no está autenticado
   if (mode === "auth" && !isLoggedIn) {
     return <Navigate to={redirectTo} replace />;
+  }
+  // Si el modo es "consejo", redirigimos si el usuario no está autenticado
+  if (mode === "consejo" && auth?.user?.tipo_usuario !== "SuperAdministrador") {
+    return <Navigate to={redirectTo2} replace />;
   }
 
   return <Outlet />;
