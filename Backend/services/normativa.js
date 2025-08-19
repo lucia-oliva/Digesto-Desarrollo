@@ -460,33 +460,48 @@ async function create(data) {
   }
 }
 
-//Delete by id
-//TODO: Cuando se elimina hay que revisar luego si se elimina los tags relacionados a estas normativas. / O si aparece en auditoria.
-//FIXME: (En realidad no se elimina, sino que se cambia el estado a eliminado - VER ESTO).
-async function eliminar(id, userId) {
-  console.log("backend user",userId)
-  debugger
+//Eliminar por id
+async function eliminar(id, userId, motivo = null) {
+  console.log("backend user", userId);
   try {
-    await db.query("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
-    const sql = "DELETE FROM normativa WHERE id = ?";
-    const result = await db.query(sql, [id]);
-    if (result.affectedRows === 0) {
+ 
+    const rows = await db.query("SELECT estado FROM normativa WHERE id = ?", [id]);
+    if (!rows || rows.length === 0) {
       console.log(`No se encontró la normativa con el ID ${id}`);
       return { success: false, message: "Normativa no encontrada" };
     }
-      if (userId) {
-        await auditoriaService.crearRegistroAuditoria({
-          id_normativa: id,
-          id_usuario: userId,
-          tipo: "baja"
-        });
-      }
-    return { success: true, message: "Normativa eliminada correctamente" };
+
+    const estadoAnterior = rows[0].estado;
+    if (estadoAnterior === "eliminada") {
+      return { success: true, message: "La normativa ya estaba eliminada" };
+    }
+
+    
+    const sql = "UPDATE normativa SET estado = 'eliminada' WHERE id = ?";
+    const result = await db.query(sql, [id]);
+
+    if (!result || result.affectedRows === 0) {
+      return { success: false, message: "No se pudo actualizar la normativa" };
+    }
+
+  
+    if (userId) {
+      await auditoriaService.crearRegistroAuditoria({
+        id_normativa: id,
+        id_usuario: userId,
+        tipo: "baja",
+
+      });
+    }
+
+    return { success: true, message: "Normativa marcada como eliminada" };
   } catch (error) {
     console.error("Error al eliminar la normativa:", error);
     throw error;
   }
 }
+
+
 
 //ENDPOINTS ESPECIFICOS
 async function getAllYears() {
@@ -555,7 +570,7 @@ async function searchNormativaByParameters(
 ) {
   try {
     let sql =
-      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
+      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'publicado'";
     let params = [];
     
     if (numero) {
@@ -610,6 +625,85 @@ async function searchNormativaByParameters(
     throw err;
   }
 }
+
+
+//Busqueda avanzada de normativas eliminadas!
+async function searchNormativaEliminadaByParameters(
+  numero,
+  dependencia,
+  emisor,
+  documento,
+  anio,
+  limite = null,
+  offset = null,
+  tags
+) {
+  try {
+    let sql =
+      "SELECT " +
+      "  n.id, n.resumen, n.archivo, n.anio, n.titulo, n.visitas, " +
+      "  e.nombre AS emisor, n.numero, " +
+      "  DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, " +
+      "  tn.nombre AS tipo_normativa, d.nombre AS dependencia, " +
+      "  COUNT(*) OVER() AS total " +
+      "FROM normativa n " +
+      "JOIN emisor e ON n.id_emisor = e.id " +
+      "JOIN dependencia d ON d.id = n.id_dependencia " +
+      "JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa " +
+      "WHERE n.estado = 'eliminada'";
+
+    let params = [];
+
+    if (numero) {
+      sql += " AND n.numero = ?";
+      params.push(numero);
+    }
+    if (dependencia) {
+      sql += " AND n.id_dependencia = ?";
+      params.push(dependencia);
+    }
+    if (emisor) {
+      sql += " AND n.id_emisor = ?";
+      params.push(emisor);
+    }
+    if (documento) {
+      sql += " AND n.id_tipo_normativa = ?";
+      params.push(documento);
+    }
+    if (anio) {
+      sql += " AND n.anio = ?";
+      params.push(anio);
+    }
+    if (tags) {
+      sql +=
+        " AND EXISTS (" +
+        "   SELECT 1 FROM tag_normativa tn2 " +
+        "   JOIN tag t ON t.id = tn2.id_tag " +
+        "   WHERE tn2.id_normativa = n.id AND t.nombre = ?" +
+        " )";
+      params.push(tags);
+    }
+    sql += " GROUP BY n.id";
+
+    if (limite !== null && offset !== null) {
+      sql += " LIMIT ? OFFSET ?";
+      params.push(Number(limite) || 10, Number(offset) || 0);
+    }
+
+    const results = await db.query(sql, params);
+    const totalResults = results?.length > 0 ? results[0].total : 0;
+
+    if (!results) {
+      return { results, totalResults };
+    }
+    return { data: results, totalResults };
+  } catch (err) {
+    console.error("Error al buscar normativa eliminada por parámetros: ", err);
+    throw err;
+  }
+}
+
+
 
 //Buscador mediante Tags...
 async function searchNormativasByTags(dependencia, tags) {
@@ -877,5 +971,5 @@ export default {
   updateModificacion,
   registrarModificacion,
   editNormativaModificada,
-  eliminarRelacionesDeNormativa,getNormativaCompletaById
+  eliminarRelacionesDeNormativa,getNormativaCompletaById, searchNormativaEliminadaByParameters
 };

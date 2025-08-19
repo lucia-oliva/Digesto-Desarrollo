@@ -8,11 +8,12 @@ const LOGO_UNLAR = "/src/assets/UnlarLogo.png";
 
 const BASE_LINKS = [
   { to: "/consejo-superior", label: "Inicio", end: true },
-  { to: "/consejo-superior/normativas", label: "Normativas" },
-  { to: "/consejo-superior/sesiones", label: "Sesiones" },
   { to: "/consejo-superior/integrantes", label: "Integrantes" },
-  { to: "/consejo-superior/reglamento", label: "Reglamento" },
   { to: "/consejo-superior/comisiones", label: "Comisiones" },
+  { to: "/consejo-superior/reglamento", label: "Reglamento" },
+  { to: "/consejo-superior/normativas", label: "Normativas" }, 
+  { to: "/consejo-superior/sesiones", label: "Sesiones" },
+   
 ];
 
 const ADMIN_LINKS = [

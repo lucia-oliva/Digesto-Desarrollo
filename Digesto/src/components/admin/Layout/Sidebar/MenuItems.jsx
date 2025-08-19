@@ -21,7 +21,7 @@ export const menuItems = [
       { name: "Listado", path: "./ListadoNormativa" },
       {
         name: "Normativas Eliminadas",
-        path: "./ListadoNormativa?filter=deleted",
+        path: "./ListadoNormativaEliminadas",
       },
       {
         name: "Normativas Despublicadas",

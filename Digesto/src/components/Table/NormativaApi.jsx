@@ -18,6 +18,23 @@ export const searchNormativas = async (page, limit, type, filtros={}) => {
   }
 };
 
+export const searchNormativasEliminadas = async (page, limit, type, filtros={}) =>{
+  console.log("tipo:", type, "filtros:", filtros);
+  try{
+    const response = await axios.post(
+      `http://localhost:3000/api/normativa/searchEliminadas?page=${page}&limite=${limit}`,
+      filtros,
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+    return response.data;
+  }catch(error){
+    console.error("Error al buscar normativas eliminadas", error);
+    throw error;
+  }
+}
+
 
 export const deleteApi = async (id,type,userId) => {
   try {
@@ -59,3 +76,10 @@ export const editApi = async (dataToEdit, type, userId) => {
   }
 };
 
+export const restoreApi = async(id, userId) => {
+  //funcionar para restaurar.
+}
+
+export const hardDelete = async (id, userId) => {
+  //funcionar para eliminar definivamente. 
+}

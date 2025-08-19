@@ -29,6 +29,9 @@ export const adminConfig = {
   ListadoAuditoria: {
     tipo: "auditoria",
     columns: auditoriaColums ,
-  }
-  
+  },
+  ListadoNormativaEliminadas: {
+    tipo: "normativasEliminadas",
+    columns: normativaColumns,
+  },
 };

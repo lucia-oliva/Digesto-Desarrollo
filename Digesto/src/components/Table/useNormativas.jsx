@@ -2,7 +2,7 @@
 
 //algo se buggeo aca, revisar commit anterior
 import { useEffect, useState , useRef } from "react";
-import { searchNormativas, deleteApi, editApi} from "./NormativaApi";
+import { searchNormativas, deleteApi,  searchNormativasEliminadas} from "./NormativaApi";
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
 
@@ -65,6 +65,13 @@ export const useNormativas = (type,filtros) => {
         }
 
         return; 
+      }else if(type === "normativasEliminadas"){
+        res = await searchNormativasEliminadas(pageToLoad, 6, type,filtros);
+        console.log(res);
+        setNormativas(res.data || []);
+        total = res.totalResults || 1;
+        setTotalPages(Math.ceil(total/6));
+
       }else{
         res = await searchNormativas(pageToLoad, 6, type,filtros);
         console.log(res);
@@ -125,6 +132,7 @@ export const useNormativas = (type,filtros) => {
   const reload = () => {
     loadNormativas(page);
   };
+
 
   return {
     normativas,

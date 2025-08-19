@@ -34,6 +34,7 @@ const Router = () => {
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
             <Route index element={<ConsejoInicio />} />
+            <Route path="document/:id" element={<DocumentView />} />
             <Route path="normativas" element={<ConsejoNormativas />} />
             <Route path="sesiones" element={<ConsejoSesiones />} />
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
@@ -54,6 +55,8 @@ const Router = () => {
             <Route path="logout" element={<Logout />} />
             <Route path="usuario" element={<EditarUsuario />} />
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
+            <Route path="ListadoNormativaEliminadas" element={<VistaAdministrativa />} />
+             <Route path="ListadoNormativaDespublicadas" element={<VistaAdministrativa />} />
             <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
             <Route path="ListadoAuditoria" element={<VistaAdministrativa />} />
             <Route

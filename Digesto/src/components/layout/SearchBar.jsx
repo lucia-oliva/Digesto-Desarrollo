@@ -93,7 +93,7 @@ function SearchBar({onSearch}) {
           onKeyPress={handleKeyPress}
           required
           placeholder="Buscar por tags..."
-          className="flex-1"
+          className="flex-1 text-black"
         />
       </label>
       {inputValue && isListVisible && filteredOptions.length > 0 && (
