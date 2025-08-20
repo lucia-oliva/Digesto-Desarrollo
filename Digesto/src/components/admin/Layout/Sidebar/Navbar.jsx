@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router";
 import { FaUserCircle } from "react-icons/fa";
-import {routeTitles} from "./routeTitles";
+import { routeTitles } from "./routeTitles";
 
 export default function Navbar() {
   const location = useLocation();
@@ -9,7 +9,7 @@ export default function Navbar() {
   return (
     <div className="navbar bg-base-100 shadow-md px-4">
       {/* Título del sistema */}
-      <div className="flex-1">
+      <div className="flex-1 not-lg:pl-14">
         <h1 className="text-lg font-semibold text-primary">{pageTitle}</h1>{" "}
       </div>
 
