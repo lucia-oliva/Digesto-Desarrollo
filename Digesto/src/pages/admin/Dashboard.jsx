@@ -45,7 +45,7 @@ function Dashboard() {
   const stats = [
     {
       title: "Normativas",
-      description: "Gestioná, creá o editá las normativas vigentes.",
+      description: "Gestion, creácion o edicion de las normativas vigentes.",
       value: totales.normativas,
       iconFront: <FaFileLines className="text-6xl" />,
       iconBg: <FaFileLines className="mb-3"/>,
@@ -57,7 +57,7 @@ function Dashboard() {
     },
     {
       title: "Usuarios",
-      description: "Administrá cuentas, roles y permisos del sistema.",
+      description: "Cuentas, roles y permisos del sistema.",
       value: totales.usuarios,
       iconFront: <FaUserGroup className="text-6xl" />,
       iconBg: <FaUserGroup />,
@@ -69,7 +69,7 @@ function Dashboard() {
     },
     {
       title: "Dependencias",
-      description: "Organizá las áreas y estructuras administrativas.",
+      description: "Areas y estructuras administrativas.",
       value: totales.dependencias,
       iconFront:<FaBuilding className="text-6xl" />,
       iconBg: <FaBuilding className="mb-2"/>,
@@ -81,7 +81,7 @@ function Dashboard() {
     },
     {
       title: "Palabras Clave",
-      description: "Mantené actualizadas las etiquetas del sistema.",
+      description: "Etiquetas del sistema.",
       value: totales.palabras_clave,
       iconFront: <FaTags className="text-6xl" />, 
       iconBg: <FaTags className="mb-2"/>,
@@ -93,7 +93,7 @@ function Dashboard() {
     },
     {
       title: "Emisores",
-      description: "Definí y controlá quién emite cada normativa.",
+      description: "Organismos y autoridades emisoras de normativas.",
       value: totales.emisores,
       iconFront: <FaUser className="text-6xl" />,
       iconBg: <FaUser className="mb-2"/>,
@@ -111,8 +111,7 @@ function Dashboard() {
         <div className="mb-6 md:mb-0 md:mr-6 max-w-xl">
           <h1 className="text-2xl font-bold mb-2">Hola, {user.nombre} 👋</h1>
           <p className="text-gray-600 text-sm mb-2">
-            Bienvenido al panel de administración del sistema Digesto. Desde aquí podés
-            gestionar normativas, usuarios y otras entidades clave.
+            Bienvenido al panel de administración del sistema Digesto. Desde aquí podés acceder y trabajar con las secciones que tenés habilitadas.
           </p>
           <p className="text-gray-500 text-sm">
             Utilizá los accesos directos a continuación para navegar por las secciones disponibles.
