@@ -58,56 +58,61 @@ function EditarSesion() {
 
   return (
     <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 border">
-        <h1 className="text-xl font-semibold mb-4">Editar Sesión</h1>
+     <div
+        className="max-w-2xl mx-auto bg-white rounded-xl p-6 border"
+        style={{
+          boxShadow: "4px 4px 19px 5px rgba(0,0,0,0.1), 0px 10px 15px -3px rgba(0,0,0,0.1)"
+        }}
+      >
+        <h1 className="text-xl text-black font-semibold mb-4">Editar Sesión</h1>
 
         {error && <div className="text-red-600 mb-2">{error}</div>}
 
         {sesion ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block">Nombre de la sesión</label>
+              <label className="block text-black">Nombre de la sesión</label>
               <input
                 type="text"
                 value={sesion.nombre_orden}
                 disabled
-                className="w-full input input-bordered"
+                className="w-full input input-bordered text-black"
               />
             </div>
 
             <div>
-              <label className="block">Fecha</label>
+              <label className="block  text-black">Fecha</label>
               <input
                 type="date"
                 value={sesion.fecha_sesion}
                 disabled
-                className="w-full input input-bordered"
+                className="w-full input input-bordered text-black"
               />
             </div>
 
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-800">
                 PDF actual (orden): {sesion.orden_url}
               </p>
             </div>
 
             <div>
-              <label className="block">Nombre del acta</label>
+              <label className="block  text-black">Nombre del acta</label>
               <input
                 type="text"
                 value={nombreActa}
                 onChange={(e) => setNombreActa(e.target.value)}
-                className="w-full input input-bordered"
+                className="w-full input input-bordered  text-black"
               />
             </div>
 
             <div>
-              <label className="block">Archivo PDF del acta</label>
+              <label className="block text-black">Archivo PDF del acta</label>
               <input
                 type="file"
                 accept="application/pdf"
                 onChange={(e) => setArchivoActa(e.target.files?.[0] || null)}
-                className="file-input file-input-bordered file-input-primary w-full"
+                className="file-input file-input-bordered file-input-primary w-full "
               />
             </div>
 

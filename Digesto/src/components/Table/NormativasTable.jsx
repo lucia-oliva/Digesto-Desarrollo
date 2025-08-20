@@ -84,6 +84,14 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
               { label: "Eliminar", type: "error", onClick: onDelete }
             );
           }
+          if (auth.user?.tipo_usuario === "SuperAdministrador") {
+            base.push({
+              label: "Editar Sesión",
+              onClick: (item) => navigate(`/consejo-superior/EditarSesion/${item.id_sesion}`),
+              type: "success",
+              className: "btn btn-info",
+            });
+          }
           return base;
         })()
       : effectiveModo === "ver"

@@ -7,7 +7,13 @@ function ConsejoReglamento() {
             <h1 className="text-2xl font-bold text-center mb-6 text-black">Reglamento</h1>
 
             {/* Visor del PDF */}
-            <div className="w-full h-[600px] border rounded-lg overflow-hidden shadow-md">
+            <div
+            className="w-full h-[600px] border rounded-lg overflow-hidden"
+            style={{
+                boxShadow: "4px 4px 19px 5px rgba(0,0,0,0.1), 0px 10px 15px -3px rgba(0,0,0,0.1)"
+            }}
+            >
+
                 <iframe
                     src={pdfUrl}
                     title="Reglamento PDF"

@@ -359,10 +359,13 @@ function ConsejoIntegrantes() {
   };
 
   return (
-    <div
-  className={
-    `max-w-6xl mx-auto mt-4 md:mb-4 bg-white shadow md:rounded-lg overflow-hidden `
-  }>
+   <div
+      className="max-w-6xl mx-auto mt-4 md:mb-4 bg-white md:rounded-lg overflow-hidden"
+      style={{
+        boxShadow: "4px 4px 19px 5px rgba(0,0,0,0.1), 0px 10px 15px -3px rgba(0,0,0,0.1)",
+      }}
+    >
+
       {/* Layout */}
       <div className="flex flex-col md:flex-row">
         {/* Sidebar (siempre visible) */}
