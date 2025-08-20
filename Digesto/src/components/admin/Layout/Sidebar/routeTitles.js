@@ -16,4 +16,6 @@
     "/admin/NuevaPalabraClave": "Nueva Palabra Clave",
     "/admin/ListadoPalabrasClave": "Palabras Clave",
     "/admin/perfil": "Perfil de Usuario",
+    "/admin/ListadoNormativaEliminadas": "Normativas Eliminadas",
+    "/admin/ListadoNormativaDespublicadas": "Normativas Despublicadas",
   }; 
