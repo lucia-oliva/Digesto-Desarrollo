@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
 import { useAuth } from "../../context/useAuth"; 
+import { restoreApi } from "./NormativaApi";
 
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     onPageChange,
     reload,
     onEdit,
-    onDelete, // en "normativasEliminadas" lo usamos como Eliminar definitivo
+    onDelete, 
   } = useNormativas(tipo, filtros);
 
   useEffect(() => {
@@ -46,30 +47,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isAdmin = isAdminRoute || modo === "admin";
 
-  // Handler local para RESTAURAR en la vista de eliminadas
-  const onRestaurar = async (item) => {
-    if (!window.confirm("¿Restaurar la normativa? Volverá a 'despublicada'.")) return;
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/normativasEliminadas/restaurar/${item.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user?.id ?? "", // tu backend ya lo usa en headers
-          },
-        }
-      );
-      const data = await res.json();
-      if (!res.ok || (!data.ok && !data.success)) {
-        throw new Error(data?.message || "No se pudo restaurar");
-      }
-      reload();
-    } catch (e) {
-      console.error(e);
-      alert("Error al restaurar la normativa");
-    }
-  };
+  
 
   const actions =
     type === "ListadoAuditoria"
@@ -133,15 +111,28 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
                 className: "btn-outline btn-primary",
               });
             }
-
-            // 👇 Acciones especiales para la vista de ELIMINADAS
+            // Acciones normativas eliminadas
             if (tipo === "normativasEliminadas") {
-              base.push(
-                { label: "Restaurar", onClick: onRestaurar, type: "secondary" },
-                { label: "Eliminar definitivo", onClick: onDelete, type: "error" } // onDelete llama a /api/normativasEliminadas/eliminar/:id
+              base.push({
+                  label: "Restaurar",
+                  onClick: async (item) => {
+                    if (!window.confirm("¿Restaurar la normativa? Volverá a normativas despublicadas.")) return;
+                    try {
+                      const data = await restoreApi(item.id, user?.id);
+                      if (!data.ok && !data.success) {
+                        throw new Error(data?.message || "No se pudo restaurar");
+                      }
+                      reload();
+                    } catch (e) {
+                      console.error(e);
+                      alert("Error al restaurar la normativa");
+                    }
+                  },
+                  type: "secondary",
+                }  
               );
             } else {
-              // Acciones por defecto (no eliminadas)
+              // Acciones por defecto
               base.push(
                 { label: "Editar", onClick: onEdit, type: "secondary" },
                 { label: "Eliminar", onClick: onDelete, type: "error" }

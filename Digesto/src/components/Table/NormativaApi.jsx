@@ -76,10 +76,22 @@ export const editApi = async (dataToEdit, type, userId) => {
   }
 };
 
-export const restoreApi = async(id, userId) => {
-  //funcionar para restaurar.
-}
+export const restoreApi = async (id, userId) => {
+  try {
+    const response = await axios.post(
+      `http://localhost:3000/api/normativa/restaurar/${id}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error al restaurar normativa:", error);
+    throw error;
+  }
+};
 
-export const hardDelete = async (id, userId) => {
-  //funcionar para eliminar definivamente. 
-}

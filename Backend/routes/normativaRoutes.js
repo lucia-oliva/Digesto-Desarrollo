@@ -412,5 +412,30 @@ router.put("/edit", async (req, res) => {
   }
 });
 
+// routes/normativas.js
+router.post("/restaurar/:id", async (req, res) => {
+  const { id } = req.params;
+  const userId = req.header("x-user-id") || req.body.userId || null;
+
+  try {
+    const result = await normativaDB.restaurar(id, userId);
+
+    if (!result.success) {
+      const code =
+        result.message?.includes("no encontrada") ? 404 :
+        result.message?.includes("Solo se pueden restaurar") ? 400 :
+        400;
+      return res.status(code).json({ ok: false, message: result.message });
+    }
+
+    return res.status(200).json({ ok: true, ...result });
+  } catch (err) {
+    console.error("RESTORE ERROR:", err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Error interno al restaurar" });
+  }
+});
+
 
 export default router;

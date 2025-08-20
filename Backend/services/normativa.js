@@ -966,6 +966,50 @@ async function searchNormativaEliminadas(
   }
 }
 
+// Restaurar normativa eliminada 
+async function restaurar(id, userId) {
+  try {
+    const rows = await db.query(
+      "SELECT estado FROM normativa WHERE id = ?",
+      [id]
+    );
+    if (!rows || rows.length === 0) {
+      return { success: false, message: "Normativa no encontrada" };
+    }
+
+    const estadoAnterior = rows[0].estado;
+    if (estadoAnterior !== "eliminada") {
+      return {
+        success: false,
+        message: "Solo se pueden restaurar normativas eliminadas",
+      };
+    }
+
+    const result = await db.query(
+      "UPDATE normativa SET estado = 'despublicada' WHERE id = ?",
+      [id]
+    );
+
+    if (!result || result.affectedRows === 0) {
+      return { success: false, message: "No se pudo restaurar la normativa" };
+    }
+
+    if (userId) {
+      await auditoriaService.crearRegistroAuditoria({
+        id_normativa: id,
+        id_usuario: userId,
+        tipo: "restauracion",
+      });
+    }
+
+    return { success: true, message: "Normativa restaurada a 'despublicada'" };
+  } catch (error) {
+    console.error("Error al restaurar la normativa:", error);
+    throw error;
+  }
+}
+
+
 export default {
   getAllYears,
   searchByNumber,
@@ -985,5 +1029,6 @@ export default {
   updateModificacion,
   registrarModificacion,
   editNormativaModificada,
-  eliminarRelacionesDeNormativa,getNormativaCompletaById, searchNormativaEliminadaByParameters
+  eliminarRelacionesDeNormativa,getNormativaCompletaById, searchNormativaEliminadaByParameters,
+  restaurar
 };
