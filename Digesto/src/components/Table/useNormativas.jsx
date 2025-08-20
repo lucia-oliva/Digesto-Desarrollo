@@ -2,7 +2,7 @@
 
 //algo se buggeo aca, revisar commit anterior
 import { useEffect, useState , useRef } from "react";
-import { searchNormativas, deleteApi,  searchNormativasEliminadas} from "./NormativaApi";
+import { searchNormativas, deleteApi,  searchNormativasEliminadas, searchNormativasDespublicadas} from "./NormativaApi";
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
 
@@ -72,6 +72,12 @@ export const useNormativas = (type,filtros) => {
         total = res.totalResults || 1;
         setTotalPages(Math.ceil(total/6));
 
+      }else if(type === "normativaDespublicadas"){
+        res = await searchNormativasDespublicadas(pageToLoad, 6, type,filtros);
+        console.log(res);
+        setNormativas(res.data || []);
+        total = res.totalResults || 1;
+        setTotalPages(Math.ceil(total/6));
       }else{
         res = await searchNormativas(pageToLoad, 6, type,filtros);
         console.log(res);

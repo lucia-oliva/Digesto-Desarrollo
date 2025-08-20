@@ -824,9 +824,9 @@ async function updateNormativa(id, dataToSend) {
   }
 }
 
+
 //Traer normativas despublicadas
-
-async function searchNormativaDespublicadas(
+async function searchNormativaDespublicadasByParameters(
   numero,
   dependencia,
   emisor,
@@ -838,39 +838,54 @@ async function searchNormativaDespublicadas(
 ) {
   try {
     let sql =
-      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'despublicado'";
-    let params = [];
+      "SELECT " +
+      "  n.id, n.resumen, n.archivo, n.anio, n.titulo, n.visitas, " +
+      "  e.nombre AS emisor, n.numero, " +
+      "  DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, " +
+      "  tn.nombre AS tipo_normativa, d.nombre AS dependencia, " +
+      "  COUNT(*) OVER() AS total " +
+      "FROM normativa n " +
+      "JOIN emisor e ON n.id_emisor = e.id " +
+      "JOIN dependencia d ON d.id = n.id_dependencia " +
+      "JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa " +
+      "WHERE n.estado = 'despublicado'";
+
+    const params = [];
 
     if (numero) {
-      sql += " AND numero = ?";
+      sql += " AND n.numero = ?";
       params.push(numero);
     }
     if (dependencia) {
-      sql += " AND id_dependencia = ?";
+      sql += " AND n.id_dependencia = ?";
       params.push(dependencia);
     }
     if (emisor) {
-      sql += " AND id_emisor = ?";
+      sql += " AND n.id_emisor = ?";
       params.push(emisor);
     }
     if (documento) {
-      sql += " AND id_tipo_normativa = ?";
+      sql += " AND n.id_tipo_normativa = ?";
       params.push(documento);
     }
-
     if (anio) {
-      sql += " AND anio = ?";
+      sql += " AND n.anio = ?";
       params.push(anio);
     }
 
-    console.log("tags", tags);
-
+    // 👇 Filtrado por tag SIN joinear en el FROM
     if (tags) {
-      sql += ` AND t.nombre = (?)`;
+      sql +=
+        " AND EXISTS (" +
+        "   SELECT 1 FROM tag_normativa tn2 " +
+        "   JOIN tag t ON t.id = tn2.id_tag " +
+        "   WHERE tn2.id_normativa = n.id AND t.nombre = ?" +
+        " )";
       params.push(tags);
     }
 
-    sql += " GROUP BY n.id ";
+    // Una fila por normativa
+    sql += " GROUP BY n.id";
 
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
@@ -880,88 +895,12 @@ async function searchNormativaDespublicadas(
     const results = await db.query(sql, params);
     const totalResults = results?.length > 0 ? results[0].total : 0;
 
-    console.log(params, sql);
-
     if (!results) {
-      console.log(
-        "No se encontró la normativa con los parámetros especificados"
-      );
       return { data: [], totalResults };
     }
     return { data: results, totalResults };
   } catch (err) {
-    console.error("Error al buscar normativa por parámetros: ", err);
-    throw err;
-  }
-}
-
-//Traer normativas eliminadas
-
-async function searchNormativaEliminadas(
-  numero,
-  dependencia,
-  emisor,
-  documento,
-  anio,
-  limite = null,
-  offset = null,
-  tags
-) {
-  try {
-    let sql =
-      "SELECT t.nombre,n.id, n.resumen, n.archivo, n.anio, n.archivo ,n.titulo, n.visitas, e.nombre AS emisor, n.numero, DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha, tn.nombre AS tipo_normativa,  d.nombre AS dependencia, COUNT(*) OVER() as total FROM normativa n JOIN emisor e ON n.id_emisor = e.id JOIN dependencia d ON d.id = n.id_dependencia JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa INNER JOIN tag_normativa tn2 ON n.id = tn2.id_normativa INNER JOIN tag t ON tn2.id_tag = t.id WHERE 1 = 1 AND n.estado = 'eliminada'";
-    let params = [];
-
-    if (numero) {
-      sql += " AND numero = ?";
-      params.push(numero);
-    }
-    if (dependencia) {
-      sql += " AND id_dependencia = ?";
-      params.push(dependencia);
-    }
-    if (emisor) {
-      sql += " AND id_emisor = ?";
-      params.push(emisor);
-    }
-    if (documento) {
-      sql += " AND id_tipo_normativa = ?";
-      params.push(documento);
-    }
-
-    if (anio) {
-      sql += " AND anio = ?";
-      params.push(anio);
-    }
-
-    console.log("tags", tags);
-
-    if (tags) {
-      sql += ` AND t.nombre = (?)`;
-      params.push(tags);
-    }
-
-    sql += " GROUP BY n.id ";
-
-    if (limite !== null && offset !== null) {
-      sql += " LIMIT ? OFFSET ?";
-      params.push(Number(limite) || 10, Number(offset) || 0);
-    }
-
-    const results = await db.query(sql, params);
-    const totalResults = results?.length > 0 ? results[0].total : 0;
-
-    console.log(params, sql);
-
-    if (!results) {
-      console.log(
-        "No se encontró la normativa con los parámetros especificados"
-      );
-      return { data: [], totalResults };
-    }
-    return { data: results, totalResults };
-  } catch (err) {
-    console.error("Error al buscar normativa por parámetros: ", err);
+    console.error("Error al buscar normativa despublicada por parámetros: ", err);
     throw err;
   }
 }
@@ -986,7 +925,7 @@ async function restaurar(id, userId) {
     }
 
     const result = await db.query(
-      "UPDATE normativa SET estado = 'despublicada' WHERE id = ?",
+      "UPDATE normativa SET estado = 'despublicado' WHERE id = ?",
       [id]
     );
 
@@ -1009,6 +948,51 @@ async function restaurar(id, userId) {
   }
 }
 
+// Publicar nuevamente una normativa 
+async function publicar(id, userId) {
+  try {
+    const rows = await db.query(
+      "SELECT estado FROM normativa WHERE id = ?",
+      [id]
+    );
+    if (!rows || rows.length === 0) {
+      return { success: false, message: "Normativa no encontrada" };
+    }
+
+    const estadoAnterior = rows[0].estado;
+    if (estadoAnterior !== "despublicado") {
+      return {
+        success: false,
+        message: "Solo se pueden publicar normativas despublicadas",
+      };
+    }
+
+    const result = await db.query(
+      "UPDATE normativa SET estado = 'publicado' WHERE id = ?",
+      [id]
+    );
+
+    if (!result || result.affectedRows === 0) {
+      return { success: false, message: "No se pudo publicar la normativa" };
+    }
+
+    // Auditoría
+    if (userId) {
+      await auditoriaService.crearRegistroAuditoria({
+        id_normativa: id,
+        id_usuario: userId,
+        tipo: "re-publicacion"  
+      });
+    }
+
+    return { success: true, message: "Normativa publicada correctamente" };
+  } catch (error) {
+    console.error("Error al publicar la normativa:", error);
+    throw error;
+  }
+}
+
+
 
 export default {
   getAllYears,
@@ -1023,12 +1007,11 @@ export default {
   updateNormativa,
   create,
   edit,
-  searchNormativaDespublicadas,
+  searchNormativaDespublicadasByParameters,
   deleteModificacion,
-  searchNormativaEliminadas,
   updateModificacion,
   registrarModificacion,
   editNormativaModificada,
   eliminarRelacionesDeNormativa,getNormativaCompletaById, searchNormativaEliminadaByParameters,
-  restaurar
+  restaurar, publicar
 };

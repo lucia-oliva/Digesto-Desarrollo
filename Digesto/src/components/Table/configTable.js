@@ -34,4 +34,8 @@ export const adminConfig = {
     tipo: "normativasEliminadas",
     columns: normativaColumns,
   },
+  ListadoNormativaDespublicadas: {
+    tipo: "normativaDespublicadas",
+    columns: normativaColumns,
+  },
 };

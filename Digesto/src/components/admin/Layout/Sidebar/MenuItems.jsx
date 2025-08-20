@@ -25,7 +25,7 @@ export const menuItems = [
       },
       {
         name: "Normativas Despublicadas",
-        path: "./ListadoNormativa?filter=unpublish",
+        path: "./ListadoNormativaDespublicadas",
       },
     ],
     roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],

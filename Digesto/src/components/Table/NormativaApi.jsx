@@ -35,6 +35,25 @@ export const searchNormativasEliminadas = async (page, limit, type, filtros={}) 
   }
 }
 
+export const searchNormativasDespublicadas = async (page, limit, type, filtros={}) =>{
+  console.log("tipo:", type, "filtros:", filtros);
+  try{
+    const response = await axios.post(
+      `http://localhost:3000/api/normativa/searchDespublicadas?page=${page}&limite=${limit}`,
+      filtros,
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+    return response.data;
+  }catch(error){
+    console.error("Error al buscar normativas despublicadas", error);
+    throw error;
+  }
+}
+
+
+
 
 export const deleteApi = async (id,type,userId) => {
   try {
@@ -95,3 +114,22 @@ export const restoreApi = async (id, userId) => {
   }
 };
 
+
+export const publicarApi = async (id, userId) => {
+  try{
+      const response = await axios.post(
+         `http://localhost:3000/api/normativa/publicar/${id}`,
+          {},
+          {
+            headers: {
+              "Content-Type" : "application/json",
+              "x-user-id": userId,
+            },
+          }
+        );
+        return response.data;
+  }catch(error){
+    console.error("Error al restaurar normativa:", error);
+    throw error;
+  }
+}

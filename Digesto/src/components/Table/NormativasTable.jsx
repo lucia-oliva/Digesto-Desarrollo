@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
 import { useAuth } from "../../context/useAuth"; 
-import { restoreApi } from "./NormativaApi";
+import { restoreApi, publicarApi } from "./NormativaApi";
 
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const navigate = useNavigate();
@@ -131,7 +131,27 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
                   type: "secondary",
                 }  
               );
-            } else {
+            }else if(tipo === "normativaDespublicadas")
+              {
+                 base.push({
+                  label: "Publicar",
+                  onClick: async (item) => {
+                    if (!window.confirm("¿Publicar la normativa? Volverá a normativas publicadas.")) return;
+                    try {
+                      const data = await publicarApi(item.id, user?.id);
+                      if (!data.ok && !data.success) {
+                        throw new Error(data?.message || "No se pudo publicar");
+                      }
+                      reload();
+                    } catch (e) {
+                      console.error(e);
+                      alert("Error al re-publicar la normativa");
+                    }
+                  },
+                  type: "secondary",
+                }  
+              ); 
+              }else {
               // Acciones por defecto
               base.push(
                 { label: "Editar", onClick: onEdit, type: "secondary" },

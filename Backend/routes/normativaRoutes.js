@@ -179,7 +179,7 @@ router.post("/searchEliminadas", async (req, res) => {
 });
 
 
-//Buscar normativas despublicadas 
+//Buscar normativas despublicadas
 router.post("/searchDespublicadas", async (req, res) => {
   let { numero, emisor, documento, anio, tags } = req.body;
   let { dependencia } = req.query;
@@ -195,50 +195,7 @@ router.post("/searchDespublicadas", async (req, res) => {
     const offset = (page - 1) * limite;
     //Get the total count of results
     const { data, totalResults } =
-      await normativaDB.searchNormativaDespublicadas(
-        numero,
-        dependencia,
-        emisor,
-        documento,
-        anio,
-        limite,
-        offset,
-        tags
-      );
-
-    if (!data || data.length === 0) {
-      return res
-        .status(404)
-        .json({
-          error: "No se encontró la normativa que coincida con su búsqueda",
-        });
-    }
-
-    res.status(200).json({ data, totalResults });
-  } catch (err) {
-    console.log("Error al buscar la normativa", err);
-    res.status(500).json({ error: "Error al buscar la normativa" });
-  }
-});
-
-
-//Buscar normativas eliminadas 
-router.post("/searchEliminadas", async (req, res) => {
-  let { numero, emisor, documento, anio, tags } = req.body;
-  let { dependencia } = req.query;
-  console.log("parametros:", numero,emisor,documento,anio,tags,dependencia);
-  if (!dependencia) {
-    dependencia = req.body.dependencia;
-  }
-  let { page , limite } = req.query;
-  page = parseInt(page, 10) || 1;
-  limite = parseInt(limite, 10) || 10;
-  try {
-    // Si hay otros parámetros, filtrar por ellos
-    const offset = (page - 1) * limite;
-    //Get the total count of results
-    const { data, totalResults } =
-      await normativaDB.searchNormativaEliminadas(
+      await normativaDB.searchNormativaDespublicadasByParameters(
         numero,
         dependencia,
         emisor,
@@ -296,6 +253,33 @@ router.get("/search/tag", async (req, res) => {
     res.status(500).json({ error: "Error al realizar la busqueda" });
   }
 });
+
+// routes/normativas.js
+router.post("/publicar/:id", async (req, res) => {
+  const { id } = req.params;
+  const userId = req.header("x-user-id") || req.body.userId || null;
+
+  try {
+    const result = await normativaDB.publicar(id, userId);
+
+    if (!result.success) {
+      const code =
+        result.message?.includes("no encontrada") ? 404 :
+        result.message?.includes("Solo se pueden publicar") ? 400 :
+        400;
+      return res.status(code).json({ ok: false, message: result.message });
+    }
+
+    return res.status(200).json({ ok: true, ...result });
+  } catch (err) {
+    console.error("PUBLICAR ERROR:", err);
+    return res
+      .status(500)
+      .json({ ok: false, message: "Error interno al publicar normativa" });
+  }
+});
+
+
 
 //Filtrar años de las normativas
 
