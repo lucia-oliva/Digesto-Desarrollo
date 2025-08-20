@@ -5,9 +5,21 @@ import auditoriaService from "./auditoria.js";
 //BASIC CRUD
 
 //para la funcion de editar
+// Pequeño normalizador de resultados:
+// - Si viene [rows, fields] => devuelve rows
+// - Si viene rows directo    => devuelve rows
+function rowsOnly(result) {
+  if (Array.isArray(result)) {
+    // mysql2/promise: [rows, fields]
+    return Array.isArray(result[0]) || result[0]?.length !== undefined ? result[0] : result;
+  }
+  // Algunos wrappers devuelven { rows: [...] }
+  if (result && typeof result === "object" && Array.isArray(result.rows)) return result.rows;
+  return result; // último recurso
+}
+
 async function getNormativaCompletaById(id) {
   try {
-   
     const normativaSql = `
       SELECT n.id, n.numero, n.anio, n.titulo, n.resumen, n.archivo,
              DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha,
@@ -21,19 +33,23 @@ async function getNormativaCompletaById(id) {
       JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa
       WHERE n.id = ?
     `;
-    const [normativa] = await db.query(normativaSql, [id]);
-    if (!normativa) return null;
 
-    
+    const normRes = await db.query(normativaSql, [id]);
+    const normRows = rowsOnly(normRes);
+    if (!Array.isArray(normRows) || normRows.length === 0) return null;
+
+    const normativa = normRows[0];
+
     const tagsSql = `
       SELECT t.nombre
       FROM tag t
       JOIN tag_normativa tn ON t.id = tn.id_tag
       WHERE tn.id_normativa = ?
     `;
-    const tagsResults = await db.query(tagsSql, [id]);
-    const tags = tagsResults.map(tag => tag.nombre);
-    
+    const tagRes = await db.query(tagsSql, [id]);
+    const tagRows = rowsOnly(tagRes);
+    const tags = Array.isArray(tagRows) ? tagRows.map(r => r.nombre) : [];
+
     const relacionesSql = `
       SELECT
              r.normativa_original AS id,
@@ -46,18 +62,22 @@ async function getNormativaCompletaById(id) {
       JOIN acciones_normativa a ON a.id = r.id_acciones
       WHERE r.normativa_complementaria = ?
     `;
-    const normativas_modificadas = await db.query(relacionesSql, [id]);
+    const relRes = await db.query(relacionesSql, [id]);
+    const relRows = rowsOnly(relRes);
+    const normativas_modificadas = Array.isArray(relRows) ? relRows : [];
 
     return {
       ...normativa,
       tags,
-      normativas_modificadas
+      normativas_modificadas,
     };
   } catch (error) {
     console.error("Error en getNormativaCompletaById:", error);
     throw error;
   }
 }
+
+
 
 
 //funciona!

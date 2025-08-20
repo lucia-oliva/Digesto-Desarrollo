@@ -129,7 +129,13 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
                     }
                   },
                   type: "secondary",
-                }  
+                },{ label: "Editar", onClick: onEdit, type: "primary" }, 
+                {
+                label: "Ver Normativa",
+                onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+                type: "primary",
+                className: "btn btn-info",
+              } 
               );
             }else if(tipo === "normativaDespublicadas")
               {
@@ -149,7 +155,15 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
                     }
                   },
                   type: "secondary",
-                }  
+                },
+                { label: "Editar", onClick: onEdit, type: "primary" }, 
+                { label: "Eliminar", onClick: onDelete, type: "error" },
+                {
+                label: "Ver Normativa",
+                onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+                type: "primary",
+                className: "btn btn-info",
+              }  
               ); 
               }else {
               // Acciones por defecto
