@@ -20,14 +20,27 @@ const ADMIN_LINKS = [
   { to: "/consejo-superior/addsesion", label: "Agregar Sesión" },
 ];
 
+
+
 function ConsejoPage() {
   const { auth } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+ console.log("datos:", auth.user);
+const links = useMemo(() => {
+  const tipo = auth.user?.tipo_usuario;
+  const depName = auth.user?.dependencia; 
 
-  const links = useMemo(() => {
-    if (auth.user?.tipo_usuario !== "SuperAdministrador") return BASE_LINKS;
+  const isSuperAdmin = tipo === "SuperAdministrador";
+  const isSupervisorCS =
+    (tipo === "Supervisor" || tipo === "Administrador de Dependencia") &&
+    depName === "Consejo Superior";
+
+  if (isSuperAdmin || isSupervisorCS) {
     return [...BASE_LINKS, { type: "separator" }, ...ADMIN_LINKS];
-  }, [auth]);
+  }
+  return BASE_LINKS;
+}, [auth.user?.tipo_usuario, auth.user?.dependencia]);
+  
 
   const linkClasses = ({ isActive }) =>
     `hover:text-blue-400 transition-colors ${

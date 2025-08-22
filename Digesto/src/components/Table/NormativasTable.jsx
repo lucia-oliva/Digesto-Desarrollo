@@ -13,6 +13,12 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
   const location = useLocation();
   const { auth } = useAuth();
   const user = auth?.user;
+  const tipoUser = auth.user?.tipo_usuario;
+  const depName = auth.user?.dependencia; 
+  const isSuperAdmin = tipoUser === "SuperAdministrador";
+  const isSupervisorCS =
+  (tipoUser === "Supervisor" || tipoUser === "Administrador de Dependencia") &&
+  depName === "Consejo Superior";
 
   const { tipo = "", columns = [] } = adminConfig[type] || {};
 
@@ -84,7 +90,7 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
               { label: "Eliminar", type: "error", onClick: onDelete }
             );
           }
-          if (auth.user?.tipo_usuario === "SuperAdministrador") {
+          if (isSuperAdmin || isSupervisorCS) {
             base.push({
               label: "Editar Sesión",
               onClick: (item) => navigate(`/consejo-superior/EditarSesion/${item.id_sesion}`),

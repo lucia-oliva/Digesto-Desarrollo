@@ -23,10 +23,20 @@ const RouteGuard = ({
   if (mode === "auth" && !isLoggedIn) {
     return <Navigate to={redirectTo} replace />;
   }
+
   // Si el modo es "consejo", redirigimos si el usuario no está autenticado
-  if (mode === "consejo" && auth?.user?.tipo_usuario !== "SuperAdministrador") {
-    return <Navigate to={redirectTo2} replace />;
+  if (mode === "consejo") {
+    const tipo = auth?.user?.tipo_usuario;
+    const depName = auth?.user?.dependencia; 
+    const isSuperAdmin = tipo === "SuperAdministrador";
+    const isSupervisorCS =
+      (tipo === "Supervisor" || tipo === "Administrador de Dependencia") &&
+      depName === "Consejo Superior";
+    if (!(isSuperAdmin || isSupervisorCS)) {
+      return <Navigate to={redirectTo2} replace />;
+    }
   }
+
 
   return <Outlet />;
 };
