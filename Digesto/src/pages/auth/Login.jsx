@@ -111,15 +111,6 @@ function Login() {
                 className="mt-2 block w-full px-4 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
               />
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <label className="inline-flex items-center">
-                <input type="checkbox" className="form-checkbox mr-2" />
-                Recuérdame
-              </label>
-              <a href="#" className="text-primary hover:underline">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
             <button
               type="submit"
               className="w-full py-3 px-6 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary-content hover:text-primary transition-all"
