@@ -1,16 +1,12 @@
 import {
-  FaAdn,
   FaBuilding,
   FaBuildingColumns,
   FaFileLines,
   FaHammer,
   FaUser,
   FaUserGroup,
-  FaUserMinus,
-  FaUsersLine,
-  FaTags
+  FaTags,
 } from "react-icons/fa6";
-
 
 export const menuItems = [
   {
@@ -60,15 +56,12 @@ export const menuItems = [
   {
     title: "Auditoria",
     icon: <FaHammer className="text-lg" />,
-    children: [
-    
-      { name: "Normativas", path: "./ListadoAuditoria" },
-    ],
+    children: [{ name: "Normativas", path: "./ListadoAuditoria" }],
     roles: ["SuperAdministrador"],
   },
   {
     title: "Palabras Clave",
-    icon: <FaTags className="text-lg" />, 
+    icon: <FaTags className="text-lg" />,
     children: [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },

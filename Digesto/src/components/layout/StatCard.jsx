@@ -12,6 +12,8 @@ function StatCard({
   toCreate,
   textList,
   textCreate,
+  user,
+  permissions,
 }) {
   return (
     <div
@@ -36,13 +38,17 @@ function StatCard({
       <div className="flex flex-col lg:flex-row lg:justify-end gap-2 lg:gap-3 mt-6 z-10">
         <Link
           to={toList}
-          className="text-sm text-center bg-white/20 px-4 py-2 rounded hover:bg-white/30 transition"
+          className={`${
+            user !== permissions && !permissions ? "" : "hidden"
+          } text-sm text-center bg-white/20 px-4 py-2 rounded hover:bg-white/30 transition`}
         >
           {textList}
         </Link>
         <Link
           to={toCreate}
-          className="text-sm text-center bg-white/20 px-4 py-2 rounded hover:bg-white/30 transition"
+          className={`${
+            user !== permissions && !permissions ? "" : "hidden"
+          } text-sm text-center bg-white/20 px-4 py-2 rounded hover:bg-white/30 transition`}
         >
           {textCreate}
         </Link>

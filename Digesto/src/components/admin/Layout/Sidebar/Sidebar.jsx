@@ -7,7 +7,12 @@ export default function Sidebar() {
   const { auth } = useAuth();
   const rol = auth.user.tipo_usuario || {};
   const [openSection, setOpenSection] = useState(null);
-  const location = useLocation();
+  const { pathname } = useLocation();
+  const itemPath = pathname
+    .split("/")
+    .slice(1, 3)
+    .join("/")
+    .replace("admin", ".");
 
   const toggleSection = (title) => {
     setOpenSection((prev) => (prev === title ? null : title));
@@ -38,13 +43,13 @@ export default function Sidebar() {
               <Link
                 to={itemDisabled ? "#" : item.path}
                 className={`flex items-center gap-2 justify-start w-full ${
-                  location.pathname === item.path
-                    ? "bg-primary text-white font-semibold"
+                  item.children?.some((child) => child.path).includes(itemPath)
+                    ? "bg-base-300 text-primary font-semibold"
                     : ""
-                } ${
+                }  ${
                   itemDisabled
-                    ? "!bg-red-900 !text-blue-200 pointer-events-none cursor-not-allowed"
-                    : "btn btn-ghost"
+                    ? "pointer-events-none cursor-not-allowed"
+                    : "btn btn-ghost bg-amber-400"
                 }`}
                 tabIndex={itemDisabled ? -1 : 0}
                 aria-disabled={itemDisabled}
@@ -63,7 +68,7 @@ export default function Sidebar() {
               onClick={() => !itemDisabled && toggleSection(item.title)}
               className={`w-full text-left btn btn-ghost flex items-center justify-between px-2 py-2 mb-1 ${
                 isOpen ? "bg-base-200 text-black" : ""
-              } ${itemDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              } ${itemDisabled ? " cursor-not-allowed" : ""}`}
               disabled={itemDisabled}
               tabIndex={itemDisabled ? -1 : 0}
               aria-disabled={itemDisabled}
@@ -87,7 +92,7 @@ export default function Sidebar() {
                       <Link
                         to={childDisabled ? "#" : child.path}
                         className={`justify-start w-full text-left ${
-                          location.pathname === child.path
+                          itemPath === child.path
                             ? "bg-base-300 text-primary font-semibold"
                             : ""
                         } ${

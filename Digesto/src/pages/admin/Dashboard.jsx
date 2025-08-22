@@ -1,39 +1,42 @@
 import { useAuth } from "../../context/useAuth";
-import StatCard from "../../components/layout/StatCard"
-import { FaTags, FaBuilding,FaFileLines, FaTag, FaUser, FaUserGroup } from "react-icons/fa6";;
+import StatCard from "../../components/layout/StatCard";
+import {
+  FaTags,
+  FaBuilding,
+  FaFileLines,
+  FaUser,
+  FaUserGroup,
+} from "react-icons/fa6";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-
-
-
 function Dashboard() {
-
   const [totales, setTotales] = useState({
-  normativas: 0,
-  usuarios: 0,
-  dependencias: 0,
-  palabras_clave: 0,
-  emisores: 0
-});
+    normativas: 0,
+    usuarios: 0,
+    dependencias: 0,
+    palabras_clave: 0,
+    emisores: 0,
+  });
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/dashboard/resumen", {
-        withCredentials: true,
-      });
-      console.log("Datos reales:", res.data);
-      setTotales(res.data);
-    } catch (err) {
-      console.error("Error al obtener totales del dashboard", err);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/dashboard/resumen",
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("Datos reales:", res.data);
+        setTotales(res.data);
+      } catch (err) {
+        console.error("Error al obtener totales del dashboard", err);
+      }
+    };
 
-  fetchData();
-}, []);
-
-
+    fetchData();
+  }, []);
 
   const { auth } = useAuth();
   const user = auth.user;
@@ -48,7 +51,7 @@ function Dashboard() {
       description: "Gestion, creácion o edicion de las normativas vigentes.",
       value: totales.normativas,
       iconFront: <FaFileLines className="text-6xl" />,
-      iconBg: <FaFileLines className="mb-3"/>,
+      iconBg: <FaFileLines className="mb-3" />,
       color: "bg-blue-600",
       toList: "/admin/ListadoNormativa",
       toCreate: "/admin/NuevaNormativa",
@@ -66,25 +69,27 @@ function Dashboard() {
       toCreate: "/admin/NuevoUsuario",
       textList: "Ver Usuarios",
       textCreate: "Crear Usuario",
+      Permissions: "SuperAdministrador",
     },
     {
       title: "Dependencias",
       description: "Areas y estructuras administrativas.",
       value: totales.dependencias,
-      iconFront:<FaBuilding className="text-6xl" />,
-      iconBg: <FaBuilding className="mb-2"/>,
+      iconFront: <FaBuilding className="text-6xl" />,
+      iconBg: <FaBuilding className="mb-2" />,
       color: "bg-blue-900",
       toList: "/admin/ListadoDependencias",
       toCreate: "/admin/NuevaDependencia",
       textList: "Ver Dependencias",
       textCreate: "Crear Dependencia",
+      Permissions: "SuperAdministrador",
     },
     {
       title: "Palabras Clave",
       description: "Etiquetas del sistema.",
       value: totales.palabras_clave,
-      iconFront: <FaTags className="text-6xl" />, 
-      iconBg: <FaTags className="mb-2"/>,
+      iconFront: <FaTags className="text-6xl" />,
+      iconBg: <FaTags className="mb-2" />,
       color: "bg-gray-700",
       toList: "/admin/ListadoPalabrasClave",
       toCreate: "/admin/NuevaPalabraClave",
@@ -96,12 +101,13 @@ function Dashboard() {
       description: "Organismos y autoridades emisoras de normativas.",
       value: totales.emisores,
       iconFront: <FaUser className="text-6xl" />,
-      iconBg: <FaUser className="mb-2"/>,
+      iconBg: <FaUser className="mb-2" />,
       color: "bg-sky-700",
       toList: "/admin/ListadoEmisores",
       toCreate: "/admin/NuevoEmisor",
       textList: "Ver Emisores",
       textCreate: "Crear Emisor",
+      Permissions: "SuperAdministrador",
     },
   ];
 
@@ -111,10 +117,13 @@ function Dashboard() {
         <div className="mb-6 md:mb-0 md:mr-6 max-w-xl">
           <h1 className="text-2xl font-bold mb-2">Hola, {user.nombre} 👋</h1>
           <p className="text-gray-600 text-sm mb-2">
-            Bienvenido al panel de administración del sistema Digesto. Desde aquí podés acceder y trabajar con las secciones que tenés habilitadas.
+            Bienvenido al panel de administración del sistema Digesto. Desde
+            aquí podés acceder y trabajar con las secciones que tenés
+            habilitadas.
           </p>
           <p className="text-gray-500 text-sm">
-            Utilizá los accesos directos a continuación para navegar por las secciones disponibles.
+            Utilizá los accesos directos a continuación para navegar por las
+            secciones disponibles.
           </p>
         </div>
       </div>
@@ -133,12 +142,15 @@ function Dashboard() {
             toCreate={item.toCreate}
             textList={item.textList}
             textCreate={item.textCreate}
+            user={user.tipo_usuario}
+            permissions={item.Permissions}
           />
         ))}
       </div>
 
       <footer className="mt-12 text-center text-sm text-gray-500 max-w-xl mx-auto">
-        Sistema desarrollado para la Universidad Nacional de La Rioja. Para soporte técnico, comunicate con el área correspondiente.
+        Sistema desarrollado para la Universidad Nacional de La Rioja. Para
+        soporte técnico, comunicate con el área correspondiente.
         <div className="mt-4 text-xs text-gray-400">
           © {new Date().getFullYear()} Sistema Digesto UNLaR
         </div>
