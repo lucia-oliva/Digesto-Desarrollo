@@ -11,7 +11,7 @@ import {useAuth} from "../../context/useAuth.jsx";
 //BUG: Cuando clickeo en una pagina alta (ej pagina 50) y luego cambio a listados cortos por ejemplo usuarios, carga tags(???)
 //BUG: los filtros aplicados no se borran y se aplican en otras tablas que no tienen que ver (si coincide el filtro capaz.)
 const DEP_BY_NAME = new Map(dependenciaOptions.map(d => [String(d.label).trim(), String(d.value)]));
-const DEP_BY_ID   = new Map(dependenciaOptions.map(d => [String(d.value), String(d.label).trim()]));
+
 
 function GenericFilterSearch({ type, onSearch }) {
   const filters = useMemo(() => filterConfig[type] || [], [type]);
@@ -72,13 +72,14 @@ function GenericFilterSearch({ type, onSearch }) {
 
   const handleBuscar = () => {
     onSearch(formState);
+    // eslint-disable-next-line no-unused-vars
     setFormState(prev =>
       (!isSuperAdmin && lockedDepValue) ? { dependencia: lockedDepValue } : {}
     );
   };
 
   return (
-    <div className="p-4 rounded-box border mb-4">
+    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
       <h2 className="text-lg font-bold mb-4">Filtros de búsqueda</h2>
       {/*Abecedario*/}
       {filters.some((f) => f.name === "letra") && (

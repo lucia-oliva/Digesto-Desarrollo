@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Header from "./components/layout/Header";
-import Prueba from "./pages/Prueba";
+import BusquedaNormativas from "./pages/BusquedaNormativas.jsx";
 import DocumentView from "./pages/documentView";
 import Login from "./pages/auth/Login";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -30,7 +30,7 @@ const Router = () => {
         <Route element={<Header />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
-          <Route path="busqueda" element={<Prueba />} />
+          <Route path="busqueda" element={<BusquedaNormativas />} />
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
             <Route index element={<ConsejoInicio />} />
