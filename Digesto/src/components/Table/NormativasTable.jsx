@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
@@ -7,6 +7,7 @@ import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
 import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi } from "./NormativaApi";
+import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo";
 
 const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
   const navigate = useNavigate();
@@ -19,6 +20,19 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
   const isSupervisorCS =
   (tipoUser === "Supervisor" || tipoUser === "Administrador de Dependencia") &&
   depName === "Consejo Superior";
+   const DEP_BY_NAME = useMemo(
+   () => new Map(dependenciaOptions.map(d => [String(d.label).trim(), String(d.value)])),
+   []
+ );
+  const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_dependencia || null;
+  
+  const filtrosEfectivos = useMemo(() => {
+  if (!isSuperAdmin && (userDepId || depName)) {
+    return { ...filtros, dependencia: String(userDepId ?? depName) };
+  }
+  return filtros;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuperAdmin, userDepId, depName, JSON.stringify(filtros)]);
 
   const { tipo = "", columns = [] } = adminConfig[type] || {};
 
@@ -52,12 +66,12 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtros);
+  } = useNormativas(tipo, filtrosEfectivos);
 
   useEffect(() => {
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, JSON.stringify(filtros)]);
+  }, [path, JSON.stringify(filtrosEfectivos)]);
 
  
   const filteredColumns = (columns || []).filter(
