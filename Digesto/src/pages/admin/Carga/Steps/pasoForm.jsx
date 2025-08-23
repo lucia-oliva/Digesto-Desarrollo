@@ -13,6 +13,9 @@ function PasoForm({
 }) {
   const campos = useMemo(() => camposPorEntidad[entidad] || [], [entidad]);
   const [tagInput, setTagInput] = useState("");
+  const normalizePhone = (v) => String(v || "").replace(/\D/g, "");
+  const telefonoRegex =
+    /^(?:(?:00)?549?)?0?(?:11|[2368]\d)(?:(?=\d{0,2}15)\d{2})??\d{8}$/;
 
   const shouldShowField = useCallback(
     (fieldName) => {
@@ -132,6 +135,53 @@ function PasoForm({
 
       if (required && isEmpty && name !== "archivo" && name !== "tags") {
         nuevosErrores[name] = "Este campo es obligatorio.";
+      }
+
+      if (name === "telefono" && !isEmpty) {
+        const normalized = normalizePhone(value);
+        if (!telefonoRegex.test(normalized)) {
+          nuevosErrores[name] =
+            "Formato de teléfono inválido. Ej.: 3804123456789.";
+          return;
+        }
+      }
+
+      if (name === "email" && !isEmpty) {
+        const email = value;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+          nuevosErrores[name] = "Formato de email inválido.";
+          return;
+        }
+      }
+
+      if (name === "password") {
+        if (!isEmpty) {
+          const password = String(value);
+
+          // Reglas y mensajes
+          const rules = [
+            { test: /.{8,}/, message: "mínimo 8 caracteres" },
+            { test: /[a-z]/, message: "una minúscula" },
+            { test: /[A-Z]/, message: "una mayúscula" },
+            { test: /\d/, message: "un número" },
+          ];
+
+          const failed = rules.filter((r) => !r.test.test(password));
+
+          if (failed.length > 0) {
+            nuevosErrores[name] = `La contraseña es débil. Falta: ${failed
+              .map((f) => f.message)
+              .join(", ")}.`;
+          }
+
+          // Confirmación de contraseña"
+          const confirm = formData.passwordConfirm;
+          if (confirm !== undefined && String(confirm) !== password) {
+            nuevosErrores.passwordConfirm = "Las contraseñas no coinciden.";
+          }
+        }
+        return;
       }
     });
 

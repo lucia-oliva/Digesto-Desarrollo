@@ -89,9 +89,21 @@ export const camposPorEntidad = {
       ],
     },
     { name: "nombre", label: "Nombre", type: "text", required: true },
-    { name: "email", label: "Correo", type: "email", required: true },
+    {
+      name: "email",
+      label: "Correo",
+      type: "email",
+      required: true,
+      autoComplete: "email",
+    },
     { name: "telefono", label: "Teléfono", type: "number" },
     { name: "password", label: "Contraseña", type: "password", required: true },
+    {
+      name: "confirmPassword",
+      label: "Confirmar Contraseña",
+      type: "password",
+      required: true,
+    },
   ],
 
   dependencia: [

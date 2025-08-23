@@ -1,10 +1,9 @@
 import PropTypes from "prop-types";
-import { getLabel } from "../config/mapeo.js"
-import { camposOcultosVerificacion } from "../../Edit/VerificacionIgnoreFields.js"
+import { getLabel } from "../config/mapeo.js";
+import { camposOcultosVerificacion } from "../../Edit/VerificacionIgnoreFields.js";
 import { useLocation } from "react-router";
 
 function PasoVerificacion({ formData, onBack, onSubmit }) {
-    
   const location = useLocation();
   const pathSegment = location.pathname
     .split("/")
@@ -14,7 +13,9 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
     ? pathSegment.replace("Editar", "").replace("Nuevo", "").toLowerCase()
     : null;
 
-  const camposIgnorados = entidad ? camposOcultosVerificacion[entidad] || [] : [];
+  const camposIgnorados = entidad
+    ? camposOcultosVerificacion[entidad] || []
+    : [];
 
   return (
     <div className="space-y-6 mt-6">
@@ -25,7 +26,6 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="align w-5xl bg-base-300 p-4 rounded-lg">
           {Object.entries(formData).map(([key, value]) => {
-            
             if (key === "normativas_modificadas" && value.length > 0) {
               return (
                 <div key={key}>
@@ -33,7 +33,10 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                   <ul className="list-disc list-inside">
                     {value.map((n, index) => (
                       <li key={index}>
-                        <strong>Normativa:</strong> {n.titulo} - <strong>Accion:</strong> {n.accion} - <strong>Comentario: </strong>{n.comentario} 
+                        <strong>Normativa:</strong> {n.titulo} -{" "}
+                        <strong>Accion:</strong> {n.accion} -{" "}
+                        <strong>Comentario: </strong>
+                        {n.comentario}
                       </li>
                     ))}
                   </ul>
@@ -49,13 +52,13 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                 "comentarioSeleccionado",
                 "normativas_modificadas",
                 "editingSelectedId",
-                "normativas_bajas"
-              ].includes(key) || camposIgnorados.includes(key)
+                "normativas_bajas",
+                "confirmPassword",
+              ].includes(key) ||
+              camposIgnorados.includes(key)
             ) {
               return null;
             }
-
-            console.log("campos ignorados",camposIgnorados);
 
             // Etiquetas legibles
             const etiquetas = {
@@ -77,7 +80,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
               archivo: "Archivo",
               fecha: "Fecha",
               emisor: "Emisor",
-              tags: "Palabras Clave"
+              tags: "Palabras Clave",
             };
 
             return (
@@ -87,7 +90,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
                   ? value.join(", ")
                   : typeof value === "object" && value?.name
                   ? value.name
-                  : getLabel(key,value)}
+                  : getLabel(key, value)}
               </p>
             );
           })}
