@@ -16,7 +16,7 @@ function VistaAdministrativa() {
 
   return (
     <div className="container ">
-      <GenericFilterSearch type={type} onSearch={handleSearch} />
+      <GenericFilterSearch type={type} scope="admin" onSearch={handleSearch} />
       <NormativaTable type={type} filtros={filters} modo={modo}/>
     </div>
   );

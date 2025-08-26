@@ -45,7 +45,7 @@ const dependenciaSeleccionada =
       }`}
     >
       <div className="w-auto bg-gray-100 text-neutral text-center p-10 rounded-lg shadow-lg">
-        <GenericFilterSearch type={type} onSearch={handleSearch} />
+        <GenericFilterSearch type={type} scope="public" onSearch={handleSearch} />
         <div className="flex flex-wrap justify-between items-center border-b pb-4 mb-4 mt-4">
           <h2 className="text-xl font-bold">Resultados de Normativas</h2>
           <SearchBar onSearch={handleSearchTags} />

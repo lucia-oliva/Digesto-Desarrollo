@@ -13,7 +13,7 @@ import {useAuth} from "../../context/useAuth.jsx";
 const DEP_BY_NAME = new Map(dependenciaOptions.map(d => [String(d.label).trim(), String(d.value)]));
 
 
-function GenericFilterSearch({ type, onSearch }) {
+function GenericFilterSearch({ type, onSearch, scope="public" }) {
   const filters = useMemo(() => filterConfig[type] || [], [type]);
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
@@ -25,6 +25,8 @@ function GenericFilterSearch({ type, onSearch }) {
   const userDepNombre = (user?.dependencia ?? "").trim();
   const lockedDepValue = !isSuperAdmin
   ? (DEP_BY_NAME.get(userDepNombre) ?? "") : "";
+  const isAdminScope= scope === "admin";
+  const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
   
   const handleLetterSelect = (letra) => {
     setSelectedLetter(letra);
@@ -35,9 +37,10 @@ function GenericFilterSearch({ type, onSearch }) {
 
   useEffect(() => {
     const hasDependencia = filters.some((f) => f.name === "dependencia");
-    if (hasDependencia && lockedDepValue) {
+    if (hasDependencia && canLockDep) {
       setFormState(prev => ({ ...prev, dependencia: lockedDepValue }));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, lockedDepValue]);
 
   
@@ -66,7 +69,7 @@ function GenericFilterSearch({ type, onSearch }) {
 
    const handleChange = (e) => {
     const { name, value } = e.target;
-    if (!isSuperAdmin && name === "dependencia") return;
+    if (name ==="dependencia" && canLockDep) return;
     setFormState({ ...formState, [name]: value });
   };
 
@@ -74,7 +77,7 @@ function GenericFilterSearch({ type, onSearch }) {
     onSearch(formState);
     // eslint-disable-next-line no-unused-vars
     setFormState(prev =>
-      (!isSuperAdmin && lockedDepValue) ? { dependencia: lockedDepValue } : {}
+      canLockDep ? {dependencia: lockedDepValue} : {}
     );
   };
 
@@ -117,7 +120,7 @@ function GenericFilterSearch({ type, onSearch }) {
               ? dynamicOptions[filter.name] || []
               : filter.options || [];
             const isDependencia = filter.name ==="dependencia";
-            const disabled = isDependencia && !isSuperAdmin && !!lockedDepValue;
+            const disabled = isDependencia && canLockDep;
 
             return (
               <div key={filter.name} className="flex flex-col">
@@ -125,10 +128,10 @@ function GenericFilterSearch({ type, onSearch }) {
                 <select
                     name={filter.name}
                     value={
-                      isDependencia && !isSuperAdmin && lockedDepValue
-                        ? lockedDepValue
-                        : formState[filter.name] || ""
-                    }
+                     isDependencia && canLockDep
+                      ? lockedDepValue
+                      : (formState[filter.name] ?? "")
+                   }
                     onChange={handleChange}
                     className="select select-bordered"
                     disabled={disabled}
@@ -160,6 +163,7 @@ function GenericFilterSearch({ type, onSearch }) {
 GenericFilterSearch.propTypes = {
   type: PropTypes.string.isRequired,
   onSearch: PropTypes.func.isRequired,
+  scope: PropTypes.oneOf(["admin","public"])
 };
 
 export default GenericFilterSearch;
