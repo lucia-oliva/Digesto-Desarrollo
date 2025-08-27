@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router";
+import { Link } from "react-router"; // <- fix import
 
 const dependenciaEnum = [
   "Exactas",
@@ -24,6 +24,23 @@ const colors = [
   "bg-red-300",
 ];
 
+// nombre visible -> id (para el filtro)
+const nombreToId = {
+  Aplicadas: "1",
+  Exactas: "2",
+  Salud: "3",
+  Sociales: "4",
+  Humanas: "5",
+  "C. Superior": "20", // aceptamos ambas variantes
+  "C.Superior": "20",
+  Chepes: "22",
+  "Villa Union": "26",
+  "Villa Unión": "26",
+  Chamical: "25",
+  Aimogasta: "24",
+  Catuna: "23",
+};
+
 function Dependencias({ dependencias }) {
   const displayedDependencias = dependencias.length
     ? dependencias
@@ -31,27 +48,40 @@ function Dependencias({ dependencias }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      {displayedDependencias.map((nombre, index) => (
-        <Link
-          key={index}
-          to={`busqueda/?dependencia=${nombre}`}
-          className={`card  flex flex-1/4 md:flex-1/5 items-center p-2
+      {displayedDependencias.map((nombre, index) => {
+        // Texto mostrado (solo cambiamos C. Superior -> C.Superior)
+        const label =
+          nombre === "C. Superior" ? "C.Superior" : String(nombre);
+
+        // Armado del link
+        const id = nombreToId[nombre] ?? nombreToId[label] ?? "";
+        const to =
+          label.toLowerCase() === "todas" || !id
+            ? "/busqueda"
+            : `/busqueda?dependencia=${encodeURIComponent(id)}`;
+
+        return (
+          <Link
+            key={index}
+            to={to}
+            className={`card  flex flex-1/4 md:flex-1/5 items-center p-2
             text-white font-medium md:text-xl
             ${colors[index] || "bg-slate-400"}
             hover:-translate-y-1 hover:shadow-lg
             transition-all duration-300 ease-in-out 
             `}
-        >
-          <figure className="flex items-center self-start justify-start w-10 h-10 rounded-full">
-            <img
-              src="src/assets/UnlarLogo.png"
-              alt=""
-              className="object-contain"
-            />
-          </figure>
-          {nombre}
-        </Link>
-      ))}
+          >
+            <figure className="flex items-center self-start justify-start w-10 h-10 rounded-full">
+              <img
+                src="src/assets/UnlarLogo.png"
+                alt=""
+                className="object-contain"
+              />
+            </figure>
+            {label}
+          </Link>
+        );
+      })}
     </div>
   );
 }

@@ -8,16 +8,25 @@ import {dependenciaOptions} from "../../pages/admin/Carga/config/mapeo.js";
 import {useAuth} from "../../context/useAuth.jsx";
 
 
+
 //BUG: Cuando clickeo en una pagina alta (ej pagina 50) y luego cambio a listados cortos por ejemplo usuarios, carga tags(???)
 //BUG: los filtros aplicados no se borran y se aplican en otras tablas que no tienen que ver (si coincide el filtro capaz.)
 const DEP_BY_NAME = new Map(dependenciaOptions.map(d => [String(d.label).trim(), String(d.value)]));
 
 
-function GenericFilterSearch({ type, onSearch, scope="public" }) {
+function GenericFilterSearch({ type, onSearch, scope="public", initialState={}, autoSearch= false }) {
   const filters = useMemo(() => filterConfig[type] || [], [type]);
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
   const [selectedLetter, setSelectedLetter] = useState("");
+
+  useEffect(() => {
+    const hasInitial = initialState && Object.keys(initialState).length > 0;
+    if (!hasInitial) return;
+    setFormState(prev => ({ ...prev, ...initialState }));
+    if (autoSearch) onSearch({ ...initialState });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialState), autoSearch]);
 
   const {auth} = useAuth();
   const user = auth?.user;
@@ -163,7 +172,9 @@ function GenericFilterSearch({ type, onSearch, scope="public" }) {
 GenericFilterSearch.propTypes = {
   type: PropTypes.string.isRequired,
   onSearch: PropTypes.func.isRequired,
-  scope: PropTypes.oneOf(["admin","public"])
+  scope: PropTypes.oneOf(["admin","public"]),
+  initialState: PropTypes.object,
+  autoSearch: PropTypes.bool
 };
 
 export default GenericFilterSearch;
