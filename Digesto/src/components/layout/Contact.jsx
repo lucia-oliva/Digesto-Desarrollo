@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // ContactModal.jsx
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
@@ -29,14 +30,13 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   };
 
   useEffect(() => {
-    // 1) Si viene por prop (desde filtros), úsala
     if (dependenciaProp && dependenciaProp.trim() !== "") {
       setIsVisible(true);
       setNombreDependencia(dependenciaProp.trim());
       return;
     }
 
-    // 2) Fallback: leer de la URL (comportamiento anterior)
+   
     const searchParams = new URLSearchParams(location.search);
     const depFromUrl = searchParams.get("dependencia") || "";
     const decoded = decodeURIComponent(depFromUrl);
@@ -132,7 +132,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
                 placeholder="Nombre"
                 className="w-full p-2 border border-gray-300 rounded mb-2"
                 required
-                pattern="[A-Za-z\\s]{3,}"
+                pattern="^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]{3,}$"
                 title="El nombre debe tener al menos 3 caracteres y solo letras."
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
