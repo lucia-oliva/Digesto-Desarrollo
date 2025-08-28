@@ -45,7 +45,7 @@ function About() {
                   <FiSearch className="mr-2" />
                   Búsqueda avanzada
                 </Link>
-                <Link to="/document/1" className="btn btn-outline">
+                <Link to="/document/3" className="btn btn-outline">
                   <FiFileText className="mr-2" />
                   Ver un ejemplo
                 </Link>
