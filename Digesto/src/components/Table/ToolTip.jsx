@@ -16,12 +16,15 @@ function cortarResumen(texto, maxOraciones = 3, maxPalabras = 60) {
   return `${seleccionado}...`;
 }
 
-function ResumenTooltip({ texto, onVerMas }) {
+// eslint-disable-next-line react/prop-types
+function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector = ".table-pagination" })
+ {
   
   const contRef = useRef(null);
   const tipRef = useRef(null);
   const [abierto, setAbierto] = useState(false);
   const [arriba, setArriba] = useState(false);
+  const closeTimerRef = useRef(null);
 
   
   const textoSeguro = String(texto ?? "").trim();
@@ -36,14 +39,26 @@ function ResumenTooltip({ texto, onVerMas }) {
   const preview = cortarResumen(textoSeguro, 3, 60);
 
   useLayoutEffect(() => {
-    if (!abierto || !contRef.current || !tipRef.current) return;
-    const r = contRef.current.getBoundingClientRect();
-    const hTip = tipRef.current.getBoundingClientRect().height;
-    const hayAbajo = r.bottom + 8 + hTip <= window.innerHeight;
-    const espacioAbajo = window.innerHeight - r.bottom;
-    const preferirArriba = !hayAbajo || espacioAbajo < 150 || r.top > window.innerHeight * 0.65;
-    setArriba(preferirArriba);
-  }, [abierto, textoSeguro]);
+   if (!abierto || !contRef.current || !tipRef.current) return;
+    let irArriba = false;
+    // Evitar solapar con paginacion
+    if (avoidOverlapSelector) {
+      const r = contRef.current.getBoundingClientRect();
+      const hTip = tipRef.current.getBoundingClientRect().height;
+      const margin = 8;
+      const pagEl = document.querySelector(avoidOverlapSelector);
+      if (pagEl) {
+        const pagRect = pagEl.getBoundingClientRect();
+        const tipProjectedTop = r.bottom + margin;
+        const tipProjectedBottom = tipProjectedTop + hTip;
+        const overlapVertical =
+          tipProjectedTop < pagRect.bottom && tipProjectedBottom > pagRect.top;
+        if (overlapVertical) irArriba = true;
+      }
+    }
+    setArriba(irArriba);
+  }, [abierto, textoSeguro, avoidOverlapSelector]);
+   
 
  
   useEffect(() => {
@@ -59,8 +74,14 @@ function ResumenTooltip({ texto, onVerMas }) {
     <div
       ref={contRef}
       className="relative group max-w-[260px] cursor-default"
-      onMouseEnter={() => tieneTexto && setAbierto(true)}   
-      onMouseLeave={() => setAbierto(false)}
+      onMouseEnter={() => {
+        if (!tieneTexto) return;
+        clearTimeout(closeTimerRef.current);
+        setAbierto(true);
+      }}
+      onMouseLeave={() => {
+        closeTimerRef.current = setTimeout(() => setAbierto(false), 120); //delay
+      }}
     >
       
       <div
@@ -80,7 +101,7 @@ function ResumenTooltip({ texto, onVerMas }) {
       {abierto && tieneTexto && (
         <div
           ref={tipRef}
-          className={`absolute z-[9999] bg-white border border-gray-300 p-2 shadow-lg w-[300px] text-xs rounded-md right-0 ${
+          className={`absolute z-[49] bg-white border border-gray-300 p-2 shadow-lg w-[300px] text-xs rounded-md right-0 ${
             arriba ? "bottom-full mb-1" : "top-full mt-1"
           } max-h-[60vh] overflow-y-auto`}
         >
@@ -114,4 +135,9 @@ function ResumenTooltip({ texto, onVerMas }) {
   );
 }
 
+
+
+
 export default ResumenTooltip;
+
+
