@@ -310,7 +310,7 @@ const confirmarSeleccion = () => {
         <>
           <h3 className="text-lg font-semibold">Busque y Seleccione la Normativa Modificada</h3>
 
-          <GenericFilterSearch type={type} scope="admin" onSearch={handleSearch} />
+          <GenericFilterSearch type={type} scope="public" onSearch={handleSearch} />
 
           <NormativaTable
             type="ListadoNormativa"

@@ -24,33 +24,35 @@ const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) =
    () => new Map(dependenciaOptions.map(d => [String(d.label).trim(), String(d.value)])),
    []
  );
-  const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_dependencia || null;
-  
-  const filtrosEfectivos = useMemo(() => {
-  if (!isSuperAdmin && (userDepId || depName)) {
-    return { ...filtros, dependencia: String(userDepId ?? depName) };
-  }
-  return filtros;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuperAdmin, userDepId, depName, JSON.stringify(filtros)]);
-
-  const { tipo = "", columns = [] } = adminConfig[type] || {};
-
+   
+const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_dependencia || null;
   const path = location.pathname;
-
   const isAdminRoute      = path.startsWith("/admin");
-  const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);  
-  const isNuevaNormativa  = /^\/admin\/NuevaNormativa$/i.test(path);  
-
+  const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
+  const isNuevaNormativa  = /^\/admin\/NuevaNormativa$/i.test(path);
   
+
   const effectiveModo =
-    modo ?? (isEditarNormativa
-      ? "crear_edit"
-      : isAdminRoute
-        ? "admin"
-        : isNuevaNormativa
-          ? "seleccionar"
-          : "ver");
+    modo ??
+    (onSeleccionar
+      ? "seleccionar"
+      : (
+          isEditarNormativa ? "crear_edit" :
+          isNuevaNormativa  ? "seleccionar" :
+          isAdminRoute      ? "admin" :
+                              "ver"
+        ));
+
+//Bloquear filtro dependencia x rol.
+  const filtrosEfectivos = useMemo(() => {
+    if (isAdminRoute && effectiveModo !== "seleccionar" && !isSuperAdmin && (userDepId || depName)) {
+      return { ...filtros, dependencia: String(userDepId ?? depName) };
+    }
+    return filtros;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminRoute, effectiveModo, isSuperAdmin, userDepId, depName, JSON.stringify(filtros)]);
+
+   const { tipo = "", columns = [] } = adminConfig[type] || {};
 
   const baseDocPath = isAdminRoute
     ? "/admin/document"
