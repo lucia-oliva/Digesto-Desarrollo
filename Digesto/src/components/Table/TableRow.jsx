@@ -1,7 +1,8 @@
 
 function TableRow({ item, columns, actions }) {
   return (
-    <tr className="hover:bg-primary-content odd:bg-[#F7F6FE]">
+   <tr className="odd:bg-blue-50 even:bg-white hover:bg-blue-100 transition-colors">
+
       {columns.map((col) => (
         <td key={col.key} className={col.className}>
           {col.render ? col.render(item[col.key], item) : item[col.key]}

@@ -58,7 +58,7 @@ const dependenciaSeleccionada =
           onSearch={handleSearch}
         />
         <div className="flex flex-wrap justify-between items-center border-b pb-4 mb-4 mt-4">
-          <h2 className="text-xl font-bold">Resultados de Normativas</h2>
+          <h2 className="text-xl font-bold mb-2">Resultados de Normativas</h2>
           <SearchBar onSearch={handleSearchTags} />
         </div>
         <NormativaTable type={type} filtros={filtros} modo={modo} />

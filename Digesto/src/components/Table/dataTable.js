@@ -34,7 +34,7 @@ export const emisorColumns = [
 ]
 
 export const tagsColumns = [
-  { key: "id", label: "ID",className:"text-center font-[Raleway] text-gray-700 text-md sm:text-md" },
+  { key: "id", label: "ID",className:"text-center font-[Raleway] text-gray-700 text-md sm:text-md",hiddenIn: ["busqueda","ver","admin", "crear_edit", "seleccionar"] },
   { key: "nombre", label: "Nombre",className:"text-center font-[Raleway] text-gray-700  text-md sm:text-md" },
   { key: "cantidad_usos", label: "Cantidad de Usos",className:"text-center font-[Raleway] text-gray-700 text-md sm:text-md" },
 ]

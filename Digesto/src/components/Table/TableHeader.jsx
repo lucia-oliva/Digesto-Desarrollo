@@ -1,7 +1,7 @@
 // components/GenericTable/TableHeader.jsx
 function TableHeader({ columns, showActions }) {
   return (
-    <tr className="bg-primary text-white text-center font-[Raleway] font-bold text-lg" >
+    <tr className="bg-gradient-to-r from-primary to-blue-700 text-white text-center font-[Raleway] font-semibold text-base shadow-sm">
       {columns.map((col) => (
         <th key={col.key} className="py-4" > {col.label}</th>
       ))}

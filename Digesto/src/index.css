@@ -196,4 +196,15 @@
     font-family: "Raleway", sans-serif;
     background-color: rgb(237, 237, 237);
   }
+  .no-spinner {
+    appearance: none; /* estándar */
+    -moz-appearance: textfield; /* Firefox */
+  }
+
+  .no-spinner::-webkit-outer-spin-button,
+  .no-spinner::-webkit-inner-spin-button {
+    appearance: none; /* estándar */
+    -webkit-appearance: none; /* Chrome/Safari */
+    margin: 0;
+  }
 }
