@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import { useEffect, useMemo } from "react";
 import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
@@ -9,7 +11,7 @@ import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi } from "./NormativaApi";
 import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo";
 
-const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData }) => {
+const NormativaTable = ({ type, filtros = {}, onSeleccionar, modo, formData, data: dataOverride = null, hidePagination = false}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { auth } = useAuth();
@@ -61,19 +63,25 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
       : "/document";
 
   const {
-    normativas,
-    page,
-    totalPages,
+    normativas: hookNormativas,
+    page: hookPage,
+    totalPages: hookTotalPages,
     onPageChange,
     reload,
     onEdit,
     onDelete,
   } = useNormativas(tipo, filtrosEfectivos);
 
+  const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
+  const normativas = usingStatic ? dataOverride : hookNormativas;
+  const page = usingStatic ? 1 : hookPage;
+  const totalPages = usingStatic ? 1 : hookTotalPages;
+
+
   useEffect(() => {
-    reload();
+    if (!usingStatic) reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, JSON.stringify(filtrosEfectivos)]);
+  }, [path, JSON.stringify(filtrosEfectivos), usingStatic]);
 
  
   const filteredColumns = (columns || []).filter(
@@ -233,9 +241,11 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
       data={normativas}
       columns={filteredColumns}
       actions={actions}
-      page={page}
-      totalPages={totalPages}
-      onPageChange={onPageChange}
+      {
+        ...(!(usingStatic || hidePagination)
+          ? { page, totalPages, onPageChange }   
+          : {})                                
+      }
     />
   );
 };
@@ -243,7 +253,7 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
 NormativaTable.propTypes = {
   type: PropTypes.any,
   filtros: PropTypes.object,
-  modo: PropTypes.oneOf(["admin", "ver", "seleccionar", "crear_edit"]),
+  modo: PropTypes.oneOf(["admin", "ver", "seleccionar", "crear_edit", "inicio"]),
   onSeleccionar: PropTypes.func,
   formData: PropTypes.object,
 };

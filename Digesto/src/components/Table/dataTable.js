@@ -1,7 +1,7 @@
 import {renderResumen} from "./ResumeRender";
 
 export const normativaColumns = [
-  {key: "numero", label: "N°", className: "text-center font-[Raleway] text-gray-700 text-md sm:text-sm" ,hiddenIn: ["busqueda","ver","admin", "crear_edit", "seleccionar"]},
+  {key: "numero", label: "N°", className: "text-center font-[Raleway] text-gray-700 text-md sm:text-sm" ,hiddenIn: ["busqueda","ver","admin", "crear_edit", "seleccionar", "inicio"]},
   { key: "fecha", label: "Fecha",className:"text-center text-gray-700 font-[Raleway] text-md sm:text-sm" },
   { key: "titulo", label: "Título",className:"text-center text-gray-700 font-[Raleway]  text-md sm:text-md " },
   { key: "dependencia", label: "Dependencia",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md" },
@@ -12,7 +12,7 @@ export const normativaColumns = [
     label: "Resumen",
     className: "text-left font-[Raleway] text-gray-700 text-md max-w-[300px]",
     render: renderResumen,
-  },
+  hiddenIn: ["inicio"]},
   { key: "visitas", label: "Visitas",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md", hiddenIn: ["busqueda","crear_edit", "seleccionar"] },
 ];
 

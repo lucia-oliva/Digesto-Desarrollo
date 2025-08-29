@@ -1,18 +1,14 @@
 import { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import useAxios from "axios-hooks";
-import { useNavigate } from "react-router";
 
+import NormativaTable from "../components/Table/NormativasTable";
 import Dependencias from "../components/Listas/Dependencias";
-import GenericTable from "../components/Table/GenericTable";
-import { adminConfig } from "../components/Table/configTable";
 import { Alert, Loading } from "../components/ui/Ui";
 
 function Home() {
-  const navigate = useNavigate();
   const [normativas, setNormativas] = useState([]);
 
-  // 🚀 Normativas más consultadas
   const [{ data, loading, error }] = useAxios({
     url: "http://localhost:3000/api/normativa/mas-buscadas",
     method: "GET",
@@ -24,22 +20,6 @@ function Home() {
     }
   }, [data]);
 
-  // 📋 Columnas base de normativas desde tu config
-  const columnsBase = adminConfig["ListadoNormativa"]?.columns ?? [];
-
-  // 🧱 Modo "inicio": ocultar número y emisor
-  const hideKeys = ["resumen"];
-  const columnsInicio = columnsBase.filter((c) => !hideKeys.includes(c.key));
-
-  // 🔘 Acción "Ver PDF" con outline y hover azul
-  const actions = [
-    {
-      label: "Ver PDF",
-      type: "primary",
-      className: "btn-outline btn-primary",
-      onClick: (item) => navigate(`/document/${item.id}`),
-    },
-  ];
 
   return (
      <div className="overflow-x-hidden">
@@ -77,17 +57,19 @@ function Home() {
         {/* Dependencias */}
         <Dependencias dependencias={[]} />
 
-        {/* Normativas más consultadas */}
-        <div className="text-center border-b pb-4 mb-4 mt-10">
-          <h2 className="text-xl font-bold">Normativas más consultadas</h2>
-        </div>
 
-        {/* 🔄 Tabla genérica sin paginación (no pasamos totalPages) */}
-        <GenericTable
-          data={normativas}
-          columns={columnsInicio}
-          actions={actions}
+
+       <div className="w-full overflow-x-auto">
+        <div className="text-center border-b pb-4 mb-4 mt-10 w-full">
+  <h2 className="text-xl font-bold">Normativas más consultadas</h2>
+</div>
+        <NormativaTable
+          type="ListadoNormativa"
+          modo="inicio"
+          data={normativas} 
+          hidePagination      
         />
+      </div>
 
         {loading && <Loading />}
         {error && (
