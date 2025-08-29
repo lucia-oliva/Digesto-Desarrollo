@@ -42,18 +42,19 @@ function Home() {
   ];
 
   return (
-    <div>
+     <div className="overflow-x-hidden">
       {/* Hero section */}
       <div
-        className="hero min-h-screen"
+   className="hero min-h-screen bg-no-repeat bg-cover bg-center"
         style={{
           backgroundImage:
             "url(https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg)",
         }}
       >
-        <div className="hero-overlay bg-gradient-to-b to-95% from-transparent to-[rgba(0,0,0,0.4s)] "></div>
-        <div className="hero-content text-center flex items-start py-25">
-          <div className="w-full lg:w-2/3 px-4">
+        <div className="hero-overlay bg-black/40"></div>
+   <div className="hero-content text-center flex items-start py-24">
+
+          <div className="w-full lg:w-2/3 px-2 sm:px-4 mx-auto">
             <h1 className="mb-4 text-5xl font-sans font-semibold text-base-100">
               Bienvenido a Digesto UNLaR
             </h1>
