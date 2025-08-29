@@ -84,17 +84,17 @@ function About() {
           <Feature
             icon={<FiSearch />}
             title="Búsqueda Inteligente"
-            text="Filtros por año, emisor y dependencia para encontrar en segundos."
+            text="Filtros por año, emisor, dependencia y mas para encontrar en segundos."
           />
           <Feature
             icon={<FiZap />}
             title="Interfaz ágil"
-            text="Diseñada para uso cotidiano, clara y sin vueltas."
+            text="Diseñada para uso cotidiano garantizando la experiencia de usuario."
           />
           <Feature
             icon={<FiUsers />}
             title="Dependencias"
-            text="Navegá por facultades y sedes con accesos rápidos."
+            text="Navegá por la documentacion de todas las dependencias de la universidad."
           />
           <Feature
             icon={<FiBookOpen />}
