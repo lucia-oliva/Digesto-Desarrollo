@@ -21,9 +21,9 @@ export default function Navbar() {
           </label>
           <ul
             tabIndex={0}
-            className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+            className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border-t-1 border-t-gray-300"
           >
-            <li>
+            <li >
               <Link to="./logout">Cerrar sesión</Link>
             </li>
           </ul>
