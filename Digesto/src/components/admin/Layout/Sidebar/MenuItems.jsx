@@ -13,14 +13,14 @@ export const menuItems = [
     title: "Normativas",
     icon: <FaFileLines className="text-lg" />,
     children: [
-      { name: "Nueva Normativa", path: "./NuevaNormativa" },
+      { name: "Crear Normativa", path: "./NuevaNormativa" },
       { name: "Listado", path: "./ListadoNormativa" },
       {
-        name: "Normativas Eliminadas",
+        name: "Eliminadas",
         path: "./ListadoNormativaEliminadas",
       },
       {
-        name: "Normativas Despublicadas",
+        name: "Despublicadas",
         path: "./ListadoNormativaDespublicadas",
       },
     ],
@@ -39,7 +39,7 @@ export const menuItems = [
     title: "Dependencias",
     icon: <FaBuilding className="text-lg" />,
     children: [
-      { name: "Agregar Dependencia", path: "./NuevaDependencia" },
+      { name: "Crear Dependencia", path: "./NuevaDependencia" },
       { name: "Listado Dependencias", path: "./ListadoDependencias" },
     ],
     roles: ["SuperAdministrador", "supervisor"],
@@ -48,7 +48,7 @@ export const menuItems = [
     title: "Emisores",
     icon: <FaUser className="text-lg" />,
     children: [
-      { name: "Agregar Emisor", path: "./NuevoEmisor" },
+      { name: "Crear Emisor", path: "./NuevoEmisor" },
       { name: "Listado Emisores", path: "./ListadoEmisores" },
     ],
     roles: ["SuperAdministrador"],
@@ -66,7 +66,7 @@ export const menuItems = [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },
     ],
-    roles: ["SuperAdministrador", "supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
   },
 
   // Elementos especiales sin hijos
