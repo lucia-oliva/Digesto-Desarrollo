@@ -49,7 +49,7 @@ const dependenciaSeleccionada =
         isAdmin ? "w-full" : "w-screen items-center"
       }`}
     >
-      <div className="w-auto bg-gray-100 text-neutral text-center p-10 rounded-lg shadow-lg">
+      <div className="w-auto bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
        <GenericFilterSearch
           type={type}
           scope="public"
