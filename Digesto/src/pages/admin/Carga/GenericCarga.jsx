@@ -147,7 +147,7 @@ function GenericCarga() {
   };
 
   return (
-    <div className="w-full p-6 rounded-lg text-neutral">
+    <div className="w-full rounded-lg text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
         {entidad === "palabraclave"
           ? "Crear Palabra Clave"
@@ -155,20 +155,26 @@ function GenericCarga() {
               entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""
             }`}
       </h2>
-
-      {/* Steps visuales */}
-      <div className="flex justify-center">
-        <ul className="steps z-0 mb-6">
-          {pasos.map((paso, i) => (
-            <li
-              key={paso}
-              className={` mr-4 step ${i <= currentStep ? "step-primary" : ""}`}
-            >
-              {paso
-                .replace(/([A-Z])/g, " $1")
-                .replace(/^./, (str) => str.toUpperCase())}
-            </li>
-          ))}
+      {/* Steps visuales*/}
+      <div className="w-full flex justify-center mb-4 sm:mb-6">
+        <ul className="steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
+          {pasos.map((paso, i) => {
+            const label = paso
+              .replace(/([A-Z])/g, " $1")
+              .replace(/^./, (s) => s.toUpperCase());
+            return (
+              <li
+                key={paso}
+                className={`step ${i <= currentStep ? "step-primary" : ""}`}
+                title={label}
+                aria-label={label}
+              >
+                <span className="hidden sm:block mt-2 text-xs text-center font-sans whitespace-nowrap">
+                  {label}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
