@@ -18,7 +18,7 @@ async function edit(data) {
     //Actualizar el usuario
     const sqlUpdate =
       "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
-    const result = await db.query(sqlUpdate, [
+    const result = await db.execute(sqlUpdate, [
       nombre,
       rol,
       telefono,
@@ -31,19 +31,14 @@ async function edit(data) {
       id,
     ]);
 
-    if (result.affectedRows > 0) {
-      console.log({ mensaje: `Usuario '${nombre}' actualizado correctamente` });
-      return {
-        success: true,
-        message: `Usuario '${nombre}' actualizado correctamente`,
-      };
-    } else {
-      console.log({ mensaje: `No se encontró el usuario con ID ${id}` });
-      return {
-        success: false,
-        message: `No se encontró el usuario con ID ${id}`,
-      };
+    if (result.affectedRows === 0) {
+      const error = new Error("Usuario no encontrado");
+      error.status = 404;
+      throw error;
     }
+    return {
+      mensaje: "Usuario editado correctamente",
+    };
   } catch (error) {
     console.error("Error al editar el usuario:", error);
     throw error;
@@ -51,26 +46,17 @@ async function edit(data) {
 }
 
 //Mostrar usuario por ID
-async function getUsuarioById(id) {
-  const sql =
-    "SELECT id, telefono, estado, email, nombre, id_tipo_usuario FROM usuario WHERE id = ?";
-  const results = await db.query(sql, [id]);
-  return results;
-}
-
 async function getUsuarioByIdDatos(id) {
   const sql =
     "SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, clave as password, id_dependencia as dependencia FROM usuario WHERE id = ?";
-  const results = await db.query(sql, [id]);
-  return results[0];
+  const results = await db.queryOne(sql, [id]);
+  if (!results) {
+    const error = new Error("Usuario no encontrado");
+    error.status = 404;
+    throw error;
+  }
+  return results;
 }
-
-/*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
-campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ] 
-*/
-
-//FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
-//FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
 async function create(data) {
   const { nombre, telefono, email, password, rol, dependencia } = data;
@@ -81,8 +67,17 @@ async function create(data) {
     const fechaSubida = new Date().toISOString().split("T")[0];
     const estado = "activo";
     const claveHasheada = await hashPasswordBcrypt(password);
-    const sqlInsertUser = ` INSERT INTO usuario (nombre, telefono, email, clave, fecha_alta, id_dependencia, estado, id_tipo_usuario, ultima_visita) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)`;
+    const duplicateCheck = await db.queryOne(
+      "SELECT id FROM usuario WHERE email = ?",
+      [email]
+    );
+    if (duplicateCheck) {
+      const error = new Error(`El email '${email}' ya está registrado.`);
+      error.errno = 409; // Código de error personalizado para conflicto
+      throw error;
+    }
 
+    const sqlInsertUser = ` INSERT INTO usuario (nombre, telefono, email, clave, fecha_alta, id_dependencia, estado, id_tipo_usuario, ultima_visita) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)`;
     const result = await db.query(sqlInsertUser, [
       nombre,
       telefono,
@@ -97,9 +92,7 @@ async function create(data) {
     const userId = result.insertId;
 
     return {
-      succeso: true,
       mensaje: "Usuario creado correctamente",
-      id: userId,
     };
   } catch (error) {
     console.error("Error al crear el usuario:", error);
@@ -181,7 +174,8 @@ export async function updateUsuario(id, datos) {
     valores.push(nuevaClave);
   }
 
-  if (campos.length === 0) throw new Error("No hay campos para actualizar");
+  if (campos.length === 0)
+    throw new Error("No hay campos para actualizar", 400);
 
   const sql = `UPDATE usuario SET ${campos.join(", ")} WHERE id=?`;
   valores.push(id);
@@ -225,47 +219,43 @@ async function searchUsuariosByParameters(
   limite = null,
   offset = null
 ) {
-  try {
-    let sql =
-      "SELECT u.id,u.nombre, u.telefono, u.email, DATE_FORMAT(u.fecha_alta, '%Y-%m-%d') AS fecha_alta,DATE_FORMAT(u.ultima_visita, '%Y-%m-%d') AS ultima_visita,u.estado, tu.nombre AS rol, d.nombre AS dependencia, COUNT(*)OVER() AS total FROM usuario u JOIN tipo_usuario tu ON tu.id = u.id_tipo_usuario  LEFT JOIN dependencia d ON d.id = u.id_dependencia WHERE 1=1";
-    const params = [];
-    if (tipoUsuario) {
-      sql += " AND id_tipo_usuario = ?";
-      params.push(tipoUsuario);
-    }
-    if (nombre) {
-      sql += " AND u.nombre LIKE ?";
-      params.push(`%${nombre}%`);
-    }
-    if (dependencia) {
-      sql += " AND id_dependencia = ?";
-      params.push(dependencia);
-    }
-    if (estado) {
-      sql += " AND u.estado = ?";
-      params.push(estado);
-    }
-    sql += " GROUP BY u.id";
-    if (limite !== null && offset !== null) {
-      sql += " LIMIT ? OFFSET ?";
-      params.push(Number(limite) || 10, Number(offset) || 0);
-    }
-    const results = await db.query(sql, params);
-    const totalResults = results?.length > 0 ? results[0].total : 0;
-    if (!results) {
-      console.log(
-        "No se encontró los usuarios con los parámetros especificados"
-      );
-      return { data: [], totalResults };
-    }
-    return { data: results, totalResults };
-  } catch (error) {
-    console.error("Error al buscar usuarios por parámetros:", error);
+  let sql =
+    "SELECT u.id,u.nombre, u.telefono, u.email, DATE_FORMAT(u.fecha_alta, '%Y-%m-%d') AS fecha_alta,DATE_FORMAT(u.ultima_visita, '%Y-%m-%d') AS ultima_visita,u.estado, tu.nombre AS rol, d.nombre AS dependencia, COUNT(*)OVER() AS total FROM usuario u JOIN tipo_usuario tu ON tu.id = u.id_tipo_usuario  LEFT JOIN dependencia d ON d.id = u.id_dependencia WHERE 1=1";
+  const params = [];
+  if (tipoUsuario) {
+    sql += " AND id_tipo_usuario = ?";
+    params.push(tipoUsuario);
   }
+  if (nombre) {
+    sql += " AND u.nombre LIKE ?";
+    params.push(`%${nombre}%`);
+  }
+  if (dependencia) {
+    sql += " AND id_dependencia = ?";
+    params.push(dependencia);
+  }
+  if (estado) {
+    sql += " AND u.estado = ?";
+    params.push(estado);
+  }
+  sql += " GROUP BY u.id";
+  if (limite !== null && offset !== null) {
+    sql += " LIMIT ? OFFSET ?";
+    params.push(Number(limite) || 10, Number(offset) || 0);
+  }
+  const results = await db.query(sql, params);
+  const totalResults = results?.[0]?.total ?? 0;
+  if (!results.length) {
+    const error = new Error(
+      "No se encontró los usuarios que coincidan con su búsqueda"
+    );
+    error.status = 404;
+    throw error;
+  }
+  return { data: results, totalResults };
 }
 
 export default {
-  getUsuarioById,
   getUsuarioByIdDatos,
   createUsuario,
   updateUsuario,

@@ -5,8 +5,8 @@ import db from "./db.js";
 //ENDPOINTS ESPECIFICOS
 async function getAllTipoNormativa() {
   const sql = "SELECT nombre FROM tipo_normativa";
-  const results = await db.query(sql,[]);
+  const results = await db.query(sql, []);
   return results;
 }
 
-export default {getAllTipoNormativa}; 
+export default { getAllTipoNormativa };

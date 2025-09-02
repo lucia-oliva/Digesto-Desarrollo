@@ -2,10 +2,7 @@ import db from "./db.js";
 
 // Funciones CRUD basicas
 
-
 //eliminer sesiones del consejo superior
-
-
 
 //Mostrar sesiones del consejo superior
 
@@ -20,9 +17,11 @@ async function getSesionesPaginado(page = 1, limite = 10) {
     LIMIT ? OFFSET ?;
   `;
   const sesiones = await db.query(sql, [limite, offset]);
-  const totalRowsResult = await db.query("SELECT COUNT(*) as total FROM sesiones");
+  const totalRowsResult = await db.query(
+    "SELECT COUNT(*) as total FROM sesiones"
+  );
   const totalRows = totalRowsResult[0].total;
-  return { data: sesiones, totalResults: totalRows};
+  return { data: sesiones, totalResults: totalRows };
 }
 
 //Mostrar todos las dependencias
@@ -35,8 +34,8 @@ async function getAllDependencias() {
 //Mostrar usuario por ID
 async function getDepenendenciaById(id) {
   const sql = "SELECT * FROM dependencia WHERE id = ?";
-  const results = await db.query(sql, [id]);
-  return results[0];
+  const results = await db.queryOne(sql, [id]);
+  return results;
 }
 
 /*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
@@ -46,47 +45,69 @@ campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ]
 //FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
 async function create(data) {
- const { nombre, estado, codificacion, nombre_completo } = data;
- const color = "#00000";
- 
-try{
-  const sqlInsert = `INSERT INTO dependencia (nombre, estado, color, codificacion, nombre_completo) VALUES (?, ?, ?, ?, ?)`;
-  const result = await db.query(sqlInsert, [
-    nombre,
-    estado,
-    color,
-    codificacion,
-    nombre_completo
-  ]);
-  const dependenciaId = result.insertId;
+  const { nombre, estado, codificacion, nombre_completo } = data;
+  const color = "#00000";
 
-  return { success: true, mensaje: "Dependencia creada correctamente", id: dependenciaId };
-}catch (error) {
-  console.error("Error al crear la dependencia:", error);
-  throw error;
- }
+  try {
+    const sqlInsert = `INSERT INTO dependencia (nombre, estado, color, codificacion, nombre_completo) VALUES (?, ?, ?, ?, ?)`;
+    const result = await db.execute(sqlInsert, [
+      nombre,
+      estado,
+      color,
+      codificacion,
+      nombre_completo,
+    ]);
+    const dependenciaId = result.insertId;
+
+    return {
+      success: true,
+      mensaje: "Dependencia creada correctamente",
+      id: dependenciaId,
+    };
+  } catch (error) {
+    console.error("Error al crear la dependencia:", error);
+    throw error;
+  }
 }
 
 //Modificar dependencia
-async function edit(data){
-  const {id,nombre, nombre_completo, estado, codificacion} = data;
+async function edit(data) {
+  const { id, nombre, nombre_completo, estado, codificacion } = data;
   try {
     // Verificar si ya existe una dependencia con ese nombre
-    const existing = await db.query("SELECT id FROM dependencia WHERE nombre = ? AND id != ?", [nombre, id]);
+    const existing = await db.queryOne(
+      "SELECT id FROM dependencia WHERE nombre = ? AND id != ?",
+      [nombre, id]
+    );
     if (existing && existing.length > 0) {
       // Ya existe, no actualizar
-      console.log({ mensaje: `Dependencia '${nombre}' ya existe`});
+      console.log({ mensaje: `Dependencia '${nombre}' ya existe` });
       return { success: false, message: `Dependencia '${nombre}' ya existe` };
     } else {
       // Actualizar la dependencia
-      const sqlUpdate = "UPDATE dependencia SET nombre = ?, nombre_completo = ?, estado = ?, codificacion = ? WHERE id = ?";
-      const result = await db.query(sqlUpdate, [nombre, nombre_completo, estado, codificacion, id]);
+      const sqlUpdate =
+        "UPDATE dependencia SET nombre = ?, nombre_completo = ?, estado = ?, codificacion = ? WHERE id = ?";
+      const result = await db.execute(sqlUpdate, [
+        nombre,
+        nombre_completo,
+        estado,
+        codificacion,
+        id,
+      ]);
       if (result.affectedRows > 0) {
-        console.log({ mensaje: `Dependencia '${nombre}' actualizada correctamente` });
-        return { success: true, message: `Dependencia '${nombre}' actualizada correctamente` };
+        console.log({
+          mensaje: `Dependencia '${nombre}' actualizada correctamente`,
+        });
+        return {
+          success: true,
+          message: `Dependencia '${nombre}' actualizada correctamente`,
+        };
       } else {
         console.log({ mensaje: `No se encontró la dependencia con ID ${id}` });
-        return { success: false, message: `No se encontró la dependencia con ID ${id}` };
+        return {
+          success: false,
+          message: `No se encontró la dependencia con ID ${id}`,
+        };
       }
     }
   } catch (error) {
@@ -95,33 +116,31 @@ async function edit(data){
   }
 }
 
-
 async function eliminar(id) {
   const sql = "DELETE FROM dependencia WHERE id = ?";
-  const results = await db.query(sql, [id]);
+  const results = await db.execute(sql, [id]);
   return results;
 }
 
 // Funciones para endpoints especiales
 
-
 //Mostrar todos las dependencias
 async function getAllNamesDependencias() {
-    const sql = "SELECT nombre FROM dependencia";
-    const results = await db.query(sql,[]);
-    return results;
-  }
+  const sql = "SELECT nombre FROM dependencia";
+  const results = await db.query(sql, []);
+  return results;
+}
 
-
-//Buscar dependencia por parametros 
+//Buscar dependencia por parametros
 async function searchDependenciaByParameters(
   nombre,
-  estado, 
+  estado,
   limite = null,
   offset = null
-){
-  try{
-    let sql = "SELECT d.id, d.nombre,d.nombre_completo,d.estado,d.codificacion, COUNT(*)OVER() AS total FROM dependencia d WHERE 1=1";
+) {
+  try {
+    let sql =
+      "SELECT d.id, d.nombre,d.nombre_completo,d.estado,d.codificacion, COUNT(*)OVER() AS total FROM dependencia d WHERE 1=1";
     const params = [];
     if (nombre) {
       sql += " AND d.nombre LIKE ?";
@@ -138,19 +157,26 @@ async function searchDependenciaByParameters(
     }
     const results = await db.query(sql, params);
     const totalResults = results?.length > 0 ? results[0].total : 0;
-    console.log(params,sql);
-     if (!results) {
+    console.log(sql, params);
+    if (!results) {
       console.log(
         "No se encontró las dependencias con los parámetros especificados"
       );
       return { data: [], totalResults };
     }
     return { data: results, totalResults };
-  }catch (error) {
+  } catch (error) {
     console.error("Error al buscar dependencias por parámetros:", error);
   }
 }
 
-
-
-export default {getAllDependencias, getDepenendenciaById, create, eliminar, getAllNamesDependencias, searchDependenciaByParameters, edit, getSesionesPaginado}
+export default {
+  getAllDependencias,
+  getDepenendenciaById,
+  create,
+  eliminar,
+  getAllNamesDependencias,
+  searchDependenciaByParameters,
+  edit,
+  getSesionesPaginado,
+};

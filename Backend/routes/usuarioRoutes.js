@@ -1,134 +1,124 @@
-import UsuariosDB from "../services/usuarios.js";
 import express from "express";
+import UsuariosDB from "../services/usuarios.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-router.post("/create", async (req, res) => {
-  const usuarioData = req.body;
-  try {
+// Crear usuario
+router.post(
+  "/create",
+  asyncHandler(async (req, res) => {
+    const usuarioData = req.body;
     const result = await UsuariosDB.create(usuarioData);
-    res.status(201).json(result);
-  } catch (error) {
-    console.error("Error al crear el usuario:", error);
-    res.status(500).json({ error: "Error al crear el usuario" });
-  }
-});
+    res.status(201).json({ ok: true, message: result.mensaje });
+  })
+);
 
-//Editar usuario
-router.post("/edit", async (req, res) => {
-  const usuarioDataEdit = req.body;
-  try {
+// Editar usuario
+router.post(
+  "/edit",
+  asyncHandler(async (req, res) => {
+    const usuarioDataEdit = req.body;
     const result = await UsuariosDB.edit(usuarioDataEdit);
-    if (result) {
-      res.status(200).json({ message: "Usuario editado correctamente." });
-    } else {
-      res.status(400).json({ error: "No se pudo editar el usuario." });
-    }
-  } catch (error) {
-    console.error("Error al editar el usuario:", error);
-    res.status(500).json({ error: "Error al editar el usuario" });
-  }
-});
+    res.status(200).json({ ok: true, message: result.mensaje });
+  })
+);
 
-//Mostrar todos los usuarios
-async function getAllUsuarios() {
-  const sql = "SELECT nombre,email,telefono,id_dependencia  FROM usuario";
-  const results = await db.query(sql);
-  return results;
-}
+// Mostrar todos los usuarios
+router.get(
+  "/",
+  asyncHandler(async (req, res) => {
+    const users = await UsuariosDB.getAllUsuarios();
+    res.json(users);
+  })
+);
 
-router.get("/", async (req, res) => {
-  const users = await UsuariosDB.getAllUsuarios();
-  res.json(users);
-});
+router.get(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const users = await UsuariosDB.getUsuarioById(id);
+    res.json(users);
+  })
+);
 
-router.get("/:id", async (req, res) => {
-  const id = req.params.id;
-  const users = await UsuariosDB.getUsuarioById(id);
-  res.json(users);
-});
+router.get(
+  "/datos/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const users = await UsuariosDB.getUsuarioByIdDatos(id);
+    res.json(users);
+  })
+);
 
-router.get("/datos/:id", async (req, res) => {
-  const id = req.params.id;
-  const users = await UsuariosDB.getUsuarioByIdDatos(id);
-  res.json(users);
-});
-
-router.post("/", async (req, res) => {
-  const data = req.body;
-  try {
+router.post(
+  "/",
+  asyncHandler(async (req, res) => {
+    const data = req.body;
     const users = await UsuariosDB.createUsuario(data);
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  })
+);
 
-router.delete("/eliminar/:id", async (req, res) => {
-  const data = req.params.id;
-  try {
-    const users = await UsuariosDB.eliminar(data);
+router.delete(
+  "/eliminar/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const users = await UsuariosDB.eliminar(id);
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  })
+);
 
-router.put("/:id", async (req, res) => {
-  try {
+router.put(
+  "/:id",
+  asyncHandler(async (req, res) => {
     await UsuariosDB.updateUsuario(req.params.id, req.body);
     res.json({ success: true, message: "Usuario actualizado" });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
+  })
+);
 
-router.get("/filter/:id", async (req, res) => {
-  const id = req.params.id;
-  try {
+router.get(
+  "/filter/:id",
+  asyncHandler(async (req, res) => {
+    const id = req.params.id;
     const users = await UsuariosDB.filterUsuariosporDepartament(id);
-    res.json(users);
-    if (users.affectedRows === 0) {
+    if (!users || users.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    res.json(users);
+  })
+);
 
-router.post("/userEmail", async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: "Faltan parámetros 'email'" });
-  }
-
-  try {
+router.post(
+  "/userEmail",
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Faltan parámetros 'email'" });
+    }
     const result = await UsuariosDB.UsuarioByEmailAndEstado(email);
-
-    if (result.affectedRows === 0) {
+    if (!result || result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  })
+);
 
-//Filtrar usuarios por parametros
-router.post("/search", async (req, res) => {
-  let { tipoUsuario, nombre, estado } = req.body;
-  let { dependencia } = req.query;
-  if (!dependencia) {
-    dependencia = req.body.dependencia;
-  }
-  let { page, limite } = req.query;
-  limite = parseInt(limite, 10) || 10;
-  page = parseInt(page, 10) || 1;
-  try {
-    // Si hay otros parámetros, filtrar por ellos
+// Filtrar usuarios por parámetros
+router.post(
+  "/search",
+  asyncHandler(async (req, res) => {
+    let { tipoUsuario, nombre, estado } = req.body;
+    let {
+      dependencia = req.body.dependencia,
+      page = 1,
+      limite = 10,
+    } = req.query;
+
+    limite = parseInt(limite, 10) || 10;
+    page = parseInt(page, 10) || 1;
     const offset = (page - 1) * limite;
-    //Get the total count of results
+
     const { data, totalResults } = await UsuariosDB.searchUsuariosByParameters(
       tipoUsuario,
       nombre,
@@ -137,16 +127,8 @@ router.post("/search", async (req, res) => {
       limite,
       offset
     );
-    if (!data || data.length === 0) {
-      return res.status(404).json({
-        error: "No se encontró los usuarios que coincidan con su búsqueda",
-      });
-    }
     res.status(200).json({ data, totalResults });
-  } catch (err) {
-    console.log("Error al buscar el usuario", err);
-    res.status(500).json({ error: "Error al buscar el usuario" });
-  }
-});
+  })
+);
 
 export default router;

@@ -1,6 +1,5 @@
 import db from "./db.js";
 
-
 async function searchAuditoriaByParameters(
   titulo,
   usuario,
@@ -57,12 +56,12 @@ async function crearRegistroAuditoria({ id_normativa, id_usuario, tipo }) {
       INSERT INTO auditoria_normativa (id_normativa, id_usuario, fecha, tipo)
       VALUES (?, ?, ?, ?)
     `;
-    await db.query(sql, [id_normativa, id_usuario, fecha, tipo]);
-    return { success: true, message: "Registro de auditoría creado" };
+    await db.execute(sql, [id_normativa, id_usuario, fecha, tipo]);
+    return { ok: true, message: "Registro de auditoría creado" };
   } catch (error) {
     console.error("Error al crear registro de auditoría:", error);
-    return { success: false, message: "Error al crear registro de auditoría" };
+    return { ok: false, message: "Error al crear registro de auditoría" };
   }
 }
 
-export default {searchAuditoriaByParameters, crearRegistroAuditoria };
+export default { searchAuditoriaByParameters, crearRegistroAuditoria };
