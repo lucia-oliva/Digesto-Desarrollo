@@ -132,12 +132,11 @@ export const filterConfig = {
         { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
         { label: "Nota", value: "6" },
-
       ],
     },
   ],
-  
-ListadoNormativaDespublicadas: [
+
+  ListadoNormativaDespublicadas: [
     {
       name: "numero",
       type: "text",
@@ -196,32 +195,30 @@ ListadoNormativaDespublicadas: [
         { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
         { label: "Nota", value: "6" },
-
       ],
     },
   ],
-  
 
-  ListadoAuditoria:[
+  ListadoAuditoria: [
     {
       name: "titulo",
       type: "text",
-      label: "Titulo Normativa"
+      label: "Titulo Normativa",
     },
     {
       name: "usuario",
       type: "text",
-      label: "Nombre Usuario"
+      label: "Nombre Usuario",
     },
     {
       name: "accion",
       type: "select",
       label: "Accion",
       options: [
-        {label: "Alta", value: "alta"},
-        {label: "Baja", value: "baja"},
-        {label: "Edicion", value: "modificacion"}
-      ]
+        { label: "Alta", value: "alta" },
+        { label: "Baja", value: "baja" },
+        { label: "Edicion", value: "modificacion" },
+      ],
     },
     {
       name: "dependencia",
@@ -283,12 +280,10 @@ ListadoNormativaDespublicadas: [
       type: "select",
       label: "Estado",
       options: [
-        { label: "Todos", value: "" },
-        { label: "Activa", value: "activa" },
-        { label: "Inactiva", value: "inactiva" },
+        { label: "Publicadas", value: "publicado" },
+        { label: "Despublicadas", value: "despublicado" },
       ],
     },
-  
   ],
   ListadoEmisores: [
     {
@@ -300,19 +295,17 @@ ListadoNormativaDespublicadas: [
         { label: "despublicado", value: "despublicado" },
       ],
     },
-  
   ],
   ListadoPalabrasClave: [
     {
       name: "nombre",
       type: "text",
       label: "Nombre",
-    },  
+    },
     {
       name: "letra",
       type: "custom",
       label: "Empieza con",
-    },  
-  
+    },
   ],
-}; 
+};

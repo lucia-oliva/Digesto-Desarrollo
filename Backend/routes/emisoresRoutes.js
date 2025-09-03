@@ -1,104 +1,96 @@
 import emisoresDB from "../services/emisores.js";
 import express from "express";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-router.get("/datos/:id", async (req,res) =>{
-  const {id} = req.params;
-  try{
+// Obtener datos de un emisor por ID
+router.get(
+  "/datos/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
     const emisor = await emisoresDB.getById(id);
-    if(!emisor){
-      return res.status(404).json({error: "Emisor no encontrado"});
+    if (!emisor) {
+      throw new Error("Emisor no encontrado", 404);
     }
     res.json(emisor);
-  }catch(error){
-    console.error("Error al obtener emisor: ", error);
-    res.status(500).json({error: "Error al obtener emisor"});
-  }
-});
-
-router.get("/name", async (req, res) => {
-  try{
-    const emisores = await emisoresDB.getAllEmisoresName(); 
-    res.json(emisores);
-  }catch(err){
-    console.log("Error al obtener emisores",error);
-    res.status(500).json({ error: "Error al obtener emisores" });   
-  }}
+  })
 );
 
+// Que uso tiene?? TODO CHECK
+router.get(
+  "/name",
+  asyncHandler(async (req, res) => {
+    const emisores = await emisoresDB.getAllEmisoresName();
+    res.json(emisores);
+  })
+);
 
-router.post("/edit", async (req, res) => {
-  console.log("Cuerpo de la solicitud:", req.body);
-  const emisorDataEdit = req.body; 
-  try {
+// Editar emisor
+router.post(
+  "/edit",
+  asyncHandler(async (req, res) => {
+    const emisorDataEdit = req.body;
     const result = await emisoresDB.edit(emisorDataEdit);
-    if (result.success) {
-      res.status(200).json({ message: "Emisor editado correctamente." });
-    } else {
-      res.status(400).json({ error: result.mensaje });
-    }
-  } catch (error) {
-    console.error("Error al editar el emisor:", error);
-    res.status(500).json({ error: "Error al editar el emisor" });
-  }
-});
+    res.status(200).json({ ok: true, msg: result.mensaje });
+  })
+);
 
-router.post("/create", async (req, res) => {
-  const emisorData = req.body;
-  try {
+// Crear emisor
+router.post(
+  "/create",
+  asyncHandler(async (req, res) => {
+    const emisorData = req.body;
     const result = await emisoresDB.create(emisorData);
+    if (result.affectedRows === 0) {
+      const err = new Error("Error al crear el emisor");
+      err.status = 400;
+      throw err;
+    }
     res.status(201).json(result);
-  } catch (error) {
-    console.error("Error al crear el emisor:", error);
-    res.status(500).json({ error: "Error al crear el emisor" });
-  }
-});
+  })
+);
 
 //Filtrar dependencia por parametros
-router.post("/search", async (req, res) => {
-  let {nombre,estado} = req.body;
-  console.log("parametros:",nombre,estado);
-  let { page , limite } = req.query;
-  limite = parseInt(limite, 10) || 10;
-  page = parseInt(page, 10) || 1;
-  try {
+router.post(
+  "/search",
+  asyncHandler(async (req, res) => {
+    let { nombre, estado } = req.body;
+    let { page, limite } = req.query;
+    limite = parseInt(limite, 10) || 10;
+    page = parseInt(page, 10) || 1;
     // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
     //Get the total count of results
-    const { data, totalResults } =
-      await emisoresDB.searchEmisorByParameters(
-        nombre,
-        estado,
-        limite,
-        offset,
-      );
+    const { data, totalResults } = await emisoresDB.searchEmisorByParameters(
+      nombre,
+      estado,
+      limite,
+      offset
+    );
     if (!data || data.length === 0) {
-      return res
-        .status(404)
-        .json({
-          error: "No se encontró los emisores que coincidan con su búsqueda",
-        });
+      throw new Error(
+        "No se encontraron emisores con los parámetros especificados",
+        404
+      );
     }
     res.status(200).json({ data, totalResults });
-  } catch (err) {
-    console.log("Error al buscar el emisor", err);
-    res.status(500).json({ error: "Error al buscar el emisor" });
-  }
-});
+  })
+);
 
-router.delete("/eliminar/:id", async (req, res) => {
-  const {id} = req.params;
-  try{
-  const result = await emisoresDB.eliminar(id);
-  if (!result) {
-    return res.status(404).json({ error: "Emisor no encontrado" });
+// Eliminar emisor
+router.delete(
+  "/eliminar/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const result = await emisoresDB.eliminar(id);
+    if (result.affectedRows === 0) {
+      const err = new Error("Emisor no encontrado o ya eliminado");
+      err.status = 404;
+      throw err;
     }
-  res.status(200).json({ message: "Emisor eliminado correctamente" });
-  }catch(e){
-    console.error("Error al eliminar el emisor:", e);
-    res.status(500).json({ error: "Error al eliminar el emisor" });
-  }
-});
+    res.status(200).json({ ok: true, msg: "Emisor eliminado correctamente" });
+  })
+);
 
 export default router;

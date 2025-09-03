@@ -1,144 +1,114 @@
-import tagsDB from '../services/tag.js';
+import tagsDB from "../services/tag.js";
 import express from "express";
+import { asyncHandler } from "../utils/asyncHandler.js";
 const router = express.Router();
 
-router.delete("/eliminar/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
+// Eliminar un tag por id
+router.delete(
+  "/eliminar/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
     const result = await tagsDB.eliminar(id);
-
-    if (!result) {
-      return res.status(404).json({ error: "Tag no encontrado" });
-    }
-
-    res.json({ message: "Tag eliminado correctamente" });
-  } catch (error) {
-    console.error("Error al eliminar tag:", error);
-    res.status(500).json({ error: "Error interno al eliminar el tag" });
-  }
-});
-
-
-//traer datos para la funcion de editar
-router.get("/datos/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const tag = await tagsDB.getById(id);
-    if (!tag) {
-      return res.status(404).json({ error: "Tag no encontrada" });
-    }
-    res.json(tag);
-  } catch (error) {
-    console.error("Error al obtener tag:", error);
-    res.status(500).json({ error: "Error al obtener tag" });
-  }
-});
-
-router.get("/tags", async (req, res) => {
-try{
-    const tags = await tagsDB.getAllTags(); 
-    res.status(200).json({tags});
-}catch(err){
-    console.log("Error al obtener los tags", err);
-    res.status(500).json({ error: "Error al obtener los tags" });   
-}}
+    res.status(200).json({ ok: true, msg: "Tag eliminado correctamente" });
+  })
 );
 
-router.post("/edit", async (req, res) => {
-  console.log("Cuerpo de la solicitud:", req.body);
-  const dataTagEdit = req.body; 
-  try {
+//traer datos para la funcion de editar
+router.get(
+  "/datos/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    console.log(id);
+
+    const tag = await tagsDB.getById(id);
+    res.status(200).json(tag);
+  })
+);
+
+// Obtener todos los tags
+router.get(
+  "/tags",
+  asyncHandler(async (req, res) => {
+    const tags = await tagsDB.getAllTags();
+    res.status(200).json({ tags });
+  })
+);
+
+// Editar un tag
+router.post(
+  "/edit",
+  asyncHandler(async (req, res) => {
+    console.log("Cuerpo de la solicitud:", req.body);
+    const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
-    if (result.success) {
-      res.status(200).json({ message: "Tag editado correctamente." });
-    } else {
-      res.status(400).json({ error: result.mensaje });
-    }
-  } catch (error) {
-    console.error("Error al editar el tag:", error);
-    res.status(500).json({ error: "Error al editar el tag" });
-  }
-});
+    res.status(200).json({ ok: true, msg: "Tag editado correctamente." });
+  })
+);
 
-router.post("/create", async (req, res) => {
-  const tagData = req.body; // Array de tags
-  try {
+// Crear tags
+router.post(
+  "/create",
+  asyncHandler(async (req, res) => {
+    const tagData = req.body; // Array de tags
     await tagsDB.create(tagData);
-    res.status(200).json({ message: "Tags insertados correctamente." });
-  } catch (error) {
-    console.error("Error al insertar los tags:", error);
-    res.status(500).json({ error: "Error al insertar los tags" });
-  }
-});
+    res.status(200).json({ ok: true, msg: "Tags insertados correctamente." });
+  })
+);
 
-//Obtener tags de normativa 
-
-router.get("/tags/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
+//Obtener tags de normativa
+router.get(
+  "/tags/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
     const tags = await tagsDB.getTagsByNormativaId(id);
     res.status(200).json(tags);
-  } catch (error) {
-    console.error("Error al obtener los tags:", error);
-    res.status(500).json({ error: "Error al obtener los tags" });
-  }
-});
-
+  })
+);
 
 // Asociar tags con una normativa
-router.post("/tags/normativa/:id", async (req, res) => {
-  const { id } = req.params; // ID de la normativa
-  const { tags } = req.body; // Array de tags
-
-  if (!Array.isArray(tags) || tags.length === 0) {
-    return res.status(400).json({ error: "No se proporcionaron tags válidos." });
-  }
-
-  try {
+router.post(
+  "/tags/normativa/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params; // ID de la normativa
+    const { tags } = req.body; // Array de tags
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No se proporcionaron tags válidos." });
+    }
     await tagsDB.insertTagsForNormativa(id, tags);
-    res.status(200).json({ message: "Tags asociados correctamente a la normativa." });
-  } catch (error) {
-    console.error("Error al asociar tags con la normativa:", error);
-    res.status(500).json({ error: "Error al asociar tags con la normativa." });
-  }
-});
+    res
+      .status(200)
+      .json({ message: "Tags asociados correctamente a la normativa." });
+  })
+);
 
-
-//Filtrar dependencia por parametros
-router.post("/search", async (req, res) => {
-  let {nombre,letra} = req.body;
-  console.log("parametros:",nombre,letra);
-  let { page , limite } = req.query;
-  limite = parseInt(limite, 10) || 10;
-  page = parseInt(page, 10) || 1;
-  try {
-    // Si hay otros parámetros, filtrar por ellos
-    const offset = (page - 1) * limite;
-    //Get the total count of results
-    const { data, totalResults } =
-      await tagsDB.searchTagsByParameters(
+//Filtrar Tags por parametros
+router.post(
+  "/search",
+  asyncHandler(async (req, res) => {
+    try {
+      let { nombre, letra } = req.body;
+      console.log("parametros:", nombre, letra);
+      let page = req.query.page !== undefined ? req.query.page : 1;
+      let limite = req.query.limite !== undefined ? req.query.limite : 10;
+      limite = parseInt(limite, 10) || 10;
+      page = parseInt(page, 10) || 1;
+      // Si hay otros parámetros, filtrar por ellos
+      const offset = (page - 1) * limite;
+      //Get the total count of results
+      const { data, totalResults } = await tagsDB.searchTagsByParameters(
         nombre,
         letra,
         limite,
-        offset,
+        offset
       );
-    if (!data || data.length === 0) {
-      return res
-        .status(404)
-        .json({
-          error: "No se encontró los tags que coincidan con su búsqueda",
-        });
+      res.status(200).json({ data, totalResults });
+    } catch (error) {
+      console.error("Error en /search:", error);
+      res.status(500).json({ error: "Error interno del servidor." });
     }
-    res.status(200).json({ data, totalResults });
-  } catch (err) {
-    console.log("Error al buscar el tag", err);
-    res.status(500).json({ error: "Error al buscar el tag" });
-  }
-});
-
-
+  })
+);
 
 export default router;

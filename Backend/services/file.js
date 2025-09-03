@@ -23,17 +23,20 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
       throw new Error("Faltan parámetros obligatorios para normativa");
     }
 
-    const normativa = await db.query("SELECT * FROM normativa WHERE id = ?", [normativaId]);
+    const normativa = await db.queryOne(
+      "SELECT * FROM normativa WHERE id = ?",
+      [normativaId]
+    );
     if (!normativa || normativa.length === 0) {
       throw new Error("Normativa no encontrada");
     }
 
-    const resultado = await db.query(
+    const resultado = await db.queryOne(
       "SELECT codificacion FROM dependencia WHERE id = ?",
       [id_dependencia]
     );
 
-    if (!resultado.length) {
+    if (!resultado || resultado.length === 0) {
       throw new Error("Dependencia no encontrada");
     }
 
@@ -44,7 +47,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
     await fs.rename(viejoPath, nuevoPath);
 
-    const result = await db.query(
+    const result = await db.execute(
       "UPDATE normativa SET archivo = ? WHERE id = ?",
       [nuevoNombre, normativaId]
     );
@@ -54,26 +57,29 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     }
 
     return { id: normativaId, filename: nuevoNombre };
-
   } else if (type === "consejo") {
-
     if (!id_sesion || !fecha_sesion) {
       throw new Error("Faltan parámetros obligatorios para sesión");
     }
     console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
-    const sesion = await db.query("SELECT * FROM sesiones WHERE id_sesion = ?", [id_sesion]);
+    const sesion = await db.queryOne(
+      "SELECT * FROM sesiones WHERE id_sesion = ?",
+      [id_sesion]
+    );
     if (!sesion || sesion.length === 0) {
-      throw new Error("Sesión no encontrada, recibimos el id_sesion: " + id_sesion);
+      throw new Error(
+        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion
+      );
     }
 
     const fechaFormateada = new Date(fecha_sesion).toISOString().split("T")[0];
     const nuevoNombre = `ORDEN_DEL_DIA_${fechaFormateada}.pdf`;
-    const carpetaOrdenes = path.join(carpeta, "OrdenesDelDia")
+    const carpetaOrdenes = path.join(carpeta, "OrdenesDelDia");
     const nuevoPath = path.join(carpetaOrdenes, nuevoNombre);
 
     await fs.rename(viejoPath, nuevoPath);
 
-    const result = await db.query(
+    const result = await db.execute(
       "UPDATE sesiones SET orden_url = ? WHERE id_sesion = ?",
       [nuevoNombre, id_sesion]
     );
@@ -83,36 +89,40 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     }
 
     return { id: id_sesion, filename: nuevoNombre };
-  }else if(type === "acta") {
-      console.log("entro al acta:" ,id_sesion, fecha_sesion, nombre_acta);
+  } else if (type === "acta") {
+    console.log("entro al acta:", id_sesion, fecha_sesion, nombre_acta);
     if (!id_sesion || !fecha_sesion || !nombre_acta) {
       throw new Error("Faltan parámetros obligatorios para sesión");
     }
     console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
-    const sesion = await db.query("SELECT * FROM sesiones WHERE id_sesion = ?", [id_sesion]);
+    const sesion = await db.queryOne(
+      "SELECT * FROM sesiones WHERE id_sesion = ?",
+      [id_sesion]
+    );
     if (!sesion || sesion.length === 0) {
-      throw new Error("Sesión no encontrada, recibimos el id_sesion: " + id_sesion);
+      throw new Error(
+        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion
+      );
     }
 
     const fechaFormateada = new Date(fecha_sesion).toISOString().split("T")[0];
     const nuevoNombre = `ACTA_DEL_DIA_${fechaFormateada}.pdf`;
-    const carpetaOrdenes = path.join(carpeta, "Actas")
+    const carpetaOrdenes = path.join(carpeta, "Actas");
     const nuevoPath = path.join(carpetaOrdenes, nuevoNombre);
     await fs.rename(viejoPath, nuevoPath);
-    const result = await db.query(
-  "UPDATE sesiones SET acta_url = ?, nombre_acta = ? WHERE id_sesion = ?",
-  [nuevoNombre, nombre_acta, id_sesion]
-);
+    const result = await db.execute(
+      "UPDATE sesiones SET acta_url = ?, nombre_acta = ? WHERE id_sesion = ?",
+      [nuevoNombre, nombre_acta, id_sesion]
+    );
     if (result.affectedRows === 0) {
       throw new Error("No se pudo actualizar la sesión");
     }
     return { id: id_sesion, filename: nuevoNombre };
-  }
-   else {
+  } else {
     throw new Error("Tipo de procesamiento no reconocido");
   }
 }
 
 export default {
-  procesarArchivoDeNormativa
+  procesarArchivoDeNormativa,
 };

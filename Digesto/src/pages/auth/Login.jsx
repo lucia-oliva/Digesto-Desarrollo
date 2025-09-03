@@ -36,6 +36,7 @@ function Login() {
       navigate("/admin");
     } catch (error) {
       const msg = error?.response?.data?.msg || "Error al iniciar sesión.";
+      console.log(error);
       setForm({ email: "", password: "" });
       setResponse({ msg, isError: true });
     } finally {
@@ -47,34 +48,33 @@ function Login() {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Imagen o presentación izquierda */}
       <div
-  className="md:w-3/5 w-full bg-primary text-primary-content flex flex-col justify-center items-center px-10 py-12 relative"
-  style={{
-    backgroundImage:
-      "url('https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-  }}
->
-  {/* Overlay oscuro */}
-  <div className="absolute inset-0 bg-black opacity-50
+        className="md:w-3/5 w-full bg-primary text-primary-content flex flex-col justify-center items-center px-10 py-12 relative"
+        style={{
+          backgroundImage:
+            "url('https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Overlay oscuro */}
+        <div
+          className="absolute inset-0 bg-black opacity-50
 
- z-0"></div>
+ z-0"
+        ></div>
 
-  {/* Contenido sobre la imagen */}
-  <div className="p-10 text-center max-w-xl w-full relative z-10">
-    <div className="mb-6">
-      <div className="text-white flex justify-center font-bold text-3xl">
-        <img
-              src="src\assets\unlar-white.png"
-              alt="Unlar logo"
-            />
-
+        {/* Contenido sobre la imagen */}
+        <div className="p-10 text-center max-w-xl w-full relative z-10">
+          <div className="mb-6">
+            <div className="text-white flex justify-center font-bold text-3xl">
+              <img src="src\assets\unlar-white.png" alt="Unlar logo" />
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            ¡Hola, bienvenido!
+          </h1>
+        </div>
       </div>
-    </div>
-    <h1 className="text-4xl md:text-5xl font-bold mb-4">¡Hola, bienvenido!</h1>
-  </div>
-</div>
-
 
       {/* Formulario derecho */}
       <div className="md:w-2/5 w-full bg-base-100 flex items-center justify-center p-8">
@@ -84,7 +84,10 @@ function Login() {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-primary">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-primary"
+              >
                 Correo electrónico
               </label>
               <input
@@ -98,7 +101,10 @@ function Login() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-primary">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-primary"
+              >
                 Contraseña
               </label>
               <input
@@ -123,7 +129,11 @@ function Login() {
 
       {response.msg && (
         <div className="absolute top-0 left-0 right-0 z-50 flex justify-center">
-          <Alert message={response.msg} title="Login" error={response.isError} />
+          <Alert
+            message={response.msg}
+            title="Login"
+            error={response.isError}
+          />
         </div>
       )}
       {loading && (
