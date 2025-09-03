@@ -52,9 +52,11 @@ function GenericEdit() {
         .then((data) => {
           if (!data) {
             alert("No se encontraron datos para editar.");
-          } else {
-            setFormData({
+          } else if(entidad === "normativa"){
+                setFormData({
               ...data,
+              
+            
               emisor: getValueFromLabel(emisorOptions, data.emisor),
               dependencia: getValueFromLabel(
                 dependenciaOptions,
@@ -68,6 +70,10 @@ function GenericEdit() {
                   : data.cambia_normativa || "NO",
               _originalesNormativas: data.normativas_modificadas || [],
               normativas_bajas: [],
+            });
+          } else {
+            setFormData({
+              ...data,
             });
           }
         })

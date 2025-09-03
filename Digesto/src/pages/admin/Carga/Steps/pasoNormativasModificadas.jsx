@@ -169,9 +169,13 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
           n.id === prev.editingSelectedId ? { ...n, ...conEstado } : n
         );
         const {
+          // eslint-disable-next-line no-unused-vars     
           modalSeleccionarNormativa,
+          // eslint-disable-next-line no-unused-vars     
           accionSeleccionada,
+          // eslint-disable-next-line no-unused-vars     
           comentarioSeleccionado,
+          // eslint-disable-next-line no-unused-vars     
           editingSelectedId,
           ...rest
         } = prev;
@@ -191,9 +195,13 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
         : [...lista, conEstado];
 
       const {
+        // eslint-disable-next-line no-unused-vars        
         modalSeleccionarNormativa,
+        // eslint-disable-next-line no-unused-vars     
         accionSeleccionada,
+        // eslint-disable-next-line no-unused-vars     
         comentarioSeleccionado,
+        // eslint-disable-next-line no-unused-vars     
         editingSelectedId,
         ...rest
       } = prev;
