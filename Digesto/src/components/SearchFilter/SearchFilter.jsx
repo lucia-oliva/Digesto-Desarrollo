@@ -79,8 +79,8 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
   };
 
   return (
-    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
-      <h2 className="text-lg font-bold mb-4">Filtros de búsqueda</h2>
+    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow ">
+      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
       {/*Abecedario*/}
       {filters.some((f) => f.name === "letra") && (
         <div className="mb-4">
@@ -99,13 +99,13 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
             if (filter.type === "text") {
               return (
                 <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium">{filter.label}</label>
+                  <label className="mb-1 font-medium max-[426px]:text-xs">{filter.label}</label>
                   <input
                     type="text"
                     name={filter.name}
                     value={formState[filter.name] || ""}
                     onChange={handleChange}
-                    className="input input-bordered"
+                    className="input input-bordered max-[426px]:input-sm"
                   />
                 </div>
               );
@@ -120,7 +120,7 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
 
               return (
                 <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium">{filter.label}</label>
+                  <label className="mb-1 font-medium max-[426px]:text-xs">{filter.label}</label>
                   <select
                     name={filter.name}
                     value={
@@ -129,7 +129,7 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
                         : formState[filter.name] ?? ""
                     }
                     onChange={handleChange}
-                    className="select select-bordered"
+                    className="select select-bordered max-[425px]:select-sm"
                     disabled={disabled}
                   >
                     <option value="" disabled>
