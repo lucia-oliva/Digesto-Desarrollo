@@ -7,8 +7,6 @@ import AbecedarioFiltro from "./AlphabetFilter";
 import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo.js";
 import { useAuth } from "../../context/useAuth.jsx";
 
-//BUG: Cuando clickeo en una pagina alta (ej pagina 50) y luego cambio a listados cortos por ejemplo usuarios, carga tags(???)
-//BUG: los filtros aplicados no se borran y se aplican en otras tablas que no tienen que ver (si coincide el filtro capaz.)
 const DEP_BY_NAME = new Map(
   dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
 );

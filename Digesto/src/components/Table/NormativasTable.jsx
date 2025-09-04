@@ -79,10 +79,26 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
 
 
   useEffect(() => {
-    if (!usingStatic) reload();
+    if (!usingStatic) 
+      reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, JSON.stringify(filtrosEfectivos), usingStatic]);
 
+  useEffect(() => {
+  if (!usingStatic) {
+    onPageChange(1);
+  }
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [tipo, JSON.stringify(filtrosEfectivos)]);
+
+useEffect(() => {
+  if (!usingStatic && totalPages && page > totalPages) {
+    onPageChange(Math.max(1, totalPages));
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [totalPages]);
+
+console.log("totalPages y page: ", totalPages, page );
  
   const filteredColumns = (columns || []).filter(
     (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo))
