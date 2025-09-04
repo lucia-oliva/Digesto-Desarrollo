@@ -26,7 +26,7 @@ async function edit(data) {
       [nombre, id]
     );
     // Verificar si ya existe otro tag con el mismo nombre
-    if (!existing) {
+    if (existing) {
       const err = new Error(`Tag '${nombre}' ya existe`);
       err.status = 400;
       throw err;

@@ -15,7 +15,6 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
   const filters = useMemo(() => filterConfig[type] || [], [type]);
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
-  const [selectedLetter, setSelectedLetter] = useState("");
 
   const { auth } = useAuth();
   const user = auth?.user;
@@ -28,10 +27,11 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
   const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
 
   const handleLetterSelect = (letra) => {
-    setSelectedLetter(letra);
-    const updatedState = { ...formState, letra };
-    setFormState(updatedState);
-    onSearch(updatedState); // ejecuta la búsqueda con la letra
+    setFormState((prev) => {
+      const next = { ...prev, letra };
+      onSearch(next);
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -73,7 +73,7 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
   const handleBuscar = () => {
     onSearch(formState);
     // eslint-disable-next-line no-unused-vars
-    setFormState((prev) => (canLockDep ? { dependencia: lockedDepValue } : {}));
+    setFormState((prev) => (canLockDep ? { dependencia: lockedDepValue, letra: ""} : {letra:""}));
   };
 
   return (
@@ -84,7 +84,7 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
         <div className="mb-4">
           <label className="block font-medium mb-1">Empieza con</label>
           <AbecedarioFiltro
-            selectedLetter={selectedLetter}
+            value={formState.letra ?? ""}
             onSelect={handleLetterSelect}
           />
         </div>
