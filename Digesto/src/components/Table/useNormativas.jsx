@@ -118,16 +118,30 @@ export const useNormativas = (type,filtros) => {
 
   
   const onDelete = async (item) => {
-    
+    console.log(type);
+    if(type === "tag"){
+    if (!window.confirm("¿Eliminar Tag?")) return;
+  }else if(type=== "usuarios"){
+    if (!window.confirm("¿Eliminar Usuario?")) return;
+  }else if(type=== "dependencia"){
+    if (!window.confirm("¿Eliminar Dependencia")) return;
+  }else if(type=== "emisores"){
+    if (!window.confirm("¿Eliminar Emisor?")) return;
+  }
+  else{
     if (!window.confirm("¿Eliminar normativa?")) return;
+  }
 
     try {
       setLoading(true);
       console.log("prueba usuario eliminaaaar",user.id);
       const response = await deleteApi(item.id || item.id_sesion,type,user.id);
       if (!response.ok) throw new Error("No se pudo eliminar");
+      
       // Refrescar lista
       loadNormativas(page);
+      alert("Se elimino correctamente");
+
     } catch (err) {
       setError("Error al eliminar la normativa", err);
     } finally {

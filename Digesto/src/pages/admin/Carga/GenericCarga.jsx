@@ -85,14 +85,15 @@ function GenericCarga() {
             }
           }
 
+        
+          setFormData({});
+          setErrores({});
+          setCurrentStep(0);
           alert(
             `${
               entidad.charAt(0).toUpperCase() + entidad.slice(1)
             } creado/a correctamente`
           );
-          setFormData({});
-          setErrores({});
-          setCurrentStep(0);
         })
         .catch(() => alert("Error al crear registro"));
     } catch (err) {
