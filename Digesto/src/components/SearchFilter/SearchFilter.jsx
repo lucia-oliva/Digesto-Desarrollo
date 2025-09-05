@@ -11,7 +11,13 @@ const DEP_BY_NAME = new Map(
   dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
 );
 
-function GenericFilterSearch({ type, onSearch, scope = "public" }) {
+function GenericFilterSearch({
+  type,
+  onSearch,
+  scope = "public",
+  initialState = {},
+  autoSearch = false,
+}) {
   const filters = useMemo(() => filterConfig[type] || [], [type]);
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
@@ -20,20 +26,24 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
   const user = auth?.user;
   const isSuperAdmin = user?.tipo_usuario === "SuperAdministrador";
   const userDepNombre = (user?.dependencia ?? "").trim();
-  const lockedDepValue = !isSuperAdmin
-    ? DEP_BY_NAME.get(userDepNombre) ?? ""
-    : "";
+  const lockedDepValue = !isSuperAdmin ? DEP_BY_NAME.get(userDepNombre) ?? "" : "";
   const isAdminScope = scope === "admin";
   const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
 
-  const handleLetterSelect = (letra) => {
+  // ✅ Restaurado: tomar estado inicial (ej. dependencia de la URL) y buscar si autoSearch
+  useEffect(() => {
+    const hasInitial = initialState && Object.keys(initialState).length > 0;
+    if (!hasInitial) return;
+
     setFormState((prev) => {
-      const next = { ...prev, letra };
-      onSearch(next);
+      const next = { ...prev, ...initialState };
+      if (autoSearch) onSearch(next);
       return next;
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(initialState), autoSearch]);
 
+  // Mantener dependencia bloqueada en admin cuando corresponda
   useEffect(() => {
     const hasDependencia = filters.some((f) => f.name === "dependencia");
     if (hasDependencia && canLockDep) {
@@ -42,6 +52,7 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, lockedDepValue]);
 
+  // Carga de opciones async
   useEffect(() => {
     const fetchOptions = async () => {
       const updatedOptions = {};
@@ -60,9 +71,16 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
       }
       setDynamicOptions(updatedOptions);
     };
-
     fetchOptions();
   }, [filters]);
+
+  const handleLetterSelect = (letra) => {
+    setFormState((prev) => {
+      const next = { ...prev, letra };
+      onSearch(next); // búsqueda inmediata al tocar letra
+      return next;
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,19 +90,22 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
 
   const handleBuscar = () => {
     onSearch(formState);
-    // eslint-disable-next-line no-unused-vars
-    setFormState((prev) => (canLockDep ? { dependencia: lockedDepValue, letra: ""} : {letra:""}));
+    // mantener tus cambios nuevos: limpiar letra y respetar dependencia bloqueada
+    setFormState(() =>
+      canLockDep ? { dependencia: lockedDepValue, letra: "" } : { letra: "" }
+    );
   };
 
   return (
     <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow ">
       <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
-      {/*Abecedario*/}
+
+      {/* Abecedario */}
       {filters.some((f) => f.name === "letra") && (
         <div className="mb-4">
           <label className="block font-medium mb-1">Empieza con</label>
           <AbecedarioFiltro
-            value={formState.letra ?? ""}
+            value={formState.letra ?? ""}  
             onSelect={handleLetterSelect}
           />
         </div>
@@ -97,7 +118,9 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
             if (filter.type === "text") {
               return (
                 <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium max-[426px]:text-xs">{filter.label}</label>
+                  <label className="mb-1 font-medium max-[426px]:text-xs">
+                    {filter.label}
+                  </label>
                   <input
                     type="text"
                     name={filter.name}
@@ -118,7 +141,9 @@ function GenericFilterSearch({ type, onSearch, scope = "public" }) {
 
               return (
                 <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium max-[426px]:text-xs">{filter.label}</label>
+                  <label className="mb-1 font-medium max-[426px]:text-xs">
+                    {filter.label}
+                  </label>
                   <select
                     name={filter.name}
                     value={
@@ -160,6 +185,8 @@ GenericFilterSearch.propTypes = {
   type: PropTypes.string.isRequired,
   onSearch: PropTypes.func.isRequired,
   scope: PropTypes.oneOf(["admin", "public"]),
+  initialState: PropTypes.object,
+  autoSearch: PropTypes.bool,
 };
 
 export default GenericFilterSearch;
