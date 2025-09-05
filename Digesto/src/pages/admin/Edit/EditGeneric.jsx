@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useParams,useNavigate } from "react-router";
 import PasoSeleccionTipo from "../Carga/Steps/pasoSeleccionTipo.jsx";
 import PasoFormulario from "../Carga/Steps/pasoForm.jsx";
 import PasoModifica from "../Carga/Steps/pasoNormativasModificadas.jsx";
@@ -12,6 +12,7 @@ import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 
 function GenericEdit() {
+  const navigate = useNavigate();
   const { auth } = useAuth();
   const user = auth.user;
   const location = useLocation();
@@ -100,11 +101,17 @@ function GenericEdit() {
     const cambios = buildRelacionesNormativas(formData);
 
     const {
+    // eslint-disable-next-line no-unused-vars
       accionSeleccionada,
+    // eslint-disable-next-line no-unused-vars
       comentarioSeleccionado,
+    // eslint-disable-next-line no-unused-vars
       editingSelectedId,
+    // eslint-disable-next-line no-unused-vars
       modalSeleccionarNormativa,
+    // eslint-disable-next-line no-unused-vars
       normativas_bajas,
+    // eslint-disable-next-line no-unused-vars
       _originalesNormativas,
       ...formClean
     } = formData;
@@ -150,7 +157,7 @@ function GenericEdit() {
 
           return fetch(`http://localhost:3000/api/file/upload/${formData.id}`, {
             method: "POST",
-            body: formDataUpload, // NO setees Content-Type
+            body: formDataUpload, 
           })
             .then((resUpload) => {
               if (!resUpload.ok) throw new Error("Error al subir archivo PDF.");
@@ -160,6 +167,15 @@ function GenericEdit() {
               console.log("Resultado de subida de archivo:", resJson);
               alert(`Entidad ${entidad} editada correctamente.`);
             });
+        }
+        setFormData({});
+        setErrores({});
+        if(entidad === "palabraclave"){
+           navigate(`/admin/ListadoPalabrasClave`);
+        }else if(entidad === "emisor"){
+          navigate(`/admin/ListadoEmisores`);
+        }else if(entidad === "dependencia"){
+          navigate(`/admin/ListadoDependencias`);
         }
         alert(`Entidad ${entidad} editada correctamente.`);
       });

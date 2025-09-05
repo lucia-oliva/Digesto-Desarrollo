@@ -52,9 +52,7 @@ async function edit(data) {
 }
 
 async function create(data) {
-  const { nombre } = data;
-
-  const estado = "publicado"; // Estado por defecto al crear un emisor
+  const { nombre, estado } = data;
   try {
     const sqlInsert = `INSERT INTO emisor (nombre, estado) VALUES (?, ?)`;
     const result = await db.execute(sqlInsert, [nombre, estado]);

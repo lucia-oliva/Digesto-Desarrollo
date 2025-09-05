@@ -118,38 +118,56 @@ export const useNormativas = (type,filtros) => {
 
   
   const onDelete = async (item) => {
-    console.log(type);
-    if(type === "tag"){
-    if (!window.confirm("¿Eliminar Tag?")) return;
-  }else if(type=== "usuarios"){
-    if (!window.confirm("¿Eliminar Usuario?")) return;
-  }else if(type=== "dependencia"){
-    if (!window.confirm("¿Eliminar Dependencia")) return;
-  }else if(type=== "emisores"){
-    if (!window.confirm("¿Eliminar Emisor?")) return;
-  }
-  else{
-    if (!window.confirm("¿Eliminar normativa?")) return;
-  }
+    const msg =
+      type === "tag" ? "¿Eliminar Tag?" :
+      type === "usuarios" ? "¿Eliminar Usuario?" :
+      type === "dependencia" ? "¿Eliminar Dependencia?" :
+      type === "emisores" ? "¿Eliminar Emisor?" :
+      "¿Eliminar normativa?";
+
+    if (!window.confirm(msg)) return;
+
+    // ----- LOG: qué type es y qué id estamos usando
+    const idParaBorrar = item.id || item.id_sesion; // <--- si dependencias usa otra pk (id_dependencia), probalo a mano acá
+    console.log("[DELETE] type:", type, "id:", idParaBorrar, "page:", page, "len antes:", normativas.length);
+
+    // decidir si hay que retroceder (si queda vacía la página actual)
+    const shouldGoBack = page > 1 && Array.isArray(normativas) && normativas.length === 1;
+    console.log("[DELETE] shouldGoBack?:", shouldGoBack);
 
     try {
       setLoading(true);
-      console.log("prueba usuario eliminaaaar",user.id);
-      const response = await deleteApi(item.id || item.id_sesion,type,user.id);
-      if (!response.ok) throw new Error("No se pudo eliminar");
-      
-      // Refrescar lista
-      loadNormativas(page);
-      alert("Se elimino correctamente");
+      const response = await deleteApi(idParaBorrar, type, user?.id);
 
+      const ok =
+        (typeof response?.ok === "boolean" && response.ok) ||
+        (typeof response?.status === "number" && response.status >= 200 && response.status < 300) ||
+        response?.data?.success === true ||
+        response?.success === true;
+
+      console.log("[DELETE] response:", response, "ok:", ok);
+      if (!ok) throw new Error("No se pudo eliminar");
+
+      if (shouldGoBack) {
+        console.log("[DELETE] acción -> retroceder página");
+        setPage((p) => Math.max(1, p - 1)); // esto dispara el useEffect y recarga
+      } else {
+        console.log("[DELETE] acción -> recargar misma página");
+        await loadNormativas(page); // recarga directa
+      }
+
+      console.log("[DELETE] FIN (tras recarga), len ahora (estado):", normativas.length);
+      alert("Se elimino correctamente");
     } catch (err) {
-      setError("Error al eliminar la normativa", err);
+      console.error("[DELETE] ERROR:", err);
+      setError("Error al eliminar la normativa");
     } finally {
       setLoading(false);
     }
   };
 
   const reload = () => {
+    console.log("[RELOAD] manual page:", page, "type:", type);
     loadNormativas(page);
   };
 

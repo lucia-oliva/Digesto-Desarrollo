@@ -188,16 +188,13 @@ router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    try {
       const result = await dependenciaDB.eliminar(id);
       if (result.affectedRows === 0) {
-        return res.status(404).json({ error: "Dependencia no encontrada" });
+        const err = new Error("Dependencia no encontrada o ya eliminado");
+        err.status = 404;
+        throw err;
       }
-      res.json({ message: "Dependencia eliminada correctamente" });
-    } catch (error) {
-      console.error("Error al eliminar la dependencia:", error);
-      res.status(500).json({ error: "Error al eliminar la dependencia" });
-    }
+       res.status(200).json({ ok: true, msg: "Dependencia eliminada correctamente" });
   })
 );
 

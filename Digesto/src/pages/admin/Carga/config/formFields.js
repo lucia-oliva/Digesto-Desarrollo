@@ -129,7 +129,7 @@ export const camposPorEntidad = {
       type: "text",
       required: true,
     },
-    { name: "estado", label: "Estado", type: "text" },
+    { name: "estado", label: "Estado", type: "select", options: ["publicado", "despublicado"] },
   ],
   palabraclave: [
     {
