@@ -64,8 +64,13 @@ router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    const users = await UsuariosDB.eliminar(id);
-    res.json(users);
+    const result = await UsuariosDB.eliminar(id);
+    if(result.affectedRows === 0){
+      const err = new Error("Error al eliminar el usuario, usuario no encontrado o ya eliminado");
+      err.status = 404;
+      throw err;
+    }
+    res.status(200).json({ ok: true, message: "Usuario eliminado correctamente" });
   })
 );
 

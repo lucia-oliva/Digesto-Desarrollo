@@ -5,7 +5,6 @@ import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
 //Editar usuario.
 async function edit(data) {
-  console.log("password", password);
   const { id, rol, nombre, telefono, email, password, estado, dependencia } =
     data;
   //verificar si id_dependencia es undefined, si lo es, asignar 0 como valor por defecto
