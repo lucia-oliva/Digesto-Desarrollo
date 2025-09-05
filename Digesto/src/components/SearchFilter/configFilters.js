@@ -218,6 +218,8 @@ export const filterConfig = {
         { label: "Alta", value: "alta" },
         { label: "Baja", value: "baja" },
         { label: "Edicion", value: "modificacion" },
+        { label: "Republicacion", value: "re-publicacion" },
+        { label: "Restauracion", value: "restauracion" }
       ],
     },
     {
