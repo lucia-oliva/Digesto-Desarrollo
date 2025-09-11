@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useCallback, useMemo, useState } from "react";
 import { camposPorEntidad } from "../config/formFields";
-
 function PasoForm({
   entidad,
   formData,
@@ -11,6 +10,8 @@ function PasoForm({
   errores = {},
   setErrores = () => {},
 }) {
+  console.log(formData);
+  console.log(setFormData);
   const campos = useMemo(() => camposPorEntidad[entidad] || [], [entidad]);
   const [tagInput, setTagInput] = useState("");
   const normalizePhone = (v) => String(v || "").replace(/\D/g, "");
@@ -105,27 +106,25 @@ function PasoForm({
       if (name === "archivo") {
         const archivo = Array.isArray(value) ? value[0] : value;
 
-        // Si no hay nuevo archivo, pero ya hay uno cargado previamente, no marcar error
-        const archivoActual = formData.archivo;
-        console.log(!archivo && formData.archivo, archivo, archivoActual);
+        const hayPrevio = typeof archivo === "string" && archivo.trim() !== "";
+        const hayNuevo = archivo && typeof archivo === "object" && archivo.name;
 
-        if (!archivo && archivoActual) return;
+        console.log();
 
-        // Si no hay archivo nuevo ni previo, marcar como obligatorio
-        if (!archivo) {
-          nuevosErrores[name] = "Este campo es obligatorio.";
+        if (!hayPrevio && !hayNuevo) {
+          nuevosErrores[name] = "Debe subir un archivo PDF.";
           return;
         }
+        if (hayNuevo) {
+          const isPDF =
+            archivo.type === "application/pdf" ||
+            archivo.name?.toLowerCase().endsWith(".pdf");
 
-        // Validar que el archivo sea un PDF
-        const isPDF =
-          archivo?.type === "application/pdf" ||
-          archivo?.name?.toLowerCase().endsWith(".pdf");
-
-        if (!isPDF) {
-          nuevosErrores[name] = "El archivo debe ser un PDF.";
-          return;
+          if (!isPDF) {
+            nuevosErrores[name] = "El archivo debe ser un PDF.";
+          }
         }
+        return;
       }
 
       if (name === "tags" && isEmpty) {
@@ -155,35 +154,30 @@ function PasoForm({
         }
       }
 
-      if (name === "password") {
-        if (!isEmpty) {
-          const password = String(value);
-
-          // Reglas y mensajes
-          const rules = [
-            { test: /.{8,}/, message: "mínimo 8 caracteres" },
-            { test: /[a-z]/, message: "una minúscula" },
-            { test: /[A-Z]/, message: "una mayúscula" },
-            { test: /\d/, message: "un número" },
-          ];
-
-          const failed = rules.filter((r) => !r.test.test(password));
-
-          if (failed.length > 0) {
-            nuevosErrores[name] = `La contraseña es débil. Falta: ${failed
-              .map((f) => f.message)
-              .join(", ")}.`;
-          }
-
-          // Confirmación de contraseña"
-          const confirm = formData.passwordConfirm;
-          if (confirm !== undefined && String(confirm) !== password) {
-            nuevosErrores.passwordConfirm = "Las contraseñas no coinciden.";
-          }
+       if (name === "password") {
+      const p = String(value ?? "");
+      if (p) {
+        const rules = [
+          { test: /.{8,}/, message: "mínimo 8 caracteres" },
+          { test: /[a-z]/, message: "una minúscula" },
+          { test: /[A-Z]/, message: "una mayúscula" },
+          { test: /\d/,   message: "un número" },
+        ];
+        const failed = rules.filter(r => !r.test.test(p));
+        if (failed.length) {
+          nuevosErrores.password = `La contraseña es débil. Falta: ${failed.map(f => f.message).join(", ")}.`;
         }
-        return;
       }
+    }
+
     });
+
+    const p = String(formData.password ?? "");
+    const c = String(formData.confirmPassword ?? "");
+
+    if ((p.length > 0 || c.length > 0) && p !== c) {
+      nuevosErrores.confirmPassword = "Las contraseñas no coididen";
+    }
 
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;

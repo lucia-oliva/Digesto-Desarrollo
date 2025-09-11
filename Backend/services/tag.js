@@ -93,7 +93,7 @@ async function insertTagsForNormativa(normativaId, tags) {
       continue;
     }
     try {
-      const [existingTagRow] = await db.queryOne(
+      const existingTagRow = await db.queryOne(
         "SELECT id FROM tag WHERE nombre = ?",
         [tag]
       );
@@ -106,7 +106,7 @@ async function insertTagsForNormativa(normativaId, tags) {
       } else {
         tagId = existingTagRow.id;
       }
-      const [existingLink] = await db.queryOne(
+      const existingLink = await db.queryOne(
         "SELECT 1 FROM tag_normativa WHERE id_normativa = ? AND id_tag = ?",
         [normativaId, tagId]
       );

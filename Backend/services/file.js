@@ -40,7 +40,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
       throw new Error("Dependencia no encontrada");
     }
 
-    const { codificacion } = resultado[0];
+    const { codificacion } = resultado;
     const timestamp = Date.now();
     const nuevoNombre = `${codificacion}_${resolucion}_${anio}_${timestamp}.pdf`;
     const nuevoPath = path.join(carpeta, nuevoNombre);
