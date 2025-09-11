@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams,useNavigate } from "react-router";
+import { useLocation, useParams, useNavigate } from "react-router";
 import PasoSeleccionTipo from "../Carga/Steps/pasoSeleccionTipo.jsx";
 import PasoFormulario from "../Carga/Steps/pasoForm.jsx";
 import PasoModifica from "../Carga/Steps/pasoNormativasModificadas.jsx";
@@ -10,6 +10,7 @@ import { useAuth } from "../../../context/useAuth.jsx";
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
 import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
+import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
 
 function GenericEdit() {
   const navigate = useNavigate();
@@ -53,11 +54,10 @@ function GenericEdit() {
         .then((data) => {
           if (!data) {
             alert("No se encontraron datos para editar.");
-          } else if(entidad === "normativa"){
-                setFormData({
+          } else if (entidad === "normativa") {
+            setFormData({
               ...data,
-              
-            
+
               emisor: getValueFromLabel(emisorOptions, data.emisor),
               dependencia: getValueFromLabel(
                 dependenciaOptions,
@@ -75,6 +75,9 @@ function GenericEdit() {
           } else {
             setFormData({
               ...data,
+              password: "",
+              confirmPassword: "",
+              _passwordEdited: false,
             });
           }
         })
@@ -101,17 +104,17 @@ function GenericEdit() {
     const cambios = buildRelacionesNormativas(formData);
 
     const {
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       accionSeleccionada,
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       comentarioSeleccionado,
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       editingSelectedId,
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       modalSeleccionarNormativa,
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       normativas_bajas,
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
       _originalesNormativas,
       ...formClean
     } = formData;
@@ -123,12 +126,20 @@ function GenericEdit() {
         ? formClean.archivo
         : "";
 
+    
     const dataToSend = {
       ...mapCamposEditar(entidad, formClean),
       archivo: archivoNombre,
       userId: user.id,
       normativas_modificadas: cambios,
     };
+
+    if(entidad === "usuario"){
+      dataToSend.password = 
+        formData._passwordEdited && formData.password?.trim() 
+        ? formData.password.trim()
+        : null;
+    }
 
     fetch(`http://localhost:3000/api/${ruta}/edit`, {
       method: "POST",
@@ -157,7 +168,7 @@ function GenericEdit() {
 
           return fetch(`http://localhost:3000/api/file/upload/${formData.id}`, {
             method: "POST",
-            body: formDataUpload, 
+            body: formDataUpload,
           })
             .then((resUpload) => {
               if (!resUpload.ok) throw new Error("Error al subir archivo PDF.");
@@ -170,11 +181,11 @@ function GenericEdit() {
         }
         setFormData({});
         setErrores({});
-        if(entidad === "palabraclave"){
-           navigate(`/admin/ListadoPalabrasClave`);
-        }else if(entidad === "emisor"){
+        if (entidad === "palabraclave") {
+          navigate(`/admin/ListadoPalabrasClave`);
+        } else if (entidad === "emisor") {
           navigate(`/admin/ListadoEmisores`);
-        }else if(entidad === "dependencia"){
+        } else if (entidad === "dependencia") {
           navigate(`/admin/ListadoDependencias`);
         }
         alert(`Entidad ${entidad} editada correctamente.`);
@@ -197,15 +208,25 @@ function GenericEdit() {
         );
       case "formulario":
         return (
-          <PasoFormulario
-            entidad={entidad}
-            formData={formData}
-            setFormData={setFormData}
-            onNext={handleNext}
-            onBack={handleBack}
-            errores={errores}
-            setErrores={setErrores}
-          />
+          <>
+            {entidad === "usuario" && formData?.id && (
+              <ActualizarContrasenia
+                formData={formData}
+                setFormData={setFormData}
+                errores={errores}
+              />
+            )}
+            <PasoFormulario
+              entidad={entidad}
+              formData={formData}
+              setFormData={setFormData}
+              onNext={handleNext}
+              onBack={handleBack}
+              errores={errores}
+              setErrores={setErrores}
+              omitPwdFields={entidad === "usuario"}
+            />
+          </>
         );
       case "modificaNormativa":
         return (
@@ -236,7 +257,7 @@ function GenericEdit() {
         {entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""}
       </h2>
 
-       <div className="w-full flex justify-center mb-4 sm:mb-6">
+      <div className="w-full flex justify-center mb-4 sm:mb-6">
         <ul className="steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
           {pasos.map((paso, i) => {
             const label = paso

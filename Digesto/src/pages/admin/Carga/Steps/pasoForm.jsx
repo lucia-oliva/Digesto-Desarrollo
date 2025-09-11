@@ -9,6 +9,7 @@ function PasoForm({
   onBack,
   errores = {},
   setErrores = () => {},
+  omitPwdFields = false,
 }) {
   console.log(formData);
   console.log(setFormData);
@@ -19,14 +20,21 @@ function PasoForm({
     /^(?:(?:00)?549?)?0?(?:11|[2368]\d)(?:(?=\d{0,2}15)\d{2})??\d{8}$/;
 
   const shouldShowField = useCallback(
-    (fieldName) => {
-      if (entidad === "usuario" && fieldName === "dependencia") {
+  (fieldName) => {
+    if (entidad === "usuario") {
+      if (omitPwdFields && (fieldName === "password" || fieldName === "confirmPassword")) {
+        return false;
+      }
+      
+      if (fieldName === "dependencia") {
         return ["2", "4"].includes(String(formData.rol ?? ""));
       }
-      return true;
-    },
-    [entidad, formData.rol]
-  );
+    }
+    return true;
+  },
+  [entidad, omitPwdFields, formData?.rol]
+);
+
 
   const updateField = useCallback(
     (name, value) => {
@@ -92,6 +100,9 @@ function PasoForm({
 
   const validar = useCallback(() => {
     const nuevosErrores = {};
+    const isUser = entidad == "usuario";
+    const isCreate = isUser && !formData?.id;
+    const willEditPwd = isCreate || !!formData._passwordEdited;
 
     campos.forEach(({ name, required }) => {
       if (!shouldShowField(name)) return;
@@ -154,31 +165,28 @@ function PasoForm({
         }
       }
 
-       if (name === "password") {
-      const p = String(value ?? "");
-      if (p) {
-        const rules = [
-          { test: /.{8,}/, message: "mínimo 8 caracteres" },
-          { test: /[a-z]/, message: "una minúscula" },
-          { test: /[A-Z]/, message: "una mayúscula" },
-          { test: /\d/,   message: "un número" },
-        ];
-        const failed = rules.filter(r => !r.test.test(p));
-        if (failed.length) {
-          nuevosErrores.password = `La contraseña es débil. Falta: ${failed.map(f => f.message).join(", ")}.`;
-        }
-      }
-    }
-
     });
-
+    if (willEditPwd) {
     const p = String(formData.password ?? "");
     const c = String(formData.confirmPassword ?? "");
-
-    if ((p.length > 0 || c.length > 0) && p !== c) {
-      nuevosErrores.confirmPassword = "Las contraseñas no coididen";
+    if (!p) nuevosErrores.password = "Este campo es obligatorio.";
+    if (!c) nuevosErrores.confirmPassword = "Este campo es obligatorio.";
+    if (p) {
+      const rules = [
+        { test: /.{8,}/, message: "mínimo 8 caracteres" },
+        { test: /[a-z]/, message: "una minúscula" },
+        { test: /[A-Z]/, message: "una mayúscula" },
+        { test: /\d/,   message: "un número" },
+      ];
+      const faltan = rules.filter(r => !r.test.test(p)).map(r => r.message);
+      if (faltan.length) {
+        nuevosErrores.password = `La contraseña es débil. Falta: ${faltan.join(", ")}.`;
+      }
     }
-
+    if (p && c && p !== c) {
+      nuevosErrores.confirmPassword = "Las contraseñas no coinciden.";
+    }
+  }
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   }, [campos, formData, setErrores, shouldShowField]);

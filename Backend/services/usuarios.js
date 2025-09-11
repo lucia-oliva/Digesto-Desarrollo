@@ -11,12 +11,16 @@ async function edit(data) {
   const dependenciaFinal = dependencia ?? 0; // Si no se proporciona, usar
 
   const fechaSubida = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
-  const claveHasheada = await hashPasswordBcrypt(password); // Hashear la clave
-  console.log("clave hasheada:", claveHasheada);
+
+  //Null si no hay contraseña nueva
+  let claveHasheada = null;
+  if (typeof password === "string" && password.trim() !== "") {
+    claveHasheada = await hashPasswordBcrypt(password.trim());
+  }
   try {
     //Actualizar el usuario
     const sqlUpdate =
-      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
+      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = COALESCE(?, clave), estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
     const result = await db.execute(sqlUpdate, [
       nombre,
       rol,
@@ -47,7 +51,7 @@ async function edit(data) {
 //Mostrar usuario por ID
 async function getUsuarioByIdDatos(id) {
   const sql =
-    "SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, clave as password, id_dependencia as dependencia FROM usuario WHERE id = ?";
+    "SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, id_dependencia as dependencia FROM usuario WHERE id = ?";
   const results = await db.queryOne(sql, [id]);
   if (!results) {
     const error = new Error("Usuario no encontrado");
