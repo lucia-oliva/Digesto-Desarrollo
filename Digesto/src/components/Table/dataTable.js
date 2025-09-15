@@ -1,10 +1,10 @@
 import {renderResumen} from "./ResumeRender";
 
 export const normativaColumns = [
-  {key: "numero", label: "N°", className: "text-center font-[Raleway] text-gray-700 text-md sm:text-sm" ,hiddenIn: ["busqueda","ver","admin", "crear_edit", "seleccionar", "inicio"]},
+  {key: "numero", label: "N°", className: "text-center font-[Raleway] text-gray-700 text-md sm:text-sm" ,hiddenIn: ["busqueda","ver","admin", "crear_edit", "seleccionar", "inicio", "consejo"]},
   { key: "fecha", label: "Fecha",className:"text-center text-gray-700 font-[Raleway] text-md sm:text-sm" },
   { key: "titulo", label: "Título",className:"text-center text-gray-700 font-[Raleway]  text-md sm:text-md " },
-  { key: "dependencia", label: "Dependencia",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md" },
+  { key: "dependencia", label: "Dependencia",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md", hiddenIn:["consejo"] },
   {key: "emisor", label: "Emisor",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md", hiddenIn: ["admin"]},
   { key: "tipo_normativa", label: "Tipo",className:"text-center text-gray-700 font-[Raleway] text-lg sm:text-md" },
    {

@@ -34,7 +34,7 @@ router.post(
     res.status(201).json({
       ok: true,
       msg: "Sesión creada correctamente",
-      id_sesion: result.insertId,
+      id_sesion: result.id_sesion,
     });
   })
 );

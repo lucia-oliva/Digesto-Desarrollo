@@ -367,7 +367,7 @@ function ConsejoIntegrantes() {
     >
 
       {/* Layout */}
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row pt-13">
         {/* Sidebar (siempre visible) */}
         <div className="w-full md:w-1/3 md:border-r md:border-gray-400 bg-gray-50">
           {tabs.map((tab) => (

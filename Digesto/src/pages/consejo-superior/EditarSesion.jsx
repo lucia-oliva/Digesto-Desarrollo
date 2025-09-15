@@ -57,7 +57,7 @@ function EditarSesion() {
   };
 
   return (
-    <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8 pt-30">
      <div
         className="max-w-2xl mx-auto bg-white rounded-xl p-6 border"
         style={{
@@ -102,6 +102,7 @@ function EditarSesion() {
                 type="text"
                 value={nombreActa}
                 onChange={(e) => setNombreActa(e.target.value)}
+                placeholder="Ej.: Acta del 02-4-2025"
                 className="w-full input input-bordered  text-black"
               />
             </div>
@@ -112,7 +113,7 @@ function EditarSesion() {
                 type="file"
                 accept="application/pdf"
                 onChange={(e) => setArchivoActa(e.target.files?.[0] || null)}
-                className="file-input file-input-bordered file-input-primary w-full "
+                className=" text-black file-input file-input-bordered file-input-primary w-full "
               />
             </div>
 

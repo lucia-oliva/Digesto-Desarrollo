@@ -25,6 +25,9 @@ async function create(data) {
       orden_url,
       nombre_acta,
     ]);
+
+    console.log("Sesión creada", result);
+
     return {
       id_sesion: result.insertId,
     };
@@ -53,7 +56,7 @@ async function getSesionById(id) {
     err.status = 404;
     throw err;
   }
-  return results[0];
+  return results;
 }
 
 export default { eliminar, getSesionById, create };

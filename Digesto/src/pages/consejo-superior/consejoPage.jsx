@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import { IoIosMenu, IoIosClose } from "react-icons/io";
 
-// Si el logo está en /public, usá "/UnlarLogo.png"
 const LOGO_UNLAR = "/src/assets/UnlarLogo.png";
 
 const BASE_LINKS = [
@@ -25,7 +24,6 @@ const ADMIN_LINKS = [
 function ConsejoPage() {
   const { auth } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
- console.log("datos:", auth.user);
 const links = useMemo(() => {
   const tipo = auth.user?.tipo_usuario;
   const depName = auth.user?.dependencia; 
@@ -52,14 +50,14 @@ const links = useMemo(() => {
 
   return (
     <main id="main" className="bg-white text-primary-content min-h-screen">
-      {/* NAVBAR */}
+     
       <header className="bg-primary shadow-sm border-gray-200 fixed top-0 w-full z-30">
-        {/* Desktop / Tablet */}
+     
         <nav
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden border-b-1 sm:flex items-center h-16"
           aria-label="Navegación principal del Consejo Superior"
         >
-          {/* Izquierda: Logo */}
+   
           <div className="flex items-center">
             <NavLink
               className="flex flex-row justify-center items-center"
@@ -69,7 +67,7 @@ const links = useMemo(() => {
             </NavLink>
           </div>
 
-          {/* Centro: Links */}
+        
           <ul className="flex-1 flex justify-center gap-6 text-sm sm:text-base font-medium text-white font-sans">
             {links.map((item, idx) => {
               if (item.type === "separator") {
@@ -95,18 +93,18 @@ const links = useMemo(() => {
             })}
           </ul>
 
-          {/* Derecha: vacío para balancear (podés poner user/avatar) */}
+   
           <div className="w-8" />
         </nav>
 
-        {/* Mobile */}
+        
         <nav className="sm:hidden px-4 h-16 flex items-center justify-between">
           {/* Izquierda: Logo */}
           <NavLink to="/" onClick={closeMobile}>
             <img src={LOGO_UNLAR} alt="Unlar" className="h-8 w-auto" />
           </NavLink>
 
-          {/* Botón hamburguesa */}
+         
           <button
             className="p-2 rounded-md border border-gray-200"
             aria-label="Abrir menú"
@@ -118,7 +116,7 @@ const links = useMemo(() => {
           </button>
         </nav>
 
-        {/* Panel móvil desplegable */}
+     
         <div
           id="mobile-menu"
           className={`sm:hidden overflow-hidden transition-[max-height] duration-300 bg-white border-t border-gray-200 ${
@@ -154,8 +152,8 @@ const links = useMemo(() => {
         </div>
       </header>
 
-      {/* CONTENIDO */}
-      <section className="min-h-[60vh] lg:py-16 ">
+    
+      <section className="min-h-[60vh]">
         <Outlet />
       </section>
     </main>

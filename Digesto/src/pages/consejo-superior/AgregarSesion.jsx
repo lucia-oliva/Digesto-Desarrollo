@@ -40,6 +40,9 @@ function AgregarSesion() {
     const data = await res.json();
 
     // 2. Subir archivo PDF con lógica especial
+    console.log("entra",archivo, data.id_sesion)
+    console.log(data);
+
     if (archivo && data?.id_sesion) {
       const formDataUpload = new FormData();
       formDataUpload.append("file", archivo);
@@ -74,7 +77,7 @@ function AgregarSesion() {
 
 
   return (
-    <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8 pt-30">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 border border-gray-200">
         <h1 className="text-xl font-semibold text-gray-800 mb-4">
           Agregar Sesión del Consejo
@@ -97,7 +100,7 @@ function AgregarSesion() {
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej.: Orden Marzo 2025"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 text-black focus:ring-primary"
             />
           </div>
 
@@ -110,7 +113,7 @@ function AgregarSesion() {
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full text-black rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -123,7 +126,7 @@ function AgregarSesion() {
               type="file"
               accept="application/pdf"
               onChange={(e) => setArchivo(e.target.files?.[0] || null)}
-              className="file-input file-input-bordered file-input-primary w-full"
+              className=" text-black file-input file-input-bordered file-input-primary w-full"
             />
             {archivo && (
               <p className="mt-1 text-xs text-gray-600">Seleccionado: {archivo.name}</p>

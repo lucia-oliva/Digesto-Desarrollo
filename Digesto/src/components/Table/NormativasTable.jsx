@@ -32,6 +32,8 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
   const isAdminRoute      = path.startsWith("/admin");
   const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
   const isNuevaNormativa  = /^\/admin\/NuevaNormativa$/i.test(path);
+  const isConsejo = path.startsWith("/consejo-superior/normativas");
+
   
 
   const effectiveModo =
@@ -42,7 +44,9 @@ const userDepId = DEP_BY_NAME.get(String(depName || "").trim()) || user?.id_depe
           isEditarNormativa ? "crear_edit" :
           isNuevaNormativa  ? "seleccionar" :
           isAdminRoute      ? "admin" :
+          isConsejo ?         "consejo" :
                               "ver"
+                      
         ));
 
 //Bloquear filtro dependencia x rol.

@@ -4,11 +4,9 @@ import path from "path";
 import fs from "fs/promises";
 import { pdfHandler } from "../Middleware/fileMiddleware.js";
 import fileDB from "../services/file.js";
+
 const router = express.Router();
 
-
-//TODO: Agregar validaciones? ( si el estado es eliminado , etc)
-//Download fil
 router.get("/download", async (req, res) => {
   try {
     const filename = req.query.filename;
@@ -17,20 +15,42 @@ router.get("/download", async (req, res) => {
     if (!filename) {
       return res.status(400).json({ error: "Filename is required" });
     }
+      const base = path.resolve("archivos");
+      const candidates = [
+        {dir: base, updateVisita: true},
+        {dir: path.join(base, "Actas"), updateVisita: false},
+        {dir: path.join(base, "OrdenesDelDia"), updateVisita: false},
+      ]
 
-    const filePath = path.resolve("archivos", filename);
+      let foundPath = null;
+      let shouldUpdateVisita = false;
 
-    // Check if file exists
-    try {
-      await fs.access(filePath);
+      for (const candidate of candidates) {
+        const p = path.join(candidate.dir, filename);
+        try{
+          await fs.access(p);
+          foundPath = p;
+          shouldUpdateVisita = candidate.updateVisita;
+          break;
+        }catch{
+          // No existe
+        }
+      }
+
+      if(!foundPath){
+        return res.status(404).json({ error: "File not found" });
+      }
       //Sumar una visita a la normativa. 
-      await db.query("UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?", [filename]);
+      if(shouldUpdateVisita){
+      
+        try{
+        await db.query("UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?", [filename]);
+        }catch(err){
+          console.error("Error updating visitas count:", err);
+        }
+      }
 
-    } catch {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    res.download(filePath, filename, (err) => {
+    res.download(foundPath, filename, (err) => {
       if (err) {
         console.error("Error downloading file:", err);
         res.status(500).json({ error: "Error downloading file" });
