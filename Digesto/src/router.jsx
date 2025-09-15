@@ -80,7 +80,7 @@ const Router = () => {
             <Route path="EditarEmisor/:id" element={<GenericEdit />} />
             <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route path="EditarPalabraClave/:id" element={<GenericEdit />} />
-            <Route path="document/:id" element={<DocumentView/>} />
+            <Route path="document/:id" element={<DocumentView variant="admin"/>} />
           </Route>
         </Route>
       </Routes>
