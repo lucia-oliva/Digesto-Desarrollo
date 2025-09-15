@@ -34,7 +34,7 @@ const Router = () => {
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
             <Route index element={<ConsejoInicio />} />
-            <Route path="document/:id" element={<DocumentView />} />
+            <Route path="document/:id" element={<DocumentView variant="consejo"/>} />
             <Route path="normativas" element={<ConsejoNormativas />} />
             <Route path="sesiones" element={<ConsejoSesiones />} />
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
@@ -80,7 +80,7 @@ const Router = () => {
             <Route path="EditarEmisor/:id" element={<GenericEdit />} />
             <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route path="EditarPalabraClave/:id" element={<GenericEdit />} />
-            <Route path="document/:id" element={<DocumentView />} />
+            <Route path="document/:id" element={<DocumentView/>} />
           </Route>
         </Route>
       </Routes>
