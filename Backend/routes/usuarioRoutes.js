@@ -4,6 +4,24 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
+
+//Cambiar estado (activar/desactivar)
+router.post(
+  "/cambiar-estado",
+  asyncHandler(async (req, res) => {
+    const { id_usuario, nuevo_estado } = req.body;
+    const result = await UsuariosDB.cambiarEstado({
+      id_usuario,
+      nuevo_estado
+      });
+    res.status(200).json({
+      ok: true,
+      message: result.mensaje,
+      ...(result.noChange ? { noChange: true } : {}),
+    });
+  })
+);
+
 // Crear usuario
 router.post(
   "/create",

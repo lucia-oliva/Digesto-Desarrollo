@@ -1,6 +1,21 @@
 import axios from "axios";
 
 
+
+export const cambiarEstadoUsuario = async (id_usuario, nuevo_estado) => {
+  try {
+    const { data } = await axios.post(
+      "http://localhost:3000/api/usuarios/cambiar-estado",
+      { id_usuario, nuevo_estado },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return data; 
+  } catch (error) {
+    console.error("Error al cambiar estado de usuario:", error);
+    throw error;
+  }
+};
+
 export const searchNormativas = async (page, limit, type, filtros={}) => {
   console.log("tipo:",type, "filtros:",filtros);
   try {

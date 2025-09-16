@@ -3,6 +3,34 @@ import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
 // Funciones CRUD basicas
 
+//cambiar estado
+async function cambiarEstado({ id_usuario, nuevo_estado}) {
+  if (!id_usuario || !nuevo_estado) {
+    const err = new Error("Faltan datos: id_usuario y nuevo_estado son requeridos.");
+    err.errno = 400;
+    throw err;
+  }
+  const estado = String(nuevo_estado).toLowerCase().trim();
+  if (!["activo", "inactivo"].includes(estado)) {
+    const err = new Error("nuevo_estado inválido: use 'activo' o 'inactivo'.");
+    err.errno = 400;
+    throw err;
+  }
+  const user = await db.queryOne("SELECT id, estado FROM usuario WHERE id = ?", [id_usuario]);
+  if (!user) {
+    const err = new Error(`Usuario id=${id_usuario} no encontrado.`);
+    err.errno = 404;
+    throw err;
+  }
+  if (String(user.estado).toLowerCase() === estado) {
+    return { mensaje: `Sin cambios: el usuario ya estaba ${estado}.`, noChange: true };
+  }
+  await db.query("UPDATE usuario SET estado = ? WHERE id = ?", [estado, id_usuario]);
+  return { mensaje: `Usuario ${estado === "activo" ? "activado" : "desactivado"} correctamente.` };
+}
+
+
+
 //Editar usuario.
 async function edit(data) {
   const { id, rol, nombre, telefono, email, password, estado, dependencia } =
@@ -267,5 +295,5 @@ export default {
   UsuarioByEmailAndEstado,
   searchUsuariosByParameters,
   create,
-  edit,
+  edit,cambiarEstado
 };
