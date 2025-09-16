@@ -2,10 +2,29 @@ import PropTypes from "prop-types";
 import { getLabel, toAccionText as _toAccionText } from "../config/mapeo.js";
 import { camposOcultosVerificacion } from "../../Edit/VerificacionIgnoreFields.js";
 import { useLocation } from "react-router";
+import { tipoNormativaOptions, dependenciaOptions, RolOptions, emisorOptions } from "../config/mapeo.js";
 
 
+const normalize = (s) =>
+  String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
-// arriba del componente (mismo archivo)
+const toLabel = (options = [], value) => {
+  const str = String(value ?? "").trim();
+  if (!str) return "—";
+  const found = options.find(
+    (opt) => String(opt.value) === str || normalize(opt.label) === normalize(str)
+  );
+  return found?.label ?? str;
+};
+
+const OPTIONS_BY_KEY = {
+  tipo_normativa: tipoNormativaOptions,
+  dependencia: dependenciaOptions,                    
+  normativa_interdepartamental: dependenciaOptions, 
+  rol: RolOptions,
+  emisor: emisorOptions
+};
+
 const getBadgeClass = (accion) => {
   const t = toAccionText(accion);
   if (t === "Deroga") return "badge badge-md badge-error";
@@ -66,6 +85,7 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
     fecha: "Fecha",
     emisor: "Emisor",
     tags: "Palabras Clave",
+    normativa_interdepartamental: "Resolucion Interdepartamental"
   };
 
   const visibles = Object.entries(formData).filter(([key]) => {
@@ -86,11 +106,14 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
     : [];
   const tieneNormMods = normMods.length > 0;
 
-  const renderValor = (key, value) => {
-    if (typeof value === "object" && value?.name) return value.name;
-    if (Array.isArray(value)) return value.join(", ");
-    return getLabel(key, value);
-  };
+const renderValor = (key, value) => {
+  if (typeof value === "object" && value?.name) return value.name;
+  if (Array.isArray(value)) return value.join(", ");
+  const opts = OPTIONS_BY_KEY[key];
+  if (opts) return toLabel(opts, value);
+  return getLabel(key, value);
+};
+
 
   return (
     <div className="mt-6">
