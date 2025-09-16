@@ -21,8 +21,8 @@ async function searchAuditoriaByParameters(
       params.push(`%${usuario}%`);
     }
     if (accion) {
-      sql += " AND a.tipo = ?";
-      params.push(accion);
+      sql += " AND a.tipo LIKE ?";
+      params.push(`%${accion}%`);
     }
     if (dependencia) {
       sql += " AND d.id = ?";
