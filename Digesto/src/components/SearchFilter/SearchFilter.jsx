@@ -6,6 +6,7 @@ import { filterConfig } from "./configFilters";
 import AbecedarioFiltro from "./AlphabetFilter";
 import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo.js";
 import { useAuth } from "../../context/useAuth.jsx";
+import {useLocation} from "react-router"
 
 const DEP_BY_NAME = new Map(
   dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
@@ -21,6 +22,7 @@ function GenericFilterSearch({
   const filters = useMemo(() => filterConfig[type] || [], [type]);
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
+  const location = useLocation();
 
   const { auth } = useAuth();
   const user = auth?.user;
@@ -30,7 +32,15 @@ function GenericFilterSearch({
   const isAdminScope = scope === "admin";
   const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
 
-  // ✅ Restaurado: tomar estado inicial (ej. dependencia de la URL) y buscar si autoSearch
+  useEffect(() => {
+  console.log("🔍 Estado actual de filtros:", formState);
+}, [formState]);
+
+  useEffect(() => {
+    setFormState({});
+    setDynamicOptions({});
+  }, [location.pathname, type]);
+
   useEffect(() => {
     const hasInitial = initialState && Object.keys(initialState).length > 0;
     if (!hasInitial) return;
