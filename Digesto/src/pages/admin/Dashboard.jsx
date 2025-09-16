@@ -112,7 +112,7 @@ function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f7fa] text-gray-800 p-8">
+    <div className="min-h-screen bg-[#f4f7fa] text-gray-800 p-3">
       <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col md:flex-row items-center justify-between mb-10">
         <div className="mb-6 md:mb-0 md:mr-6 max-w-xl">
           <h1 className="text-2xl font-bold mb-2">Hola, {user.nombre} 👋</h1>

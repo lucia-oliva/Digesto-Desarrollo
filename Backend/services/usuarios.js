@@ -243,7 +243,7 @@ async function UsuarioByEmailAndEstado(email) {
 
 //Buscar usuarios por parametros
 async function searchUsuariosByParameters(
-  tipoUsuario,
+  rol,
   nombre,
   dependencia,
   estado,
@@ -253,9 +253,9 @@ async function searchUsuariosByParameters(
   let sql =
     "SELECT u.id,u.nombre, u.telefono, u.email, DATE_FORMAT(u.fecha_alta, '%Y-%m-%d') AS fecha_alta,DATE_FORMAT(u.ultima_visita, '%Y-%m-%d') AS ultima_visita,u.estado, tu.nombre AS rol, d.nombre AS dependencia, COUNT(*)OVER() AS total FROM usuario u JOIN tipo_usuario tu ON tu.id = u.id_tipo_usuario  LEFT JOIN dependencia d ON d.id = u.id_dependencia WHERE 1=1";
   const params = [];
-  if (tipoUsuario) {
+  if (rol) {
     sql += " AND id_tipo_usuario = ?";
-    params.push(tipoUsuario);
+    params.push(rol);
   }
   if (nombre) {
     sql += " AND u.nombre LIKE ?";

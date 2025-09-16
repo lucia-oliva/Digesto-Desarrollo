@@ -255,8 +255,9 @@ export const filterConfig = {
       label: "Rol",
       options: [
         { label: "Todos", value: "" },
-        { label: "Administrador", value: "admin" },
-        { label: "Usuario", value: "user" },
+        { label: "Administrador", value: 2 },
+        { label: "SuperAdministrador", value: 1 },
+        { label: "Supervisor", value: 4 },
       ],
     },
     {

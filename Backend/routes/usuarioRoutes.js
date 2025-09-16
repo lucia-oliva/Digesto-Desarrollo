@@ -131,7 +131,7 @@ router.post(
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
-    let { tipoUsuario, nombre, estado } = req.body;
+    let { rol, nombre, estado } = req.body;
     let {
       dependencia = req.body.dependencia,
       page = 1,
@@ -143,7 +143,7 @@ router.post(
     const offset = (page - 1) * limite;
 
     const { data, totalResults } = await UsuariosDB.searchUsuariosByParameters(
-      tipoUsuario,
+      rol,
       nombre,
       dependencia,
       estado,
