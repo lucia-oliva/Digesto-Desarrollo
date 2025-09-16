@@ -85,8 +85,11 @@ function GenericEdit() {
     }
   }, [entidad, id]);
 
-  const handleNext = () => setCurrentStep((prev) => prev + 1);
-  const handleBack = () => setCurrentStep((prev) => prev - 1);
+   const handleNext = () =>
+   setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
+   const handleBack = () =>
+   setCurrentStep((prev) => Math.max(0, prev - 1));
+   const canBack = currentStep > 0;
 
   const handleSubmit = () => {
     if (!formData || !formData.id) {
@@ -225,6 +228,7 @@ function GenericEdit() {
               errores={errores}
               setErrores={setErrores}
               omitPwdFields={entidad === "usuario"}
+              canBack={canBack}
             />
           </>
         );
@@ -235,6 +239,7 @@ function GenericEdit() {
             setFormData={setFormData}
             onNext={handleNext}
             onBack={handleBack}
+            canBack={canBack}
           />
         );
       case "verificacion":
@@ -243,6 +248,7 @@ function GenericEdit() {
             formData={formData}
             onBack={handleBack}
             onSubmit={handleSubmit}
+            canBack={canBack}
           />
         );
       default:

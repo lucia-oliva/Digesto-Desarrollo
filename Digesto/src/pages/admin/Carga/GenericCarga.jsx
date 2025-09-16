@@ -28,8 +28,11 @@ function GenericCarga() {
     setCurrentStep(0);
   }, [location.pathname]);
 
-  const handleNext = () => setCurrentStep((prev) => prev + 1);
-  const handleBack = () => setCurrentStep((prev) => prev - 1);
+   const handleNext = () =>
+   setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
+   const handleBack = () =>
+   setCurrentStep((prev) => Math.max(0, prev - 1));
+   const canBack = currentStep > 0;
 
   const handleSubmit = () => {
     const dataToSend = { ...formData };
@@ -111,6 +114,7 @@ function GenericCarga() {
             formData={formData}
             setFormData={setFormData}
             onNext={handleNext}
+            canBack={canBack}
           />
         );
       case "formulario":
@@ -123,6 +127,7 @@ function GenericCarga() {
             onBack={handleBack}
             errores={errores}
             setErrores={setErrores}
+            canBack={canBack}
           />
         );
       case "modificaNormativa":
@@ -132,6 +137,7 @@ function GenericCarga() {
             setFormData={setFormData}
             onNext={handleNext}
             onBack={handleBack}
+            canBack={canBack}
           />
         );
       case "verificacion":
@@ -140,6 +146,7 @@ function GenericCarga() {
             formData={formData}
             onBack={handleBack}
             onSubmit={handleSubmit}
+             canBack={canBack}
           />
         );
       default:
