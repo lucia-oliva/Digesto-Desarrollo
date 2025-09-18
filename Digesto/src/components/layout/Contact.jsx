@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
+import { API_BASE } from "../../api/axiosPrivate";
 
 export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const modalRef = useRef(null);
@@ -62,7 +63,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
     const payload = { nombre, email, mensaje, destinatario };
 
     try {
-      const res = await fetch("http://localhost:3000/api/contacto", {
+      const res = await fetch(`${API_BASE}/api/contacto`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

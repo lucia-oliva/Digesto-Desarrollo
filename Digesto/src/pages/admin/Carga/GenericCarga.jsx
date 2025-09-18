@@ -7,6 +7,7 @@ import PasoVerificacion from "./Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "./config/flujoSteps.js";
 import { getRuta } from "./config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
+import { API_BASE } from "../../../api/axiosPrivate.js";
 
 function GenericCarga() {
   const { auth } = useAuth();
@@ -41,7 +42,7 @@ function GenericCarga() {
     try {
       //Ruta generica
       console.log("verificando data to Send:", dataToSend);
-      fetch(`http://localhost:3000/api/${ruta}/create`, {
+      fetch(`${API_BASE}/${ruta}/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,7 +74,7 @@ function GenericCarga() {
             formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
 
             const resUpload = await fetch(
-              `http://localhost:3000/api/file/upload/${data.id}`,
+              `${API_BASE}/file/upload/${data.id}`,
               {
                 method: "POST",
                 body: formDataUpload,

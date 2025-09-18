@@ -11,6 +11,7 @@ import { mapCamposEditar } from "./mapeoCamposEdit.js";
 import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
+import { API_BASE } from "../../../api/axiosPrivate.js";
 
 function GenericEdit() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ function GenericEdit() {
       const ruta = getRuta(entidad);
       console.log(ruta);
 
-      fetch(`http://localhost:3000/api/${ruta}/datos/${id}`)
+      fetch(`${API_BASE}/${ruta}/datos/${id}`)
         .then((res) => {
           if (!res.ok) throw new Error("Error al buscar");
           return res.json();
@@ -144,7 +145,7 @@ function GenericEdit() {
         : null;
     }
 
-    fetch(`http://localhost:3000/api/${ruta}/edit`, {
+    fetch(`${API_BASE}/${ruta}/edit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dataToSend),
@@ -169,7 +170,7 @@ function GenericEdit() {
           formDataUpload.append("id_emisor", formData.emisor);
           formDataUpload.append("tipo_normativa", formData.tipo_normativa);
 
-          return fetch(`http://localhost:3000/api/file/upload/${formData.id}`, {
+          return fetch(`${API_BASE}/file/upload/${formData.id}`, {
             method: "POST",
             body: formDataUpload,
           })

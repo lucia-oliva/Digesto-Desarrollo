@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 
 function TableRow({ item, columns, actions }) {
   return (

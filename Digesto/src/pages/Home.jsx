@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import useAxios from "axios-hooks";
-
+import {API_BASE} from "../api/axiosPrivate"
 import NormativaTable from "../components/Table/NormativasTable";
 import Dependencias from "../components/Listas/Dependencias";
 import { Alert, Loading } from "../components/ui/Ui";
@@ -10,7 +10,7 @@ function Home() {
   const [normativas, setNormativas] = useState([]);
 
   const [{ data, loading, error }] = useAxios({
-    url: "http://localhost:3000/api/normativa/mas-buscadas",
+    url: `${API_BASE}/normativa/mas-buscadas`,
     method: "GET",
   });
 

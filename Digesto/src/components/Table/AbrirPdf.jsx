@@ -1,9 +1,10 @@
 import axios from "axios";
+import { API_BASE } from "../../api/axiosPrivate";
 
 export async function abrirPdfDesdeBlobUrl(nombreArchivo) {
   try {
     const response = await axios.get(
-      "http://localhost:3000/api/file/download",
+      `${API_BASE}/file/download`,
       {
         params: { filename: nombreArchivo },
         responseType: "blob",

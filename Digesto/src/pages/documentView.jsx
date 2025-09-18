@@ -7,6 +7,7 @@ import { useLocation, useParams } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
 import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
+import { API_BASE } from "../api/axiosPrivate";
 
 // ==== Helper: mapear label de tipo de normativa (tal como ya lo tenías) ====
 const tipoNormativaLabel = (valor) => {
@@ -54,7 +55,7 @@ function MetaGrid({ normativa }) {
       </div>
 
       <div className="rounded-lg p-3 sm:p-4 border border-base-200">
-        <div className="text-[10px] sm:text-xs uppercase text-gray-500 text-black">
+        <div className="text-[10px] sm:text-xs uppercase  text-black">
           Emisor
         </div>
         <div className="text-sm sm:text-base font-medium text-black">
@@ -141,7 +142,7 @@ function DocumentView({ variant = "auto" }) {
   const [resumenOpen, setResumenOpen] = useState(false);
 
   const [{ data: normativa, loading }] = useAxios({
-    url: `http://localhost:3000/api/normativa/datos/${id}`,
+    url: `${API_BASE}/normativa/datos/${id}`,
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

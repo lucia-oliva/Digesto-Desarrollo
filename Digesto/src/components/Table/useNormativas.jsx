@@ -5,7 +5,7 @@ import { useEffect, useState , useRef } from "react";
 import { searchNormativas, deleteApi,  searchNormativasEliminadas, searchNormativasDespublicadas} from "./NormativaApi";
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
-
+import { API_BASE } from "../../api/axiosPrivate.js";
 import axios from "axios"; 
 import {useAuth} from '../../context/useAuth';
 
@@ -45,7 +45,7 @@ export const useNormativas = (type,filtros) => {
       let total;
       if (type === "sesiones") {
         const response = await axios.get(
-          "http://localhost:3000/api/dependencia/sesiones",
+          `${API_BASE}/dependencia/sesiones`,
           { params: { page: pageToLoad, limite: 6 } }
         );
 

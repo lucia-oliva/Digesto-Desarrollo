@@ -2,11 +2,12 @@ import useAxios from "axios-hooks";
 import { useEffect } from "react";
 import { Alert, Loading } from "components/ui/Ui";
 import propTypes from "prop-types";
+import { API_BASE } from "../../api/axiosPrivate";
 
 export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
   const [{ data, loading, error }, fetchPdf] = useAxios(
     {
-      url: `http://localhost:3000/api/file/download`,
+      url: `${API_BASE}/file/download`,
       method: "GET",
       responseType: "blob",
     },

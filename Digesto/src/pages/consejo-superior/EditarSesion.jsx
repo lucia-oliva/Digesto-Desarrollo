@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import {API_BASE} from "../../api/axiosPrivate"
 
 function EditarSesion() {
   const { id } = useParams();
@@ -13,7 +14,7 @@ function EditarSesion() {
   useEffect(() => {
     const fetchSesion = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/sesiones/${id}`);
+        const res = await fetch(`${API_BASE}/sesiones/${id}`);
         const data = await res.json();
         setSesion(data);
       } catch (err) {
@@ -41,7 +42,7 @@ function EditarSesion() {
     formDataUpload.append("nombre_acta", nombreActa);
 
     try {
-      const res = await fetch(`http://localhost:3000/api/file/upload/${id}`, {
+      const res = await fetch(`${API_BASE}/file/upload/${id}`, {
         method: "POST",
         body: formDataUpload,
       });

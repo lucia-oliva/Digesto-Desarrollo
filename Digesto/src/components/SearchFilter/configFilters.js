@@ -1,4 +1,5 @@
 // configFilter.js
+import { API_BASE } from "../../api/axiosPrivate.js";
 
 export const tipoNormativaOptions = [
   { label: "Acta", value: 1 },
@@ -54,7 +55,7 @@ export const filterConfig = {
       type: "select",
       label: "Año",
       async: true,
-      endpoint: "http://localhost:3000/api/normativa/yearNormativa",
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
       key: "anio",
     },
     {
@@ -117,7 +118,7 @@ export const filterConfig = {
       type: "select",
       label: "Año",
       async: true,
-      endpoint: "http://localhost:3000/api/normativa/yearNormativa",
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
       key: "anio",
     },
     {
@@ -180,7 +181,7 @@ export const filterConfig = {
       type: "select",
       label: "Año",
       async: true,
-      endpoint: "http://localhost:3000/api/normativa/yearNormativa",
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
       key: "anio",
     },
     {

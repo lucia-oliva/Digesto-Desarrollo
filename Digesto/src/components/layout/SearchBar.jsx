@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import useAxios from "axios-hooks";
 import PropTypes from "prop-types";
-
+import { API_BASE } from '../../api/axiosPrivate';
 function SearchBar({onSearch}) {
   const [inputValue, setInputValue] = useState('');
   const [filteredOptions, setFilteredOptions] = useState([]);
@@ -9,7 +9,7 @@ function SearchBar({onSearch}) {
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  const [{ data }] = useAxios("http://localhost:3000/api/tag/tags");
+  const [{ data }] = useAxios(`${API_BASE}/tag/tags`);
 
   const handleInputChange = (e) => {
     const value = e.target.value;

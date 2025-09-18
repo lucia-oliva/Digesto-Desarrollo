@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // components/GenericTable/TableHeader.jsx
 function TableHeader({ columns, showActions }) {
   return (

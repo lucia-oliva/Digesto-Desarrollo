@@ -1,11 +1,11 @@
 import axios from "axios";
-
+import { API_BASE } from "../../api/axiosPrivate";
 
 
 export const cambiarEstadoUsuario = async (id_usuario, nuevo_estado) => {
   try {
     const { data } = await axios.post(
-      "http://localhost:3000/api/usuarios/cambiar-estado",
+        `${API_BASE}/usuarios/cambiar-estado`,
       { id_usuario, nuevo_estado },
       { headers: { "Content-Type": "application/json" } }
     );
@@ -20,7 +20,7 @@ export const searchNormativas = async (page, limit, type, filtros={}) => {
   console.log("tipo:",type, "filtros:",filtros);
   try {
     const response = await axios.post(
-      `http://localhost:3000/api/${type}/search?page=${page}&limite=${limit}`,
+      `${API_BASE}/${type}/search?page=${page}&limite=${limit}`,
       filtros,
       {
         headers: { "Content-Type": "application/json" }
@@ -37,7 +37,7 @@ export const searchNormativasEliminadas = async (page, limit, type, filtros={}) 
   console.log("tipo:", type, "filtros:", filtros);
   try{
     const response = await axios.post(
-      `http://localhost:3000/api/normativa/searchEliminadas?page=${page}&limite=${limit}`,
+      `${API_BASE}/normativa/searchEliminadas?page=${page}&limite=${limit}`,
       filtros,
       {
         headers: { "Content-Type": "application/json" }
@@ -54,7 +54,7 @@ export const searchNormativasDespublicadas = async (page, limit, type, filtros={
   console.log("tipo:", type, "filtros:", filtros);
   try{
     const response = await axios.post(
-      `http://localhost:3000/api/normativa/searchDespublicadas?page=${page}&limite=${limit}`,
+      `${API_BASE}/normativa/searchDespublicadas?page=${page}&limite=${limit}`,
       filtros,
       {
         headers: { "Content-Type": "application/json" }
@@ -73,7 +73,7 @@ export const searchNormativasDespublicadas = async (page, limit, type, filtros={
 export const deleteApi = async (id,type,userId) => {
   try {
     console.log(id , type, userId);
-    const response = await fetch(`http://localhost:3000/api/${type}/eliminar/${id}`, {
+    const response = await fetch(`${API_BASE}/${type}/eliminar/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export const editApi = async (dataToEdit, type, userId) => {
     };
 
     const response = await axios.post(
-      `http://localhost:3000/api/${type}/edit`,
+      `${API_BASE}/${type}/edit`,
       payload,
       {
         headers: { "Content-Type": "application/json" },
@@ -113,7 +113,7 @@ export const editApi = async (dataToEdit, type, userId) => {
 export const restoreApi = async (id, userId) => {
   try {
     const response = await axios.post(
-      `http://localhost:3000/api/normativa/restaurar/${id}`,
+      `${API_BASE}/normativa/restaurar/${id}`,
       {},
       {
         headers: {
@@ -133,7 +133,7 @@ export const restoreApi = async (id, userId) => {
 export const publicarApi = async (id, userId) => {
   try{
       const response = await axios.post(
-         `http://localhost:3000/api/normativa/publicar/${id}`,
+         `${API_BASE}/normativa/publicar/${id}`,
           {},
           {
             headers: {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-
+import { API_BASE } from "../../api/axiosPrivate";
 function AgregarSesion() {
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ function AgregarSesion() {
       orden_url: archivo.name,
     };
 
-    const res = await fetch("http://localhost:3000/api/sesiones/create", {
+    const res = await fetch(`${API_BASE}/sesiones/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -52,7 +52,7 @@ function AgregarSesion() {
 
       console.log("DATOS SESIONEEEEEEEEEEEEEEEEEEES: ", formDataUpload);
 
-      const uploadRes = await fetch(`http://localhost:3000/api/file/upload/${data.id_sesion}`, {
+      const uploadRes = await fetch(`${API_BASE}/file/upload/${data.id_sesion}`, {
         method: "POST",
         body: formDataUpload,
       });

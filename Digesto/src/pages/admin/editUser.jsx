@@ -4,7 +4,7 @@ import useAxios from "axios-hooks";
 import { useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router";
-
+import { API_BASE } from "../../api/axiosPrivate";
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
   const { id } = useParams();
@@ -24,7 +24,7 @@ export default function EditarUsuario() {
 
   
     const [{ data: usuario2 }] = useAxios({
-      url: `http://localhost:3000/api/usuarios/${userId}`,
+      url: `${API_BASE}/usuarios/${userId}`,
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function EditarUsuario() {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/usuarios/${userId}`, {
+    const response = await fetch(`${API_BASE}/usuarios/${userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

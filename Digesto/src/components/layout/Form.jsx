@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import useAxios from "axios-hooks";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-
+import { API_BASE } from "../../api/axiosPrivate";
 function Form({
   dependencia,
   onFormChange,
@@ -51,7 +51,7 @@ function Form({
   };
 
   const [{ data: yearsData }] = useAxios(
-    "http://localhost:3000/api/normativa/yearNormativa"
+    `${API_BASE}/normativa/yearNormativa`
   );
 
   useEffect(() => {

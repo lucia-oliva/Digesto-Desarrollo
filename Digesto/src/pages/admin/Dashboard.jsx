@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa6";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { API_BASE } from "../../api/axiosPrivate";
 
 function Dashboard() {
   const [totales, setTotales] = useState({
@@ -23,7 +24,7 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:3000/api/dashboard/resumen",
+          `${API_BASE}/dashboard/resumen`,
           {
             withCredentials: true,
           }
