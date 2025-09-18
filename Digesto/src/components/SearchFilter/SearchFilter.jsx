@@ -69,8 +69,9 @@ function GenericFilterSearch({
       for (const filter of filters) {
         if (filter.async && filter.endpoint) {
           try {
-            const { data } = await axios.get(filter.endpoint);
-            updatedOptions[filter.name] = data.map((item) => ({
+            const response = await axios.get(filter.endpoint);
+            const arrayData = response.data;
+            updatedOptions[filter.name] = arrayData.data.map((item) => ({
               label: item[filter.key],
               value: item[filter.key],
             }));
