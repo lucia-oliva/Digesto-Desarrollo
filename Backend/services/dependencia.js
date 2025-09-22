@@ -38,6 +38,13 @@ async function getDepenendenciaById(id) {
   return results;
 }
 
+//dependencia para mapear
+async function getDependencias() {
+  const sql = "SELECT id, nombre FROM dependencia where estado = 'publicado'";
+  const results = await db.query(sql);
+  return results;
+}
+
 /*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
 campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ] 
 */
@@ -179,4 +186,5 @@ export default {
   searchDependenciaByParameters,
   edit,
   getSesionesPaginado,
+  getDependencias
 };

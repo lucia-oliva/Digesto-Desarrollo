@@ -62,6 +62,16 @@ router.get(
   })
 );
 
+//get dependencia mapeo
+
+router.get(
+  "/getDependencias",
+  asyncHandler(async (req, res) => {
+    const dependencias = await dependenciaDB.getDependencias();
+    res.json(dependencias);
+  })
+);
+
 //obtener sesiones consejo-superior
 router.get(
   "/sesiones",

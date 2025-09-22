@@ -36,6 +36,17 @@ router.post(
   })
 );
 
+
+//emisores para mapeo
+
+router.get(
+  "/getEmisores",
+  asyncHandler(async (req, res) => {
+    const emisores = await emisoresDB.getEmisores();
+    res.json(emisores);
+  })
+);
+
 // Crear emisor
 router.post(
   "/create",

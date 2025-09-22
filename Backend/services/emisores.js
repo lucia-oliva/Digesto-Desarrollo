@@ -22,6 +22,15 @@ async function getAllEmisoresName() {
   return results;
 }
 
+
+//Emisores para mapeo
+
+async function getEmisores(){
+  const sql = "SELECT id, nombre FROM emisor where estado = 'publicado'";
+  const results = await db.query(sql, []);
+  return results;
+}
+
 async function edit(data) {
   console.log(data);
 
@@ -114,4 +123,5 @@ export default {
   create,
   edit,
   getById,
+  getEmisores
 };
