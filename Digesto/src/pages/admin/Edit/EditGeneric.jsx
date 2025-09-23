@@ -8,15 +8,33 @@ import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
 import { getRuta } from "../Carga/config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
-//import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
+import { useReferencias } from "../../../context/referenciasContext.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
 import { API_BASE } from "../../../api/axiosPrivate.js";
 
 function GenericEdit() {
+
+
+  
   const navigate = useNavigate();
   const { auth } = useAuth();
   const user = auth.user;
+  const { dependencias, emisores } = useReferencias();
+  const findIdByNameOrId = (list, value) => {
+    if (value == null) return "";
+    const s = String(value).trim();
+    if (/^\d+$/.test(s)) return s; // ya es un ID
+    const lower = s.toLowerCase();
+    const hit = (list ?? []).find(
+      (x) => String(x.nombre ?? x.label ?? "")
+              .trim()
+              .toLowerCase() === lower
+    );
+    return hit ? String(hit.id ?? hit.value ?? "") : "";
+  };
+
+
   const location = useLocation();
   const { id } = useParams();
 
@@ -33,10 +51,7 @@ function GenericEdit() {
   const [formData, setFormData] = useState(null);
   const [errores, setErrores] = useState({});
 
-  const getValueFromLabel = (options, label) => {
-    const found = options.find((opt) => opt.label === label);
-    return found ? found.value : label;
-  };
+
 
   useEffect(() => {
     setCurrentStep(0);
@@ -55,24 +70,25 @@ function GenericEdit() {
         .then((data) => {
           if (!data) {
             alert("No se encontraron datos para editar.");
-          } else if (entidad === "normativa") {
-            setFormData({
-              ...data,
-
-              emisor: getValueFromLabel(emisorOptions, data.emisor),
-              dependencia: getValueFromLabel(
-                dependenciaOptions,
-                data.dependencia
+          } 
+else if (entidad === "normativa") {
+             setFormData({
+               ...data,
+              emisor: findIdByNameOrId(emisores, data.id_emisor ?? data.emisor),
+             dependencia: findIdByNameOrId(
+               dependencias,
+                data.id_dependencia ?? data.dependencia
               ),
-              archivo: data.archivo ?? "",
-              cambia_normativa:
-                Array.isArray(data.normativas_modificadas) &&
-                data.normativas_modificadas.length > 0
-                  ? "SI"
-                  : data.cambia_normativa || "NO",
-              _originalesNormativas: data.normativas_modificadas || [],
-              normativas_bajas: [],
-            });
+              tipo_normativa: String(data.id_tipo_normativa ?? data.tipo_normativa ?? "").trim(),
+               archivo: data.archivo ?? "",
+               cambia_normativa:
+                 Array.isArray(data.normativas_modificadas) &&
+                 data.normativas_modificadas.length > 0
+                   ? "SI"
+                   : data.cambia_normativa || "NO",
+               _originalesNormativas: data.normativas_modificadas || [],
+               normativas_bajas: [],
+             });
           } else {
             setFormData({
               ...data,
@@ -84,7 +100,29 @@ function GenericEdit() {
         })
         .catch(() => alert("Error al cargar los datos para editar"));
     }
-  }, [entidad, id]);
+
+
+    
+  }, [entidad, id, dependencias,emisores]);
+
+ useEffect(() => {
+   if (entidad === "normativa" && formData) {
+     const depId = findIdByNameOrId(dependencias, formData.dependencia);
+     const emiId = findIdByNameOrId(emisores, formData.emisor);
+     if (
+       (depId && depId !== formData.dependencia) ||
+       (emiId && emiId !== formData.emisor)
+     ) {
+       setFormData(prev => ({
+         ...prev,
+         dependencia: depId || "",
+         emisor: emiId || ""
+       }));
+     }
+   }
+   
+ }, [dependencias, emisores, entidad, formData]); 
+
 
    const handleNext = () =>
    setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
@@ -98,11 +136,10 @@ function GenericEdit() {
       return;
     }
 
-    ["dependencia", "emisor", "tipo_normativa"].forEach((campo) => {
-      if (formData[campo] !== undefined && formData[campo] !== null) {
-        formData[campo] = String(formData[campo]);
-      }
-    });
+      // IDs seguros a partir de catálogo (si por alguna razón viniera un nombre)
+  const safeDep  = findIdByNameOrId(dependencias, formData.dependencia);
+  const safeEmi  = findIdByNameOrId(emisores, formData.emisor);
+  const safeTipo = formData.tipo_normativa ?? "";
 
     const ruta = getRuta(entidad);
     const cambios = buildRelacionesNormativas(formData);
@@ -131,12 +168,19 @@ function GenericEdit() {
         : "";
 
     
-    const dataToSend = {
-      ...mapCamposEditar(entidad, formClean),
-      archivo: archivoNombre,
-      userId: user.id,
-      normativas_modificadas: cambios,
-    };
+  const safeForm = {
+    ...formClean,
+    dependencia: safeDep,
+    emisor: safeEmi,
+    tipo_normativa: safeTipo,
+  };
+
+  const dataToSend = {
+    ...mapCamposEditar(entidad, safeForm),
+     archivo: archivoNombre,
+     userId: user.id,
+     normativas_modificadas: cambios,
+   };
 
     if(entidad === "usuario"){
       dataToSend.password = 
@@ -166,9 +210,9 @@ function GenericEdit() {
           formDataUpload.append("resolucion", String(formData.numero));
           formDataUpload.append("anio", String(formData.anio));
           formDataUpload.append("titulo", formData.titulo);
-          formDataUpload.append("id_dependencia", String(formData.dependencia));
-          formDataUpload.append("id_emisor", formData.emisor);
-          formDataUpload.append("tipo_normativa", formData.tipo_normativa);
+          formDataUpload.append("id_dependencia", String(safeDep || formData.dependencia || ""));
+          formDataUpload.append("id_emisor", String(safeEmi || formData.emisor || ""));
+          formDataUpload.append("tipo_normativa", String(safeTipo || formData.tipo_normativa || ""));
 
           return fetch(`${API_BASE}/file/upload/${formData.id}`, {
             method: "POST",
@@ -196,6 +240,7 @@ function GenericEdit() {
       });
   };
 
+  
   const renderPaso = () => {
     if (!formData) return <p className="text-center">Cargando datos...</p>;
 
@@ -257,6 +302,8 @@ function GenericEdit() {
     }
   };
 
+
+  
   return (
     <div className="w-full rounded-lg text-neutral">
       <h2 className="text-xl font-semibold mb-4 text-center">
