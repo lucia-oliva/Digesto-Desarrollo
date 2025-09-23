@@ -16,19 +16,6 @@ export const tipoNormativaOptions = [
   { label: "Ordenanza", value: "1" },
 ];
 
-export const dependenciaOptions = [
-  { label: "Aplicadas", value: "1" },
-  { label: "Exactas", value: "2" },
-  { label: "Salud", value: "3" },
-  { label: "Sociales", value: "4" },
-  { label: "Humanas", value: "5" },
-  { label: "Consejo Superior", value: "20" },
-  { label: "Sede Chepes", value: "22" },
-  { label: "Sede Villa Unión", value: "26" },
-  { label: "Sede Chamical", value: "25" },
-  { label: "Sede Aimogasta", value: "24" },
-  { label: "Sede Catuna", value: "23" },
-];
 
 export const RolOptions = [
   { label: "Administrador de Dependencia", value: "2" },
@@ -36,19 +23,9 @@ export const RolOptions = [
   { label: "SuperAdministrador", value: "1" },
 ];
 
-export const emisorOptions = [
-  { label: "Decano", value: "1" },
-  { label: "Rector", value: "2" },
-  { label: "Consejo Superior", value: "4" },
-  { label: "Consejo Directivo", value: "3" },
-  { label: "Interdepartamental", value: "5" },
-  { label: "Relaciones Institucionales", value: "11" },
-];
 
-export const opcionesPorCampo = {
+export const opcionesPorCampoFijo = {
   tipo_normativa: tipoNormativaOptions,
-  dependencia: dependenciaOptions,
-    emisor: emisorOptions,
     rol: RolOptions,
 };
 
@@ -57,10 +34,11 @@ export function getRuta(entidad) {
   return rutasPorEntidad[entidad] || entidad;
 }
 
-export function getLabel(campo, value) {
-  const opciones = opcionesPorCampo[campo];
+
+export function getLabelFijo(campo, value) {
+  const opciones = opcionesPorCampoFijo[campo];
   if (!opciones) return value;
-  const match = opciones.find((opt) => opt.value === value);
+  const match = opciones.find((opt) => String(opt.value) === String(value));
   return match ? match.label : value;
 }
 
@@ -160,4 +138,16 @@ export function buildRelacionesNormativas(formData = {}) {
     .filter(Boolean);
 
   return [...altasYMods, ...bajas];
+}
+
+export function findLabelByValue(list = [], value) {
+  const v = String(value);
+  const match = list.find(o => String(o.value ?? o.id) === v);
+  return match ? (match.label ?? match.nombre ?? v) : v;
+}
+
+export function findValueByLabel(list = [], label) {
+  const l = String(label).trim().toLowerCase();
+  const match = list.find(o => String(o.label ?? o.nombre ?? "").trim().toLowerCase() === l);
+  return match ? String(match.value ?? match.id) : "";
 }

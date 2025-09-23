@@ -8,7 +8,7 @@ import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
 import { getRuta } from "../Carga/config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
-import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
+//import { emisorOptions, dependenciaOptions } from "../Carga/config/mapeo.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
 import { API_BASE } from "../../../api/axiosPrivate.js";

@@ -1,28 +1,14 @@
 import PropTypes from "prop-types";
-
-
+import {tipoNormativaOptions} from "../config/mapeo"
 
 function PasoSeleccionTipo({ entidad, formData, setFormData, onNext }) {
 
-  const opcionesPorEntidad = {
-    normativa: [
-        { label: "Ordenanza", value: 1 },
-        { label: "Acta", value: 2 },
-        { label: "Convenio", value: 3 },
-        { label: "Providencia", value: 4 },
-        { label: "Resolucion", value: 5 },
-        { label: "Nota", value: 6 }
-    ]
-  };
-
-  const opciones = opcionesPorEntidad[entidad] || [];
+  const opciones = entidad === "normativa" ? tipoNormativaOptions : [];
 
   const handleSelect = (tipo_normativa) => {
     setFormData({ ...formData, tipo_normativa });
     onNext();
   };
-
-
 
   return (
     <div className="mb-6">

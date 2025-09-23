@@ -1,10 +1,8 @@
 import PropTypes from "prop-types";
-import { getLabel, toAccionText as _toAccionText } from "../config/mapeo.js";
 import { camposOcultosVerificacion } from "../../Edit/VerificacionIgnoreFields.js";
 import { useLocation } from "react-router";
-import { tipoNormativaOptions, dependenciaOptions, RolOptions, emisorOptions } from "../config/mapeo.js";
-
-
+import { findLabelByValue, toAccionText as _toAccionText, tipoNormativaOptions, RolOptions } from "../config/mapeo.js";
+import { useReferencias } from "../../../../context/referenciasContext.js";
 const normalize = (s) =>
   String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
@@ -17,12 +15,9 @@ const toLabel = (options = [], value) => {
   return found?.label ?? str;
 };
 
-const OPTIONS_BY_KEY = {
+const OPTIONS_BY_KEY_FIJO = {
   tipo_normativa: tipoNormativaOptions,
-  dependencia: dependenciaOptions,                    
-  normativa_interdepartamental: dependenciaOptions, 
-  rol: RolOptions,
-  emisor: emisorOptions
+  rol: RolOptions
 };
 
 const getBadgeClass = (accion) => {
@@ -51,6 +46,15 @@ const toAccionText = (v) =>
 
 function PasoVerificacion({ formData, onBack, onSubmit }) {
 
+  const { dependencias, emisores } = useReferencias();
+  const depOptions = (dependencias ?? []).map(d => ({
+    label: String(d.nombre ?? d.label ?? "").trim(),
+    value: String(d.id ?? d.value ?? "").trim()
+  }));
+  const emiOptions = (emisores ?? []).map(e => ({
+    label: String(e.nombre ?? e.label ?? "").trim(),
+    value: String(e.id ?? e.value ?? "").trim()
+  }));
   console.log(formData);
   const location = useLocation();
   const pathSegment = location.pathname
@@ -107,13 +111,18 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
   const tieneNormMods = normMods.length > 0;
 
 const renderValor = (key, value) => {
-  if (typeof value === "object" && value?.name) return value.name;
-  if (Array.isArray(value)) return value.join(", ");
-  const opts = OPTIONS_BY_KEY[key];
-  if (opts) return toLabel(opts, value);
-  return getLabel(key, value);
-};
-
+    if (typeof value === "object" && value?.name) return value.name;
+    if (Array.isArray(value)) return value.join(", ");
+    const fijo = OPTIONS_BY_KEY_FIJO[key];
+    if (fijo) return toLabel(fijo, value);
+    if (key === "dependencia" || key === "normativa_interdepartamental") {
+      return findLabelByValue(depOptions, value);
+    }
+    if (key === "emisor") {
+      return findLabelByValue(emiOptions, value);
+    }
+    return String(value ?? "—");
+  };
 
   return (
     <div className="mt-6">

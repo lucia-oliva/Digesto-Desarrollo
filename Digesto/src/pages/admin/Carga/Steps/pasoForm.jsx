@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
-import { useMemo } from "react";
-import { camposPorEntidad } from "../config/formFields"; // ajusta la ruta real
+import { useMemo, useEffect } from "react";
+import { camposPorEntidad } from "../config/formFields"; 
 import { usePasoForm, shouldShowField } from "./pasoFormLogic";
-import { dependenciaOptions } from "../config/mapeo";
+import {useReferencias} from "../../../../context/referenciasContext"
+import {useAuth} from "../../../../context/useAuth";
 
 function PasoForm({
   entidad,
@@ -14,24 +15,61 @@ function PasoForm({
   setErrores = () => {},
   omitPwdFields = false,
 }) {
+  const { dependencias, emisores } = useReferencias();
+  const {auth} = useAuth();
+  const user = auth?.user;
+  const isSuperAdmin = user?.tipo_usuario === "SuperAdministrador";
+  const userDepNombre = String(user?.dependencia ?? "").trim();
+
+  const depOptions = useMemo(
+    () => (dependencias ?? []).map(d => ({
+      label: String(d.nombre ?? d.label ?? "").trim(),
+      value: String(d.id ?? d.value ?? "").trim()
+    })),
+    [dependencias]
+  );
+  const emiOptions = useMemo(
+    () => (emisores ?? []).map(e => ({
+      label: String(e.nombre ?? e.label ?? "").trim(),
+      value: String(e.id ?? e.value ?? "").trim()
+    })),
+    [emisores]
+  );
+
+  const DEP_BY_NAME = useMemo(
+    () => new Map(depOptions.map(d => [d.label, d.value])),
+    [depOptions]
+  );
+  const lockedDepValue = !isSuperAdmin ? (DEP_BY_NAME.get(userDepNombre) ?? "") : "";
+  const shouldLockDep = !!lockedDepValue && !isSuperAdmin;
+
   const baseCampos = useMemo(() => camposPorEntidad[entidad] || [], [entidad]);
 
  const campos = useMemo(() => {
     if (entidad !== "normativa") return baseCampos;
-    // agregamos el campo virtual al final (o donde prefieras)
     return [
       ...baseCampos,
       {
         name: "normativa_interdepartamental",
         label: "Resolucion Interdepartamental",
         type: "select",
+        options: depOptions || [],
         required: true,
-        // Opciones: las mismas de dependencia
-        options: dependenciaOptions || [],
         placeholder: "Seleccione la dependencia",
       },
     ];
-  }, [entidad, baseCampos]);
+  }, [entidad, baseCampos, depOptions]);
+
+ // Pre-cargar/forzar el valor de dependencia si está bloqueado
+  useEffect(() => {
+    if (shouldLockDep) {
+      setFormData(prev => {
+        const prevVal = String(prev?.dependencia ?? "");
+        if (prevVal === String(lockedDepValue)) return prev; 
+        return { ...prev, dependencia: String(lockedDepValue) };
+      });
+    }
+  }, [shouldLockDep, lockedDepValue, setFormData]);
 
   const {
     tagInput,
@@ -49,7 +87,7 @@ function PasoForm({
 
   return (
     <form className="space-y-4" onSubmit={onSubmit} onKeyDown={preventImplicitSubmit}>
-      {campos.map(({ name, label, type, options, required, placeholder }) => {
+    {campos.map(({ name, label, type, options, required, placeholder, fromContext }) => {
         if (!shouldShowField({ entidad, formData, omitPwdFields }, name)) return null;
         const error = mergedErrors[name];
 
@@ -99,6 +137,15 @@ function PasoForm({
         }
 
         if (type === "select") {
+          let resolvedOptions = [];
+          if (fromContext === "dependencia")  resolvedOptions = depOptions;
+          else if (fromContext === "emisor") resolvedOptions = emiOptions;
+          else resolvedOptions = options || [];
+          //Select bloqueado
+          const isDependenciaField = name === "dependencia";
+          const disabled = isDependenciaField && shouldLockDep;
+          
+
           return (
             <div key={name}>
               {commonLabel}
@@ -111,9 +158,10 @@ function PasoForm({
                 required={!!required}
                 aria-invalid={!!error}
                 aria-describedby={error ? `${name}-error` : undefined}
+                disabled={disabled}
               >
                 <option value="" disabled>Seleccione</option>
-                {(options || []).map((opt) =>
+                {(resolvedOptions || []).map((opt) =>
                   typeof opt === "object" ? (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ) : (
