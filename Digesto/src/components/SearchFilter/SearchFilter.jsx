@@ -4,13 +4,13 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { filterConfig } from "./configFilters";
 import AbecedarioFiltro from "./AlphabetFilter";
-import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo.js";
+//import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo.js";
 import { useAuth } from "../../context/useAuth.jsx";
 import {useLocation} from "react-router"
-
-const DEP_BY_NAME = new Map(
-  dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
-);
+import {useReferencias} from "../../context/referenciasContext.js"
+//const DEP_BY_NAME = new Map(
+  //dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
+//);
 
 function GenericFilterSearch({
   type,
@@ -23,18 +23,48 @@ function GenericFilterSearch({
   const [formState, setFormState] = useState({});
   const [dynamicOptions, setDynamicOptions] = useState({});
   const location = useLocation();
-
   const { auth } = useAuth();
   const user = auth?.user;
   const isSuperAdmin = user?.tipo_usuario === "SuperAdministrador";
   const userDepNombre = (user?.dependencia ?? "").trim();
-  const lockedDepValue = !isSuperAdmin ? DEP_BY_NAME.get(userDepNombre) ?? "" : "";
+  //const lockedDepValue = !isSuperAdmin ? DEP_BY_NAME.get(userDepNombre) ?? "" : "";
   const isAdminScope = scope === "admin";
+  //const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
+
+  //Traer datos del contexto
+   const {dependencias,emisores, loading, error} = useReferencias(); 
+    const depOptions = useMemo(() => {
+      const list = Array.isArray(dependencias) ? dependencias : [];
+      return list.map((d) => ({
+      label: String(d.nombre ?? d.label ?? "").trim(),
+      value: String(d.id ?? d.value ?? "").trim(),
+    }));
+  }, [dependencias]);
+
+  const emiOptions = useMemo(() => {
+    const list = Array.isArray(emisores) ? emisores : [];
+    return list.map((e) => ({
+      label: String(e.nombre ?? e.label ?? "").trim(),
+      value: String(e.id ?? e.value ?? "").trim(),
+    }));
+  }, [emisores]);
+
+  //Mapeo
+  const DEP_BY_NAME = useMemo(() => {
+    return new Map(depOptions.map((d) => [d.label, d.value]));
+  }, [depOptions]);
+  //Bloqueo de dep
+  const lockedDepValue = !isSuperAdmin ? (DEP_BY_NAME.get(userDepNombre) ?? "") : "";
   const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
 
   useEffect(() => {
   console.log("🔍 Estado actual de filtros:", formState);
 }, [formState]);
+
+  useEffect(() => {
+  console.log("📚 depOptions:", depOptions);
+  console.log("🏛️ emiOptions:", emiOptions);
+}, [depOptions, emiOptions]);
 
   useEffect(() => {
     setFormState({});
@@ -110,7 +140,8 @@ function GenericFilterSearch({
   return (
     <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow ">
       <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
-
+        {loading && <div className="mb-2 text-sm opacity-70">Cargando referencias…</div>}
+        {error && <div className="mb-2 text-sm text-error">Error cargando referencias</div>}
       {/* Abecedario */}
       {filters.some((f) => f.name === "letra") && (
         <div className="mb-4">
@@ -144,10 +175,16 @@ function GenericFilterSearch({
             }
 
             if (filter.type === "select") {
-              const options = filter.async
-                ? dynamicOptions[filter.name] || []
-                : filter.options || [];
-              const isDependencia = filter.name === "dependencia";
+              //const options = filter.async
+                //? dynamicOptions[filter.name] || []
+                //: filter.options || [];
+                let options = [];
+                if(filter.fromContext === "dependencias") options = depOptions;
+                  else if(filter.fromContext === "emisores") options = emiOptions;
+                  else if(filter.async) options = dynamicOptions[filter.name] || [];
+                  else options = filter.options || [];
+              
+                const isDependencia = filter.name === "dependencia";
               const disabled = isDependencia && canLockDep;
 
               return (

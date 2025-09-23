@@ -166,7 +166,7 @@ if (entidad === "normativa" && String(formData?.emisor ?? "") === "5") {
           { test: /.{8,}/, message: "mínimo 8 caracteres" },
           { test: /[a-z]/, message: "una minúscula" },
           { test: /[A-Z]/, message: "una mayúscula" },
-          { test: /\\d/,   message: "un número" },
+          { test: /\d/,   message: "un número" },
         ];
         const faltan = rules.filter(r => !r.test.test(p)).map(r => r.message);
         if (faltan.length) {
