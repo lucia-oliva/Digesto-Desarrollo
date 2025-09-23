@@ -9,7 +9,7 @@ import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
 import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi, cambiarEstadoUsuario } from "./NormativaApi";
-import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo";
+import {useReferencias} from "../../context/referenciasContext"
 
 const NormativaTable = ({
   type,
@@ -31,18 +31,27 @@ const NormativaTable = ({
     (tipoUser === "Supervisor" ||
       tipoUser === "Administrador de Dependencia") &&
     depName === "Consejo Superior";
+  const{dependencias} = useReferencias(); 
+  
+
+  const depOptions = useMemo(() => {
+    const list = Array.isArray(dependencias) ? dependencias : [];
+    return list.map(d => ({
+      label: String(d.nombre ?? d.label ?? "").trim(),
+      value: String(d.id ?? d.value ?? "").trim(),
+    }));
+  }, [dependencias]);
+
   const DEP_BY_NAME = useMemo(
-    () =>
-      new Map(
-        dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
-      ),
-    []
+    () => new Map(depOptions.map(d => [d.label, d.value])),
+    [depOptions]
   );
 
   const userDepId =
     DEP_BY_NAME.get(String(depName || "").trim()) ||
     user?.id_dependencia ||
     null;
+  
   const path = location.pathname;
   const isAdminRoute = path.startsWith("/admin");
   const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
