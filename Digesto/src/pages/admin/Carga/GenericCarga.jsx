@@ -166,7 +166,7 @@ function GenericCarga() {
       </h2>
       {/* Steps visuales*/}
       <div className="w-full flex justify-center mb-4 sm:mb-6">
-        <ul className="steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
+        <ul className=" z-0 steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
           {pasos.map((paso, i) => {
             const label = paso
               .replace(/([A-Z])/g, " $1")
