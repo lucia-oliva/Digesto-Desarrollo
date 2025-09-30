@@ -19,10 +19,11 @@ export default function MobileCardList({
 
   return (
     <div className="space-y-4">
-      {data.map((item) => (
+      {data.map((item,idx) => (
         <article
-          key={item.id || item.id_sesion || JSON.stringify(item)}
+          key={item.id || item.id_sesion || `card-${idx}` }
           className="rounded-2xl overflow-hidden border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-md hover:shadow-lg transition-all duration-200"
+          
         >
         
           {hasTitulo && item.titulo ? (
@@ -46,7 +47,7 @@ export default function MobileCardList({
               return (
                 <div
                   key={col.key}
-                  className="flex justify-between items-start bg-white/70 backdrop-blur-sm rounded-lg px-3 py-2 border border-blue-100"
+                  className="flex justify-between items-start bg-white/70  rounded-lg px-3 py-2 border border-blue-100"
                 >
                   <span className="text-xs font-medium text-blue-700">
                     {col.label}
