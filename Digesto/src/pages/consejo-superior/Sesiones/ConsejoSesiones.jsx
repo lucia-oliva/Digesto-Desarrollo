@@ -1,4 +1,4 @@
-import NormativaTable from "../../components/Table/NormativasTable";
+import NormativaTable from "../../../components/Table/NormativasTable";
 
 function ConsejoSesiones(){
     return (

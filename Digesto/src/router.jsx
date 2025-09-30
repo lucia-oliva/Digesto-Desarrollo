@@ -13,15 +13,15 @@ import { VistaAdministrativa } from "./pages/admin/VistaAdministrativa";
 import GenericCarga from "./pages/admin/Carga/GenericCarga";
 import RouteGuard from "./services/RouteGuard";
 import ConsejoPage from "./pages/consejo-superior/consejoPage.jsx";
-import ConsejoComisiones from "./pages/consejo-superior/ConsejoComisiones.jsx";
-import ConsejoIntegrantes from "./pages/consejo-superior/ConsejoIntegrantes.jsx";
+import ConsejoComisiones from "./pages/consejo-superior/Informacion/ConsejoComisiones.jsx";
+import ConsejoIntegrantes from "./pages/consejo-superior/Informacion/ConsejoIntegrantes.jsx";
 import ConsejoNormativas from "./pages/consejo-superior/ConsejoNormativas.jsx";
-import ConsejoReglamento from "./pages/consejo-superior/ConsejoReglamento.jsx";
-import ConsejoSesiones from "./pages/consejo-superior/ConsejoSesiones.jsx";
+import ConsejoReglamento from "./pages/consejo-superior/Informacion/ConsejoReglamento.jsx";
+import ConsejoSesiones from "./pages/consejo-superior/Sesiones/ConsejoSesiones.jsx";
 import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
 import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
-import AgregarSesion from "./pages/consejo-superior/AgregarSesion.jsx";
-import EditarSesion from "./pages/consejo-superior/EditarSesion.jsx";
+import AgregarSesion from "./pages/consejo-superior/Sesiones/AgregarSesion.jsx";
+import EditarSesion from "./pages/consejo-superior/Sesiones/EditarSesion.jsx";
 
 const Router = () => {
   return (

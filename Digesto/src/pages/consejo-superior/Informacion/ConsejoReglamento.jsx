@@ -1,6 +1,6 @@
 
 function ConsejoReglamento() {
-    const pdfUrl = "../../../public/REGLAMENTO_CS.pdf"; // Asegúrate de tener este archivo en public/
+    const pdfUrl = "../../../../public/REGLAMENTO_CS.pdf"; 
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8 pt-25">
