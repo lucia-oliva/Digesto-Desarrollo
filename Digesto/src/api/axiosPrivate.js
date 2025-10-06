@@ -6,7 +6,7 @@ import {
 } from "../services/authservices";
 import { getGlobalLogout } from "../context/globalLogout";
 
-export const API_BASE = "http://localhost:3000/api";
+export const API_BASE = "http://172.20.3.147:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE,
