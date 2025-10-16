@@ -1,240 +1,228 @@
-// components/Search/GenericFilterSearch.jsx
-import { useState, useEffect, useMemo } from "react";
-import PropTypes from "prop-types";
-import axios from "axios";
+// src/components/SearchFilter/SearchFilter.jsx
+import { useEffect, useMemo, useState } from "react";
+import AlphabetFilter from "./AlphabetFilter";
 import { filterConfig } from "./configFilters";
-import AbecedarioFiltro from "./AlphabetFilter";
-//import { dependenciaOptions } from "../../pages/admin/Carga/config/mapeo.js";
-import { useAuth } from "../../context/useAuth.jsx";
-import {useLocation} from "react-router"
-import {useReferencias} from "../../context/referenciasContext.js"
-//const DEP_BY_NAME = new Map(
-  //dependenciaOptions.map((d) => [String(d.label).trim(), String(d.value)])
-//);
+import api from "../../api/axiosPrivate"; // tu cliente axios con interceptores
+import { useReferencias } from "../../context/referenciasContext";
 
-function GenericFilterSearch({
+// Mapea los "fromContext" con lo que provee tu ReferenciasProvider
+function useContextOptions(fromContext) {
+  const { dependencias, emisores } = useReferencias() || {};
+
+  const mapList = (arr) =>
+    (arr || []).map((it) => ({
+      label: String(it?.nombre ?? it?.label ?? "").trim(),
+      value: String(it?.id ?? it?.value ?? "").trim(),
+    }));
+
+  switch (fromContext) {
+    case "dependencias":
+      return mapList(dependencias);
+    case "emisores":
+      return mapList(emisores);
+    default:
+      return [];
+  }
+}
+
+// Carga y cache simple en memoria (por vida del componente) para opciones async
+function useAsyncOptions(field, type) {
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const cacheKey = useMemo(() => {
+    if (!field?.async || !field?.endpoint) return null;
+    // separá por entidad (type) y por key si viene informado
+    return `async:${type}:${field.name}:${field.key || "default"}`;
+  }, [field, type]);
+
+  useEffect(() => {
+    let cancel = false;
+    async function fetchOptions() {
+      if (!field?.async || !field?.endpoint || !cacheKey) return;
+      setLoading(true);
+      try {
+        // opcional: podés implementar cache global si querés (window.__filterCache)
+        const { data } = await api.get(field.endpoint);
+        if (cancel) return;
+        // Espera { key, value } o similar; adaptá si tu API devuelve otra forma
+        const mapped = (Array.isArray(data) ? data : []).map((it) => ({
+          label: String(it?.label ?? it?.[field.key] ?? it).trim(),
+          value: String(it?.value ?? it?.[field.key] ?? it).trim(),
+        }));
+        setOptions(mapped);
+      } catch (e) {
+        setOptions([]);
+      } finally {
+        if (!cancel) setLoading(false);
+      }
+    }
+    fetchOptions();
+    return () => {
+      cancel = true;
+    };
+  }, [cacheKey, field]);
+
+  return { options, loading };
+}
+
+// Prunea un estado conservando sólo las keys presentes en los campos de la entidad
+function pruneStateForFields(state, fields) {
+  const allowed = new Set(fields.map((f) => f.name));
+  const next = {};
+  for (const k of Object.keys(state || {})) {
+    if (allowed.has(k)) next[k] = state[k];
+  }
+  return next;
+}
+
+// Render por tipo de input
+function FieldRenderer({ field, value, onChange }) {
+  const { name, type, label, options, fromContext } = field;
+
+  // opciones desde contexto
+  const ctxOptions = useContextOptions(fromContext);
+
+  // opciones async
+  const { options: asyncOpts, loading: asyncLoading } = useAsyncOptions(field);
+
+  const effectiveOptions = useMemo(() => {
+    // prioridad: async > fromContext > options in-file
+    if (field?.async) return asyncOpts;
+    if (fromContext) return ctxOptions;
+    return options || [];
+  }, [field, asyncOpts, ctxOptions, options]);
+
+  if (type === "text") {
+    return (
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text">{label}</span>
+        </label>
+        <input
+          className="input input-bordered"
+          value={value ?? ""}
+          onChange={(e) => onChange(name, e.target.value)}
+          placeholder={label}
+        />
+      </div>
+    );
+  }
+
+  if (type === "select") {
+    return (
+      <div className="form-control">
+        <label className="label">
+          <span className="label-text">{label}</span>
+        </label>
+        <select
+          className="select select-bordered"
+          value={value ?? ""}
+          onChange={(e) => onChange(name, e.target.value)}
+          disabled={field?.async && asyncLoading}
+        >
+          {/* si no viene "Todos" en options, agregalo como default */}
+          {!effectiveOptions.some((o) => String(o.value) === "") && (
+            <option value="">Todos</option>
+          )}
+          {effectiveOptions.map((opt) => (
+            <option key={`${name}-${opt.value}`} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  // custom "letra" se maneja fuera (AlphabetFilter)
+  return null;
+}
+
+export default function GenericFilterSearch({
   type,
-  onSearch,
-  scope = "public",
+  scope,
   initialState = {},
   autoSearch = false,
+  onSearch = () => {},
 }) {
-  const filters = useMemo(() => filterConfig[type] || [], [type]);
-  const [formState, setFormState] = useState({});
-  const [dynamicOptions, setDynamicOptions] = useState({});
-  const location = useLocation();
-  const { auth } = useAuth();
-  const user = auth?.user;
-  const isSuperAdmin = user?.tipo_usuario === "SuperAdministrador";
-  const userDepNombre = (user?.dependencia ?? "").trim();
-  //const lockedDepValue = !isSuperAdmin ? DEP_BY_NAME.get(userDepNombre) ?? "" : "";
-  const isAdminScope = scope === "admin";
-  //const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
+  // Campos definidos por entidad
+  const fields = useMemo(() => filterConfig?.[type] || [], [type]);
 
-  //Traer datos del contexto
-   const {dependencias,emisores, loading, error} = useReferencias(); 
-    const depOptions = useMemo(() => {
-      const list = Array.isArray(dependencias) ? dependencias : [];
-      return list.map((d) => ({
-      label: String(d.nombre ?? d.label ?? "").trim(),
-      value: String(d.id ?? d.value ?? "").trim(),
-    }));
-  }, [dependencias]);
+  // Estado local del formulario
+  const [formState, setFormState] = useState(() =>
+    pruneStateForFields({ ...initialState }, fields)
+  );
 
-  const emiOptions = useMemo(() => {
-    const list = Array.isArray(emisores) ? emisores : [];
-    return list.map((e) => ({
-      label: String(e.nombre ?? e.label ?? "").trim(),
-      value: String(e.id ?? e.value ?? "").trim(),
-    }));
-  }, [emisores]);
-
-  //Mapeo
-  const DEP_BY_NAME = useMemo(() => {
-    return new Map(depOptions.map((d) => [d.label, d.value]));
-  }, [depOptions]);
-  //Bloqueo de dep
-  const lockedDepValue = !isSuperAdmin ? (DEP_BY_NAME.get(userDepNombre) ?? "") : "";
-  const canLockDep = isAdminScope && !isSuperAdmin && !!lockedDepValue;
-
+  // Cuando cambia la entidad (type) o initialState, rehidratar y PRUNEAR
   useEffect(() => {
-  console.log("🔍 Estado actual de filtros:", formState);
-}, [formState]);
+    const next = pruneStateForFields({ ...initialState }, fields);
+    setFormState(next);
+  }, [initialState, fields]);
 
+  // Input genérico
+  const handleInput = (key, value) => {
+    setFormState((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Buscar
+  const handleBuscar = () => {
+    // envia sólo las keys válidas de esta entidad
+    const next = pruneStateForFields(formState, fields);
+    onSearch(next);
+  };
+
+  // AutoSearch cuando cambia entidad / scope (si se desea)
   useEffect(() => {
-  console.log("📚 depOptions:", depOptions);
-  console.log("🏛️ emiOptions:", emiOptions);
-}, [depOptions, emiOptions]);
-
-  useEffect(() => {
-    setFormState({});
-    setDynamicOptions({});
-  }, [location.pathname, type]);
-
-  useEffect(() => {
-    const hasInitial = initialState && Object.keys(initialState).length > 0;
-    if (!hasInitial) return;
-
-    setFormState((prev) => {
-      const next = { ...prev, ...initialState };
-      if (autoSearch) onSearch(next);
-      return next;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(initialState), autoSearch]);
-
-  // Mantener dependencia bloqueada en admin cuando corresponda
-  useEffect(() => {
-    const hasDependencia = filters.some((f) => f.name === "dependencia");
-    if (hasDependencia && canLockDep) {
-      setFormState((prev) => ({ ...prev, dependencia: lockedDepValue }));
+    if (autoSearch) {
+      const next = pruneStateForFields(formState, fields);
+      onSearch(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, lockedDepValue]);
+  }, [autoSearch, type, scope]);
 
-  // Carga de opciones async
-  useEffect(() => {
-    const fetchOptions = async () => {
-      const updatedOptions = {};
-      for (const filter of filters) {
-        if (filter.async && filter.endpoint) {
-          try {
-            const response = await axios.get(filter.endpoint);
-            const arrayData = response.data;
-            updatedOptions[filter.name] = arrayData.data.map((item) => ({
-              label: item[filter.key],
-              value: item[filter.key],
-            }));
-          } catch (error) {
-            console.error(`Error al cargar ${filter.name}:`, error);
-          }
-        }
-      }
-      setDynamicOptions(updatedOptions);
-    };
-    fetchOptions();
-  }, [filters]);
+  // ¿Hay campo 'letra'?
+  const hasLetter = useMemo(
+    () => fields.some((f) => f.name === "letra" || f.type === "custom"),
+    [fields]
+  );
 
   const handleLetterSelect = (letra) => {
-    setFormState((prev) => {
-      const next = { ...prev, letra };
-      onSearch(next); // búsqueda inmediata al tocar letra
-      return next;
-    });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "dependencia" && canLockDep) return;
-    setFormState({ ...formState, [name]: value });
-  };
-
-  const handleBuscar = () => {
-    onSearch(formState);
-    // mantener tus cambios nuevos: limpiar letra y respetar dependencia bloqueada
-    setFormState(() =>
-      canLockDep ? { dependencia: lockedDepValue, letra: "" } : { letra: "" }
-    );
+    const next = { ...formState, letra };
+    const pruned = pruneStateForFields(next, fields);
+    setFormState(pruned);
+    onSearch(pruned); // búsqueda inmediata por letra
   };
 
   return (
-    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow ">
-      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
-        {loading && <div className="mb-2 text-sm opacity-70">Cargando referencias…</div>}
-        {error && <div className="mb-2 text-sm text-error">Error cargando referencias</div>}
-      {/* Abecedario */}
-      {filters.some((f) => f.name === "letra") && (
-        <div className="mb-4">
-          <label className="block font-medium mb-1">Empieza con</label>
-          <AbecedarioFiltro
-            value={formState.letra ?? ""}  
-            onSelect={handleLetterSelect}
-          />
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {filters
-          .filter((filter) => filter.name !== "letra")
-          .map((filter) => {
-            if (filter.type === "text") {
-              return (
-                <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium max-[426px]:text-xs">
-                    {filter.label}
-                  </label>
-                  <input
-                    type="text"
-                    name={filter.name}
-                    value={formState[filter.name] || ""}
-                    onChange={handleChange}
-                    className="input input-bordered max-[426px]:input-sm"
-                  />
-                </div>
-              );
-            }
-
-            if (filter.type === "select") {
-              //const options = filter.async
-                //? dynamicOptions[filter.name] || []
-                //: filter.options || [];
-                let options = [];
-                if(filter.fromContext === "dependencias") options = depOptions;
-                  else if(filter.fromContext === "emisores") options = emiOptions;
-                  else if(filter.async) options = dynamicOptions[filter.name] || [];
-                  else options = filter.options || [];
-              
-                const isDependencia = filter.name === "dependencia";
-              const disabled = isDependencia && canLockDep;
-
-              return (
-                <div key={filter.name} className="flex flex-col">
-                  <label className="mb-1 font-medium max-[426px]:text-xs">
-                    {filter.label}
-                  </label>
-                  <select
-                    name={filter.name}
-                    value={
-                      isDependencia && canLockDep
-                        ? lockedDepValue
-                        : formState[filter.name] ?? ""
-                    }
-                    onChange={handleChange}
-                    className="select select-bordered max-[425px]:select-sm"
-                    disabled={disabled}
-                  >
-                    <option value="" disabled>
-                      Seleccionar
-                    </option>
-                    {options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              );
-            }
-
-            return null;
-          })}
-
-        <div className="flex items-end">
-          <button className="btn btn-primary w-full" onClick={handleBuscar}>
+    <div className="p-4 bg-white rounded-lg shadow">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {fields
+          .filter((f) => f.type !== "custom") // los custom (letra) van abajo
+          .map((field) => (
+            <FieldRenderer
+              key={field.name}
+              field={field}
+              value={formState?.[field.name]}
+              onChange={handleInput}
+            />
+          ))}
+        {/* Botón buscar */}
+        <div className="form-control justify-end">
+          <button className="btn btn-primary" onClick={handleBuscar}>
             Buscar
           </button>
         </div>
       </div>
+
+      {hasLetter && (
+        <div className="mt-3">
+          <AlphabetFilter
+            value={formState.letra || ""}
+            onChange={handleLetterSelect}
+          />
+        </div>
+      )}
     </div>
   );
 }
-
-GenericFilterSearch.propTypes = {
-  type: PropTypes.string.isRequired,
-  onSearch: PropTypes.func.isRequired,
-  scope: PropTypes.oneOf(["admin", "public"]),
-  initialState: PropTypes.object,
-  autoSearch: PropTypes.bool,
-};
-
-export default GenericFilterSearch;

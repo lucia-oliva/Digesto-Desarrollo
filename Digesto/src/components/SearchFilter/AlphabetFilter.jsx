@@ -1,44 +1,28 @@
-/* eslint-disable react/prop-types */
-const AbecedarioFiltro = ({ value = "", onSelect }) => {
-  const abecedario = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-  const isActive = (ch) => value === ch;
-
+// src/components/SearchFilter/AlphabetFilter.jsx
+export default function AlphabetFilter({ value = "", onChange = () => {} }) {
+  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   return (
-    <div className="join flex flex-wrap gap-1">
-      {/* Limpiar */}
-      <button
-        type="button"
-        className={`join-item btn btn-xs ${value === "" ? "btn-primary" : "btn-outline"}`}
-        onClick={() => onSelect("")}
-        aria-pressed={value === ""}
-      >
-        Todos
-      </button>
-
-      {/* Símbolos / otros */}
-      <button
-        type="button"
-        className={`join-item btn btn-xs ${isActive("#") ? "btn-primary" : "btn-outline"}`}
-        onClick={() => onSelect(isActive("#") ? "" : "#")}
-        aria-pressed={isActive("#")}
-      >
-        #
-      </button>
-
-      {abecedario.map((letra) => (
+    <div className="flex flex-wrap gap-2">
+      {letras.map((l) => (
         <button
+          key={l}
           type="button"
-          key={letra}
-          className={`join-item btn btn-xs ${isActive(letra) ? "btn-primary" : "btn-outline"}`}
-          onClick={() => onSelect(isActive(letra) ? "" : letra)}
-          aria-pressed={isActive(letra)}
+          className={`btn btn-sm ${
+            value === l ? "btn-primary" : "btn-outline"
+          }`}
+          onClick={() => onChange(l === value ? "" : l)}
         >
-          {letra}
+          {l}
         </button>
       ))}
+      <button
+        type="button"
+        className="btn btn-sm btn-ghost"
+        onClick={() => onChange("")}
+        title="Limpiar letra"
+      >
+        Limpiar
+      </button>
     </div>
   );
-};
-
-export default AbecedarioFiltro;
+}

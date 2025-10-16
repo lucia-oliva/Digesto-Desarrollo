@@ -4,44 +4,70 @@ import ContactModal from "../components/layout/Contact";
 import NormativaTable from "../components/Table/NormativasTable";
 import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
 import { useSearchParams } from "react-router";
+import { useNamespacedFilters } from "../hooks/useNamespacedFilters";
+import { getWithCancel } from "../api/cancellable";
 
 function NormativasContainer({ isAdmin = false }) {
+  const [params] = useSearchParams();
+  const initial = { dependencia: params.get("dependencia") || "" };
 
-    const [params] = useSearchParams();
-    const initial = {
-      dependencia: params.get("dependencia") || "",
-    };
-   const [filtrosGenericos, setFiltrosGenericos] = useState({});
- 
-   const dependenciaIdToNombre = {
-  "1": "Aplicadas",
-  "2": "Exactas",
-  "3": "Salud",
-  "4": "Sociales",
-  "5": "Humanas",
-  "20": "C. Superior",
-  "22": "Chepes",
-  "26": "Villa Union",
-  "25": "Chamical",
-  "24": "Aimogasta",
-  "23": "Catuna",
-};
-
-const dependenciaSeleccionada =
-  filtrosGenericos?.dependenciaNombre ||         
-  filtrosGenericos?.dependenciaLabel  ||         
-  dependenciaIdToNombre?.[String(filtrosGenericos?.dependencia || "")] || 
-  "";
   const [tags, setTags] = useState("");
   const type = "ListadoNormativa";
+  const scope = "public";
+  const modo = "busqueda";
+
+  const { ns, state, setFilters } = useNamespacedFilters({
+    scope,
+    type,
+    initial,
+    persist: true,
+    urlSync: true,
+    resetOnUnmount: false,
+    onHydrated: (f) => void fetchData(f),
+  });
+
+  async function fetchData(filtros) {
+    // TODO: reemplazá el endpoint por el tuyo real
+    const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
+    if (res?.cancelled) return;
+    // TODO: setear data en estado si corresponde (tu tabla puede leer via props 'filtros')
+  }
+
   const handleSearchTags = (selectedTags) => {
     setTags(selectedTags || "");
+    const next = { ...state.filters, tags: selectedTags || "" };
+    setFilters(next);
+    fetchData(next);
   };
+
   const handleSearch = (filtersFromGeneric) => {
-    setFiltrosGenericos(filtersFromGeneric || {});
+    const next = { ...(filtersFromGeneric || {}), tags };
+    setFilters(next);
+    fetchData(next);
   };
+
+  const dependenciaIdToNombre = {
+    1: "Aplicadas",
+    2: "Exactas",
+    3: "Salud",
+    4: "Sociales",
+    5: "Humanas",
+    20: "C. Superior",
+    22: "Chepes",
+    26: "Villa Union",
+    25: "Chamical",
+    24: "Aimogasta",
+    23: "Catuna",
+  };
+
+  const filtrosGenericos = state.filters || {};
+  const dependenciaSeleccionada =
+    filtrosGenericos?.dependenciaNombre ||
+    filtrosGenericos?.dependenciaLabel ||
+    dependenciaIdToNombre?.[String(filtrosGenericos?.dependencia || "")] ||
+    "";
+
   const filtros = { ...filtrosGenericos, tags };
-  const modo = "busqueda";
 
   return (
     <div
@@ -50,21 +76,23 @@ const dependenciaSeleccionada =
       }`}
     >
       <div className="w-auto bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
-       <GenericFilterSearch
+        <GenericFilterSearch
           type={type}
-          scope="public"
+          scope={scope}
           initialState={initial}
           autoSearch
           onSearch={handleSearch}
         />
+
         <div className="flex flex-wrap justify-between items-center border-b pb-4 mb-4 mt-4">
           <h2 className="text-xl font-bold mb-2">Resultados de Normativas</h2>
           <SearchBar onSearch={handleSearchTags} />
         </div>
+
         <NormativaTable type={type} filtros={filtros} modo={modo} />
       </div>
 
-      {!isAdmin && <ContactModal dependencia={dependenciaSeleccionada}/>}
+      {!isAdmin && <ContactModal dependencia={dependenciaSeleccionada} />}
     </div>
   );
 }
