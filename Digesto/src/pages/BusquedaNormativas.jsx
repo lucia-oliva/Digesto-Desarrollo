@@ -79,7 +79,7 @@ function NormativasContainer({ isAdmin = false }) {
         <GenericFilterSearch
           type={type}
           scope={scope}
-          initialState={initial}
+          initialState={state.filters}
           autoSearch
           onSearch={handleSearch}
         />

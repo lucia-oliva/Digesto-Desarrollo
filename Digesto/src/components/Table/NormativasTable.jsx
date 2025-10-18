@@ -7,9 +7,10 @@ import { useNormativas } from "./useNormativas";
 import { useLocation, useNavigate } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
+import { nsKey } from "../../utils/filtersNamespace";
 import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi, cambiarEstadoUsuario } from "./NormativaApi";
-import {useReferencias} from "../../context/referenciasContext"
+import { useReferencias } from "../../context/referenciasContext";
 
 const NormativaTable = ({
   type,
@@ -31,19 +32,18 @@ const NormativaTable = ({
     (tipoUser === "Supervisor" ||
       tipoUser === "Administrador de Dependencia") &&
     depName === "Consejo Superior";
-  const{dependencias} = useReferencias(); 
-  
+  const { dependencias } = useReferencias();
 
   const depOptions = useMemo(() => {
     const list = Array.isArray(dependencias) ? dependencias : [];
-    return list.map(d => ({
+    return list.map((d) => ({
       label: String(d.nombre ?? d.label ?? "").trim(),
       value: String(d.id ?? d.value ?? "").trim(),
     }));
   }, [dependencias]);
 
   const DEP_BY_NAME = useMemo(
-    () => new Map(depOptions.map(d => [d.label, d.value])),
+    () => new Map(depOptions.map((d) => [d.label, d.value])),
     [depOptions]
   );
 
@@ -51,12 +51,17 @@ const NormativaTable = ({
     DEP_BY_NAME.get(String(depName || "").trim()) ||
     user?.id_dependencia ||
     null;
-  
+
   const path = location.pathname;
   const isAdminRoute = path.startsWith("/admin");
   const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
   const isNuevaNormativa = /^\/admin\/NuevaNormativa$/i.test(path);
   const isConsejo = path.startsWith("/consejo-superior/normativas");
+
+  const scope = isAdminRoute ? "admin" : "public";
+  const ns = isAdminRoute
+    ? `ns:${scope}:${type}`
+    : nsKey({ scope, type, pathname: path });
 
   const effectiveModo =
     modo ??
@@ -109,7 +114,7 @@ const NormativaTable = ({
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtrosEfectivos);
+  } = useNormativas(tipo, filtrosEfectivos, { ns });
 
   const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
   const normativas = usingStatic ? dataOverride : hookNormativas;

@@ -1,11 +1,9 @@
-// src/components/SearchFilter/SearchFilter.jsx
 import { useEffect, useMemo, useState } from "react";
 import AlphabetFilter from "./AlphabetFilter";
 import { filterConfig } from "./configFilters";
-import api from "../../api/axiosPrivate"; // tu cliente axios con interceptores
+import api from "../../api/axiosPrivate";
 import { useReferencias } from "../../context/referenciasContext";
 
-// Mapea los "fromContext" con lo que provee tu ReferenciasProvider
 function useContextOptions(fromContext) {
   const { dependencias, emisores } = useReferencias() || {};
 
@@ -45,7 +43,7 @@ function useAsyncOptions(field, type) {
         // opcional: podés implementar cache global si querés (window.__filterCache)
         const { data } = await api.get(field.endpoint);
         if (cancel) return;
-        // Espera { key, value } o similar; adaptá si tu API devuelve otra forma
+        // Espera { key, value } o similar;
         const mapped = (Array.isArray(data) ? data : []).map((it) => ({
           label: String(it?.label ?? it?.[field.key] ?? it).trim(),
           value: String(it?.value ?? it?.[field.key] ?? it).trim(),
@@ -53,6 +51,7 @@ function useAsyncOptions(field, type) {
         setOptions(mapped);
       } catch (e) {
         setOptions([]);
+        console.log(e);
       } finally {
         if (!cancel) setLoading(false);
       }
