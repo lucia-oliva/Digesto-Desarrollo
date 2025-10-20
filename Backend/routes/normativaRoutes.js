@@ -95,7 +95,8 @@ router.delete(
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
-    const { numero, emisor, documento, anio, tags } = req.body;
+    //agregamos 2 nuevos parametros al req body para filtrar por fecha y visitas. 
+    const { numero, emisor, documento, anio, tags, fechaOrder, visitasOrder} = req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
 
@@ -108,9 +109,11 @@ router.post(
         anio,
         limite,
         offset,
-        tags
+        tags,
+        fechaOrder,
+        visitasOrder
       );
-
+   //agregamos los parametros tambien en la llamada de la funcion searchNormativaByParameters.
     res.status(200).json({ ok: true, data: data || [], totalResults });
   })
 );
