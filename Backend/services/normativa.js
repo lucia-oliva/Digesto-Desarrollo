@@ -492,6 +492,8 @@ async function searchById(id) {
 /* =========================================================
  * Búsquedas avanzadas (devuelven data vacía, no lanzan)
  * =======================================================*/
+
+//agregamos los nuevos parametros fechaOrder y visitasOrder
 async function searchNormativaByParameters(
   numero,
   dependencia,
@@ -500,7 +502,9 @@ async function searchNormativaByParameters(
   anio,
   limite = null,
   offset = null,
-  tags
+  tags,
+  fechaOrder,
+  visitasOrder
 ) {
   try {
     let sql = `
@@ -548,8 +552,32 @@ async function searchNormativaByParameters(
       `;
       params.push(tags);
     }
-
     sql += " GROUP BY n.id";
+    //agregamos el order by segun los nuevos parametros
+    const clauses = [];
+    const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
+    if(fechaOrder){
+      clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
+    }
+    if(visitasOrder){
+      clauses.push(`n.visitas ${normDir(visitasOrder)}`);
+    }
+
+   if (clauses.length === 0) {
+     // Default: más nuevos primero (y estable por id)
+     sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+   } else {
+     // Tie-breakers para resultados deterministas
+     // - Si solo ordenás por visitas, añadimos fecha DESC como 2° criterio
+     // - Si ya hay fecha y visitas, queda tal cual
+     if (!fechaOrder && visitasOrder) {
+       clauses.push("n.fecha_normativa DESC");
+     }
+     // Siempre cerramos con id DESC para estabilidad visual
+     clauses.push("n.id DESC");
+     sql += " ORDER BY " + clauses.join(", ");
+   }
+
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);

@@ -13,7 +13,8 @@ function GenericTable({
   totalPages,
   onPageChange,
   showActions = true,
-   emptyMessage = "No se encontraron resultados. Intentá cambiando los filtros."
+   emptyMessage = "No se encontraron resultados. Intentá cambiando los filtros.",
+   headerProps={},
 }) {
   const items = Array.isArray(data) ? data : [];
   const cols = Array.isArray(columns) ? columns : [];
@@ -26,7 +27,7 @@ function GenericTable({
       <div className="hidden min-[979px]:block overflow-x-auto">
       <table className="table w-full ">
         <thead>
-          <TableHeader columns={columns} showActions={actions.length > 0 && showActions} />
+          <TableHeader columns={columns} showActions={actions.length > 0 && showActions} {...headerProps} />
         </thead>
          <tbody>
           {items.length > 0 ? (

@@ -11,6 +11,7 @@ import { nsKey } from "../../utils/filtersNamespace";
 import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi, cambiarEstadoUsuario } from "./NormativaApi";
 import { useReferencias } from "../../context/referenciasContext";
+import { useTablaOrden } from "./useTablaOrden";
 
 const NormativaTable = ({
   type,
@@ -106,6 +107,20 @@ const NormativaTable = ({
     ? "/consejo-superior/document"
     : "/document";
 
+  const filteredColumns = (columns || []).filter(
+    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo))
+  );
+
+  const { filtrosEfectivos: filtrosConOrden, headerProps } = useTablaOrden({
+    effectiveModo,
+    filtros: filtrosEfectivos, // ← usamos tu objeto ya “bloqueado” por rol
+    filteredColumns, // columnas visibles (respeta hiddenIn por modo)
+    isAdminRoute,
+    isSuperAdmin,
+    userDepId,
+    depName,
+  });
+
   const {
     normativas: hookNormativas,
     page: hookPage,
@@ -114,7 +129,7 @@ const NormativaTable = ({
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtrosEfectivos, { ns });
+  } = useNormativas(tipo, filtrosConOrden, { ns });
 
   const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
   const normativas = usingStatic ? dataOverride : hookNormativas;
@@ -124,14 +139,14 @@ const NormativaTable = ({
   useEffect(() => {
     if (!usingStatic) reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path, JSON.stringify(filtrosEfectivos), usingStatic]);
+  }, [path, JSON.stringify(filtrosConOrden), usingStatic]);
 
   useEffect(() => {
     if (!usingStatic) {
       onPageChange(1);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tipo, JSON.stringify(filtrosEfectivos)]);
+  }, [tipo, JSON.stringify(filtrosConOrden)]);
 
   useEffect(() => {
     if (!usingStatic && totalPages && page > totalPages) {
@@ -141,10 +156,6 @@ const NormativaTable = ({
   }, [totalPages]);
 
   console.log("totalPages y page: ", totalPages, page);
-
-  const filteredColumns = (columns || []).filter(
-    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo))
-  );
 
   const actions =
     type === "ListadoAuditoria"
@@ -362,6 +373,7 @@ const NormativaTable = ({
       {...(!(usingStatic || hidePagination)
         ? { page, totalPages, onPageChange }
         : {})}
+      headerProps={headerProps}
     />
   );
 };
