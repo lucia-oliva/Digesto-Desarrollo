@@ -2,12 +2,12 @@
 export default function AlphabetFilter({ value = "", onChange = () => {} }) {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1">
       {letras.map((l) => (
         <button
           key={l}
           type="button"
-          className={`btn btn-sm ${
+          className={` join-item btn btn-xs ${
             value === l ? "btn-primary" : "btn-outline"
           }`}
           onClick={() => onChange(l === value ? "" : l)}
@@ -17,7 +17,7 @@ export default function AlphabetFilter({ value = "", onChange = () => {} }) {
       ))}
       <button
         type="button"
-        className="btn btn-sm btn-ghost"
+        className="btn btn-xs btn-primary"
         onClick={() => onChange("")}
         title="Limpiar letra"
       >
