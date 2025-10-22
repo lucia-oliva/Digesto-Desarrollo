@@ -1,7 +1,6 @@
 // configFilter.js
 import { API_BASE } from "../../api/axiosPrivate.js";
 
-
 export const tipoNormativaOptions = [
   { label: "Acta", value: 1 },
   { label: "Resolución", value: 2 },
@@ -22,8 +21,7 @@ export const filterConfig = {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
-      fromContext: "dependencias"
-     
+      fromContext: "dependencias",
     },
     {
       name: "emisor",
@@ -65,8 +63,7 @@ export const filterConfig = {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
-      fromContext: "dependencias"
-     
+      fromContext: "dependencias",
     },
     {
       name: "emisor",
@@ -104,12 +101,11 @@ export const filterConfig = {
       type: "text",
       label: "Número",
     },
-     {
+    {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
-      fromContext: "dependencias"
-     
+      fromContext: "dependencias",
     },
     {
       name: "emisor",
@@ -161,15 +157,14 @@ export const filterConfig = {
         { label: "Baja", value: "baja" },
         { label: "Edicion", value: "modificacion" },
         { label: "Republicacion", value: "re-publicacion" },
-        { label: "Restauracion", value: "restauracion" }
+        { label: "Restauracion", value: "restauracion" },
       ],
     },
     {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
-      fromContext: "dependencias"
-     
+      fromContext: "dependencias",
     },
   ],
 
