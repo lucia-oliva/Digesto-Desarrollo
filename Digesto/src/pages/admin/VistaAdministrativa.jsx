@@ -11,14 +11,14 @@ function VistaAdministrativa() {
   const modo = "admin";
 
   const { ns, state, setFilters } = useNamespacedFilters({
-    scope,
-    type,
+    scope: "admin",
+    type, // entidad actual (según URL interna)
     initial: {},
-    persist: false,
     urlSync: false,
-    resetOnUnmount: false, // la vista no se desmonta
-    resetOnNsChange: true, // 🔸 limpia filtros al cambiar de entidad
-    nsStrategy: "byType", // 🔸 namespace por entidad (no por ruta)
+    nsStrategy: "byType", // ⬅️ por entidad
+    persist: false,
+    resetOnUnmount: false, // la vista no desmonta
+    resetOnNsChange: true, // ⬅️ al cambiar entidad, reset total a default
     onHydrated: (f) => void fetchData(f),
   });
 
@@ -39,8 +39,8 @@ function VistaAdministrativa() {
     <div className="container">
       <GenericFilterSearch
         type={type}
-        scope={scope}
-        initialState={state.filters} // ← importante: rehidrata por entidad
+        scope="admin"
+        initialState={state.filters} // ← SIEMPRE desde el contexto
         autoSearch
         onSearch={handleSearch}
       />

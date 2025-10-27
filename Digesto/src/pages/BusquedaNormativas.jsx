@@ -17,12 +17,16 @@ function NormativasContainer({ isAdmin = false }) {
   const modo = "busqueda";
 
   const { ns, state, setFilters } = useNamespacedFilters({
-    scope,
-    type,
+    scope: "public",
+    type: "ListadoNormativa",
     initial,
-    persist: true,
     urlSync: true,
-    resetOnUnmount: false,
+    nsStrategy: "byPath",
+    persist: true,
+    requireQueryToPersist: true, //  sólo guarda si hay ?query
+    ignoreStorageIfNoQuery: true, //  si NO hay ?query, arranca en default (no lee storage)
+    resetOnUnmount: true, //  al salir, resetea mem
+    clearStorageOnUnmount: true, //  y borra storage
     onHydrated: (f) => void fetchData(f),
   });
 
@@ -77,8 +81,8 @@ function NormativasContainer({ isAdmin = false }) {
     >
       <div className="w-auto bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
         <GenericFilterSearch
-          type={type}
-          scope={scope}
+          type="ListadoNormativa"
+          scope="public"
           initialState={state.filters}
           autoSearch
           onSearch={handleSearch}
