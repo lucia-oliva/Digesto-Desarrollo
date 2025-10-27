@@ -1,4 +1,4 @@
-//mapeo campos para enviar datos
+
 export const nombreRutaPorEntidad = {
   tag: "PalabraClave",
   normativa: "Normativa",

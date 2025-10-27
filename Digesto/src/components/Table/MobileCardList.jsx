@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// components/GenericTable/MobileCardList.jsx
 import TablePagination from "./TablePagination";
 
 export default function MobileCardList({
@@ -37,8 +36,6 @@ export default function MobileCardList({
          
           <div className="px-4 py-3 space-y-2">
             {columns.map((col) => {
-              //if (col.key === "resumen") return null;
-
               if (hasTitulo && col.key === "titulo") return null;
               const value = col.render
                 ? col.render(item[col.key], item)

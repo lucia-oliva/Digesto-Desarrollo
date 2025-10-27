@@ -3,8 +3,6 @@ import { IoIosMenu, IoIosClose, IoIosHelpCircleOutline } from "react-icons/io";
 
 function Header() {
   const location = useLocation();
-
-  // Si estás en cualquier ruta que comience con "/consejo-superior", no mostramos navbar
   if (location.pathname.startsWith("/consejo-superior")) {
     return (
       <div className="mx-auto">
@@ -36,7 +34,6 @@ function Header() {
   return (
     <>
       <div className="navbar bg-primary z-50 fixed top-0 flex items-center justify-between px-4 max-h-18 w-full">
-        {/* Izquierda: Logo */}
         <div className="navbar-start">
           <Link to="/" className="hover:opacity-80 transition duration-300">
             <img
@@ -46,8 +43,6 @@ function Header() {
             />
           </Link>
         </div>
-
-        {/* Centro: Menú desktop */}
         <div className="navbar-center hidden md:block">
           <ul className="menu menu-horizontal gap-4">
             {navLinks.map((link, index) => (
@@ -68,8 +63,6 @@ function Header() {
             ))}
           </ul>
         </div>
-
-        {/* Derecha: Menú mobile general */}
         <div className="navbar-end md:hidden">
           <div className="dropdown dropdown-end dropdown-bottom">
             <div
@@ -97,8 +90,6 @@ function Header() {
           </div>
         </div>
       </div>
-
-      {/* Contenido */}
       <div className="mx-auto mt-18">
         <Outlet />
       </div>

@@ -1,15 +1,11 @@
 /* eslint-disable react/prop-types */
-// src/context/ReferenciasProvider.jsx
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ReferenciasCtx } from "./referenciasContext";
 import { fetchDependencias, fetchEmisores } from "../services/referencias";
 
 
 export default function ReferenciasProvider({ children, preload = true, fallback = null }) {
-
-console.log("%c[RefProvider] MONTÓ", "color:green");
-
-
   const [dependencias, setDependencias] = useState(null); 
   const [emisores, setEmisores] = useState(null);
   const [error, setError] = useState(null);

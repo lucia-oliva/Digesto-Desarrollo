@@ -1,16 +1,14 @@
-// services/normativaService.js
+
 import db from "./db.js";
 import tagService from "./tag.js";
 import auditoriaService from "./auditoria.js";
 
-/** Pequeño helper para crear errores HTTP sin clase custom */
 function httpError(status, message) {
   const err = new Error(message);
   err.status = status;
   return err;
 }
 
-// GET: Normativa completa por ID
 async function getNormativaCompletaById(id) {
   try {
     const normativaSql = `
@@ -60,10 +58,7 @@ async function getNormativaCompletaById(id) {
   }
 }
 
-/* =========================================================
- * UPDATE: Relación (modificación puntual)
- * - 404 si no existe
- * =======================================================*/
+
 async function updateModificacion({ id_relacion, accion, comentario }) {
   try {
     const result = await db.execute(
@@ -79,10 +74,6 @@ async function updateModificacion({ id_relacion, accion, comentario }) {
   }
 }
 
-/* =========================================================
- * DELETE: Todas las relaciones de una normativa
- * (id normativa_complementaria)
- * =======================================================*/
 async function eliminarRelacionesDeNormativa(normativaId) {
   try {
     const exists = await db.queryOne(
@@ -106,10 +97,6 @@ async function eliminarRelacionesDeNormativa(normativaId) {
   }
 }
 
-/* =========================================================
- * Procesa array de normativas_modificadas (alta/baja/edición)
- * Lanza si faltan datos esenciales
- * =======================================================*/
 async function editNormativaModificada(
   normativas_modificadas,
   normativaId,
@@ -157,11 +144,6 @@ async function editNormativaModificada(
   }
 }
 
-/* =========================================================
- * UPDATE: Editar normativa (datos + tags + relaciones)
- * - 404 si normativa no existe/ no se actualiza
- * - Usa execute para DML
- * =======================================================*/
 async function edit(data) {
   const {
     id,
@@ -208,10 +190,10 @@ async function edit(data) {
     if (upd.affectedRows === 0)
       throw httpError(404, `No se encontró la normativa con ID ${id}`);
 
-    // Tags
+  
     await tagService.insertTagsForNormativa(id, tags);
 
-    // Relaciones
+
     const fechaSubida = new Date().toISOString().split("T")[0];
     if (cambia_normativa === "SI") {
       if (
@@ -220,7 +202,6 @@ async function edit(data) {
       ) {
         await editNormativaModificada(normativas_modificadas, id, fechaSubida);
       } else {
-        // No es error, solo warning: se indicó SI pero no enviaron relaciones
         console.warn(
           "Se indicó 'SI' en cambia_normativa pero no llegaron relaciones."
         );
@@ -228,8 +209,6 @@ async function edit(data) {
     } else if (cambia_normativa === "NO") {
       await eliminarRelacionesDeNormativa(id);
     }
-
-    // Auditoría
     if (userId) {
       await auditoriaService.crearRegistroAuditoria({
         id_normativa: id,
@@ -245,10 +224,6 @@ async function edit(data) {
   }
 }
 
-/* =========================================================
- * DELETE: Relación por ID
- * - 404 si no existe
- * =======================================================*/
 async function deleteModificacion(id) {
   try {
     const res = await db.execute("DELETE FROM relacion WHERE id = ?", [id]);
@@ -261,10 +236,6 @@ async function deleteModificacion(id) {
   }
 }
 
-/* =========================================================
- * INSERT: Registrar modificación
- * - 400 si no inserta
- * =======================================================*/
 async function registrarModificacion({
   id,
   accion,
@@ -289,11 +260,6 @@ async function registrarModificacion({
     throw error;
   }
 }
-
-/* =========================================================
- * INSERT: Crear normativa (+ tags + relaciones opcionales)
- * - Lanza en errores; respuesta incluye id
- * =======================================================*/
 async function create(data) {
   const {
     numero,
@@ -339,7 +305,6 @@ async function create(data) {
 
     const normativaId = ins.insertId;
 
-    // Relaciones (opcionales)
     if (
       Array.isArray(normativas_modificadas) &&
       normativas_modificadas.length > 0
@@ -358,10 +323,10 @@ async function create(data) {
       }
     }
 
-    // Tags
+ 
     await tagService.insertTagsForNormativa(normativaId, tags);
 
-    // Auditoría
+  
     if (user?.id) {
       await auditoriaService.crearRegistroAuditoria({
         id_normativa: normativaId,
@@ -377,10 +342,6 @@ async function create(data) {
   }
 }
 
-/* =========================================================
- * SOFT-DELETE: marcar como 'eliminada'
- * - 404 si no existe
- * =======================================================*/
 async function eliminar(id, userId, motivo = null) {
   try {
     const row = await db.queryOne("SELECT estado FROM normativa WHERE id = ?", [
@@ -414,9 +375,7 @@ async function eliminar(id, userId, motivo = null) {
   }
 }
 
-/* =========================================================
- * GET simples
- * =======================================================*/
+
 async function getAllYears() {
   return db.query("SELECT DISTINCT anio FROM normativa");
 }
@@ -457,7 +416,7 @@ async function searchByNumber(number) {
     const row = await db.queryOne("SELECT * FROM normativa WHERE numero = ?", [
       number,
     ]);
-    return row || null; // búsqueda: no lanzar 404
+    return row || null; 
   } catch (err) {
     console.error("Error al buscar normativa por número: ", err);
     throw err;
@@ -489,11 +448,6 @@ async function searchById(id) {
   }
 }
 
-/* =========================================================
- * Búsquedas avanzadas (devuelven data vacía, no lanzan)
- * =======================================================*/
-
-//agregamos los nuevos parametros fechaOrder y visitasOrder
 async function searchNormativaByParameters(
   numero,
   dependencia,
@@ -553,7 +507,6 @@ async function searchNormativaByParameters(
       params.push(tags);
     }
     sql += " GROUP BY n.id";
-    //agregamos el order by segun los nuevos parametros
     const clauses = [];
     const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
     if(fechaOrder){
@@ -564,16 +517,13 @@ async function searchNormativaByParameters(
     }
 
    if (clauses.length === 0) {
-     // Default: más nuevos primero (y estable por id)
+    
      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
    } else {
-     // Tie-breakers para resultados deterministas
-     // - Si solo ordenás por visitas, añadimos fecha DESC como 2° criterio
-     // - Si ya hay fecha y visitas, queda tal cual
+  l
      if (!fechaOrder && visitasOrder) {
        clauses.push("n.fecha_normativa DESC");
      }
-     // Siempre cerramos con id DESC para estabilidad visual
      clauses.push("n.id DESC");
      sql += " ORDER BY " + clauses.join(", ");
    }
@@ -663,8 +613,6 @@ async function searchNormativaEliminadaByParameters(
     throw err;
   }
 }
-
-// Búsqueda por tags (devuelve array, sin lanzar si vacío)
 async function searchNormativasByTags(dependencia, tags) {
   try {
     const placeholders = tags.map(() => "?").join(",");
@@ -702,7 +650,6 @@ async function getMostPopularNormatives() {
   return db.query(sql);
 }
 
-// UPDATE: Actualizar normativa (datos + tags)
 async function updateNormativa(id, dataToSend) {
   const {
     numero,
@@ -721,8 +668,6 @@ async function updateNormativa(id, dataToSend) {
   try {
     if (!Array.isArray(tags))
       throw httpError(400, "El campo 'tags' debe ser un array");
-
-    // Si no viene archivo, conservar el existente
     let archivoFinal = archivo;
     if (!archivo || String(archivo).trim() === "") {
       const row = await db.queryOne(
@@ -769,7 +714,6 @@ async function updateNormativa(id, dataToSend) {
   }
 }
 
-// Restaurar (eliminada → despublicado) y Publicar (despublicado → publicado)
 async function restaurar(id, userId) {
   try {
     const row = await db.queryOne("SELECT estado FROM normativa WHERE id = ?", [
@@ -830,9 +774,6 @@ async function publicar(id, userId) {
   }
 }
 
-/* =========================================================
- * Busqueda avanzada de normativas DESPUBLICADAS
- * =======================================================*/
 async function searchNormativaDespublicadasByParameters(
   numero,
   dependencia,
@@ -920,12 +861,10 @@ export default {
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
-
   eliminar,
   updateNormativa,
   create,
   edit,
-
   searchNormativaDespublicadasByParameters:
     searchNormativaDespublicadasByParameters,
   deleteModificacion,
@@ -935,7 +874,6 @@ export default {
   eliminarRelacionesDeNormativa,
   getNormativaCompletaById,
   searchNormativaEliminadaByParameters,
-
   restaurar,
   publicar,
 };

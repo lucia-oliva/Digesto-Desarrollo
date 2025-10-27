@@ -62,7 +62,6 @@ router.get(
   })
 );
 
-//get dependencia mapeo
 
 router.get(
   "/getDependencias",
@@ -72,7 +71,7 @@ router.get(
   })
 );
 
-//obtener sesiones consejo-superior
+
 router.get(
   "/sesiones",
   asyncHandler(async (req, res) => {
@@ -141,8 +140,8 @@ router.delete(
 router.put(
   "/:id",
   asyncHandler(async (req, res) => {
-    const id = req.params.id; // Capturamos el ID desde la URL
-    const data = req.body; // Capturamos los datos del usuario desde el cuerpo
+    const id = req.params.id; 
+    const data = req.body; 
 
     try {
       const result = await dependenciaDB.updateUsuario(id, data);
@@ -160,7 +159,7 @@ router.put(
   })
 );
 
-//Filtrar dependencia por parametros
+
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
@@ -170,9 +169,7 @@ router.post(
     limite = parseInt(limite, 10) || 10;
     page = parseInt(page, 10) || 1;
     try {
-      // Si hay otros parámetros, filtrar por ellos
       const offset = (page - 1) * limite;
-      //Get the total count of results
       const { data, totalResults } =
         await dependenciaDB.searchDependenciaByParameters(
           nombre,

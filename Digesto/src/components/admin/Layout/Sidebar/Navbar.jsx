@@ -8,12 +8,9 @@ export default function Navbar() {
   const pageTitle = routeTitles[fullPath] || "Digesto - Administración";
   return (
     <div className="navbar bg-base-100 shadow-md px-4">
-      {/* Título del sistema */}
       <div className="flex-1 not-lg:pl-14">
         <h1 className="text-lg font-semibold text-primary">{pageTitle}</h1>{" "}
       </div>
-
-      {/* Menú de perfil */}
       <div className="flex-none">
         <div className="dropdown dropdown-end">
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">

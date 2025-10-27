@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { MdOutlineLastPage } from "react-icons/md";
 import { MdOutlineFirstPage } from "react-icons/md";
 
-
-
 function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange }) {
   const totalPages = Math.ceil(totalResults / resultsPerPage);
   const maxPageButtons = 10;
@@ -60,7 +58,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
       <div className="flex flex-1 justify-between sm:hidden">
         <button
-          onClick={() => handlePageChange(1)} // Ir a la primera página
+          onClick={() => handlePageChange(1)} 
           className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
           Primera
@@ -78,7 +76,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
           Siguiente
         </button>
         <button
-          onClick={() => handlePageChange(totalPages)} // Ir a la última página
+          onClick={() => handlePageChange(totalPages)}
           className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
         >
           Última
@@ -111,7 +109,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
             aria-label="Pagination"
           >
             <button
-              onClick={() => handlePageChange(1)} // Ir a la primera página
+              onClick={() => handlePageChange(1)} 
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
               <span className="sr-only">Primera</span>
@@ -155,7 +153,7 @@ function Pagination({ currentPage, totalResults, resultsPerPage, onPageChange })
               </svg>
             </button>
             <button
-              onClick={() => handlePageChange(totalPages)} // Ir a la última página
+              onClick={() => handlePageChange(totalPages)}
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus:z-20 focus:outline-offset-0 cursor-pointer"
             >
               <span className="sr-only">Última</span>

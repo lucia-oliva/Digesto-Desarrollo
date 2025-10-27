@@ -10,10 +10,9 @@ export const API_BASE = "http://localhost:3000/api";
 
 const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: true, // se envía la cookie HttpOnly del refresh token
+  withCredentials: true, 
 });
 
-//cliente separado para refresh/logout
 export const refreshClient = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
@@ -22,8 +21,6 @@ export const refreshClient = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-// Esta funcion se ejecuta cuando se recibe una respuesta con un status 401
-// y no hay token en la cookie , y se intenta refrescar el token o se rechaza todo
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
@@ -32,8 +29,6 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// Esta funcion se ejecuta antes de cada solicitud para
-// agregar el token de autorización , si hay un token en los cookies
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
@@ -43,8 +38,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Esta funcion se ejecuta después de cada solicitud para
-// manejar errores de refresco de token
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -53,11 +46,8 @@ api.interceptors.response.use(
     const isLoginRequest = originalRequest?.url?.includes("/auth/login");
     const hasRetried = originalRequest?._retry;
 
-    // Si es un error 401 y no es una solicitud de login, intentamos refrescar
     if (status === 401 && !hasRetried && !isLoginRequest) {
       originalRequest._retry = true;
-
-      // Si ya estamos refrescando el token, encolamos la solicitud
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
@@ -77,13 +67,10 @@ api.interceptors.response.use(
 
         setAccessToken(newToken);
         processQueue(null, newToken);
-
-        // Reintentar solicitud original con el nuevo token
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
-        // Si falla el refresh, limpiamos y forzamos logout
         processQueue(refreshError, null);
         clearAccessToken();
         const logout = getGlobalLogout?.();
@@ -99,8 +86,6 @@ api.interceptors.response.use(
         isRefreshing = false;
       }
     }
-
-    // Si no es un 401 o no califica para refresh, rechazamos normalmente
     return Promise.reject(err);
   }
 );

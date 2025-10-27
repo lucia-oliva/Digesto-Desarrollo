@@ -77,8 +77,6 @@ const NormativaTable = ({
       : isConsejo
       ? "consejo"
       : "ver");
-
-  //Bloquear filtro dependencia x rol.
   const filtrosEfectivos = useMemo(() => {
     if (
       isAdminRoute &&
@@ -113,8 +111,8 @@ const NormativaTable = ({
 
   const { filtrosEfectivos: filtrosConOrden, headerProps } = useTablaOrden({
     effectiveModo,
-    filtros: filtrosEfectivos, // ← usamos tu objeto ya “bloqueado” por rol
-    filteredColumns, // columnas visibles (respeta hiddenIn por modo)
+    filtros: filtrosEfectivos, 
+    filteredColumns, 
     isAdminRoute,
     isSuperAdmin,
     userDepId,

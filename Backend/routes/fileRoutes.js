@@ -33,14 +33,12 @@ router.get("/download", async (req, res) => {
           shouldUpdateVisita = candidate.updateVisita;
           break;
         }catch{
-          // No existe
         }
       }
 
       if(!foundPath){
         return res.status(404).json({ error: "File not found" });
       }
-      //Sumar una visita a la normativa. 
       if(shouldUpdateVisita){
       
         try{
@@ -62,7 +60,6 @@ router.get("/download", async (req, res) => {
   }
 });
 
-//endpoint agregado de upload para usarse en administracion
 router.post("/upload/:id", pdfHandler.single("file"), async (req, res) => {
   try {
     const resultado = await fileDB.procesarArchivoDeNormativa({
@@ -81,14 +78,6 @@ router.post("/upload/:id", pdfHandler.single("file"), async (req, res) => {
   }
 });
 
-
-/* FIXME: Se Requiere Mejorar RUTA UPLOAD 
-    A Mejorar: 
-    1- Prevenir que se cree un archivo al existir uno con los mismos parámetros en la bd.
-    2- Agregar los parametros faltantes (fecha de alta , creacion , titulo, resumen , etc)
-*/
-
-//Upload file
 router.post("/upload", pdfHandler.single("file"), async (req, res) => {
   try {
     if (!req.file) {
@@ -105,7 +94,6 @@ router.post("/upload", pdfHandler.single("file"), async (req, res) => {
       anio,
     } = req.body;
 
-    // Valida si ya existe una normativa con los mismos parámetros
     const existingNormativa = await db.query(
       "SELECT * FROM normativa WHERE id_dependencia = ? AND numero = ? AND anio = ?",
       [id_dependencia, resolucion, anio]
@@ -117,7 +105,6 @@ router.post("/upload", pdfHandler.single("file"), async (req, res) => {
       });
     }
 
-    // Guarda el archivo en la base de datos
     const result = await db.query(
       "INSERT INTO normativa (id_dependencia, id_emisor, id_tipo_normativa,titulo, numero, anio, archivo) VALUES (?,?, ?,?, ?, ?, ?)",
       [
@@ -131,7 +118,6 @@ router.post("/upload", pdfHandler.single("file"), async (req, res) => {
       ]
     );
 
-    // Verifica si la inserción fue exitosa
     if (result.affectedRows === 0) {
       throw new Error(" La base de datos no pudo guardar el archivo.");
     }

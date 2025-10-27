@@ -1,9 +1,9 @@
 import multer from "multer";
 import fs from "fs-extra";
 
-// Configuración de Multer
+
 const storage = multer.diskStorage({
-  // 📁 Carpeta donde se guarda el archivo
+
   destination: async (req, file, cb) => {
     try {
       const uploadsDir = "./archivos";
@@ -14,16 +14,15 @@ const storage = multer.diskStorage({
     }
   },
 
-  // 📝 Nombre temporal del archivo (se renombra después en el controlador)
   filename: (req, file, cb) => {
     try {
-      // Solo permitimos PDF
+    
       if (file.mimetype !== "application/pdf") {
         return cb(new Error("Solo se permiten archivos PDF"));
       }
 
       const timestamp = Date.now();
-      const fileName = `temp_${timestamp}.pdf`; // nombre temporal
+      const fileName = `temp_${timestamp}.pdf`;
       cb(null, fileName);
     } catch (error) {
       cb(error);
@@ -31,5 +30,4 @@ const storage = multer.diskStorage({
   }
 });
 
-// Exportamos el middleware de multer
 export const pdfHandler = multer({ storage });

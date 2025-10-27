@@ -40,22 +40,20 @@ function GenericCarga() {
     const ruta = getRuta(entidad);
 
     try {
-      //Ruta generica
+      
       console.log("verificando data to Send:", dataToSend);
       fetch(`${API_BASE}/${ruta}/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...dataToSend,
-          archivo: dataToSend.archivo?.name || "", // solo nombre
+          archivo: dataToSend.archivo?.name || "", 
           user,
         }),
       })
         .then((res) => res.json())
         .then(async (data) => {
           console.log(`[POST] /api/${ruta}/create =>`, data);
-
-          // Paso 2: subir el archivo solo si es normativa
           if (
             entidad === "normativa" &&
             dataToSend.archivo instanceof File &&

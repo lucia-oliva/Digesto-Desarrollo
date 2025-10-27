@@ -19,12 +19,9 @@ function StatCard({
     <div
       className={`relative flex flex-col justify-between overflow-hidden rounded-xl p-6 shadow-sm text-white transition transform hover:scale-[1.02] hover:shadow-md ${color} min-h-[180px]`}
     >
-      {/* Icono decorativo al fondo */}
       <div className="absolute right-4 bottom-0 text-[100px] opacity-10 pointer-events-none select-none">
         {iconBg}
       </div>
-
-      {/* Contenido principal */}
       <div className="flex items-start justify-between z-10">
         <div className="text-5xl">{iconFront}</div>
         <div className="text-right">
@@ -33,8 +30,6 @@ function StatCard({
           <p className="text-2xl font-bold mt-2">{value}</p>
         </div>
       </div>
-
-      {/* Acciones responsivas (columna hasta 1023px, fila desde 1024px) */}
       <div className="flex flex-col lg:flex-row lg:justify-end gap-2 lg:gap-3 mt-6 z-10">
         <Link
           to={toList}

@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// ContactModal.jsx
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";

@@ -23,18 +23,16 @@ function NormativasContainer({ isAdmin = false }) {
     urlSync: true,
     nsStrategy: "byPath",
     persist: true,
-    requireQueryToPersist: true, //  sólo guarda si hay ?query
-    ignoreStorageIfNoQuery: true, //  si NO hay ?query, arranca en default (no lee storage)
-    resetOnUnmount: true, //  al salir, resetea mem
-    clearStorageOnUnmount: true, //  y borra storage
+    requireQueryToPersist: true, 
+    ignoreStorageIfNoQuery: true, 
+    resetOnUnmount: true, 
+    clearStorageOnUnmount: true, 
     onHydrated: (f) => void fetchData(f),
   });
 
   async function fetchData(filtros) {
-    // TODO: reemplazá el endpoint por el tuyo real
     const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
     if (res?.cancelled) return;
-    // TODO: setear data en estado si corresponde (tu tabla puede leer via props 'filtros')
   }
 
   const handleSearchTags = (selectedTags) => {

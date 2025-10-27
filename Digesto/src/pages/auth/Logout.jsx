@@ -21,7 +21,7 @@ const Logout = () => {
     };
     doLogout();
   }, [navigate, logout]);
-  return null; // O puedes mostrar un spinner o mensaje de "Cerrando sesión..."
+  return null; 
 };
 
 export default Logout;

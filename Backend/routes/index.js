@@ -31,7 +31,6 @@ const routesMap = [
   ["/auditoria", auditoriaRoutes],
 ];
 
-// Montaje en bucle
 for (const [prefix, router] of routesMap) {
   api.use(prefix, router);
 }

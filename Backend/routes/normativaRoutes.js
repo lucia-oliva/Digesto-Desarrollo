@@ -1,11 +1,9 @@
-// routes/normativas.js
+
 import express from "express";
 import normativaDB from "../services/normativa.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
-
-/** Helper para extraer paginación */
 function getPagination(req, defaultLimit = 10) {
   let { page, limite } = req.query;
   const p = parseInt(page, 10) || 1;
@@ -14,22 +12,16 @@ function getPagination(req, defaultLimit = 10) {
   return { page: p, limite: l, offset };
 }
 
-/** -----------------------------------------
- * GET: datos completos para edición
- * ----------------------------------------*/
+
 router.get(
   "/datos/:id",
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const data = await normativaDB.getNormativaCompletaById(id); // lanza 404 si no existe
+    const data = await normativaDB.getNormativaCompletaById(id); 
     res.json(data);
   })
 );
 
-/** -----------------------------------------
- * POST: editar (modo “wizard”)
- * El servicio lanza en errores (404/400) y devuelve { message }
- * ----------------------------------------*/
 router.post(
   "/edit",
   asyncHandler(async (req, res) => {
@@ -38,10 +30,7 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * POST: crear
- * El servicio lanza en errores y devuelve { id, message }
- * ----------------------------------------*/
+
 router.post(
   "/create",
   asyncHandler(async (req, res) => {
@@ -58,10 +47,7 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * GET: traer por id (vista pública/detalle)
- * El servicio lanza 404 si no existe
- * ----------------------------------------*/
+
 router.get(
   "/traer/:id",
   asyncHandler(async (req, res) => {
@@ -70,10 +56,7 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * DELETE: soft-delete (marcar eliminada)
- * Requiere userId (x-user-id)
- * ----------------------------------------*/
+
 router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
@@ -88,14 +71,10 @@ router.delete(
   })
 );
 
-/** -----------------------------------------
- * POST: búsqueda avanzada (publicadas)
- * Devuelve 200 con data vacía (no 404) para mejor DX
- * ----------------------------------------*/
+
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
-    //agregamos 2 nuevos parametros al req body para filtrar por fecha y visitas. 
     const { numero, emisor, documento, anio, tags, fechaOrder, visitasOrder} = req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
@@ -113,14 +92,12 @@ router.post(
         fechaOrder,
         visitasOrder
       );
-   //agregamos los parametros tambien en la llamada de la funcion searchNormativaByParameters.
+  
     res.status(200).json({ ok: true, data: data || [], totalResults });
   })
 );
 
-/** -----------------------------------------
- * POST: búsqueda de ELIMINADAS
- * ----------------------------------------*/
+
 router.post(
   "/searchEliminadas",
   asyncHandler(async (req, res) => {
@@ -144,9 +121,6 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * POST: búsqueda de DESPUBLICADAS
- * ----------------------------------------*/
 router.post(
   "/searchDespublicadas",
   asyncHandler(async (req, res) => {
@@ -170,10 +144,7 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * POST: búsqueda por TAGS
- * (cambié a POST: recibís array en body)
- * ----------------------------------------*/
+
 router.post(
   "/search/tag",
   asyncHandler(async (req, res) => {
@@ -193,10 +164,6 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * POST: publicar
- * Servicio lanza 404/400 si corresponde
- * ----------------------------------------*/
 router.post(
   "/publicar/:id",
   asyncHandler(async (req, res) => {
@@ -207,9 +174,7 @@ router.post(
   })
 );
 
-/** -----------------------------------------
- * GET: años disponibles
- * ----------------------------------------*/
+
 router.get(
   "/yearNormativa",
   asyncHandler(async (_req, res) => {
@@ -218,10 +183,6 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * GET: buscar por “número” (tu ruta decía year/:year pero llamaba searchByNumber)
- * Mantengo la firma pero devuelvo 404 si no hay
- * ----------------------------------------*/
 router.get(
   "/year/:year",
   asyncHandler(async (req, res) => {
@@ -231,7 +192,7 @@ router.get(
       err.status = 400;
       throw err;
     }
-    const row = await normativaDB.searchByNumber(year); // devuelve null si no hay
+    const row = await normativaDB.searchByNumber(year); 
     if (!row) {
       const err = new Error(
         "No se encontró la normativa para el año solicitado"
@@ -243,9 +204,6 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * GET: todas (top/últimas)
- * ----------------------------------------*/
 router.get(
   "/normativas",
   asyncHandler(async (_req, res) => {
@@ -254,9 +212,7 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * GET: eliminadas (listado)
- * ----------------------------------------*/
+
 router.get(
   "/deleted",
   asyncHandler(async (_req, res) => {
@@ -265,9 +221,6 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * GET: más buscadas
- * ----------------------------------------*/
 router.get(
   "/mas-buscadas",
   asyncHandler(async (_req, res) => {
@@ -276,9 +229,6 @@ router.get(
   })
 );
 
-/** -----------------------------------------
- * PUT: actualizar (modo REST clásico)
- * ----------------------------------------*/
 router.put(
   "/update/:id",
   asyncHandler(async (req, res) => {
@@ -288,10 +238,7 @@ router.put(
   })
 );
 
-/** -----------------------------------------
- * PUT: editar (ruta duplicada de “/edit”)
- * Si vas a mantenerla, que haga lo mismo que POST /edit
- * ----------------------------------------*/
+
 router.put(
   "/edit",
   asyncHandler(async (req, res) => {
@@ -300,9 +247,6 @@ router.put(
   })
 );
 
-/** -----------------------------------------
- * POST: restaurar (eliminada → despublicado)
- * ----------------------------------------*/
 router.post(
   "/restaurar/:id",
   asyncHandler(async (req, res) => {

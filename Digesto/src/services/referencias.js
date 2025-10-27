@@ -1,6 +1,5 @@
 import api from "../api/axiosPrivate";
 
-//Conveertir a formato {label, value} esperado por Select
 const normalize = (rows = []) =>
   rows.map(r => ({
     label: r.nombre,      

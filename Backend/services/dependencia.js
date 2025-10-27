@@ -1,10 +1,5 @@
 import db from "./db.js";
 
-// Funciones CRUD basicas
-
-//eliminer sesiones del consejo superior
-
-//Mostrar sesiones del consejo superior
 
 async function getSesionesPaginado(page = 1, limite = 10) {
   const offset = (page - 1) * limite;
@@ -24,32 +19,27 @@ async function getSesionesPaginado(page = 1, limite = 10) {
   return { data: sesiones, totalResults: totalRows };
 }
 
-//Mostrar todos las dependencias
+
 async function getAllDependencias() {
   const sql = "SELECT * FROM dependencia";
   const results = await db.query(sql);
   return results;
 }
 
-//Mostrar usuario por ID
+
 async function getDepenendenciaById(id) {
   const sql = "SELECT * FROM dependencia WHERE id = ?";
   const results = await db.queryOne(sql, [id]);
   return results;
 }
 
-//dependencia para mapear
+
 async function getDependencias() {
   const sql = "SELECT id, nombre FROM dependencia where estado = 'publicado'";
   const results = await db.query(sql);
   return results;
 }
 
-/*TODO  : Comprobar los campos en la bd , hay campos sin un default o null por lo que hay que especificar todo
-campos a cambiar = [ tipo de user , fecha de alta , ultima visita , estado ] 
-*/
-//FIXME -  funcion ideal para create , no funciona faltan los campos aclarados
-//FIXME - Para todos estos valores funciona el create, hay que verificar que datos se consiguen de donde, es decir que esta incompleta esta funcion;
 
 async function create(data) {
   const { nombre, estado, codificacion, nombre_completo } = data;
@@ -77,21 +67,20 @@ async function create(data) {
   }
 }
 
-//Modificar dependencia
 async function edit(data) {
   const { id, nombre, nombre_completo, estado, codificacion } = data;
   try {
-    // Verificar si ya existe una dependencia con ese nombre
+ 
     const existing = await db.queryOne(
       "SELECT id FROM dependencia WHERE nombre = ? AND id != ?",
       [nombre, id]
     );
     if (existing && existing.length > 0) {
-      // Ya existe, no actualizar
+  
       console.log({ mensaje: `Dependencia '${nombre}' ya existe` });
       return { success: false, message: `Dependencia '${nombre}' ya existe` };
     } else {
-      // Actualizar la dependencia
+   
       const sqlUpdate =
         "UPDATE dependencia SET nombre = ?, nombre_completo = ?, estado = ?, codificacion = ? WHERE id = ?";
       const result = await db.execute(sqlUpdate, [
@@ -129,16 +118,12 @@ async function eliminar(id) {
   return results;
 }
 
-// Funciones para endpoints especiales
-
-//Mostrar todos las dependencias
 async function getAllNamesDependencias() {
   const sql = "SELECT nombre FROM dependencia";
   const results = await db.query(sql, []);
   return results;
 }
 
-//Buscar dependencia por parametros
 async function searchDependenciaByParameters(
   nombre,
   estado,

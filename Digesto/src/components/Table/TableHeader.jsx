@@ -4,9 +4,9 @@ import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 function TableHeader({
   columns,
   showActions,
-  sortState,                 // { fecha: "ASC"|"DESC"|null, visitas: "ASC"|"DESC"|null }
-  onToggleSort,             // (key, dir) => void
-  sortableKeys = [],        // ← si viene [], no hay íconos ni clicks (p.ej. "inicio")
+  sortState,                 
+  onToggleSort,             
+  sortableKeys = [],        
 }) {
   const getSortIcon = (key) => {
     if (!sortableKeys.includes(key)) return null;

@@ -1,4 +1,3 @@
-// src/context/FiltersContext.jsx
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 const FiltersContext = createContext(null);

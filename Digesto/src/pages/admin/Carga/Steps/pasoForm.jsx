@@ -60,7 +60,6 @@ function PasoForm({
     ];
   }, [entidad, baseCampos, depOptions]);
 
- // Pre-cargar/forzar el valor de dependencia si está bloqueado
   useEffect(() => {
     if (shouldLockDep) {
       setFormData(prev => {
@@ -98,7 +97,7 @@ function PasoForm({
           </label>
         );
 
-        // Caso especial: normativa.tags
+      
         if (entidad === "normativa" && name === "tags") {
           return (
             <div key={name}>
@@ -141,7 +140,6 @@ function PasoForm({
           if (fromContext === "dependencia")  resolvedOptions = depOptions;
           else if (fromContext === "emisor") resolvedOptions = emiOptions;
           else resolvedOptions = options || [];
-          //Select bloqueado
           const isDependenciaField = name === "dependencia";
           const disabled = isDependenciaField && shouldLockDep;
           
@@ -194,8 +192,6 @@ function PasoForm({
             </div>
           );
         }
-
-        // default input (incluye file)
         return (
           <div key={name}>
             {commonLabel}

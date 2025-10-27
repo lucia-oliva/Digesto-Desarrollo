@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// components/GenericTable/GenericTable.jsx
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TablePagination from "./TablePagination";
@@ -58,8 +57,6 @@ function GenericTable({
       )}
     </div>
 
-
-{/* Mobile / ≤978px */}
 <div className="block min-[979px]:hidden p-2">
   <MobileCardList
     data={items}

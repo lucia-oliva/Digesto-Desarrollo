@@ -4,6 +4,4 @@ export const camposOcultosVerificacion = {
   dependencia: ["id","color","password","_passwordEdited"],
   emisor: ["id","password","_passwordEdited"],
   normativa: ["id","_originalesNormativas", "normativas_bajas", "editingSelectedId","password","_passwordEdited"],
-
-  // otras entidades...
 };

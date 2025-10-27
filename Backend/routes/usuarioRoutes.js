@@ -4,8 +4,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-
-//Cambiar estado (activar/desactivar)
 router.post(
   "/cambiar-estado",
   asyncHandler(async (req, res) => {
@@ -22,7 +20,6 @@ router.post(
   })
 );
 
-// Crear usuario
 router.post(
   "/create",
   asyncHandler(async (req, res) => {
@@ -32,7 +29,6 @@ router.post(
   })
 );
 
-// Editar usuario
 router.post(
   "/edit",
   asyncHandler(async (req, res) => {
@@ -42,7 +38,6 @@ router.post(
   })
 );
 
-// Mostrar todos los usuarios
 router.get(
   "/",
   asyncHandler(async (req, res) => {
@@ -127,7 +122,6 @@ router.post(
   })
 );
 
-// Filtrar usuarios por parámetros
 router.post(
   "/search",
   asyncHandler(async (req, res) => {

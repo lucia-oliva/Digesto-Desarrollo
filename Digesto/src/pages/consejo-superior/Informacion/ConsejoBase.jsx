@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// components/consejo/ConsejoBase.jsx
 import { useMemo, useState } from "react";
 import defaultPalette from "./palette";
 

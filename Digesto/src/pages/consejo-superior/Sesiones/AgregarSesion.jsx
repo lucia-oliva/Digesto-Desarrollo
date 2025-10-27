@@ -13,8 +13,6 @@ export default function AgregarSesion() {
     () => ({ nombre: "", fecha: "", orden: null }),
     []
   );
-
-  // Validaciones específicas de "Agregar"
   const fields = useMemo(
     () => [
       {
@@ -66,7 +64,6 @@ export default function AgregarSesion() {
       setGlobalError("");
       setLoading(true);
       try {
-        // 1) Crear sesión
         const payload = {
           nombre_orden: String(values.nombre).trim(),
           fecha_sesion: values.fecha,
@@ -80,8 +77,6 @@ export default function AgregarSesion() {
         });
         if (!res.ok) throw new Error("Error al guardar la sesión.");
         const data = await res.json();
-
-        // 2) Subir archivo del ORDEN
         if (values.orden && data?.id_sesion) {
           const formDataUpload = new FormData();
           formDataUpload.append("file", values.orden);

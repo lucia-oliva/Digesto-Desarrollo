@@ -1,4 +1,3 @@
-// src/context/AppProviders.jsx
 import { AuthProvider } from "./authProvider";
 import ReferenciasProvider from "./ReferenciasProvider";
 import { FiltersProvider } from "./FiltersContext";

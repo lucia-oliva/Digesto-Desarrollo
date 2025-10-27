@@ -77,7 +77,7 @@ export const deleteApi = async (id,type,userId) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "x-user-id": userId,  // 👈 lo mandamos por header
+        "x-user-id": userId,  
       },
     });
     return response.json();

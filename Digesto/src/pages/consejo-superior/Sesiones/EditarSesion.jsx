@@ -1,4 +1,3 @@
-// src/pages/sesiones/EditarSesion.jsx
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import SesionForm from "../Sesiones/SesionForm";

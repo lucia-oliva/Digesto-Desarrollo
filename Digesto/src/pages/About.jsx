@@ -11,15 +11,12 @@ import {
 function About() {
   return (
     <div className="bg-base-100">
-      {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary/10 via-base-200 to-base-100">
-        {/* adornos suaves */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-secondary/20 blur-3xl" />
 
         <div className="container mx-auto px-4 py-14 md:py-24">
           <div className="flex flex-col-reverse md:flex-row items-center gap-10">
-            {/* texto */}
             <div className="w-full md:w-1/2 max-w-xl">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
                 <FiBookOpen />
@@ -51,8 +48,6 @@ function About() {
                 </Link>
               </div>
             </div>
-
-            {/* imagen – grande en mobile, mitad en desktop */}
             <div className="w-full md:w-1/2 flex justify-center">
               <img
                 src="https://www.cellmark.com/wp-content/uploads/2019/10/office-papers.jpg"
@@ -63,8 +58,6 @@ function About() {
           </div>
         </div>
       </section>
-
-      {/* FEATURES */}
       <section className="container mx-auto px-4 py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 text-center">
           Características de Digesto
@@ -103,8 +96,6 @@ function About() {
           />
         </div>
       </section>
-
-      {/* CTA final */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-x-0 -bottom-24 h-48 bg-gradient-to-t from-primary/10 to-transparent" />
         <div className="container mx-auto px-4 py-12">

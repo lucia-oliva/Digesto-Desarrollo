@@ -25,7 +25,6 @@ async function edit(data) {
       "SELECT id FROM tag WHERE nombre = ? AND id != ?",
       [nombre, id]
     );
-    // Verificar si ya existe otro tag con el mismo nombre
     if (existing) {
       const err = new Error(`Tag '${nombre}' ya existe`);
       err.status = 400;
@@ -117,7 +116,6 @@ async function insertTagsForNormativa(normativaId, tags) {
         );
       }
     } catch (error) {
-      // No lanzar, solo loguear
       console.error(`Error al procesar el tag '${tag}':`, error);
     }
   }
@@ -146,17 +144,17 @@ async function searchTagsByParameters(
   offset = null
 ) {
   try {
-    // 1) Construimos filtros para TAG (no tocamos tag_normativa)
+  
     const where = [];
     const params = [];
 
     if (letra) {
       if (letra === "#") {
-        // Sin índice, pero correcto. (Ver alternativa con columna generada al final)
+        
         where.push("t.nombre REGEXP '^[^A-Za-z]'");
       } else {
         where.push("t.nombre LIKE ?");
-        params.push(`${letra}%`); // prefijo -> usa idx_tag_nombre
+        params.push(`${letra}%`); 
       }
     }
 
@@ -167,8 +165,6 @@ async function searchTagsByParameters(
 
     const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
-    // 2) Query principal: lista con conteo de usos por LEFT JOIN de un subselect pre-agregado
-    // -> Evita agrupar toda tag_normativa en el mismo SELECT
     let sql = `
       SELECT
         t.id,
@@ -193,7 +189,7 @@ async function searchTagsByParameters(
 
     const rows = await db.query(sql, listParams);
 
-    //Total (separado) — permite índice en tag(nombre)
+   
     const totalSql = `
       SELECT COUNT(*) AS total
       FROM tag t
@@ -209,7 +205,7 @@ async function searchTagsByParameters(
   }
 }
 
-// Eliminar tag y sus asociaciones
+
 async function eliminar(id) {
   try {
     await db.execute("DELETE FROM tag_normativa WHERE id_tag = ?", [id]);

@@ -99,7 +99,6 @@ const links = useMemo(() => {
 
         
         <nav className="sm:hidden px-4 h-16 flex items-center justify-between">
-          {/* Izquierda: Logo */}
           <NavLink to="/" onClick={closeMobile}>
             <img src={LOGO_UNLAR} alt="Unlar" className="h-8 w-auto" />
           </NavLink>

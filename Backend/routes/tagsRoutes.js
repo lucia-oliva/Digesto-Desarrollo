@@ -3,7 +3,6 @@ import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 const router = express.Router();
 
-// Eliminar un tag por id
 router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
@@ -13,7 +12,6 @@ router.delete(
   })
 );
 
-//traer datos para la funcion de editar
 router.get(
   "/datos/:id",
   asyncHandler(async (req, res) => {
@@ -25,7 +23,7 @@ router.get(
   })
 );
 
-// Obtener todos los tags
+
 router.get(
   "/tags",
   asyncHandler(async (req, res) => {
@@ -34,7 +32,7 @@ router.get(
   })
 );
 
-// Editar un tag
+
 router.post(
   "/edit",
   asyncHandler(async (req, res) => {
@@ -45,17 +43,17 @@ router.post(
   })
 );
 
-// Crear tags
+
 router.post(
   "/create",
   asyncHandler(async (req, res) => {
-    const tagData = req.body; // Array de tags
+    const tagData = req.body; 
     await tagsDB.create(tagData);
     res.status(200).json({ ok: true, msg: "Tags insertados correctamente." });
   })
 );
 
-//Obtener tags de normativa
+
 router.get(
   "/tags/:id",
   asyncHandler(async (req, res) => {
@@ -65,12 +63,11 @@ router.get(
   })
 );
 
-// Asociar tags con una normativa
 router.post(
   "/tags/normativa/:id",
   asyncHandler(async (req, res) => {
-    const { id } = req.params; // ID de la normativa
-    const { tags } = req.body; // Array de tags
+    const { id } = req.params; 
+    const { tags } = req.body; 
     if (!Array.isArray(tags) || tags.length === 0) {
       return res
         .status(400)
@@ -83,7 +80,7 @@ router.post(
   })
 );
 
-//Filtrar Tags por parametros
+
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
@@ -94,9 +91,9 @@ router.post(
       let limite = req.query.limite !== undefined ? req.query.limite : 10;
       limite = parseInt(limite, 10) || 10;
       page = parseInt(page, 10) || 1;
-      // Si hay otros parámetros, filtrar por ellos
+  
       const offset = (page - 1) * limite;
-      //Get the total count of results
+   
       const { data, totalResults } = await tagsDB.searchTagsByParameters(
         nombre,
         letra,

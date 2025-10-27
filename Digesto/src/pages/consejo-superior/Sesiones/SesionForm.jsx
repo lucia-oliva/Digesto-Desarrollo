@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-// src/components/sesiones/SesionForm.jsx
+
 import { useMemo, useState, useCallback } from "react";
 
 export default function SesionForm({

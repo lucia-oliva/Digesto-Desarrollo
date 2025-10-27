@@ -1,5 +1,3 @@
-// components/Normativas/useNormativas.js
-
 import { useEffect, useState, useRef } from "react";
 import {
   searchNormativas,
@@ -14,9 +12,9 @@ import axios from "axios";
 import { useAuth } from "../../context/useAuth";
 
 /**
- * @param {string} type        Entidad / tipo (ej: 'normativas', 'sesiones', etc.)
- * @param {object} filtros     Objeto de filtros activos
- * @param {object} options     { ns?: string, pageSize?: number }
+ * @param {string} type        
+ * @param {object} filtros    
+ * @param {object} options    
  */
 
 export const useNormativas = (type, filtros, options = {}) => {
@@ -37,9 +35,8 @@ export const useNormativas = (type, filtros, options = {}) => {
 
   const prevFiltrosRef = useRef(JSON.stringify(filtros));
   const prevTypeRef = useRef(type);
-  const requestSeqRef = useRef(0); // ↑ se incrementa en cada load; para ignorar respuestas viejas
+  const requestSeqRef = useRef(0); 
 
-  // Reset de página si cambian los filtros
   useEffect(() => {
     const currentFiltrosString = JSON.stringify(filtros);
     if (prevFiltrosRef.current !== currentFiltrosString) {
@@ -48,28 +45,23 @@ export const useNormativas = (type, filtros, options = {}) => {
     }
   }, [filtros]);
 
-  // Reset de página si cambia el type (misma vista con sidebar)
+ 
   useEffect(() => {
     if (prevTypeRef.current !== type) {
       prevTypeRef.current = type;
       setPage(1);
-      // también limpiar resultados para no mostrar “fantasmas”
       setNormativas([]);
       setTotalPages(1);
     }
   }, [type]);
-
-  // Cargar datos cuando cambian page o type o filtros (si page ya era 1)
   useEffect(() => {
     loadNormativas(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, type]);
 
-  // Si cambian filtros y page ya es 1, recargar (porque el efecto de arriba solo escucha [page,type])
   useEffect(() => {
     const currentFiltrosString = JSON.stringify(filtros);
     if (prevFiltrosRef.current === currentFiltrosString && page === 1) {
-      // mismos filtros, no hagas nada
       return;
     }
     if (page === 1) {
@@ -79,18 +71,15 @@ export const useNormativas = (type, filtros, options = {}) => {
   }, [filtros]);
 
   const loadNormativas = async (pageToLoad) => {
-    const mySeq = ++requestSeqRef.current; // capturamos el número de request de esta carga
+    const mySeq = ++requestSeqRef.current; 
 
     try {
       setLoading(true);
       setError(null);
-
-      // ----- Sesiones (endpoint especial)
       if (type === "sesiones") {
         const response = await axios.get(`${API_BASE}/dependencia/sesiones`, {
           params: { page: pageToLoad, limite: pageSize },
         });
-        // Si llegó una respuesta vieja, la ignoramos
         if (requestSeqRef.current !== mySeq) return;
 
         const payload = response?.data ?? {};
@@ -112,8 +101,6 @@ export const useNormativas = (type, filtros, options = {}) => {
         }
         return;
       }
-
-      // ----- Eliminadas
       if (type === "normativasEliminadas") {
         const res = await searchNormativasEliminadas(
           pageToLoad,
@@ -128,8 +115,6 @@ export const useNormativas = (type, filtros, options = {}) => {
         setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
         return;
       }
-
-      // ----- Despublicadas
       if (type === "normativaDespublicadas") {
         const res = await searchNormativasDespublicadas(
           pageToLoad,
@@ -144,8 +129,6 @@ export const useNormativas = (type, filtros, options = {}) => {
         setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
         return;
       }
-
-      // ----- Caso general
       const res = await searchNormativas(pageToLoad, pageSize, type, filtros);
       if (requestSeqRef.current !== mySeq) return;
 
@@ -153,7 +136,6 @@ export const useNormativas = (type, filtros, options = {}) => {
       const total = Number(res?.totalResults || 0);
       setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
     } catch (err) {
-      // Ignorar si llegó tarde (aunque en error no suele pasar, mantenemos simetría)
       if (requestSeqRef.current !== mySeq) return;
 
       const msg =
@@ -165,7 +147,6 @@ export const useNormativas = (type, filtros, options = {}) => {
       setTotalPages(1);
       setEmptyMessage(msg);
     } finally {
-      // Solo terminar si seguimos siendo la request vigente
       if (requestSeqRef.current === mySeq) {
         setLoading(false);
       }
@@ -176,7 +157,6 @@ export const useNormativas = (type, filtros, options = {}) => {
 
   const onEdit = (item) => {
     const rutaEntidad = nombreRutaPorEntidad[type] || type;
-    // Para sesiones, el id es distinto
     if (rutaEntidad === "Sesion") {
       const id = item.id_sesion || item.id;
       navigate(`/consejo-superior/Editar${rutaEntidad}/${id}`);
@@ -218,9 +198,9 @@ export const useNormativas = (type, filtros, options = {}) => {
       if (!ok) throw new Error("No se pudo eliminar");
 
       if (shouldGoBack) {
-        setPage((p) => Math.max(1, p - 1)); // dispara recarga por efecto
+        setPage((p) => Math.max(1, p - 1)); 
       } else {
-        await loadNormativas(page); // recarga misma página
+        await loadNormativas(page); 
       }
 
       alert("Se eliminó correctamente");

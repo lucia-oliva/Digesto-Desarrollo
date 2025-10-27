@@ -15,16 +15,12 @@ const RouteGuard = ({
     return <div className="text-gray-600 text-center p-8">Cargando...</div>;
   }
 
-  // Si el modo es "guest", redirigimos si el usuario está autenticado
   if (mode === "guest" && isLoggedIn) {
     return <Navigate to={fallbackTo} replace />;
   }
-  // Si el modo es "auth", redirigimos si el usuario no está autenticado
   if (mode === "auth" && !isLoggedIn) {
     return <Navigate to={redirectTo} replace />;
   }
-
-  // Si el modo es "consejo", redirigimos si el usuario no está autenticado
   if (mode === "consejo") {
     const tipo = auth?.user?.tipo_usuario;
     const depName = auth?.user?.dependencia; 

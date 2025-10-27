@@ -68,8 +68,6 @@ export const menuItems = [
     ],
     roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
   },
-
-  // Elementos especiales sin hijos
   {
     title: "Consejo Superior",
     path: "../consejo-superior",

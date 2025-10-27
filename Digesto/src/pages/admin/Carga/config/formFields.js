@@ -34,7 +34,6 @@ export const camposPorEntidad = {
     { name: "archivo", label: "PDF", type: "file" },
     { name: "tags", label: "Tags", type: "text" },
 
-    // etc...
   ],
   usuario: [
     {

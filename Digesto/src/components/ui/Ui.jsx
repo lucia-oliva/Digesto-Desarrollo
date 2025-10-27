@@ -13,11 +13,9 @@ export const Loading = () => {
 export const Alert = ({ message, title, error, duration = 5000 }) => {
   const [visible, setVisible] = useState(true);
   const [fadeIn, setFadeIn] = useState(false);
-
-  // Show animation on mount
   useEffect(() => {
-    const entry = setTimeout(() => setFadeIn(true), 50); // trigger fade-in
-    const exit = setTimeout(() => setFadeIn(false), duration - 300); // start fade-out before unmount
+    const entry = setTimeout(() => setFadeIn(true), 50); 
+    const exit = setTimeout(() => setFadeIn(false), duration - 300); 
     const final = setTimeout(() => setVisible(false), duration);
 
     return () => {
@@ -38,7 +36,6 @@ export const Alert = ({ message, title, error, duration = 5000 }) => {
         ${fadeIn ? "opacity-100" : "opacity-0"}
       `}
     >
-      {/* Manual close */}
       <button
         onClick={() => setVisible(false)}
         className="absolute top-2 right-2 text-base-200 hover:text-base-content"
@@ -66,11 +63,11 @@ Alert.propTypes = {
   message: PropTypes.string.isRequired,
   title: PropTypes.string,
   error: PropTypes.bool,
-  duration: PropTypes.number, // auto-dismiss time in ms
+  duration: PropTypes.number, 
 };
 
 Alert.defaultProps = {
   title: "Aviso",
   error: false,
-  duration: 5000, // 5 seconds
+  duration: 5000, 
 };

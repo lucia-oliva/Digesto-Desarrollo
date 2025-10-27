@@ -27,7 +27,6 @@ function useIsSmallScreen(max = 1024) {
   return isSmall;
 }
 
-/* ===== Componente ===== */
 // eslint-disable-next-line react/prop-types
 export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector = ".table-pagination" }) {
   const contRef = useRef(null);
@@ -45,8 +44,6 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
   const palabras = textoSeguro.split(/\s+/);
   const truncado = palabras.length > 3 ? palabras.slice(0, 2).join(" ") + "..." : textoSeguro;
   const preview = cortarResumen(textoSeguro, 3, 60);
-
-  /* ===== Desktop: calcular posición FIXED con flip + clamp (via portal) ===== */
   useLayoutEffect(() => {
     if (!abierto || !contRef.current || isSmall) return;
 
@@ -96,8 +93,6 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
       window.removeEventListener("resize", onScrollOrResize, true);
     };
   }, [abierto, isSmall, avoidOverlapSelector]);
-
-  /* ===== Cerrar al click fuera ===== */
   useEffect(() => {
     if (!abierto) return;
     const cerrar = (e) => {
@@ -114,7 +109,7 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
       ref={contRef}
       className="relative group max-w-[260px]"
       onMouseEnter={() => {
-        if (!tieneTexto || isSmall) return; // en mobile no usamos hover
+        if (!tieneTexto || isSmall) return; 
         clearTimeout(closeTimerRef.current);
         setAbierto(true);
       }}
@@ -123,7 +118,6 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
         closeTimerRef.current = setTimeout(() => setAbierto(false), 120);
       }}
     >
-      {/* Trigger distinto en mobile/tablet vs desktop */}
       {isSmall ? (
         <button
           type="button"
@@ -143,11 +137,8 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
           {tieneTexto ? truncado : <span className="text-gray-400 italic">Sin resumen</span>}
         </div>
       )}
-
-      {/* ===== Render ===== */}
       {abierto && tieneTexto && createPortal(
         isSmall ? (
-          /* ---------- MOBILE/TABLET: cajita fija abajo ---------- */
           <div
             ref={tipRef}
             className="fixed bottom-0 inset-x-0 z-[2000] bg-white border-t p-4 shadow-lg"
@@ -165,7 +156,6 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
             )}
           </div>
         ) : (
-          /* ---------- DESKTOP: tooltip FIXED ---------- */
           <div
             ref={tipRef}
             style={{

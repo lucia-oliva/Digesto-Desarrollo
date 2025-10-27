@@ -24,7 +24,7 @@ function GenericEdit() {
   const findIdByNameOrId = (list, value) => {
     if (value == null) return "";
     const s = String(value).trim();
-    if (/^\d+$/.test(s)) return s; // ya es un ID
+    if (/^\d+$/.test(s)) return s; 
     const lower = s.toLowerCase();
     const hit = (list ?? []).find(
       (x) => String(x.nombre ?? x.label ?? "")
@@ -135,8 +135,6 @@ else if (entidad === "normativa") {
       alert("Faltan datos clave para editar.");
       return;
     }
-
-      // IDs seguros a partir de catálogo (si por alguna razón viniera un nombre)
   const safeDep  = findIdByNameOrId(dependencias, formData.dependencia);
   const safeEmi  = findIdByNameOrId(emisores, formData.emisor);
   const safeTipo = formData.tipo_normativa ?? "";

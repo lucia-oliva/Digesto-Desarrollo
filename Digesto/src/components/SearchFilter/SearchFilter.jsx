@@ -23,14 +23,12 @@ function useContextOptions(fromContext) {
   }
 }
 
-// Carga y cache simple en memoria (por vida del componente) para opciones async
 function useAsyncOptions(field, type) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const cacheKey = useMemo(() => {
     if (!field?.async || !field?.endpoint) return null;
-    // separá por entidad (type) y por key si viene informado
     return `async:${type}:${field.name}:${field.key || "default"}`;
   }, [field, type]);
 
@@ -40,10 +38,8 @@ function useAsyncOptions(field, type) {
       if (!field?.async || !field?.endpoint || !cacheKey) return;
       setLoading(true);
       try {
-        // opcional: podés implementar cache global si querés (window.__filterCache)
         const { data } = await api.get(field.endpoint);
         if (cancel) return;
-        // Espera { key, value } o similar;
         const mapped = (Array.isArray(data) ? data : []).map((it) => ({
           label: String(it?.label ?? it?.[field.key] ?? it).trim(),
           value: String(it?.value ?? it?.[field.key] ?? it).trim(),
@@ -65,7 +61,6 @@ function useAsyncOptions(field, type) {
   return { options, loading };
 }
 
-// Prunea un estado conservando sólo las keys presentes en los campos de la entidad
 function pruneStateForFields(state, fields) {
   const allowed = new Set(fields.map((f) => f.name));
   const next = {};
@@ -75,18 +70,12 @@ function pruneStateForFields(state, fields) {
   return next;
 }
 
-// Render por tipo de input
 function FieldRenderer({ field, value, onChange }) {
   const { name, type, label, options, fromContext } = field;
-
-  // opciones desde contexto
   const ctxOptions = useContextOptions(fromContext);
-
-  // opciones async
   const { options: asyncOpts, loading: asyncLoading } = useAsyncOptions(field);
 
   const effectiveOptions = useMemo(() => {
-    // prioridad: async > fromContext > options in-file
     if (field?.async) return asyncOpts;
     if (fromContext) return ctxOptions;
     return options || [];
@@ -120,7 +109,6 @@ function FieldRenderer({ field, value, onChange }) {
           onChange={(e) => onChange(name, e.target.value)}
           disabled={field?.async && asyncLoading}
         >
-          {/* si no viene "Todos" en options, agregalo como default */}
           {!effectiveOptions.some((o) => String(o.value) === "") && (
             <option value="">Todos</option>
           )}
@@ -133,8 +121,6 @@ function FieldRenderer({ field, value, onChange }) {
       </div>
     );
   }
-
-  // custom "letra" se maneja fuera (AlphabetFilter)
   return null;
 }
 
@@ -145,33 +131,21 @@ export default function GenericFilterSearch({
   autoSearch = false,
   onSearch = () => {},
 }) {
-  // Campos definidos por entidad
   const fields = useMemo(() => filterConfig?.[type] || [], [type]);
-
-  // Estado local del formulario
   const [formState, setFormState] = useState(() =>
     pruneStateForFields({ ...initialState }, fields)
-  );
-
-  // Cuando cambia la entidad (type) o initialState, rehidratar y PRUNEAR
+  )
   useEffect(() => {
     const next = pruneStateForFields({ ...initialState }, fields);
     setFormState(next);
   }, [initialState, fields]);
-
-  // Input genérico
   const handleInput = (key, value) => {
     setFormState((prev) => ({ ...prev, [key]: value }));
   };
-
-  // Buscar
   const handleBuscar = () => {
-    // envia sólo las keys válidas de esta entidad
     const next = pruneStateForFields(formState, fields);
     onSearch(next);
   };
-
-  // AutoSearch cuando cambia entidad / scope (si se desea)
   useEffect(() => {
     if (autoSearch) {
       const next = pruneStateForFields(formState, fields);
@@ -179,8 +153,6 @@ export default function GenericFilterSearch({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSearch, type, scope]);
-
-  // ¿Hay campo 'letra'?
   const hasLetter = useMemo(
     () => fields.some((f) => f.name === "letra" || f.type === "custom"),
     [fields]
@@ -190,14 +162,14 @@ export default function GenericFilterSearch({
     const next = { ...formState, letra };
     const pruned = pruneStateForFields(next, fields);
     setFormState(pruned);
-    onSearch(pruned); // búsqueda inmediata por letra
+    onSearch(pruned);
   };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow">
       <div className="grid gap-3 sm:grid-cols-3">
         {fields
-          .filter((f) => f.type !== "custom") // los custom (letra) van abajo
+          .filter((f) => f.type !== "custom")
           .map((field) => (
             <FieldRenderer
               key={field.name}
@@ -206,14 +178,12 @@ export default function GenericFilterSearch({
               onChange={handleInput}
             />
           ))}
-        {/* Botón buscar */}
         <div className="form-control justify-end">
           <button className="btn btn-primary" onClick={handleBuscar}>
             Buscar
           </button>
         </div>
       </div>
-
       {hasLetter && (
         <div className="mt-3">
           <AlphabetFilter

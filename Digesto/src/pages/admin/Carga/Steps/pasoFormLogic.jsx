@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 
-// Helpers
 const normalizePhone = (v) => String(v || "").replace(/\D/g, "");
 const telefonoRegex = /^(?:(?:00)?549?)?0?(?:11|[2368]\d)(?:(?=\d{0,2}15)\d{2})??\d{8}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

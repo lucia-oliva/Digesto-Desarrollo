@@ -24,7 +24,6 @@ const getBadgeClass = (accion) => {
   const t = toAccionText(accion);
   if (t === "Deroga") return "badge badge-md badge-error";
   if (t === "Complementa") return "badge badge-md badge-info";
-  // default
   return "badge badge-md badge-primary";
 };
 

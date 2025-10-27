@@ -6,27 +6,27 @@ import { getWithCancel } from "../../api/cancellable";
 
 function VistaAdministrativa() {
   const location = useLocation();
-  const type = location.pathname.split("/")[2]; // p.ej. '/admin/Normativas' → 'Normativas'
+  const type = location.pathname.split("/")[2]; 
   const scope = "admin";
   const modo = "admin";
 
   const { ns, state, setFilters } = useNamespacedFilters({
     scope: "admin",
-    type, // entidad actual (según URL interna)
+    type, 
     initial: {},
     urlSync: false,
-    nsStrategy: "byType", // ⬅️ por entidad
+    nsStrategy: "byType", 
     persist: false,
-    resetOnUnmount: false, // la vista no desmonta
-    resetOnNsChange: true, // ⬅️ al cambiar entidad, reset total a default
+    resetOnUnmount: false, 
+    resetOnNsChange: true, 
     onHydrated: (f) => void fetchData(f),
   });
 
   async function fetchData(filtros) {
-    // Cambiá el endpoint según la entidad si hace falta
+    
     const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
     if (res?.cancelled) return;
-    // setear datos si tu tabla no se auto-carga
+    
   }
 
   const handleSearch = (formData) => {
@@ -40,7 +40,7 @@ function VistaAdministrativa() {
       <GenericFilterSearch
         type={type}
         scope="admin"
-        initialState={state.filters} // ← SIEMPRE desde el contexto
+        initialState={state.filters} 
         autoSearch
         onSearch={handleSearch}
       />

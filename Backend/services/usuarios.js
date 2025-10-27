@@ -1,9 +1,6 @@
 import db from "./db.js";
 import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
 
-// Funciones CRUD basicas
-
-//cambiar estado
 async function cambiarEstado({ id_usuario, nuevo_estado}) {
   if (!id_usuario || !nuevo_estado) {
     const err = new Error("Faltan datos: id_usuario y nuevo_estado son requeridos.");
@@ -30,23 +27,21 @@ async function cambiarEstado({ id_usuario, nuevo_estado}) {
 }
 
 
-
-//Editar usuario.
 async function edit(data) {
   const { id, rol, nombre, telefono, email, password, estado, dependencia } =
     data;
-  //verificar si id_dependencia es undefined, si lo es, asignar 0 como valor por defecto
-  const dependenciaFinal = dependencia ?? 0; // Si no se proporciona, usar
 
-  const fechaSubida = new Date().toISOString().split("T")[0]; // Formato YYYY-MM-DD
+  const dependenciaFinal = dependencia ?? 0; 
 
-  //Null si no hay contraseña nueva
+  const fechaSubida = new Date().toISOString().split("T")[0]; 
+
+
   let claveHasheada = null;
   if (typeof password === "string" && password.trim() !== "") {
     claveHasheada = await hashPasswordBcrypt(password.trim());
   }
   try {
-    //Actualizar el usuario
+  
     const sqlUpdate =
       "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = COALESCE(?, clave), estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
     const result = await db.execute(sqlUpdate, [
@@ -76,7 +71,7 @@ async function edit(data) {
   }
 }
 
-//Mostrar usuario por ID
+
 async function getUsuarioByIdDatos(id) {
   const sql =
     "SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, id_dependencia as dependencia FROM usuario WHERE id = ?";
@@ -91,7 +86,7 @@ async function getUsuarioByIdDatos(id) {
 
 async function create(data) {
   const { nombre, telefono, email, password, rol, dependencia } = data;
-  const dependenciaFinal = dependencia ?? 0; // Si no se proporciona, usar 0 como valor por defecto
+  const dependenciaFinal = dependencia ?? 0;
   console.log("user model", data);
 
   try {
@@ -104,7 +99,7 @@ async function create(data) {
     );
     if (duplicateCheck) {
       const error = new Error(`El email '${email}' ya está registrado.`);
-      error.errno = 409; // Código de error personalizado para conflicto
+      error.errno = 409;
       throw error;
     }
 
@@ -131,7 +126,6 @@ async function create(data) {
   }
 }
 
-//BUG  no estoy segura si la funcion de create es usada en otra parte del codigo, por las dudas replico la funcionalidad...y si no esta quedaria para borrar.
 async function createUsuario(user) {
   console.log("user model", user);
 
@@ -149,22 +143,9 @@ async function createUsuario(user) {
   ]);
   return results;
 }
-//Modificar usuario
-//async function updateUsuario(id, data) {
-//const sql =
-//"UPDATE usuario SET nombre = ?, email = ?, clave = ? WHERE id = ?";
-//const results = await db.query(sql, [
-//data.nombre,
-//data.email,
-//data.clave,
-//id,
-//]);
-//return results;
-//}
 
-//Falta ver el tema de la contraseña... quizas agregar la funcion de recuperar contraseña via gmail??
 export async function updateUsuario(id, datos) {
-  // Construir dinámicamente el SET del SQL
+
   const campos = [];
   const valores = [];
 
@@ -184,9 +165,9 @@ export async function updateUsuario(id, datos) {
     campos.push("id_tipo_usuario=?");
     valores.push(datos.id_tipo_usuario);
   }
-  //Cambiar clave solo si se envia la clave y clave actual_actual
+ 
   if (datos.clave && datos.clave_actual) {
-    //1. traer la clave actual de la BD
+   
     console.log("ID recibido:", id);
     const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [
       id,
@@ -215,33 +196,25 @@ export async function updateUsuario(id, datos) {
   return true;
 }
 
-//Eliminar usuario
 async function eliminar(id) {
   const sql = "DELETE FROM usuario WHERE id = ?";
   const results = await db.query(sql, [id]);
   return results;
 }
 
-// Funciones para endpoints especiales
-
-//Filtrar usuarios por departamento
 async function filterUsuariosporDepartament(id) {
   const sql = "SELECT * FROM usuario WHERE id_dependencia LIKE ? ";
   const results = await db.query(sql, [id]);
   return results;
 }
 
-//TODO - No hago esta funcion porque la clave deberia estar hasheada;
-//select * from usuario where email ? and clave ?
 
-//select * from usuario where email ? and estado='activo'
 async function UsuarioByEmailAndEstado(email) {
   const sql = "SELECT * FROM usuario WHERE email = ? AND estado = 'activo' ";
   const results = await db.query(sql, [email]);
   return results;
 }
 
-//Buscar usuarios por parametros
 async function searchUsuariosByParameters(
   rol,
   nombre,

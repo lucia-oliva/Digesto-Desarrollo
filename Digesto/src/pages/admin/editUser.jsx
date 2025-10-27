@@ -8,8 +8,7 @@ import { API_BASE } from "../../api/axiosPrivate";
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
   const { id } = useParams();
-  // Si se pasa un ID, se asume que es para editar un usuario específico
-  const userId = id || user.id; // Si no se pasa ID, usar el del usuario autenticado
+  const userId = id || user.id; 
   const [usuario, setUsuario] = useState({
     nombre: "",
     email: "",
@@ -40,7 +39,6 @@ export default function EditarUsuario() {
         email: usuario2[0].email || "",
         telefono: usuario2[0].telefono || "",
         tipo_usuario_id: usuario2.tipo_usuario_id || "",
-        // clave se deja vacío por seguridad
       }));
     }
   }, [usuario2]);
@@ -58,8 +56,6 @@ export default function EditarUsuario() {
     email: usuario.email,
     telefono: usuario.telefono,
   };
-
-  // Solo enviar claves si el usuario quiere cambiar la contraseña
   if (usuario.clave_actual && usuario.clave_nueva) {
     payload.clave_actual = usuario.clave_actual;
     payload.clave = usuario.clave_nueva;

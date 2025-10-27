@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-// components/DocumentView.jsx
 import useAxios from "axios-hooks";
 import { LuArrowRightToLine } from "react-icons/lu";
 import { useMemo, useState } from "react";
@@ -9,7 +8,6 @@ import { Loading } from "../components/ui/Ui";
 import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
 import { API_BASE } from "../api/axiosPrivate";
 
-// ==== Helper: mapear label de tipo de normativa (tal como ya lo tenías) ====
 const tipoNormativaLabel = (valor) => {
   if (valor == null || valor === "") return "—";
   const str = String(valor).trim();
@@ -37,8 +35,6 @@ const tipoNormativaLabel = (valor) => {
 
   return str;
 };
-
-// ==== Subcomponentes UI reutilizables ====
 function MetaGrid({ normativa }) {
   return (
     <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -119,8 +115,6 @@ function AccionesPDF({ pdfUrl, filename }) {
     </div>
   );
 }
-
-// ==== Deducción/forzado de variante ====
 function useVariant(forcedVariant) {
   const location = useLocation();
   return useMemo(() => {
@@ -146,8 +140,6 @@ function DocumentView({ variant = "auto" }) {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
-
-  // ====== VARIANTE ADMIN ======
   if (resolvedVariant === "admin") {
     return (
       <div className="min-h-screen flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
@@ -179,17 +171,13 @@ function DocumentView({ variant = "auto" }) {
       </div>
     );
   }
-
-  // ====== VARIANTE CONSEJO ======
   if (resolvedVariant === "consejo") {
     return (
       <div className="min-h-screen p-0 pt-15">
-        {/* Mobile: stack */}
         <div className="lg:hidden flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
           <aside className="w-full bg-base-100 rounded-xl border border-base-300 p-4 sm:p-6">
             {loading && <Loading />}
 
-            {/* Cinta Consejo */}
             <div className="mb-2">
               <span className="badge badge-info badge-outline">Consejo Superior</span>
             </div>
@@ -218,8 +206,6 @@ function DocumentView({ variant = "auto" }) {
             </div>
           </div>
         </div>
-
-        {/* Desktop: drawer con panel lateral (lectura de consejo) */}
         <div className="hidden lg:block">
           <div className="drawer drawer-end lg:drawer-open">
             <input id="dv_consejo_drawer" type="checkbox" className="drawer-toggle" />
@@ -285,11 +271,8 @@ function DocumentView({ variant = "auto" }) {
       </div>
     );
   }
-
-  // ====== VARIANTE PÚBLICA (por defecto) ======
   return (
     <div className="min-h-screen p-0">
-      {/* Mobile */}
       <div className="lg:hidden flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
         <aside className="w-full bg-base-100 rounded-xl border border-base-300 p-4 sm:p-6">
           {loading && <Loading />}
@@ -317,8 +300,6 @@ function DocumentView({ variant = "auto" }) {
           </div>
         </div>
       </div>
-
-      {/* Desktop */}
       <div className="hidden lg:block">
         <div className="drawer drawer-end lg:drawer-open">
           <input id="dv_public_drawer" type="checkbox" className="drawer-toggle" />

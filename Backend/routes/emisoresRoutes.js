@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-// Obtener datos de un emisor por ID
+
 router.get(
   "/datos/:id",
   asyncHandler(async (req, res) => {
@@ -17,7 +17,6 @@ router.get(
   })
 );
 
-// Que uso tiene?? TODO CHECK
 router.get(
   "/name",
   asyncHandler(async (req, res) => {
@@ -26,7 +25,6 @@ router.get(
   })
 );
 
-// Editar emisor
 router.post(
   "/edit",
   asyncHandler(async (req, res) => {
@@ -36,9 +34,6 @@ router.post(
   })
 );
 
-
-//emisores para mapeo
-
 router.get(
   "/getEmisores",
   asyncHandler(async (req, res) => {
@@ -47,7 +42,6 @@ router.get(
   })
 );
 
-// Crear emisor
 router.post(
   "/create",
   asyncHandler(async (req, res) => {
@@ -62,7 +56,6 @@ router.post(
   })
 );
 
-//Filtrar dependencia por parametros
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
@@ -70,9 +63,7 @@ router.post(
     let { page, limite } = req.query;
     limite = parseInt(limite, 10) || 10;
     page = parseInt(page, 10) || 1;
-    // Si hay otros parámetros, filtrar por ellos
     const offset = (page - 1) * limite;
-    //Get the total count of results
     const { data, totalResults } = await emisoresDB.searchEmisorByParameters(
       nombre,
       estado,
@@ -89,7 +80,6 @@ router.post(
   })
 );
 
-// Eliminar emisor
 router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {

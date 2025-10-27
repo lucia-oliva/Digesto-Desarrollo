@@ -14,10 +14,10 @@ const isProd = process.env.NODE_ENV === "production";
 
 const cookieOpts = {
   httpOnly: true,
-  secure: isProd ? true : false, // true en prod (HTTPS)
-  sameSite: isProd ? "none" : "strict", // none en prod para cookies cross-site
-  path: "/api/auth", // limita el scope
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
+  secure: isProd ? true : false, 
+  sameSite: isProd ? "none" : "strict", 
+  path: "/api/auth", 
+  maxAge: 7 * 24 * 60 * 60 * 1000, 
 };
 
 router.post(
@@ -60,7 +60,7 @@ router.post(
       });
     }
 
-    // Creamos los claims del usuario para el token
+
     const userClaims = {
       id: user.id,
       email: user.email,
@@ -69,7 +69,7 @@ router.post(
       dependencia: user.dependencia,
     };
 
-    // Generamos los tokens de acceso y refresh
+  
     const accessToken = generateAccessToken({
       id: user.id,
       rol: user.tipo_usuario,
@@ -92,10 +92,8 @@ router.post(
     if (!token) return res.status(401).json({ msg: "No hay refresh token" });
 
     try {
-      const payload = verifyRefreshToken(token); // { sub, roles }
+      const payload = verifyRefreshToken(token);
       const userId = payload.sub;
-
-      // Buscar usuario en DB
       const user = await db.queryOne(
         "SELECT usuario.id, usuario.email, usuario.estado , usuario.nombre, tu.nombre AS tipo_usuario, de.nombre AS dependencia " +
           "FROM usuario " +
@@ -117,7 +115,6 @@ router.post(
         });
       }
 
-      // Construir claims
       const userClaims = {
         id: user.id,
         email: user.email,
@@ -155,7 +152,7 @@ router.post(
       secure: isProd ? true : false,
       sameSite: isProd ? "none" : "strict",
       path: "/api/auth",
-      maxAge: 0, // Elimina la cookie inmediatamente
+      maxAge: 0, 
     });
 
     return res.status(200).json({ msg: "Sesión cerrada correctamente" });

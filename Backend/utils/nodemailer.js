@@ -20,11 +20,11 @@ const transporter = createTransport({
   
     try {
       const info = await transporter.sendMail({
-        from: process.env.MAIL_USER, // Desde tu correo
-        to: destinatario, // A quién le llega el mensaje
+        from: process.env.MAIL_USER, 
+        to: destinatario, 
         subject: "Nuevo mensaje de: " + nombre,
-        text: mensaje, // El mensaje del usuario
-        replyTo: email, // Para que el destinatario pueda responderle directo al usuario
+        text: mensaje, 
+        replyTo: email, 
       });
   
       console.log("Correo enviado: ", info.messageId);

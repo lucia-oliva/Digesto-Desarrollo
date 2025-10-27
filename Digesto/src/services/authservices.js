@@ -1,4 +1,4 @@
-// Mantiene el access token solo en memoria
+
 let accessToken = null;
 
 export const setAccessToken = (token) => {

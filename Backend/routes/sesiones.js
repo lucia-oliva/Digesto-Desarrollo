@@ -4,7 +4,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
 
-// eliminar una sesion por id
 router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
@@ -19,7 +18,6 @@ router.delete(
   })
 );
 
-// Crear Una nueva Sesion
 router.post(
   "/create",
   asyncHandler(async (req, res) => {

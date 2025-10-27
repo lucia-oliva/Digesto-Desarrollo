@@ -22,7 +22,6 @@ function ConsejoComisiones() {
   };
   const pal = (k) => palette[k] ?? palette.default;
 
-  // ---- Asuntos Académicos
   const aaAutoridades = [
     ["Presidente:", "Decano del Dpto. Ciencias Aplicadas a la Producción, al Ambiente y al Urbanismo — Cabrera Villafañe, Luis Alfredo"],
     ["Vicepresidente:", "Decano Sede Regional Aimogasta — Ing. Luis Eduardo Luna Mercado"],
@@ -45,8 +44,6 @@ function ConsejoComisiones() {
   const aaGrad = [
     ["Titular:", "Ávila, Rosario", "Suplente:", "Páez, María Vanesa"],
   ];
-
-  // ---- Interpretación y Reglamento
   const irAutoridades = [
     ["Presidente:", "Decana del Dpto. Cs. Sociales, Jurídicas y Económicas — Peralta de la Fuente, María Inés"],
     ["Vicepresidente:", "Decana Sede Regional Chepes — Lucero, Nancy Beatriz"],
@@ -69,8 +66,6 @@ function ConsejoComisiones() {
   const irGrad = [
     ["Titular:", "Tejeda, Carlos Alejandro", "Suplente:", "Aguirre Mercado Luna, Lucrecia"],
   ];
-
-  // ---- Presupuesto y Hacienda
   const phAutoridades = [
     ["Presidente:", "Decano del Dpto. Cs. Exactas, Físicas y Naturales — Molina, Miguel Ángel"],
     ["Vicepresidente:", "Decana Sede Regional Chamical — Quintero, Stella Maris"],
@@ -93,8 +88,6 @@ function ConsejoComisiones() {
   const phGrad = [
     ["Titular:", "Cornejo, Gimenza María del Valle", "Suplente:", "Corzo, Alejandro Javier"],
   ];
-
-  // ---- Asuntos Generales
   const agAutoridades = [
     ["Presidente:", "Decana del Dpto. Cs. Humanas y de la Educación — Fernández, Cynthia Noelia Del Valle"],
     ["Vicepresidente:", "Decana Sede Regional Catuna — Muñoz, Gladys Viviana"],
@@ -117,8 +110,6 @@ function ConsejoComisiones() {
   const agGrad = [
     ["Titular:", "Sánchez, Leandro Iván", "Suplente:", "Bazán Lucero, Marcos David Alberto"],
   ];
-
-  // ---- Extensión, Género y RR. Institucionales
   const exAutoridades = [
     ["Presidente:", "Decana del Dpto. Ciencias de la Salud — Feryala, Cecilia Sara"],
     ["Vicepresidente:", "Decano Sede Regional Villa Unión — Brac, Luis Ángel"],

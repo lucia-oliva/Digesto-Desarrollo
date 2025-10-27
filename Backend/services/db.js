@@ -1,4 +1,4 @@
-// db/index.js
+
 import mysql from "mysql2/promise";
 import config from "../config.js";
 
@@ -9,27 +9,20 @@ export const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-/**
- * Detecta el tipo de sentencia SQL por el primer token.
- */
+
 function getStatementType(sql) {
   const first = String(sql).trim().split(/\s+/)[0]?.toUpperCase();
-  return first; // "SELECT" | "INSERT" | "UPDATE" | "DELETE" | etc.
+  return first; 
 }
 
-/**
- * Normaliza el resultado para SELECT.
- * - SELECT => rows (array)
- * - INSERT/UPDATE/DELETE => objeto { affectedRows, insertId, warningStatus }
- */
+
 function normalizeResult(sql, rowsOrResult) {
   const kind = getStatementType(sql);
   if (kind === "SELECT" || kind === "SHOW" || kind === "DESCRIBE") {
-    // mysql2 devuelve [rows, fields];
-    // si no hay filas, devolvemos [];
+   
     return rowsOrResult;
   }
-  // DML Data Manipulation Language
+ 
   const r = rowsOrResult || {};
   return {
     affectedRows: r.affectedRows ?? 0,
@@ -38,12 +31,9 @@ function normalizeResult(sql, rowsOrResult) {
   };
 }
 
-/**
- * Mapea errores comunes
- */
+
 function mapMysqlError(err) {
-  // Algunos códigos y errno típicos
-  // ER_ACCESS_DENIED_ERROR (1045), ER_PARSE_ERROR (1064), ER_LOCK_DEADLOCK (1213)
+  
   switch (err?.errno) {
     case 1045:
       err.message =
@@ -57,7 +47,7 @@ function mapMysqlError(err) {
         "Deadlock detectado (ER_LOCK_DEADLOCK). Intente nuevamente.";
       break;
     default:
-      // Prefiere ‘code’ cuando exista
+    
       if (err?.code === "PROTOCOL_CONNECTION_LOST") {
         err.message =
           "Conexión a la base de datos perdida (PROTOCOL_CONNECTION_LOST).";
@@ -70,11 +60,7 @@ function mapMysqlError(err) {
   return err;
 }
 
-/**
- * Ejecuta una consulta:
- * - SELECT: devuelve array de filas
- * - DML: devuelve { affectedRows, insertId, warningStatus }
- */
+
 export async function query(sql, params = []) {
   try {
     const [rowsOrResult] = await pool.execute(sql, params);
@@ -84,9 +70,6 @@ export async function query(sql, params = []) {
   }
 }
 
-/**
- * Devuelve la primera fila o `null` si no hay resultados.
- */
 export async function queryOne(sql, params = []) {
   const rows = await query(sql, params);
   if (Array.isArray(rows)) {
@@ -95,10 +78,7 @@ export async function queryOne(sql, params = []) {
   return null;
 }
 
-/**
- * Alias semántico para DML (INSERT/UPDATE/DELETE).
- * Siempre retorna { affectedRows, insertId, warningStatus }.
- */
+
 export async function execute(sql, params = []) {
   const kind = getStatementType(sql);
   if (kind === "SELECT") {
@@ -107,24 +87,12 @@ export async function execute(sql, params = []) {
   return query(sql, params);
 }
 
-/**
- * Transacción con callback.
- * El callback recibe un helper `tx` para ejecutar sentencias sobre la misma conexión.
- * Si el callback lanza, se hace rollback y se relanza el error.
- * Util cuando creas una normativa y le asignas los tags
- * Ejemplo:
- * await transaction(async (tx) => {
- *   await tx("INSERT INTO a ...", [..]);
- *   await tx("UPDATE b ...", [..]);
- * });
- */
 
 export async function transaction(fn) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
-    // Helper para ejecutar usando la misma conexión
     const tx = async (sql, params = []) => {
       const [rowsOrResult] = await conn.execute(sql, params);
       return normalizeResult(sql, rowsOrResult);
@@ -144,9 +112,7 @@ export async function transaction(fn) {
   }
 }
 
-/**
- * Cierra el pool (útil en testeos o al apagar el proceso limpiamente).
- */
+
 export async function closePool() {
   await pool.end();
 }

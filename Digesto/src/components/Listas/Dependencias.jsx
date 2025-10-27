@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router"; // <- fix import
+import { Link } from "react-router"; 
 
 const dependenciaEnum = [
   "Exactas",
@@ -24,14 +24,13 @@ const colors = [
   "bg-red-300",
 ];
 
-// nombre visible -> id (para el filtro)
 const nombreToId = {
   Aplicadas: "1",
   Exactas: "2",
   Salud: "3",
   Sociales: "4",
   Humanas: "5",
-  "C. Superior": "20", // aceptamos ambas variantes
+  "C. Superior": "20", 
   "C.Superior": "20",
   Chepes: "22",
   "Villa Union": "26",
@@ -49,11 +48,8 @@ function Dependencias({ dependencias }) {
   return (
     <div className="flex flex-wrap gap-2">
       {displayedDependencias.map((nombre, index) => {
-        // Texto mostrado (solo cambiamos C. Superior -> C.Superior)
         const label =
           nombre === "C. Superior" ? "C.Superior" : String(nombre);
-
-        // Armado del link
         const id = nombreToId[nombre] ?? nombreToId[label] ?? "";
         const to =
           label.toLowerCase() === "todas" || !id
@@ -85,7 +81,6 @@ function Dependencias({ dependencias }) {
     </div>
   );
 }
-
 Dependencias.propTypes = {
   dependencias: PropTypes.array.isRequired,
 };

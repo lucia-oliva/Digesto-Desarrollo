@@ -1,27 +1,26 @@
+/* eslint-disable no-empty */
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { useFiltersContext } from "../context/FiltersContext";
 
 function buildNs({ scope, type, pathname, nsStrategy }) {
   if (nsStrategy === "byType") return `ns:${scope}:${type}`;
-  return `ns:${scope}:${type}:${pathname}`; // byPath (público)
+  return `ns:${scope}:${type}:${pathname}`; 
 }
 
 export function useNamespacedFilters({
   scope,
   type,
   initial = {},
-  // Público vs Admin
-  urlSync = false, // público: true | admin: false
-  nsStrategy = "byPath", // público: byPath | admin: byType
-  // Reset/persist
-  resetOnUnmount = false, // salir de la página → borra estado mem y storage (si se indica)
-  resetOnNsChange = false, // cambiar entidad (type) en la misma vista → reset
-  persist = false, // usar sessionStorage
-  clearStorageOnUnmount = false, // borrar clave en storage al desmontar
-  ignoreStorageIfNoQuery = false, // si NO hay ?query, no uses storage (default limpio)
-  requireQueryToPersist = false, // solo persistir si hay ?query
-  onHydrated, // callback(filtros) al hidratar
+  urlSync = false, 
+  nsStrategy = "byPath", 
+  resetOnUnmount = false, 
+  resetOnNsChange = false, 
+  persist = false, 
+  clearStorageOnUnmount = false, 
+  ignoreStorageIfNoQuery = false, 
+  requireQueryToPersist = false, 
+  onHydrated, 
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -37,12 +36,10 @@ export function useNamespacedFilters({
   const writingUrlRef = useRef(false);
   const lastSearchStringRef = useRef("");
 
-  // HIDRATACIÓN
+
   useEffect(() => {
     const STORAGE_KEY = `filters:${ns}`;
     const prevNs = prevNsRef.current;
-
-    // si cambia el namespace (ej. cambia la entidad), reset opcional del anterior
     if (prevNs && prevNs !== ns && resetOnNsChange) {
       ctx.reset(prevNs);
       try {
@@ -53,13 +50,10 @@ export function useNamespacedFilters({
 
     const hasQuery = location.search.length > 1;
     let base = { ...initial };
-
-    // prioridad de hidratación: URL → (opcional) storage → initial
     if (urlSync && hasQuery) {
       const fromUrl = Object.fromEntries([...params.entries()]);
       if (Object.keys(fromUrl).length) base = { ...base, ...fromUrl };
     } else if (persist && !(ignoreStorageIfNoQuery && !hasQuery)) {
-      // solo usamos storage si no nos pidieron ignorarlo por falta de query
       const raw = sessionStorage.getItem(STORAGE_KEY);
       if (raw) {
         try {
@@ -83,14 +77,10 @@ export function useNamespacedFilters({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ns]);
-
-  // PERSISTENCIA estado → storage + URL (público)
   useEffect(() => {
     const { filters } = ctx.get(ns);
     const STORAGE_KEY = `filters:${ns}`;
     const hasQuery = location.search.length > 1;
-
-    // persistencia condicionada
     if (persist && (!requireQueryToPersist || hasQuery)) {
       try {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
@@ -98,8 +88,6 @@ export function useNamespacedFilters({
     }
 
     if (!urlSync) return;
-
-    // evitar bucles por nuestro propio navigate
     if (writingUrlRef.current) {
       writingUrlRef.current = false;
       return;
@@ -118,12 +106,9 @@ export function useNamespacedFilters({
 
     writingUrlRef.current = true;
     lastSearchStringRef.current = nextStr;
-    // solo tocamos el search
     navigate({ search: nextStr ? `?${nextStr}` : "" }, { replace: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ctx.get(ns).filters, ns, urlSync, persist, requireQueryToPersist]);
-
-  // URL → estado (si la URL cambió “desde afuera”, ej. click en card o abrir nueva pestaña)
   useEffect(() => {
     if (!urlSync) return;
     if (writingUrlRef.current) {

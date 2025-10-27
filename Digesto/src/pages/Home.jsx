@@ -23,7 +23,6 @@ function Home() {
 
   return (
      <div className="overflow-x-hidden">
-      {/* Hero section */}
       <div
    className="hero min-h-screen bg-no-repeat bg-cover bg-center"
         style={{
@@ -54,7 +53,6 @@ function Home() {
       </div>
 
       <section className="flex flex-col gap-10 items-center mx-auto py-10 px-12 bg-base-100">
-        {/* Dependencias */}
         <Dependencias dependencias={[]} />
 
 

@@ -46,7 +46,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Imagen o presentación izquierda */}
       <div
         className="md:w-3/5 w-full bg-primary text-primary-content flex flex-col justify-center items-center px-10 py-12 relative"
         style={{
@@ -56,14 +55,11 @@ function Login() {
           backgroundPosition: "center",
         }}
       >
-        {/* Overlay oscuro */}
         <div
           className="absolute inset-0 bg-black opacity-50
 
  z-0"
         ></div>
-
-        {/* Contenido sobre la imagen */}
         <div className="p-10 text-center max-w-xl w-full relative z-10">
           <div className="mb-6">
             <div className="text-white flex justify-center font-bold text-3xl">
@@ -75,8 +71,6 @@ function Login() {
           </h1>
         </div>
       </div>
-
-      {/* Formulario derecho */}
       <div className="md:w-2/5 w-full bg-base-100 flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <h2 className="text-center text-3xl font-bold text-primary mb-6">

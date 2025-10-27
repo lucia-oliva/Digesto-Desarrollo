@@ -1,6 +1,5 @@
 import db from "./db.js";
 
-//crear una sesion
 
 async function create(data) {
   const { fecha_sesion, orden_url, nombre_orden } = data;
@@ -37,7 +36,6 @@ async function create(data) {
   }
 }
 
-//eliminar una sesion por id
 
 async function eliminar(id) {
   const sql = "DELETE FROM sesiones WHERE id_sesion = ?";
@@ -45,7 +43,6 @@ async function eliminar(id) {
   return results;
 }
 
-//traer una sesion por id
 
 async function getSesionById(id) {
   const sql =
