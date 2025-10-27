@@ -520,7 +520,6 @@ async function searchNormativaByParameters(
     
      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
    } else {
-  l
      if (!fechaOrder && visitasOrder) {
        clauses.push("n.fecha_normativa DESC");
      }
