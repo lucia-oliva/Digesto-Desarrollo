@@ -101,7 +101,7 @@ router.post(
 router.post(
   "/searchEliminadas",
   asyncHandler(async (req, res) => {
-    const { numero, emisor, documento, anio, tags } = req.body;
+    const { numero, emisor, documento, anio, tags,fechaOrder,visitasOrder } = req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
 
@@ -114,7 +114,9 @@ router.post(
         anio,
         limite,
         offset,
-        tags
+        tags,
+        fechaOrder,
+        visitasOrder
       );
 
     res.status(200).json({ ok: true, data: data || [], totalResults });
@@ -124,7 +126,7 @@ router.post(
 router.post(
   "/searchDespublicadas",
   asyncHandler(async (req, res) => {
-    const { numero, emisor, documento, anio, tags } = req.body;
+    const { numero, emisor, documento, anio, tags, fechaOrder, visitasOrder } = req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
 
@@ -137,7 +139,9 @@ router.post(
         anio,
         limite,
         offset,
-        tags
+        tags,
+        fechaOrder,
+        visitasOrder
       );
 
     res.status(200).json({ ok: true, data: data || [], totalResults });

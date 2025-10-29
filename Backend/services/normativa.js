@@ -549,7 +549,9 @@ async function searchNormativaEliminadaByParameters(
   anio,
   limite = null,
   offset = null,
-  tags
+  tags,
+  fechaOrder,
+  visitasOrder
 ) {
   try {
     let sql = `
@@ -599,6 +601,24 @@ async function searchNormativaEliminadaByParameters(
     }
 
     sql += " GROUP BY n.id";
+    const clauses = [];
+    const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
+    if(fechaOrder){
+      clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
+    }
+    if(visitasOrder){
+      clauses.push(`n.visitas ${normDir(visitasOrder)}`);
+    }
+
+    if(clauses.length === 0){
+      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+    }else{
+      if(!fechaOrder && visitasOrder){
+        clauses.push("n.fecha_normativa DESC");
+      }
+      clauses.push("n.id DESC");
+      sql += " ORDER BY " + clauses.join(", ");
+    }
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);
@@ -781,7 +801,9 @@ async function searchNormativaDespublicadasByParameters(
   anio,
   limite = null,
   offset = null,
-  tags
+  tags,
+  fechaOrder,
+  visitasOrder
 ) {
   try {
     let sql = `
@@ -832,7 +854,23 @@ async function searchNormativaDespublicadasByParameters(
     }
 
     sql += " GROUP BY n.id";
-
+    const clauses = [];
+    const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
+    if(fechaOrder){
+      clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
+    }
+    if(visitasOrder){
+      clauses.push(`n.visitas ${normDir(visitasOrder)}`);
+    }
+    if(clauses.length === 0){
+      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+    }else{
+      if(!fechaOrder && visitasOrder){
+        clauses.push("n.fecha_normativa DESC");
+      }
+      clauses.push("n.id DESC");
+      sql += " ORDER BY " + clauses.join(", ");
+    }
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);
