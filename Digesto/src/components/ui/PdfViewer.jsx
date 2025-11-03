@@ -3,6 +3,10 @@ import { useEffect } from "react";
 import { Alert, Loading } from "components/ui/Ui";
 import propTypes from "prop-types";
 import { API_BASE } from "../../api/axiosPrivate";
+import { Viewer } from "@react-pdf-viewer/core";
+import {defaultLayoutPlugin} from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
   const [{ data, loading, error }, fetchPdf] = useAxios(
@@ -13,6 +17,9 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
     },
     { manual: true }
   );
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
   useEffect(() => {
     if (!filename) return;
 
@@ -24,6 +31,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
       console.error(error.message);
     });
   }, [ filename, fetchPdf]);
+  
   useEffect(() => {
     if (data) {
       const blobUrl = URL.createObjectURL(
@@ -46,13 +54,9 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
         />
       )}
       {pdfUrl && (
-        <iframe
-          src={pdfUrl}
-          width="100%"
-          height="100%"
-          title="PDF"
-          className="w-full h-[100vh] block bg-base-300"
-        />
+        <Viewer 
+        fileUrl={pdfUrl}
+        plugins={[defaultLayoutPluginInstance]} />
       )}
     </div>
   );
