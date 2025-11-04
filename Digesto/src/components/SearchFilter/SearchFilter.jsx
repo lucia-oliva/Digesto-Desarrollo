@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from "react";
 import AlphabetFilter from "./AlphabetFilter";
 import { filterConfig } from "./configFilters";
@@ -83,12 +84,12 @@ function FieldRenderer({ field, value, onChange }) {
 
   if (type === "text") {
     return (
-      <div className="form-control">
-        <label className="label">
+      <div className="flex flex-col">
+        <label className="mb-1 font-medium max-[426px]:text-xs">
           <span className="label-text">{label}</span>
         </label>
         <input
-          className="input input-bordered"
+          className="input input-bordered max-[426px]:input-sm w-full"
           value={value ?? ""}
           onChange={(e) => onChange(name, e.target.value)}
           placeholder={label}
@@ -99,12 +100,12 @@ function FieldRenderer({ field, value, onChange }) {
 
   if (type === "select") {
     return (
-      <div className="form-control">
-        <label className="label">
+      <div className="flex flex-col">
+        <label className="mb-1 font-medium max-[426px]:text-xs">
           <span className="label-text">{label}</span>
         </label>
         <select
-          className="select select-bordered"
+          className="select select-bordered max-[425px]:select-sm w-full"
           value={value ?? ""}
           onChange={(e) => onChange(name, e.target.value)}
           disabled={field?.async && asyncLoading}
@@ -166,8 +167,17 @@ export default function GenericFilterSearch({
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <div className="grid gap-3 sm:grid-cols-3">
+     <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
+      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
+       {hasLetter && (
+        <div className="mt-3 mb-4">
+          <AlphabetFilter
+            value={formState.letra || ""}
+            onChange={handleLetterSelect}
+          />
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {fields
           .filter((f) => f.type !== "custom")
           .map((field) => (
@@ -178,8 +188,8 @@ export default function GenericFilterSearch({
               onChange={handleInput}
             />
           ))}
-        <div className="form-control justify-end">
-          <button className="btn btn-primary" onClick={handleBuscar}>
+        <div className="flex items-end">
+          <button className="btn btn-primary w-full" onClick={handleBuscar}>
             Buscar
           </button>
         </div>
