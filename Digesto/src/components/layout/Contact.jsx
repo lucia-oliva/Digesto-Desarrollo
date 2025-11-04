@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
 import { API_BASE } from "../../api/axiosPrivate";
+import {Alert} from "../ui/Ui";
 
 export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const modalRef = useRef(null);
@@ -15,6 +16,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [nombreDependencia, setNombreDependencia] = useState("");
+  const [alertData, setAlertData] = useState(null);
 
   const dependenciaEmails = {
     Exactas: "lucia222lr@gmail.com",
@@ -51,6 +53,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
     if (modalRef.current && event.target === modalRef.current) {
       setIsModalOpen(false);
       setSuccess(false);
+      setAlertData(null);
     }
   };
 
@@ -78,11 +81,19 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
           setIsModalOpen(false);
         }, 3000);
       } else {
-        alert("Hubo un error al enviar el mensaje.");
+        setAlertData({
+          title: "Error",
+          message: "Hubo un error al enviar el mensaje.",
+          error: true,
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("No se pudo conectar con el servidor.");
+      setAlertData({
+        title: "Error de conexion",
+        message: "No se puede conectar con el servidor",
+        error: true
+      })
     } finally {
       setIsLoading(false);
     }
@@ -162,8 +173,18 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
                   <span className="loading loading-dots loading-md"></span>
                 ) : (
                   "Enviar"
-                )}
+                )}    
               </button>
+               {alertData && (
+            <div className="mt-3 flex justify-center">
+              <Alert
+                title={alertData.title}
+                message={alertData.message}
+                error={alertData.error}
+                duration={4000}
+              />
+            </div>
+          )}
             </form>
           )}
         </div>

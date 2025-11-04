@@ -44,14 +44,16 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
   }, [data, setPdfUrl]);
 
   return (
-    <div>
+    <div className="h-full">
       {loading && <Loading />}
       {error && (
+        <div className="h-full flex items-center justify-center">
         <Alert
         title="No se encontro el documento "
         message={error.message}
           error={false}
         />
+        </div>
       )}
       {pdfUrl && (
         <Viewer 

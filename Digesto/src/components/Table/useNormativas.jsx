@@ -18,8 +18,7 @@ import { useAuth } from "../../context/useAuth";
  */
 
 export const useNormativas = (type, filtros, options = {}) => {
-  const { ns = `ns:admin:${type}`, pageSize = 6 } = options;
-
+  const { ns = `ns:admin:${type}`, pageSize = 6, confirmFn } = options;
   const { auth } = useAuth();
   const user = auth?.user;
   const navigate = useNavigate();
@@ -137,7 +136,6 @@ export const useNormativas = (type, filtros, options = {}) => {
       setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
     } catch (err) {
       if (requestSeqRef.current !== mySeq) return;
-
       const msg =
         err?.response?.data?.error ||
         err?.message ||
@@ -154,7 +152,7 @@ export const useNormativas = (type, filtros, options = {}) => {
   };
 
   const onPageChange = (newPage) => setPage(newPage);
-
+  
   const onEdit = (item) => {
     const rutaEntidad = nombreRutaPorEntidad[type] || type;
     if (rutaEntidad === "Sesion") {
@@ -176,8 +174,14 @@ export const useNormativas = (type, filtros, options = {}) => {
         : type === "emisores"
         ? "¿Eliminar Emisor?"
         : "¿Eliminar normativa?";
+    let autorizado = true;
+    if (typeof confirmFn === "function") {
+      autorizado = await confirmFn("Confirmar eliminación", msg);
+    } else {
+      autorizado = window.confirm(msg);
+    }
 
-    if (!window.confirm(msg)) return;
+    if (!autorizado) return;
 
     const idParaBorrar = item.id || item.id_sesion;
     const shouldGoBack =
@@ -186,7 +190,6 @@ export const useNormativas = (type, filtros, options = {}) => {
     try {
       setLoading(true);
       const response = await deleteApi(idParaBorrar, type, user?.id);
-
       const ok =
         (typeof response?.ok === "boolean" && response.ok) ||
         (typeof response?.status === "number" &&
@@ -194,19 +197,15 @@ export const useNormativas = (type, filtros, options = {}) => {
           response.status < 300) ||
         response?.data?.success === true ||
         response?.success === true;
-
       if (!ok) throw new Error("No se pudo eliminar");
-
       if (shouldGoBack) {
         setPage((p) => Math.max(1, p - 1)); 
       } else {
         await loadNormativas(page); 
       }
-
-      alert("Se eliminó correctamente");
     } catch (err) {
       console.error("[DELETE] ERROR:", err);
-      setError("Error al eliminar la normativa");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -226,5 +225,7 @@ export const useNormativas = (type, filtros, options = {}) => {
     onEdit,
     onDelete,
     reload,
+    ns,
+    emptyMessage
   };
 };

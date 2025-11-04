@@ -12,11 +12,10 @@ import { useReferencias } from "../../../context/referenciasContext.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
 import { API_BASE } from "../../../api/axiosPrivate.js";
+import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericEdit() {
-
-
-  
+  const [alertData, setAlertData] = useState(null);
   const navigate = useNavigate();
   const { auth } = useAuth();
   const user = auth.user;
@@ -33,25 +32,19 @@ function GenericEdit() {
     );
     return hit ? String(hit.id ?? hit.value ?? "") : "";
   };
-
-
   const location = useLocation();
   const { id } = useParams();
 
   const pathSegment = location.pathname
     .split("/")
     .find((s) => s.startsWith("Editar") || s.startsWith("Nuevo"));
-
   const entidad = pathSegment
     ? pathSegment.replace("Editar", "").replace("Nuevo", "").toLowerCase()
     : null;
-
   const pasos = flujoPorEntidad[entidad] || [];
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(null);
   const [errores, setErrores] = useState({});
-
-
 
   useEffect(() => {
     setCurrentStep(0);
@@ -69,9 +62,14 @@ function GenericEdit() {
         })
         .then((data) => {
           if (!data) {
-            alert("No se encontraron datos para editar.");
+            setAlertData({
+              id: Date.now(),
+              title: "Error",
+              message: "No se encontraron datos para editar",
+              error: true
+            })
           } 
-else if (entidad === "normativa") {
+      else if (entidad === "normativa") {
              setFormData({
                ...data,
               emisor: findIdByNameOrId(emisores, data.id_emisor ?? data.emisor),
@@ -98,11 +96,15 @@ else if (entidad === "normativa") {
             });
           }
         })
-        .catch(() => alert("Error al cargar los datos para editar"));
+        .catch(() => 
+          setAlertData({
+            id: Date.now(),
+            title:"Error",
+            message: "Error al cargar los datos para editar",
+            error: true
+          })
+      );
     }
-
-
-    
   }, [entidad, id, dependencias,emisores]);
 
  useEffect(() => {
@@ -122,8 +124,6 @@ else if (entidad === "normativa") {
    }
    
  }, [dependencias, emisores, entidad, formData]); 
-
-
    const handleNext = () =>
    setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
    const handleBack = () =>
@@ -132,7 +132,12 @@ else if (entidad === "normativa") {
 
   const handleSubmit = () => {
     if (!formData || !formData.id) {
-      alert("Faltan datos clave para editar.");
+      setAlertData({
+        id: Date.now(),
+        title: "No se pudo editar",
+        message: "Faltan datos clave para editar",
+        error: true
+      })
       return;
     }
   const safeDep  = findIdByNameOrId(dependencias, formData.dependencia);
@@ -164,8 +169,7 @@ else if (entidad === "normativa") {
         : typeof formClean.archivo === "string"
         ? formClean.archivo
         : "";
-
-    
+ 
   const safeForm = {
     ...formClean,
     dependencia: safeDep,
@@ -186,7 +190,6 @@ else if (entidad === "normativa") {
         ? formData.password.trim()
         : null;
     }
-
     fetch(`${API_BASE}/${ruta}/edit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -195,9 +198,6 @@ else if (entidad === "normativa") {
       .then((res) => res.json())
       .then((data) => {
         console.log(`[POST] /api/${ruta}/edit =>`, data);
-        console.log("FORMDATAAAAAAAAAAAAAA:", formData);
-        console.log("DataTOSEND", dataToSend);
-
         if (
           entidad === "normativa" &&
           formData.archivo instanceof File &&
@@ -217,28 +217,61 @@ else if (entidad === "normativa") {
             body: formDataUpload,
           })
             .then((resUpload) => {
-              if (!resUpload.ok) throw new Error("Error al subir archivo PDF.");
+              if (!resUpload.ok) throw new Error("Error al subir archivo PDF");
               return resUpload.json();
             })
             .then((resJson) => {
               console.log("Resultado de subida de archivo:", resJson);
-              alert(`Entidad ${entidad} editada correctamente.`);
-            });
+              setAlertData({
+                id: Date.now(),
+                title: "Exito",
+                message: `Entidad ${entidad} editada correctamente.`,
+                error: false
+              })
+            }).catch((err) =>{
+              console.error(err);
+              setAlertData({
+                id: Date.now(),
+                title: "Error",
+                message: "Error al subir archivo PDF",
+                error: true
+              })
+            })
         }
         setFormData({});
         setErrores({});
-        if (entidad === "palabraclave") {
-          navigate(`/admin/ListadoPalabrasClave`);
-        } else if (entidad === "emisor") {
-          navigate(`/admin/ListadoEmisores`);
-        } else if (entidad === "dependencia") {
-          navigate(`/admin/ListadoDependencias`);
+
+        const successAlert ={
+          id: Date.now(),
+          title: "Exito",
+          message: `Los datos se actualizaron correctamente.`,
+          error: false,
+          duration: 4000
         }
-        alert(`Entidad ${entidad} editada correctamente.`);
+
+        if (entidad === "palabraclave") {
+          navigate(`/admin/ListadoPalabrasClave`, {
+            state: { alert: successAlert },
+          });
+        } else if (entidad === "emisor") {
+           navigate(`/admin/ListadoEmisores`, {
+            state: { alert: successAlert },
+          });
+        } else if (entidad === "dependencia") {
+            navigate(`/admin/ListadoDependencias`, {
+            state: { alert: successAlert },
+          });
+        } else if (entidad === "normativa") {
+          navigate(`/admin/ListadoNormativa`, {
+            state: { alert: successAlert },
+          });
+        } else if (entidad === "usuario") {
+          navigate(`/admin/ListadoUsuarios`, {
+            state: { alert: successAlert },
+          });
+        }
       });
   };
-
-  
   const renderPaso = () => {
     if (!formData) return <p className="text-center">Cargando datos...</p>;
 
@@ -298,12 +331,20 @@ else if (entidad === "normativa") {
       default:
         return <p>No hay pasos configurados para esta entidad.</p>;
     }
-  };
-
-
-  
+  };  
   return (
     <div className="w-full rounded-lg text-neutral">
+       {alertData && (
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
+          <Alert
+            key={alertData.id}
+            title={alertData.title}
+            message={alertData.message}
+            error={alertData.error}
+            duration={4000}
+          />
+        </div>
+      )}
       <h2 className="text-xl font-semibold mb-4 text-center">
         Editar{" "}
         {entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""}
@@ -335,5 +376,4 @@ else if (entidad === "normativa") {
     </div>
   );
 }
-
 export default GenericEdit;

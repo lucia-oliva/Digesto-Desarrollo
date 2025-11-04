@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
-
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
 import { useNormativas } from "./useNormativas";
@@ -12,6 +11,8 @@ import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi, cambiarEstadoUsuario } from "./NormativaApi";
 import { useReferencias } from "../../context/referenciasContext";
 import { useTablaOrden } from "./useTablaOrden";
+import {Alert} from "../ui/Ui";
+import { useConfirm } from "../../hooks/useConfirm";
 
 const NormativaTable = ({
   type,
@@ -34,7 +35,7 @@ const NormativaTable = ({
       tipoUser === "Administrador de Dependencia") &&
     depName === "Consejo Superior";
   const { dependencias } = useReferencias();
-
+  const { confirm, ConfirmUI } = useConfirm();
   const depOptions = useMemo(() => {
     const list = Array.isArray(dependencias) ? dependencias : [];
     return list.map((d) => ({
@@ -58,11 +59,17 @@ const NormativaTable = ({
   const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
   const isNuevaNormativa = /^\/admin\/NuevaNormativa$/i.test(path);
   const isConsejo = path.startsWith("/consejo-superior/normativas");
-
+  const [alertData, setAlertData] = useState(location.state?.alert || null);
   const scope = isAdminRoute ? "admin" : "public";
   const ns = isAdminRoute
     ? `ns:${scope}:${type}`
     : nsKey({ scope, type, pathname: path });
+
+     useEffect(() => {
+    if (location.state?.alert) {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   const effectiveModo =
     modo ??
@@ -127,7 +134,7 @@ const NormativaTable = ({
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtrosConOrden, { ns });
+  } = useNormativas(tipo, filtrosConOrden, { ns, confirmFn:(title,message) =>confirm(title,message)});
 
   const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
   const normativas = usingStatic ? dataOverride : hookNormativas;
@@ -255,12 +262,13 @@ const NormativaTable = ({
                   const ahora = String(item?.estado || "").toLowerCase();
                   const nuevo = ahora === "activo" ? "inactivo" : "activo";
 
-                  const confirmar = window.confirm(
+                  const ok = await confirm(
+                    "Confirmar acción",
                     ahora === "activo"
                       ? "¿Desactivar este usuario? No podrá iniciar sesión."
                       : "¿Activar este usuario? Podrá iniciar sesión."
                   );
-                  if (!confirmar) return;
+                  if (!ok) return;
 
                   try {
                     const resp = await cambiarEstadoUsuario(item.id, nuevo);
@@ -271,7 +279,12 @@ const NormativaTable = ({
                     reload();
                   } catch (e) {
                     console.error(e);
-                    alert("Error al cambiar el estado del usuario.");
+                    setAlertData({
+                      id: Date.now(),
+                      title: "Error",
+                      message: "Error al cambiar el estado del usuario.",
+                      error: true,
+                  });
                   }
                 },
               });
@@ -282,12 +295,11 @@ const NormativaTable = ({
                 {
                   label: "Restaurar",
                   onClick: async (item) => {
-                    if (
-                      !window.confirm(
-                        "¿Restaurar la normativa? Volverá a normativas despublicadas."
-                      )
-                    )
-                      return;
+                    const ok = await confirm(
+                      "Restaurar normativa",
+                      "¿Restaurar la normativa? Volverá a normativas despublicadas."
+                    );
+                    if (!ok) return;
                     try {
                       const data = await restoreApi(item.id, user?.id);
                       if (!data?.ok && !data?.success) {
@@ -298,7 +310,12 @@ const NormativaTable = ({
                       reload();
                     } catch (e) {
                       console.error(e);
-                      alert("Error al restaurar la normativa");
+                      setAlertData({
+                        id: Date.now(),
+                        title: "Error",
+                        message: "Error al restaurar la normativa",
+                        error: true,
+                      });
                     }
                   },
                   type: "secondary",
@@ -316,12 +333,11 @@ const NormativaTable = ({
                 {
                   label: "Publicar",
                   onClick: async (item) => {
-                    if (
-                      !window.confirm(
-                        "¿Publicar la normativa? Volverá a normativas publicadas."
-                      )
-                    )
-                      return;
+                    const ok = await confirm(
+                      "Publicar normativa",
+                      "¿Publicar la normativa? Volverá a normativas publicadas."
+                    );
+                    if (!ok) return;
                     try {
                       const data = await publicarApi(item.id, user?.id);
                       if (!data?.ok && !data?.success) {
@@ -330,7 +346,12 @@ const NormativaTable = ({
                       reload();
                     } catch (e) {
                       console.error(e);
-                      alert("Error al re-publicar la normativa");
+                       setAlertData({
+                        id: Date.now(),
+                        title: "Error",
+                        message: "Error al re-publicar la normativa",
+                        error: true,
+                      });
                     }
                   },
                   type: "secondary",
@@ -364,6 +385,7 @@ const NormativaTable = ({
         })();
 
   return (
+    <>
     <GenericTable
       data={normativas}
       columns={filteredColumns}
@@ -373,6 +395,19 @@ const NormativaTable = ({
         : {})}
       headerProps={headerProps}
     />
+     {alertData && (
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
+          <Alert
+            key={alertData.id}
+            title={alertData.title}
+            message={alertData.message}
+            error={alertData.error}
+            duration={alertData.duration || 4000}
+          />
+        </div>
+      )}
+      {ConfirmUI}
+  </>
   );
 };
 

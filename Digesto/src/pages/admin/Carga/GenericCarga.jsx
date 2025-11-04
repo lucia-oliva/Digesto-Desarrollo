@@ -8,6 +8,7 @@ import { flujoPorEntidad } from "./config/flujoSteps.js";
 import { getRuta } from "./config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
 import { API_BASE } from "../../../api/axiosPrivate.js";
+import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericCarga() {
   const { auth } = useAuth();
@@ -19,7 +20,7 @@ function GenericCarga() {
   const entidad = pathSegment
     ? pathSegment.replace("Nueva", "").replace("Nuevo", "").toLowerCase()
     : null;
-
+  const [alertData, setAlertData] = useState(null);
   const pasos = flujoPorEntidad[entidad] || [];
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({});
@@ -83,22 +84,35 @@ function GenericCarga() {
             console.log("Resultado de subida de archivo:", resJson);
 
             if (!resUpload.ok) {
-              alert("Error al subir archivo PDF");
+                setAlertData({
+                  id: Date.now(),
+                  title: "Error",
+                  message:"Error al subir PDF",
+                  error: true
+                });
+              
             }
-          }
-
-        
+          }        
           setFormData({});
           setErrores({});
           setCurrentStep(0);
-          alert(
-            `${
-              entidad.charAt(0).toUpperCase() + entidad.slice(1)
-            } creado/a correctamente`
-          );
+          setAlertData({
+            id: Date.now(),
+            title: "Exito",
+            message: `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
+            error: false
+
+          })
         })
-        .catch(() => alert("Error al crear registro"));
-    } catch (err) {
+        .catch(() => 
+          setAlertData({
+            id: Date.now(),
+            title: "Error",
+            message: "Error al crear registro",
+            error: true,
+          })
+      );
+      }catch (err) {
       console.log("Error al serializar JSON:", err);
     }
   };
@@ -155,6 +169,17 @@ function GenericCarga() {
 
   return (
     <div className="w-full rounded-lg text-neutral">
+       {alertData && (
+        <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
+          <Alert
+            key={alertData.id}
+            title={alertData.title}
+            message={alertData.message}
+            error={alertData.error}
+            duration={4000}
+          />
+        </div>
+      )}
       <h2 className="text-xl font-semibold mb-4 text-center">
         {entidad === "palabraclave"
           ? "Crear Palabra Clave"
@@ -162,7 +187,6 @@ function GenericCarga() {
               entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""
             }`}
       </h2>
-      {/* Steps visuales*/}
       <div className="w-full flex justify-center mb-4 sm:mb-6">
         <ul className=" z-0 steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
           {pasos.map((paso, i) => {

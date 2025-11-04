@@ -202,3 +202,7 @@
     margin: 0;
   }
 }
+
+.rpv-default-layout__toolbar {
+  z-index: 0 !important;
+}
