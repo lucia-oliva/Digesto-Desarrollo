@@ -73,6 +73,9 @@ export const searchNormativasDespublicadas = async (page, limit, type, filtros={
 export const deleteApi = async (id,type,userId) => {
   try {
     console.log(id , type, userId);
+    if(type==="normativaDespublicadas"){
+      type="normativa"
+    }
     const response = await fetch(`${API_BASE}/${type}/eliminar/${id}`, {
       method: "DELETE",
       headers: {

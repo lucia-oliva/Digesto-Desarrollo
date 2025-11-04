@@ -160,6 +160,9 @@ export const useNormativas = (type, filtros, options = {}) => {
       navigate(`/consejo-superior/Editar${rutaEntidad}/${id}`);
     } else {
       navigate(`/admin/Editar${rutaEntidad}/${item.id}`);
+      if(rutaEntidad === "normativaDespublicadas" || rutaEntidad === "normativasEliminadas"){
+        navigate(`/admin/EditarNormativa/${item.id}`);
+      }
     }
   };
 
