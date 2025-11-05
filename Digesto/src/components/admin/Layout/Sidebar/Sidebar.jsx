@@ -6,12 +6,15 @@ import { useAuth } from "../../../../context/useAuth";
 import { FaLock } from "react-icons/fa6";
 
 export default function Sidebar() {
-
   const { auth } = useAuth();
   const rol = auth.user?.tipo_usuario || {};
   const [openSection, setOpenSection] = useState(null);
   const { pathname } = useLocation();
-  const itemPath = pathname.split("/").slice(1, 3).join("/").replace("admin", ".");
+  const itemPath = pathname
+    .split("/")
+    .slice(1, 3)
+    .join("/")
+    .replace("admin", ".");
 
   function canAccess(roles) {
     if (!roles) {
@@ -35,14 +38,11 @@ export default function Sidebar() {
       className="menu bg-primary text-base-100 font-[Montserrat] justify-around p-4 w-3/4 sm:w-1/2 md:w-1/4 lg:w-52 min-h-full"
       onClick={(e) => e.stopPropagation()}
     >
-    
       <Link to="/admin" className="mb-4 text-xl font-bold">
         Digesto UNLaR
       </Link>
 
-      
       {menuItems.map((item) => {
-        
         const hasChildren = Array.isArray(item.children);
         const isOpen = openSection === item.title;
         const itemDisabled = !canAccess(item.roles);
@@ -103,7 +103,6 @@ export default function Sidebar() {
               )}
             </button>
 
-          
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
