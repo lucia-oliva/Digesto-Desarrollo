@@ -1,7 +1,7 @@
 import api from "./axiosPrivate";
 
-const inflight = new Map(); 
-const latestReq = new Map(); 
+const inflight = new Map();
+const latestReq = new Map();
 
 export async function getWithCancel(ns, url, { params } = {}) {
   const prev = inflight.get(ns);

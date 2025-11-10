@@ -8,7 +8,7 @@ export default function Navbar() {
   const pageTitle = routeTitles[fullPath] || "Digesto - Administración";
   return (
     <div className="navbar bg-base-100 shadow-md px-4">
-      <div className="flex-1 not-lg:pl-14">
+      <div className="flex-1 not-xl:pl-14">
         <h1 className="text-lg font-semibold text-primary">{pageTitle}</h1>{" "}
       </div>
       <div className="flex-none">
@@ -20,7 +20,7 @@ export default function Navbar() {
             tabIndex={0}
             className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 border-t-1 border-t-gray-300"
           >
-            <li >
+            <li>
               <Link to="./logout">Cerrar sesión</Link>
             </li>
           </ul>

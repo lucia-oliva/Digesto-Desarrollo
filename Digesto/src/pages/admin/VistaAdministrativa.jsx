@@ -6,27 +6,24 @@ import { getWithCancel } from "../../api/cancellable";
 
 function VistaAdministrativa() {
   const location = useLocation();
-  const type = location.pathname.split("/")[2]; 
-  const scope = "admin";
+  const type = location.pathname.split("/")[2];
   const modo = "admin";
 
   const { ns, state, setFilters } = useNamespacedFilters({
     scope: "admin",
-    type, 
+    type,
     initial: {},
     urlSync: false,
-    nsStrategy: "byType", 
+    nsStrategy: "byType",
     persist: false,
-    resetOnUnmount: false, 
-    resetOnNsChange: true, 
+    resetOnUnmount: false,
+    resetOnNsChange: true,
     onHydrated: (f) => void fetchData(f),
   });
 
   async function fetchData(filtros) {
-    
-    const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
+    const res = await getWithCancel(ns, "/normativas", { params: filtros });
     if (res?.cancelled) return;
-    
   }
 
   const handleSearch = (formData) => {
@@ -40,7 +37,7 @@ function VistaAdministrativa() {
       <GenericFilterSearch
         type={type}
         scope="admin"
-        initialState={state.filters} 
+        initialState={state.filters}
         autoSearch
         onSearch={handleSearch}
       />

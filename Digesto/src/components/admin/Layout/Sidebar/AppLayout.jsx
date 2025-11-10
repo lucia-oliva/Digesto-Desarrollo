@@ -4,11 +4,11 @@ import Navbar from "./Navbar";
 
 export default function AdminLayout() {
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer xl:drawer-open">
       <input id="drawer-sidebar" type="checkbox" className="drawer-toggle" />
       <label
         htmlFor="drawer-sidebar"
-        className="btn btn-primary fixed top-4 left-4 z-50 drawer-button lg:hidden"
+        className="btn btn-primary fixed top-4 left-4 z-50 drawer-button xl:hidden"
       >
         ☰
       </label>

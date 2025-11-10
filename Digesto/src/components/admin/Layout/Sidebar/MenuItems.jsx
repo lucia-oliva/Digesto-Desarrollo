@@ -24,7 +24,7 @@ export const menuItems = [
         path: "./ListadoNormativaDespublicadas",
       },
     ],
-    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "Administrador de Dependencia"],
   },
   {
     title: "Usuarios",
@@ -66,12 +66,12 @@ export const menuItems = [
       { name: "Nueva Palabra", path: "./NuevaPalabraClave" },
       { name: "Listado Palabras", path: "./ListadoPalabrasClave" },
     ],
-    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "Administrador de Dependencia"],
   },
   {
     title: "Consejo Superior",
     path: "../consejo-superior",
     icon: <FaBuildingColumns className="text-2lg" />,
-    roles: ["SuperAdministrador", "Supervisor", "administradordependencia"],
+    roles: ["SuperAdministrador", "Supervisor", "Administrador de Dependencia"],
   },
 ];

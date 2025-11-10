@@ -11,7 +11,7 @@ import { useAuth } from "../../context/useAuth";
 import { restoreApi, publicarApi, cambiarEstadoUsuario } from "./NormativaApi";
 import { useReferencias } from "../../context/referenciasContext";
 import { useTablaOrden } from "./useTablaOrden";
-import {Alert} from "../ui/Ui";
+import { Alert } from "../ui/Ui";
 import { useConfirm } from "../../hooks/useConfirm";
 
 const NormativaTable = ({
@@ -65,7 +65,7 @@ const NormativaTable = ({
     ? `ns:${scope}:${type}`
     : nsKey({ scope, type, pathname: path });
 
-     useEffect(() => {
+  useEffect(() => {
     if (location.state?.alert) {
       navigate(location.pathname, { replace: true });
     }
@@ -118,8 +118,8 @@ const NormativaTable = ({
 
   const { filtrosEfectivos: filtrosConOrden, headerProps } = useTablaOrden({
     effectiveModo,
-    filtros: filtrosEfectivos, 
-    filteredColumns, 
+    filtros: filtrosEfectivos,
+    filteredColumns,
     isAdminRoute,
     isSuperAdmin,
     userDepId,
@@ -134,7 +134,10 @@ const NormativaTable = ({
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtrosConOrden, { ns, confirmFn:(title,message) =>confirm(title,message)});
+  } = useNormativas(tipo, filtrosConOrden, {
+    ns,
+    confirmFn: (title, message) => confirm(title, message),
+  });
 
   const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
   const normativas = usingStatic ? dataOverride : hookNormativas;
@@ -284,7 +287,7 @@ const NormativaTable = ({
                       title: "Error",
                       message: "Error al cambiar el estado del usuario.",
                       error: true,
-                  });
+                    });
                   }
                 },
               });
@@ -330,7 +333,18 @@ const NormativaTable = ({
               );
             } else if (tipo === "normativaDespublicadas") {
               base.push(
+                { label: "Editar", onClick: onEdit, type: "primary" },
+                { label: "Eliminar", onClick: onDelete, type: "error" },
                 {
+                  label: "Ver Normativa",
+                  onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+                  type: "primary",
+                  className: "btn btn-info",
+                }
+              );
+
+              if (user?.role == "Administrador de Dependencia") {
+                base.unshift({
                   label: "Publicar",
                   onClick: async (item) => {
                     const ok = await confirm(
@@ -346,7 +360,7 @@ const NormativaTable = ({
                       reload();
                     } catch (e) {
                       console.error(e);
-                       setAlertData({
+                      setAlertData({
                         id: Date.now(),
                         title: "Error",
                         message: "Error al re-publicar la normativa",
@@ -355,16 +369,8 @@ const NormativaTable = ({
                     }
                   },
                   type: "secondary",
-                },
-                { label: "Editar", onClick: onEdit, type: "primary" },
-                { label: "Eliminar", onClick: onDelete, type: "error" },
-                {
-                  label: "Ver Normativa",
-                  onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
-                  type: "primary",
-                  className: "btn btn-info",
-                }
-              );
+                });
+              }
             } else {
               base.push(
                 { label: "Editar", onClick: onEdit, type: "secondary" },
@@ -386,16 +392,16 @@ const NormativaTable = ({
 
   return (
     <>
-    <GenericTable
-      data={normativas}
-      columns={filteredColumns}
-      actions={actions}
-      {...(!(usingStatic || hidePagination)
-        ? { page, totalPages, onPageChange }
-        : {})}
-      headerProps={headerProps}
-    />
-     {alertData && (
+      <GenericTable
+        data={normativas}
+        columns={filteredColumns}
+        actions={actions}
+        {...(!(usingStatic || hidePagination)
+          ? { page, totalPages, onPageChange }
+          : {})}
+        headerProps={headerProps}
+      />
+      {alertData && (
         <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
           <Alert
             key={alertData.id}
@@ -407,7 +413,7 @@ const NormativaTable = ({
         </div>
       )}
       {ConfirmUI}
-  </>
+    </>
   );
 };
 

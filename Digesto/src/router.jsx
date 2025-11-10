@@ -22,6 +22,7 @@ import ConsejoInicio from "./pages/consejo-superior/ConsejoInicio.jsx";
 import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
 import AgregarSesion from "./pages/consejo-superior/Sesiones/AgregarSesion.jsx";
 import EditarSesion from "./pages/consejo-superior/Sesiones/EditarSesion.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const Router = () => {
   return (
@@ -34,7 +35,10 @@ const Router = () => {
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
             <Route index element={<ConsejoInicio />} />
-            <Route path="document/:id" element={<DocumentView variant="consejo"/>} />
+            <Route
+              path="document/:id"
+              element={<DocumentView variant="consejo" />}
+            />
             <Route path="normativas" element={<ConsejoNormativas />} />
             <Route path="sesiones" element={<ConsejoSesiones />} />
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
@@ -47,6 +51,8 @@ const Router = () => {
           </Route>
         </Route>
 
+        <Route path="*" element={<NotFound />} />
+
         <Route element={<RouteGuard mode="guest" />}>
           <Route path="/login" element={<Login />} />
         </Route>
@@ -57,8 +63,14 @@ const Router = () => {
             <Route path="logout" element={<Logout />} />
             <Route path="usuario" element={<EditarUsuario />} />
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
-            <Route path="ListadoNormativaEliminadas" element={<VistaAdministrativa />} />
-             <Route path="ListadoNormativaDespublicadas" element={<VistaAdministrativa />} />
+            <Route
+              path="ListadoNormativaEliminadas"
+              element={<VistaAdministrativa />}
+            />
+            <Route
+              path="ListadoNormativaDespublicadas"
+              element={<VistaAdministrativa />}
+            />
             <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
             <Route path="ListadoAuditoria" element={<VistaAdministrativa />} />
             <Route
@@ -80,7 +92,11 @@ const Router = () => {
             <Route path="EditarEmisor/:id" element={<GenericEdit />} />
             <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route path="EditarPalabraClave/:id" element={<GenericEdit />} />
-            <Route path="document/:id" element={<DocumentView variant="admin"/>} />
+            <Route
+              path="document/:id"
+              element={<DocumentView variant="admin" />}
+            />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
       </Routes>
