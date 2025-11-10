@@ -40,8 +40,9 @@ function useAsyncOptions(field, type) {
       setLoading(true);
       try {
         const { data } = await api.get(field.endpoint);
+        const list = Array.isArray(data?.data) ? data.data : [];
         if (cancel) return;
-        const mapped = (Array.isArray(data) ? data : []).map((it) => ({
+         const mapped = list.map((it) => ({
           label: String(it?.label ?? it?.[field.key] ?? it).trim(),
           value: String(it?.value ?? it?.[field.key] ?? it).trim(),
         }));
