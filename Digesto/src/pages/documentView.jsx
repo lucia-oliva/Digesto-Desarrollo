@@ -2,11 +2,17 @@
 import useAxios from "axios-hooks";
 import { LuArrowRightToLine } from "react-icons/lu";
 import { useMemo, useState } from "react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useParams, useNavigate} from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
 import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
 import { API_BASE } from "../api/axiosPrivate";
+
+const ACCION_BADGE = {
+  1: { label_entrada: "Modificada por", label_salida: "Modifica", className: "badge-warning" },
+  2: { label_entrada: "Derogada por",  label_salida: "Deroga",   className: "badge-error" },
+  3: { label_entrada: "Complementada por", label_salida: "Complementa", className: "badge-info" },
+};
 
 const tipoNormativaLabel = (valor) => {
   if (valor == null || valor === "") return "—";
@@ -129,8 +135,10 @@ function useVariant(forcedVariant) {
 
 
 function DocumentView({ variant = "auto" }) {
+
   const resolvedVariant = useVariant(variant === "auto" ? undefined : variant);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [pdfUrl, setPdfUrl] = useState("");
   const [resumenOpen, setResumenOpen] = useState(false);
@@ -140,6 +148,43 @@ function DocumentView({ variant = "auto" }) {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });
+  const [{ data: vinculosData }] = useAxios({
+    url: `${API_BASE}/relaciones/${id}`,
+    method: "GET",
+  });
+  const [{ data: vinculosInvData }] = useAxios({
+    url: `${API_BASE}/relaciones/complementaria/${id}`,
+    method: "GET",
+  });
+  const vinculosEntrada = vinculosData?.data || [];
+  const vinculosSalida = vinculosInvData?.data || [];
+   const basePath =
+    resolvedVariant === "admin"
+      ? "/admin/document/"
+      : resolvedVariant === "consejo"
+      ? "/consejo-superior/document/"
+      : "/document/";
+      const renderCompTexto = (v) => {
+    // para los que "modifican a esta": usan comp_*
+    const tipo = v.comp_tipo || "Normativa";
+    const num =
+      v.comp_numero != null
+        ? `N° ${v.comp_numero}`
+        : `ID ${v.normativa_complementaria}`;
+    const anio = v.comp_anio ? `/${v.comp_anio}` : "";
+    return `${tipo} ${num}${anio}`;
+  };
+
+  const renderOrigTexto = (v) => {
+    // para los que "esta modifica": usan orig_*
+    const tipo = v.orig_tipo || "Normativa";
+    const num =
+      v.orig_numero != null ? `N° ${v.orig_numero}` : `ID ${v.normativa_original}`;
+    const anio = v.orig_anio ? `/${v.orig_anio}` : "";
+    return `${tipo} ${num}${anio}`;
+  };
+
+
   if (resolvedVariant === "admin") {
     return (
       <div className="min-h-screen flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
@@ -147,11 +192,55 @@ function DocumentView({ variant = "auto" }) {
           {loading && <Loading />}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
-                {normativa?.titulo || "—"}
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-            </div>
+  <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
+    {normativa?.titulo || "—"}
+  </h1>
+  <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
+  {vinculosEntrada.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosEntrada.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_entrada: "Vinculada por",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`in-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_complementaria)}
+            title={v.comp_titulo || undefined}
+          >
+            {meta.label_entrada} {renderCompTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+  {vinculosSalida.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosSalida.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_salida: "Modifica a",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`out-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_original)}
+            title={v.orig_titulo || undefined}
+          >
+            {meta.label_salida} {renderOrigTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+</div>
             <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
           </div>
 
@@ -184,11 +273,55 @@ function DocumentView({ variant = "auto" }) {
 
             <div className="flex flex-col gap-3">
               <div className="space-y-1 sm:space-y-2">
-                <h1 className="text-xl sm:text-2xl font-semibold text-blue-500 leading-tight">
-                  {normativa?.titulo || "—"}
-                </h1>
-                <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-              </div>
+  <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
+    {normativa?.titulo || "—"}
+  </h1>
+  <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
+  {vinculosEntrada.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosEntrada.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_entrada: "Vinculada por",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`in-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_complementaria)}
+            title={v.comp_titulo || undefined}
+          >
+            {meta.label_entrada} {renderCompTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+  {vinculosSalida.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosSalida.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_salida: "Modifica a",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`out-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_original)}
+            title={v.orig_titulo || undefined}
+          >
+            {meta.label_salida} {renderOrigTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+</div>
               <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
             </div>
 
@@ -277,13 +410,58 @@ function DocumentView({ variant = "auto" }) {
         <aside className="w-full bg-base-100 rounded-xl border border-base-300 p-4 sm:p-6">
           {loading && <Loading />}
           <div className="flex flex-col gap-3">
-            <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-xl sm:text-2xl font-semibold text-blue-500 leading-tight">
-                {normativa?.titulo || "—"}
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-            </div>
-            <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
+<div className="space-y-1 sm:space-y-2">
+  <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
+    {normativa?.titulo || "—"}
+  </h1>
+  <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
+  {vinculosEntrada.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosEntrada.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_entrada: "Vinculada por",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`in-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_complementaria)}
+            title={v.comp_titulo || undefined}
+          >
+            {meta.label_entrada} {renderCompTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+  {vinculosSalida.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosSalida.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_salida: "Modifica a",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`out-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_original)}
+            title={v.orig_titulo || undefined}
+          >
+            {meta.label_salida} {renderOrigTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+</div>
+
+          <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
           </div>
 
           <MetaGrid normativa={normativa} />
@@ -334,6 +512,54 @@ function DocumentView({ variant = "auto" }) {
                   <h1 className="text-2xl font-semibold text-blue-400">
                     {normativa?.titulo || "—"}
                   </h1>
+                  <div className="space-y-1 sm:space-y-2">
+  {vinculosEntrada.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosEntrada.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_entrada: "Vinculada por",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`in-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_complementaria)}
+            title={v.comp_titulo || undefined}
+          >
+            {meta.label_entrada} {renderCompTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+
+  {vinculosSalida.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {vinculosSalida.map((v) => {
+        const meta =
+          ACCION_BADGE[v.id_acciones] || {
+            label_salida: "Modifica a",
+            className: "badge-outline",
+          };
+        return (
+          <button
+            key={`out-${v.id}`}
+            type="button"
+            className={`badge ${meta.className} cursor-pointer`}
+            onClick={() => navigate(basePath + v.normativa_original)}
+            title={v.orig_titulo || undefined}
+          >
+            {meta.label_salida} {renderOrigTexto(v)}
+          </button>
+        );
+      })}
+    </div>
+  )}
+</div>
+
                   <h2 className="text-lg font-medium font-sans text-gray-500">
                     Emisor: {normativa?.emisor || "—"}
                   </h2>

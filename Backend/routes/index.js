@@ -1,6 +1,7 @@
 // src/routes/index.js
 import { Router } from "express";
 
+import relaciones from "./relacionesRoutes.js";
 import usuarios from "./usuarioRoutes.js";
 import dependencia from "./dependenciaRoute.js";
 import emisores from "./emisoresRoutes.js";
@@ -29,6 +30,7 @@ const routesMap = [
   ["/contacto", contactoRoutes],
   ["/dashboard", dashboardRoutes],
   ["/auditoria", auditoriaRoutes],
+  ["/relaciones", relaciones],
 ];
 
 for (const [prefix, router] of routesMap) {
