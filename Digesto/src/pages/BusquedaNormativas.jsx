@@ -1,6 +1,6 @@
 import { useState } from "react";
 import SearchBar from "../components/layout/SearchBar";
-import ContactModal from "../components/layout/Contact";
+import ContactModal from "../components/layout/Contact/Contact";
 import NormativaTable from "../components/Table/NormativasTable";
 import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
 import { useSearchParams } from "react-router";

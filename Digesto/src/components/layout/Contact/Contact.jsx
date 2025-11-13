@@ -2,8 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
-import { API_BASE } from "../../api/axiosPrivate";
-import {Alert} from "../ui/Ui";
+import { API_BASE } from "../../../api/axiosPrivate";
+import { ContactForm } from "./ContactForm";
+import { dependenciaEmails } from "./dependenciaEmails";
 
 export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const modalRef = useRef(null);
@@ -18,19 +19,6 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const [nombreDependencia, setNombreDependencia] = useState("");
   const [alertData, setAlertData] = useState(null);
 
-  const dependenciaEmails = {
-    Exactas: "lucia222lr@gmail.com",
-    Aplicadas: "lucia222lr@gmail.com",
-    Sociales: "lucia222lr@gmail.com",
-    Humanas: "lucia222lr@gmail.com",
-    "C. Superior": "lucia222lr@gmail.com",
-    Chepes: "lucia222lr@gmail.com",
-    "Villa Union": "lucia222lr@gmail.com",
-    Chamical: "lucia222lr@gmail.com",
-    Aimogasta: "lucia222lr@gmail.com",
-    Catuna: "lucia222lr@gmail.com",
-  };
-
   useEffect(() => {
     if (dependenciaProp && dependenciaProp.trim() !== "") {
       setIsVisible(true);
@@ -38,7 +26,6 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       return;
     }
 
-   
     const searchParams = new URLSearchParams(location.search);
     const depFromUrl = searchParams.get("dependencia") || "";
     const decoded = decodeURIComponent(depFromUrl);
@@ -65,7 +52,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
     const payload = { nombre, email, mensaje, destinatario };
 
     try {
-      const res = await fetch(`${API_BASE}/api/contacto`, {
+      const res = await fetch(`${API_BASE}/contacto`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -92,8 +79,8 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       setAlertData({
         title: "Error de conexion",
         message: "No se puede conectar con el servidor",
-        error: true
-      })
+        error: true,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +100,9 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       <div
         ref={modalRef}
         className={`fixed inset-0 z-50 flex items-end justify-end transition-opacity duration-300 ${
-          isModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          isModalOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={closeModal}
       >
@@ -123,7 +112,9 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
         >
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold mb-3">
-              {nombreDependencia ? `Contactar con ${nombreDependencia}` : "Contacto"}
+              {nombreDependencia
+                ? `Contactar con ${nombreDependencia}`
+                : "Contacto"}
             </h3>
           </div>
 
@@ -132,60 +123,17 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
               Mensaje enviado con éxito.
             </div>
           ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-            >
-              <input
-                type="text"
-                placeholder="Nombre"
-                className="w-full p-2 border border-gray-300 rounded mb-2"
-                required
-                pattern="^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]{3,}$"
-                title="El nombre debe tener al menos 3 caracteres y solo letras."
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-              />
-              <input
-                type="email"
-                placeholder="Correo Electrónico"
-                className="w-full p-2 border border-gray-300 rounded mb-2"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <textarea
-                placeholder="Mensaje"
-                rows="4"
-                className="w-full p-2 border border-gray-300 rounded mb-2 resize-none"
-                required
-                value={mensaje}
-                onChange={(e) => setMensaje(e.target.value)}
-              ></textarea>
-              <button
-                type="submit"
-                className="w-full bg-primary opacity-75 text-white p-2 rounded transition mt-2 hover:opacity-100 flex justify-center items-center"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="loading loading-dots loading-md"></span>
-                ) : (
-                  "Enviar"
-                )}    
-              </button>
-               {alertData && (
-            <div className="mt-3 flex justify-center">
-              <Alert
-                title={alertData.title}
-                message={alertData.message}
-                error={alertData.error}
-                duration={4000}
-              />
-            </div>
-          )}
-            </form>
+            <ContactForm
+              nombre={nombre}
+              setNombre={setNombre}
+              email={email}
+              setEmail={setEmail}
+              mensaje={mensaje}
+              setMensaje={setMensaje}
+              isLoading={isLoading}
+              alertData={alertData}
+              handleSubmit={handleSubmit}
+            />
           )}
         </div>
       </div>
