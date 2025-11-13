@@ -156,14 +156,25 @@ function DocumentView({ variant = "auto" }) {
     url: `${API_BASE}/relaciones/complementaria/${id}`,
     method: "GET",
   });
-  const vinculosEntrada = vinculosData?.data || [];
-  const vinculosSalida = vinculosInvData?.data || [];
+  
+   const vinculosEntrada = vinculosData?.data || [];
+  const vinculosSalida  = vinculosInvData?.data || [];
+
+  const isAdmin = resolvedVariant ==="admin";
+  const vinculosEntradaVisibles = isAdmin
+  ? vinculosEntrada
+  : vinculosEntrada.filter((v) => v.comp_estado === "publicado");
+  const vinculosSalidaVisibles = isAdmin
+  ? vinculosSalida
+  : vinculosSalida.filter((v) => v.orig_estado === "publicado");
+
    const basePath =
     resolvedVariant === "admin"
       ? "/admin/document/"
       : resolvedVariant === "consejo"
       ? "/consejo-superior/document/"
       : "/document/";
+      
       const renderCompTexto = (v) => {
     // para los que "modifican a esta": usan comp_*
     const tipo = v.comp_tipo || "Normativa";
@@ -196,9 +207,9 @@ function DocumentView({ variant = "auto" }) {
     {normativa?.titulo || "—"}
   </h1>
   <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-  {vinculosEntrada.length > 0 && (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosEntrada.map((v) => {
+  {vinculosEntradaVisibles.length > 0 && (
+    <div className="flex flex-wrap gap-2 mt-2 ">
+      {vinculosEntradaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_entrada: "Vinculada por",
@@ -208,7 +219,7 @@ function DocumentView({ variant = "auto" }) {
           <button
             key={`in-${v.id}`}
             type="button"
-            className={`badge ${meta.className} cursor-pointer`}
+            className={`badge ${meta.className} cursor-pointer py-5`}
             onClick={() => navigate(basePath + v.normativa_complementaria)}
             title={v.comp_titulo || undefined}
           >
@@ -218,9 +229,9 @@ function DocumentView({ variant = "auto" }) {
       })}
     </div>
   )}
-  {vinculosSalida.length > 0 && (
+  {vinculosSalidaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosSalida.map((v) => {
+      {vinculosSalidaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_salida: "Modifica a",
@@ -277,9 +288,9 @@ function DocumentView({ variant = "auto" }) {
     {normativa?.titulo || "—"}
   </h1>
   <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-  {vinculosEntrada.length > 0 && (
+  {vinculosEntradaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosEntrada.map((v) => {
+      {vinculosEntradaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_entrada: "Vinculada por",
@@ -299,9 +310,9 @@ function DocumentView({ variant = "auto" }) {
       })}
     </div>
   )}
-  {vinculosSalida.length > 0 && (
+  {vinculosSalidaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosSalida.map((v) => {
+      {vinculosSalidaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_salida: "Modifica a",
@@ -415,9 +426,9 @@ function DocumentView({ variant = "auto" }) {
     {normativa?.titulo || "—"}
   </h1>
   <p className="text-xs sm:text-sm text-gray-500">{normativa?.fecha || "—"}</p>
-  {vinculosEntrada.length > 0 && (
+  {vinculosEntradaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosEntrada.map((v) => {
+      {vinculosEntradaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_entrada: "Vinculada por",
@@ -437,9 +448,9 @@ function DocumentView({ variant = "auto" }) {
       })}
     </div>
   )}
-  {vinculosSalida.length > 0 && (
+  {vinculosSalidaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosSalida.map((v) => {
+      {vinculosSalidaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_salida: "Modifica a",
@@ -513,9 +524,9 @@ function DocumentView({ variant = "auto" }) {
                     {normativa?.titulo || "—"}
                   </h1>
                   <div className="space-y-1 sm:space-y-2">
-  {vinculosEntrada.length > 0 && (
+  {vinculosEntradaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosEntrada.map((v) => {
+      {vinculosEntradaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_entrada: "Vinculada por",
@@ -536,9 +547,9 @@ function DocumentView({ variant = "auto" }) {
     </div>
   )}
 
-  {vinculosSalida.length > 0 && (
+  {vinculosSalidaVisibles.length > 0 && (
     <div className="flex flex-wrap gap-2 mt-2">
-      {vinculosSalida.map((v) => {
+      {vinculosSalidaVisibles.map((v) => {
         const meta =
           ACCION_BADGE[v.id_acciones] || {
             label_salida: "Modifica a",

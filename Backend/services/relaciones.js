@@ -11,6 +11,7 @@ async function getByNormativaOriginal(id) {
         n.titulo as comp_titulo,
         n.numero as comp_numero,
         n.anio as comp_anio,
+        n.estado as comp_estado,
         tn.nombre as comp_tipo
         FROM relacion r
         LEFT JOIN normativa n ON n.id = r.normativa_complementaria
@@ -35,6 +36,7 @@ async function getByNormativaComplementaria(id) {
         n.titulo    AS orig_titulo,
         n.numero    AS orig_numero,
         n.anio      AS orig_anio,
+        n.estado    AS orig_estado,
         tn.nombre   AS orig_tipo
       FROM relacion r
       LEFT JOIN normativa n      ON n.id = r.normativa_original
