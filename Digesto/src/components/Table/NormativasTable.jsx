@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
-import { useNormativas } from "./useNormativas";
+import {useTablaEntidad } from "./useTablaEntidad";
 import { useLocation, useNavigate } from "react-router";
 import { adminConfig } from "./configTable";
 import PropTypes from "prop-types";
@@ -134,7 +134,7 @@ const NormativaTable = ({
     reload,
     onEdit,
     onDelete,
-  } = useNormativas(tipo, filtrosConOrden, {
+  } = useTablaEntidad(tipo, filtrosConOrden, {
     ns,
     confirmFn: (title, message) => confirm(title, message),
   });

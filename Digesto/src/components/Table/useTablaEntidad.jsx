@@ -1,28 +1,20 @@
 import { useEffect, useState, useRef } from "react";
-import {
-  searchNormativas,
-  deleteApi,
-  searchNormativasEliminadas,
-  searchNormativasDespublicadas,
-} from "./NormativaApi";
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
-import { API_BASE } from "../../api/axiosPrivate.js";
-import axios from "axios";
-import { useAuth } from "../../context/useAuth";
-
+import { useAuth } from "../../context/useAuth.jsx";
+import { deleteApi } from "./NormativaApi.jsx";
+import { loadNormativasByType } from "./utils/loadNormativasByType.js";
+import { buildDeleteMessage, isResponseOk } from "./utils/deleteUtils.js";
 /**
  * @param {string} type        
  * @param {object} filtros    
  * @param {object} options    
  */
-
-export const useNormativas = (type, filtros, options = {}) => {
+export const useTablaEntidad = (type, filtros, options = {}) => {
   const { ns = `ns:admin:${type}`, pageSize = 6, confirmFn } = options;
   const { auth } = useAuth();
   const user = auth?.user;
   const navigate = useNavigate();
-
   const [normativas, setNormativas] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -35,7 +27,6 @@ export const useNormativas = (type, filtros, options = {}) => {
   const prevFiltrosRef = useRef(JSON.stringify(filtros));
   const prevTypeRef = useRef(type);
   const requestSeqRef = useRef(0); 
-
   useEffect(() => {
     const currentFiltrosString = JSON.stringify(filtros);
     if (prevFiltrosRef.current !== currentFiltrosString) {
@@ -44,7 +35,6 @@ export const useNormativas = (type, filtros, options = {}) => {
     }
   }, [filtros]);
 
- 
   useEffect(() => {
     if (prevTypeRef.current !== type) {
       prevTypeRef.current = type;
@@ -53,6 +43,7 @@ export const useNormativas = (type, filtros, options = {}) => {
       setTotalPages(1);
     }
   }, [type]);
+
   useEffect(() => {
     loadNormativas(page);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,71 +66,29 @@ export const useNormativas = (type, filtros, options = {}) => {
     try {
       setLoading(true);
       setError(null);
-      if (type === "sesiones") {
-        const response = await axios.get(`${API_BASE}/dependencia/sesiones`, {
-          params: { page: pageToLoad, limite: pageSize },
-        });
-        if (requestSeqRef.current !== mySeq) return;
 
-        const payload = response?.data ?? {};
-        if (payload.error) {
-          setNormativas([]);
-          setTotalPages(0);
-          setEmptyMessage(
-            payload.error ||
-              "No se encontraron resultados. Probá cambiar los filtros."
-          );
-        } else {
-          const list = Array.isArray(payload.data) ? payload.data : [];
-          const total = Number(payload.totalResults) || 0;
-          setNormativas(list);
-          setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
-          setEmptyMessage(
-            "No se encontraron resultados. Probá cambiar los filtros."
-          );
-        }
-        return;
-      }
-      if (type === "normativasEliminadas") {
-        const res = await searchNormativasEliminadas(
-          pageToLoad,
-          pageSize,
-          type,
-          filtros
-        );
-        if (requestSeqRef.current !== mySeq) return;
+      const result = await loadNormativasByType({type,pageToLoad,pageSize,filtros,});
 
-        setNormativas(res?.data || []);
-        const total = Number(res?.totalResults || 0);
-        setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
-        return;
-      }
-      if (type === "normativaDespublicadas") {
-        const res = await searchNormativasDespublicadas(
-          pageToLoad,
-          pageSize,
-          type,
-          filtros
-        );
-        if (requestSeqRef.current !== mySeq) return;
-
-        setNormativas(res?.data || []);
-        const total = Number(res?.totalResults || 0);
-        setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
-        return;
-      }
-      const res = await searchNormativas(pageToLoad, pageSize, type, filtros);
       if (requestSeqRef.current !== mySeq) return;
 
-      setNormativas(res?.data || []);
-      const total = Number(res?.totalResults || 0);
-      setTotalPages(Math.max(1, Math.ceil(total / pageSize)));
+      const {data,total,emptyMessage: customEmpty,totalPagesOverride,} = result;
+
+      setNormativas(data || []);
+
+      if (typeof totalPagesOverride === "number") {
+        setTotalPages(totalPagesOverride);
+      } else {
+        const safeTotal = Number(total || 0);
+        setTotalPages(Math.max(1, Math.ceil(safeTotal / pageSize)));
+      }
+
+      if (typeof customEmpty === "string") {
+        setEmptyMessage(customEmpty);
+      }
     } catch (err) {
       if (requestSeqRef.current !== mySeq) return;
-      const msg =
-        err?.response?.data?.error ||
-        err?.message ||
-        "No se encontraron resultados. Probá cambiar los filtros.";
+      const msg = err?.response?.data?.error ||
+        err?.message || "No se encontraron resultados. Probá cambiar los filtros.";
       setError("Error al cargar normativas");
       setNormativas([]);
       setTotalPages(1);
@@ -160,23 +109,15 @@ export const useNormativas = (type, filtros, options = {}) => {
       navigate(`/consejo-superior/Editar${rutaEntidad}/${id}`);
     } else {
       navigate(`/admin/Editar${rutaEntidad}/${item.id}`);
-      if(rutaEntidad === "normativaDespublicadas" || rutaEntidad === "normativasEliminadas"){
+      if (rutaEntidad === "normativaDespublicadas" || rutaEntidad === "normativasEliminadas") {
         navigate(`/admin/EditarNormativa/${item.id}`);
       }
     }
   };
 
   const onDelete = async (item) => {
-    const msg =
-      type === "tag"
-        ? "¿Eliminar Tag?"
-        : type === "usuarios"
-        ? "¿Eliminar Usuario?"
-        : type === "dependencia"
-        ? "¿Eliminar Dependencia?"
-        : type === "emisores"
-        ? "¿Eliminar Emisor?"
-        : "¿Eliminar normativa?";
+    const msg = buildDeleteMessage(type);
+
     let autorizado = true;
     if (typeof confirmFn === "function") {
       autorizado = await confirmFn("Confirmar eliminación", msg);
@@ -187,19 +128,13 @@ export const useNormativas = (type, filtros, options = {}) => {
     if (!autorizado) return;
 
     const idParaBorrar = item.id || item.id_sesion;
-    const shouldGoBack =
-      page > 1 && Array.isArray(normativas) && normativas.length === 1;
+    const shouldGoBack = page > 1 && Array.isArray(normativas) && normativas.length === 1;
 
     try {
       setLoading(true);
       const response = await deleteApi(idParaBorrar, type, user?.id);
-      const ok =
-        (typeof response?.ok === "boolean" && response.ok) ||
-        (typeof response?.status === "number" &&
-          response.status >= 200 &&
-          response.status < 300) ||
-        response?.data?.success === true ||
-        response?.success === true;
+      const ok = isResponseOk(response);
+
       if (!ok) throw new Error("No se pudo eliminar");
       if (shouldGoBack) {
         setPage((p) => Math.max(1, p - 1)); 
@@ -214,21 +149,10 @@ export const useNormativas = (type, filtros, options = {}) => {
     }
   };
 
-  const reload = () => {
-    loadNormativas(page);
-  };
+  const reload = () => {loadNormativas(page);} ;
 
   return {
-    normativas,
-    page,
-    totalPages,
-    loading,
-    error,
-    onPageChange,
-    onEdit,
-    onDelete,
-    reload,
-    ns,
+    normativas,page,totalPages,loading,error,onPageChange,onEdit,onDelete,reload,ns,
     emptyMessage
   };
 };
