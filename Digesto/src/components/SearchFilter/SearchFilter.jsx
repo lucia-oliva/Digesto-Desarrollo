@@ -2,75 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import AlphabetFilter from "./AlphabetFilter";
 import { filterConfig } from "./configFilters";
-import api from "../../api/axiosPrivate";
-import { useReferencias } from "../../context/referenciasContext";
-
-function useContextOptions(fromContext) {
-  const { dependencias, emisores } = useReferencias() || {};
-
-  const mapList = (arr) =>
-    (arr || []).map((it) => ({
-      label: String(it?.nombre ?? it?.label ?? "").trim(),
-      value: String(it?.id ?? it?.value ?? "").trim(),
-    }));
-
-  switch (fromContext) {
-    case "dependencias":
-      return mapList(dependencias);
-    case "emisores":
-      return mapList(emisores);
-    default:
-      return [];
-  }
-}
-
-function useAsyncOptions(field, type) {
-  const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const cacheKey = useMemo(() => {
-    if (!field?.async || !field?.endpoint) return null;
-    return `async:${type}:${field.name}:${field.key || "default"}`;
-  }, [field, type]);
-
-  useEffect(() => {
-    let cancel = false;
-    async function fetchOptions() {
-      if (!field?.async || !field?.endpoint || !cacheKey) return;
-      setLoading(true);
-      try {
-        const { data } = await api.get(field.endpoint);
-        const list = Array.isArray(data?.data) ? data.data : [];
-        if (cancel) return;
-         const mapped = list.map((it) => ({
-          label: String(it?.label ?? it?.[field.key] ?? it).trim(),
-          value: String(it?.value ?? it?.[field.key] ?? it).trim(),
-        }));
-        setOptions(mapped);
-      } catch (e) {
-        setOptions([]);
-        console.log(e);
-      } finally {
-        if (!cancel) setLoading(false);
-      }
-    }
-    fetchOptions();
-    return () => {
-      cancel = true;
-    };
-  }, [cacheKey, field]);
-
-  return { options, loading };
-}
-
-function pruneStateForFields(state, fields) {
-  const allowed = new Set(fields.map((f) => f.name));
-  const next = {};
-  for (const k of Object.keys(state || {})) {
-    if (allowed.has(k)) next[k] = state[k];
-  }
-  return next;
-}
+import { useContextOptions } from "./hooks/useContextOptions";
+import { useAsyncOptions } from "./hooks/useAsyncOptions";
+import { pruneStateForFields } from "./utils/pruneStateForFields";
 
 function FieldRenderer({ field, value, onChange }) {
   const { name, type, label, options, fromContext } = field;
@@ -134,20 +68,25 @@ export default function GenericFilterSearch({
   onSearch = () => {},
 }) {
   const fields = useMemo(() => filterConfig?.[type] || [], [type]);
+
   const [formState, setFormState] = useState(() =>
     pruneStateForFields({ ...initialState }, fields)
-  )
+  );
+
   useEffect(() => {
     const next = pruneStateForFields({ ...initialState }, fields);
     setFormState(next);
   }, [initialState, fields]);
+
   const handleInput = (key, value) => {
     setFormState((prev) => ({ ...prev, [key]: value }));
   };
+
   const handleBuscar = () => {
     const next = pruneStateForFields(formState, fields);
     onSearch(next);
   };
+
   useEffect(() => {
     if (autoSearch) {
       const next = pruneStateForFields(formState, fields);
@@ -155,6 +94,7 @@ export default function GenericFilterSearch({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSearch, type, scope]);
+
   const hasLetter = useMemo(
     () => fields.some((f) => f.name === "letra" || f.type === "custom"),
     [fields]
@@ -168,9 +108,11 @@ export default function GenericFilterSearch({
   };
 
   return (
-     <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
-      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
-       {hasLetter && (
+    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
+      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">
+        Filtros de búsqueda
+      </h2>
+      {hasLetter && (
         <div className="mt-3 mb-4">
           <AlphabetFilter
             value={formState.letra || ""}
