@@ -1,39 +1,21 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BiSolidShow } from "react-icons/bi";
+import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import { cortarResumen, clamp } from "./utils/resumenTooltipUtils";
+import ResumenTooltipMobile from "./components/ResumenTooltipMobile";
+import ResumenTooltipDesktop from "./components/ResumenTooltipDesktop";
 
-
-function cortarResumen(texto, maxOraciones = 3, maxPalabras = 60) {
-  const t = String(texto ?? "").trim();
-  if (!t) return "...";
-  const oraciones = t.match(/[^.!?]+[.!?]?/g) || [t];
-  let seleccionado = oraciones.slice(0, maxOraciones).join(" ").trim();
-  const palabrasSel = seleccionado.split(/\s+/);
-  if (palabrasSel.length > maxPalabras) {
-    seleccionado = palabrasSel.slice(0, maxPalabras).join(" ");
-  }
-  return `${seleccionado}...`;
-}
-function clamp(n, min, max) { return Math.min(Math.max(n, min), max); }
-function useIsSmallScreen(max = 1024) {
-  const [isSmall, setIsSmall] = useState(
-    typeof window !== "undefined" ? window.innerWidth <= max : false
-  );
-  useEffect(() => {
-    const handler = () => setIsSmall(window.innerWidth <= max);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, [max]);
-  return isSmall;
-}
-
-// eslint-disable-next-line react/prop-types
-export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector = ".table-pagination" }) {
+export default function ResumenTooltip({
+  texto,
+  onVerMas,
+  avoidOverlapSelector = ".table-pagination",
+}) {
   const contRef = useRef(null);
   const tipRef = useRef(null);
   const [abierto, setAbierto] = useState(false);
 
-  // Desktop coords
   const [coords, setCoords] = useState({ top: 0, left: 0, place: "bottom" });
 
   const closeTimerRef = useRef(null);
@@ -42,8 +24,10 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
   const textoSeguro = String(texto ?? "").trim();
   const tieneTexto = textoSeguro.length > 0;
   const palabras = textoSeguro.split(/\s+/);
-  const truncado = palabras.length > 3 ? palabras.slice(0, 2).join(" ") + "..." : textoSeguro;
+  const truncado =
+    palabras.length > 3 ? palabras.slice(0, 2).join(" ") + "..." : textoSeguro;
   const preview = cortarResumen(textoSeguro, 3, 60);
+
   useLayoutEffect(() => {
     if (!abierto || !contRef.current || isSmall) return;
 
@@ -61,7 +45,10 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
       const tipH = tipRef.current?.offsetHeight ?? 0;
       const projectedBottom = top + tipH;
 
-      const pagEl = avoidOverlapSelector ? document.querySelector(avoidOverlapSelector) : null;
+      const pagEl = avoidOverlapSelector
+        ? document.querySelector(avoidOverlapSelector)
+        : null;
+
       if (pagEl && tipH > 0) {
         const pagRect = pagEl.getBoundingClientRect();
         const overlap =
@@ -69,6 +56,7 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
           projectedBottom > pagRect.top &&
           anchor.left < pagRect.right &&
           anchor.right > pagRect.left;
+
         if (overlap) {
           const aboveTop = anchor.top - margin - tipH;
           if (aboveTop >= 8) {
@@ -86,13 +74,16 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
 
     placeTooltip();
     const onScrollOrResize = () => placeTooltip();
+
     window.addEventListener("scroll", onScrollOrResize, true);
     window.addEventListener("resize", onScrollOrResize, true);
+
     return () => {
       window.removeEventListener("scroll", onScrollOrResize, true);
       window.removeEventListener("resize", onScrollOrResize, true);
     };
   }, [abierto, isSmall, avoidOverlapSelector]);
+
   useEffect(() => {
     if (!abierto) return;
     const cerrar = (e) => {
@@ -109,7 +100,7 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
       ref={contRef}
       className="relative group max-w-[260px]"
       onMouseEnter={() => {
-        if (!tieneTexto || isSmall) return; 
+        if (!tieneTexto || isSmall) return;
         clearTimeout(closeTimerRef.current);
         setAbierto(true);
       }}
@@ -124,7 +115,7 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
           onClick={() => setAbierto((v) => !v)}
           className="btn btn-xs btn-"
         >
-           <BiSolidShow className="text-lg"/> VER
+          <BiSolidShow className="text-lg" /> VER
         </button>
       ) : (
         <div
@@ -134,64 +125,33 @@ export default function ResumenTooltip({ texto, onVerMas, avoidOverlapSelector =
             if (tieneTexto) setAbierto((v) => !v);
           }}
         >
-          {tieneTexto ? truncado : <span className="text-gray-400 italic">Sin resumen</span>}
+          {tieneTexto ? (
+            truncado
+          ) : (
+            <span className="text-gray-400 italic">Sin resumen</span>
+          )}
         </div>
       )}
-      {abierto && tieneTexto && createPortal(
-        isSmall ? (
-          <div
-            ref={tipRef}
-            className="fixed bottom-0 inset-x-0 z-[2000] bg-white border-t p-4 shadow-lg"
-            style={{ maxHeight: "60vh", overflowY: "auto" }}
-          >
-            <div className="whitespace-pre-wrap">{preview}</div>
-            {typeof onVerMas === "function" && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onVerMas(); }}
-                className="btn btn-primary btn-sm mt-3 w-full"
-              >
-                Ver más
-              </button>
-            )}
-          </div>
-        ) : (
-          <div
-            ref={tipRef}
-            style={{
-              position: "fixed",
-              top: coords.top,
-              left: coords.left,
-              width: 300,
-              zIndex: 2000,
-            }}
-            className="bg-white border border-gray-300 p-2 shadow-lg text-xs rounded-md
-                       max-h-[60vh] overflow-y-auto"
-            data-place={coords.place}
-          >
-            <div className="whitespace-pre-wrap">{preview}</div>
-            {typeof onVerMas === "function" && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onVerMas(); }}
-                className="group mt-2 inline-flex items-center gap-1
-                           btn btn-sm btn-ghost text-primary no-underline
-                           hover:bg-primary/10 focus:outline-none focus-visible:ring-2
-                           focus-visible:ring-primary/40 rounded-md"
-              >
-                Ver más
-                <span
-                  aria-hidden
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                >
-                  →
-                </span>
-              </button>
-            )}
-          </div>
-        ),
-        document.body
-      )}
+
+      {abierto &&
+        tieneTexto &&
+        createPortal(
+          isSmall ? (
+            <ResumenTooltipMobile
+              tipRef={tipRef}
+              preview={preview}
+              onVerMas={onVerMas}
+            />
+          ) : (
+            <ResumenTooltipDesktop
+              tipRef={tipRef}
+              coords={coords}
+              preview={preview}
+              onVerMas={onVerMas}
+            />
+          ),
+          document.body
+        )}
     </div>
   );
 }
