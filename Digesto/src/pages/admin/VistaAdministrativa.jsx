@@ -3,9 +3,13 @@ import { useLocation } from "react-router";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
 import { getWithCancel } from "../../api/cancellable";
-
+import {useAuth} from "../../context/useAuth";
 function VistaAdministrativa() {
   const location = useLocation();
+  const {auth} = useAuth();
+  const user = auth?.user;
+  const tipoUser = user?.tipo_usuario;
+  const depName = user?.dependencia;
   const type = location.pathname.split("/")[2];
   const modo = "admin";
 
@@ -31,6 +35,14 @@ function VistaAdministrativa() {
     setFilters(next);
     fetchData(next);
   };
+const isSuperAdmin = tipoUser === "SuperAdministrador";
+  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
+  const isSupervisor = tipoUser === "Supervisor";
+
+  const lockDependencia =
+    !isSuperAdmin &&
+    (isAdminDependencia || isSupervisor) &&
+    !!depName;
 
   return (
     <div className="container">
@@ -40,6 +52,9 @@ function VistaAdministrativa() {
         initialState={state.filters}
         autoSearch
         onSearch={handleSearch}
+        disabledFields={{
+          dependencia: lockDependencia,
+        }}
       />
       <NormativaTable type={type} filtros={state.filters} modo={modo} />
     </div>

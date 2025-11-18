@@ -72,7 +72,7 @@ function pruneStateForFields(state, fields) {
   return next;
 }
 
-function FieldRenderer({ field, value, onChange }) {
+function FieldRenderer({ field, value, onChange, disabled }) {
   const { name, type, label, options, fromContext } = field;
   const ctxOptions = useContextOptions(fromContext);
   const { options: asyncOpts, loading: asyncLoading } = useAsyncOptions(field);
@@ -109,7 +109,7 @@ function FieldRenderer({ field, value, onChange }) {
           className="select select-bordered max-[425px]:select-sm w-full"
           value={value ?? ""}
           onChange={(e) => onChange(name, e.target.value)}
-          disabled={field?.async && asyncLoading}
+          disabled={disabled || (field?.async && asyncLoading)}
         >
           {!effectiveOptions.some((o) => String(o.value) === "") && (
             <option value="">Todos</option>
@@ -132,6 +132,7 @@ export default function GenericFilterSearch({
   initialState = {},
   autoSearch = false,
   onSearch = () => {},
+  disabledFields = {},
 }) {
   const fields = useMemo(() => filterConfig?.[type] || [], [type]);
   const [formState, setFormState] = useState(() =>
@@ -187,6 +188,7 @@ export default function GenericFilterSearch({
               field={field}
               value={formState?.[field.name]}
               onChange={handleInput}
+              disabled={!!disabledFields[field.name]}
             />
           ))}
         <div className="flex items-end">
@@ -195,14 +197,6 @@ export default function GenericFilterSearch({
           </button>
         </div>
       </div>
-      {hasLetter && (
-        <div className="mt-3">
-          <AlphabetFilter
-            value={formState.letra || ""}
-            onChange={handleLetterSelect}
-          />
-        </div>
-      )}
     </div>
   );
 }

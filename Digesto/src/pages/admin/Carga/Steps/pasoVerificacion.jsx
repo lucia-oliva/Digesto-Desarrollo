@@ -44,6 +44,7 @@ const toAccionText = (v) =>
   _toAccionText ? _toAccionText(v) : toAccionTextFallback(v);
 
 function PasoVerificacion({ formData, onBack, onSubmit }) {
+  
 
   const { dependencias, emisores } = useReferencias();
   const depOptions = (dependencias ?? []).map(d => ({
@@ -58,11 +59,12 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
   const location = useLocation();
   const pathSegment = location.pathname
     .split("/")
-    .find((s) => s.startsWith("Editar") || s.startsWith("Nuevo"));
+    .find((s) => s.startsWith("Editar") || s.startsWith("Nuevo") || s.startsWith("Nueva"));
 
   const entidad = pathSegment
-    ? pathSegment.replace("Editar", "").replace("Nuevo", "").toLowerCase()
+    ? pathSegment.replace("Editar", "").replace("Nuevo", "").replace("Nueva", "").toLowerCase()
     : null;
+    console.log(entidad)
 
   const camposIgnorados = entidad
     ? camposOcultosVerificacion[entidad] || []

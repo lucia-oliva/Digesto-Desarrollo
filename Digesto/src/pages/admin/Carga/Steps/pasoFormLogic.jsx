@@ -1,7 +1,5 @@
 import { useCallback, useState } from "react";
 
-const normalizePhone = (v) => String(v || "").replace(/\D/g, "");
-const telefonoRegex = /^(?:(?:00)?549?)?0?(?:11|[2368]\d)(?:(?=\d{0,2}15)\d{2})??\d{8}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export function shouldShowField({ entidad, formData, omitPwdFields }, fieldName) {
@@ -126,14 +124,6 @@ export function usePasoForm({ entidad, campos, formData, setFormData, onNext, se
 
       if (required && isEmpty && name !== "archivo" && name !== "tags") {
         nuevosErrores[name] = "Este campo es obligatorio.";
-      }
-
-      if (name === "telefono" && !isEmpty) {
-        const normalized = normalizePhone(value);
-        if (!telefonoRegex.test(normalized)) {
-          nuevosErrores[name] = "Formato de teléfono inválido. Ej.: 3804123456789.";
-          return;
-        }
       }
 
       if (name === "email" && !isEmpty) {

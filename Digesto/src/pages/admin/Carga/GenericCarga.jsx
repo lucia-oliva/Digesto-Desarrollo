@@ -52,9 +52,12 @@ function GenericCarga() {
           user,
         }),
       })
-        .then((res) => res.json())
-        .then(async (data) => {
+        .then(async (res) => {
+          const data = await res.json();
           console.log(`[POST] /api/${ruta}/create =>`, data);
+          if(!res.ok || data.ok ===false){
+            throw new Error(data.msg || "Error al crear registro");
+            }
           if (
             entidad === "normativa" &&
             dataToSend.archivo instanceof File &&
@@ -99,16 +102,16 @@ function GenericCarga() {
           setAlertData({
             id: Date.now(),
             title: "Exito",
-            message: `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
+            message: data.msg || `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
             error: false
 
           })
         })
-        .catch(() => 
+        .catch((err) => 
           setAlertData({
             id: Date.now(),
             title: "Error",
-            message: "Error al crear registro",
+            message: err.message || "Error al crear registro",
             error: true,
           })
       );

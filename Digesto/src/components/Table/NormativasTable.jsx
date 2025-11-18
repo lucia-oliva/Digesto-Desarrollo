@@ -29,6 +29,8 @@ const NormativaTable = ({
   const user = auth?.user;
   const tipoUser = auth.user?.tipo_usuario;
   const depName = auth.user?.dependencia;
+  const isDepAdmin = tipoUser === "Administrador de Dependencia";
+  const isSupervisor = tipoUser === "Supervisor";
   const isSuperAdmin = tipoUser === "SuperAdministrador";
   const isSupervisorCS =
     (tipoUser === "Supervisor" ||
@@ -343,7 +345,7 @@ const NormativaTable = ({
                 }
               );
 
-              if (user?.role == "Administrador de Dependencia") {
+              if (isSupervisor || isSuperAdmin ) {
                 base.unshift({
                   label: "Publicar",
                   onClick: async (item) => {

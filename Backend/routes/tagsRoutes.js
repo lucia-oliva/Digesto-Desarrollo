@@ -39,6 +39,9 @@ router.post(
     console.log("Cuerpo de la solicitud:", req.body);
     const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
+    if(!result.success){
+      return res.status(400).json({ ok: false, msg: result.message });
+    }
     res.status(200).json({ ok: true, msg: "Tag editado correctamente." });
   })
 );
@@ -48,7 +51,10 @@ router.post(
   "/create",
   asyncHandler(async (req, res) => {
     const tagData = req.body; 
-    await tagsDB.create(tagData);
+    const result = await tagsDB.create(tagData);
+    if(!result.success){
+      return res.status(400).json({ ok: false, msg: result.message });
+    }
     res.status(200).json({ ok: true, msg: "Tags insertados correctamente." });
   })
 );

@@ -65,7 +65,7 @@ async function create(data) {
     const existing = await db.queryOne("SELECT id FROM tag WHERE nombre = ?", [
       Tag,
     ]);
-    if (existing && existing.length > 0) {
+    if (existing) {
       return { success: false, message: `Tag '${Tag}' ya existe` };
     } else {
       const result = await db.execute("INSERT INTO tag (nombre) VALUES (?)", [
