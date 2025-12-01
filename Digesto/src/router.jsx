@@ -23,6 +23,7 @@ import GenericEdit from "./pages/admin/Edit/EditGeneric.jsx";
 import AgregarSesion from "./pages/consejo-superior/Sesiones/AgregarSesion.jsx";
 import EditarSesion from "./pages/consejo-superior/Sesiones/EditarSesion.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import RequireSuperAdmin from "./components/routes/RequireSuperAdmin.jsx";
 
 const Router = () => {
   return (
@@ -61,7 +62,26 @@ const Router = () => {
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="logout" element={<Logout />} />
-            <Route path="usuario" element={<EditarUsuario />} />
+            <Route element={<RequireSuperAdmin />}>
+              <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
+              <Route
+                path="ListadoAuditoria"
+                element={<VistaAdministrativa />}
+              />
+              <Route
+                path="ListadoDependencias"
+                element={<VistaAdministrativa />}
+              />
+              <Route path="ListadoEmisores" element={<VistaAdministrativa />} />
+              <Route path="NuevoUsuario" element={<GenericCarga />} />
+              <Route path="NuevaDependencia" element={<GenericCarga />} />
+              <Route path="NuevoEmisor" element={<GenericCarga />} />
+              <Route path="EditarUsuario/:id" element={<GenericEdit />} />
+              <Route path="EditarDependencia/:id" element={<GenericEdit />} />
+              <Route path="EditarEmisor/:id" element={<GenericEdit />} />
+              <Route path="EditarNormativa/:id" element={<GenericEdit />} />
+               <Route path="usuario" element={<EditarUsuario />} />
+            </Route>
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
             <Route
               path="ListadoNormativaEliminadas"
@@ -71,26 +91,12 @@ const Router = () => {
               path="ListadoNormativaDespublicadas"
               element={<VistaAdministrativa />}
             />
-            <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
-            <Route path="ListadoAuditoria" element={<VistaAdministrativa />} />
-            <Route
-              path="ListadoDependencias"
-              element={<VistaAdministrativa />}
-            />
-            <Route path="ListadoEmisores" element={<VistaAdministrativa />} />
             <Route
               path="ListadoPalabrasClave"
               element={<VistaAdministrativa />}
             />
             <Route path="NuevaNormativa" element={<GenericCarga />} />
-            <Route path="NuevoUsuario" element={<GenericCarga />} />
-            <Route path="NuevaDependencia" element={<GenericCarga />} />
-            <Route path="NuevoEmisor" element={<GenericCarga />} />
             <Route path="NuevaPalabraClave" element={<GenericCarga />} />
-            <Route path="EditarUsuario/:id" element={<GenericEdit />} />
-            <Route path="EditarDependencia/:id" element={<GenericEdit />} />
-            <Route path="EditarEmisor/:id" element={<GenericEdit />} />
-            <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route path="EditarPalabraClave/:id" element={<GenericEdit />} />
             <Route
               path="document/:id"
