@@ -28,7 +28,11 @@ function Header() {
       href: "/consejo-superior",
       active: location.pathname.startsWith("/consejo-superior"),
     },
-    { name: "Ayuda", href: "#" },
+    {
+      name: "Ayuda",
+      href: "/ayuda",
+      active: location.pathname.startsWith("/ayuda"),
+    },
   ];
 
   return (
@@ -54,7 +58,10 @@ function Header() {
                   }`}
                 >
                   {link.name === "Ayuda" ? (
-                    <IoIosHelpCircleOutline size={30} />
+                    <>
+                      {link.name}
+                      <IoIosHelpCircleOutline size={30} />
+                    </>
                   ) : (
                     link.name
                   )}

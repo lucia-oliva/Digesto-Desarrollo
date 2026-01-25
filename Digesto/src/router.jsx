@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Header from "./components/layout/Header";
+import HelpPdfView from "./pages/Help.jsx";
 import BusquedaNormativas from "./pages/BusquedaNormativas.jsx";
 import DocumentView from "./pages/documentView";
 import Login from "./pages/auth/Login";
@@ -32,6 +33,7 @@ const Router = () => {
         <Route element={<Header />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
+          <Route path="ayuda" element={<HelpPdfView />} />
           <Route path="busqueda" element={<BusquedaNormativas />} />
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
@@ -80,7 +82,7 @@ const Router = () => {
               <Route path="EditarDependencia/:id" element={<GenericEdit />} />
               <Route path="EditarEmisor/:id" element={<GenericEdit />} />
               <Route path="EditarNormativa/:id" element={<GenericEdit />} />
-               <Route path="usuario" element={<EditarUsuario />} />
+              <Route path="usuario" element={<EditarUsuario />} />
             </Route>
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
             <Route
