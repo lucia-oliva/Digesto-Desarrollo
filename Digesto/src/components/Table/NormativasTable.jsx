@@ -19,6 +19,7 @@ const NormativaTable = ({
   filtros = {},
   onSeleccionar,
   modo,
+  isNormModificadas = false,
   formData,
   data: dataOverride = null,
   hidePagination = false,
@@ -48,7 +49,7 @@ const NormativaTable = ({
 
   const DEP_BY_NAME = useMemo(
     () => new Map(depOptions.map((d) => [d.label, d.value])),
-    [depOptions]
+    [depOptions],
   );
 
   const userDepId =
@@ -78,19 +79,20 @@ const NormativaTable = ({
     (onSeleccionar
       ? "seleccionar"
       : isEditarNormativa
-      ? "crear_edit"
-      : isNuevaNormativa
-      ? "seleccionar"
-      : isAdminRoute
-      ? "admin"
-      : isConsejo
-      ? "consejo"
-      : "ver");
+        ? "crear_edit"
+        : isNuevaNormativa
+          ? "seleccionar"
+          : isAdminRoute
+            ? "admin"
+            : isConsejo
+              ? "consejo"
+              : "ver");
   const filtrosEfectivos = useMemo(() => {
     if (
       isAdminRoute &&
       effectiveModo !== "seleccionar" &&
       !isSuperAdmin &&
+      !isNormModificadas &&
       (userDepId || depName)
     ) {
       return { ...filtros, dependencia: String(userDepId ?? depName) };
@@ -111,11 +113,11 @@ const NormativaTable = ({
   const baseDocPath = isAdminRoute
     ? "/admin/document"
     : path.startsWith("/consejo-superior")
-    ? "/consejo-superior/document"
-    : "/document";
+      ? "/consejo-superior/document"
+      : "/document";
 
   const filteredColumns = (columns || []).filter(
-    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo))
+    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo)),
   );
 
   const { filtrosEfectivos: filtrosConOrden, headerProps } = useTablaOrden({
@@ -171,226 +173,234 @@ const NormativaTable = ({
     type === "ListadoAuditoria"
       ? []
       : type === "SesionesConsejo"
-      ? (() => {
-          const base = [
-            {
-              label: "Ver Orden",
-              onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
-              type: "primary",
-              className: "btn-outline btn-primary",
-            },
-            {
-              label: "Ver Acta",
-              onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
-              type: "primary",
-              className: "btn-outline btn-primary",
-            },
-          ];
-          if (
-            isAdminRoute ||
-            effectiveModo === "admin" ||
-            effectiveModo === "crear_edit"
-          ) {
-            base.push(
-              { label: "Editar", type: "secondary", onClick: onEdit },
-              { label: "Eliminar", type: "error", onClick: onDelete }
-            );
-          }
-          if (isSuperAdmin || isSupervisorCS) {
-            base.push({
-              label: "Editar Sesión",
-              onClick: (item) =>
-                navigate(`/consejo-superior/EditarSesion/${item.id_sesion}`),
-              type: "success",
-              className: "btn btn-info",
-            });
-          }
-          return base;
-        })()
-      : effectiveModo === "ver"
-      ? [
-          {
-            label: "Ver PDF",
-            onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
-            type: "primary",
-            className: "btn-outline btn-primary",
-          },
-        ]
-      : effectiveModo === "seleccionar"
-      ? [
-          {
-            getLabel: (item) =>
-              (formData?.normativas_modificadas || []).some(
-                (n) => n.id === item.id
-              )
-                ? "Seleccionado"
-                : "Seleccionar",
-            onClick: onSeleccionar,
-            getType: (item) =>
-              (formData?.normativas_modificadas || []).some(
-                (n) => n.id === item.id
-              )
-                ? "secondary"
-                : "primary",
-          },
-        ]
-      : (() => {
-          const base = [];
-          const isAdminLike =
-            isAdminRoute ||
-            effectiveModo === "admin" ||
-            effectiveModo === "crear_edit";
-
-          if (isAdminLike) {
-            if (tipo === "normativa") {
+        ? (() => {
+            const base = [
+              {
+                label: "Ver Orden",
+                onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
+                type: "primary",
+                className: "btn-outline btn-primary",
+              },
+              {
+                label: "Ver Acta",
+                onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
+                type: "primary",
+                className: "btn-outline btn-primary",
+              },
+            ];
+            if (
+              isAdminRoute ||
+              effectiveModo === "admin" ||
+              effectiveModo === "crear_edit"
+            ) {
+              base.push(
+                { label: "Editar", type: "secondary", onClick: onEdit },
+                { label: "Eliminar", type: "error", onClick: onDelete },
+              );
+            }
+            if (isSuperAdmin || isSupervisorCS) {
               base.push({
-                label: "Ver Normativa",
+                label: "Editar Sesión",
+                onClick: (item) =>
+                  navigate(`/consejo-superior/EditarSesion/${item.id_sesion}`),
+                type: "success",
+                className: "btn btn-info",
+              });
+            }
+            return base;
+          })()
+        : effectiveModo === "ver"
+          ? [
+              {
+                label: "Ver PDF",
                 onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
                 type: "primary",
-                className: "btn btn-primary",
-              });
-            }
+                className: "btn-outline btn-primary",
+              },
+            ]
+          : effectiveModo === "seleccionar"
+            ? [
+                {
+                  getLabel: (item) =>
+                    (formData?.normativas_modificadas || []).some(
+                      (n) => n.id === item.id,
+                    )
+                      ? "Seleccionado"
+                      : "Seleccionar",
+                  onClick: onSeleccionar,
+                  getType: (item) =>
+                    (formData?.normativas_modificadas || []).some(
+                      (n) => n.id === item.id,
+                    )
+                      ? "secondary"
+                      : "primary",
+                },
+              ]
+            : (() => {
+                const base = [];
+                const isAdminLike =
+                  isAdminRoute ||
+                  effectiveModo === "admin" ||
+                  effectiveModo === "crear_edit";
 
-            if (tipo === "usuarios") {
-              base.push({
-                getLabel: (item) =>
-                  String(item?.estado || "").toLowerCase() === "activo"
-                    ? "Desactivar"
-                    : "Activar",
-
-                getClassName: (item) =>
-                  String(item?.estado || "").toLowerCase() === "activo"
-                    ? "btn-primary"
-                    : "btn-success",
-
-                onClick: async (item) => {
-                  const ahora = String(item?.estado || "").toLowerCase();
-                  const nuevo = ahora === "activo" ? "inactivo" : "activo";
-
-                  const ok = await confirm(
-                    "Confirmar acción",
-                    ahora === "activo"
-                      ? "¿Desactivar este usuario? No podrá iniciar sesión."
-                      : "¿Activar este usuario? Podrá iniciar sesión."
-                  );
-                  if (!ok) return;
-
-                  try {
-                    const resp = await cambiarEstadoUsuario(item.id, nuevo);
-                    if (!resp?.ok)
-                      throw new Error(
-                        resp?.message || "No se pudo cambiar el estado"
-                      );
-                    reload();
-                  } catch (e) {
-                    console.error(e);
-                    setAlertData({
-                      id: Date.now(),
-                      title: "Error",
-                      message: "Error al cambiar el estado del usuario.",
-                      error: true,
+                if (isAdminLike) {
+                  if (tipo === "normativa") {
+                    base.push({
+                      label: "Ver Normativa",
+                      onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+                      type: "primary",
+                      className: "btn btn-primary",
                     });
                   }
-                },
-              });
-            }
 
-            if (tipo === "normativasEliminadas") {
-              base.push(
-                {
-                  label: "Restaurar",
-                  onClick: async (item) => {
-                    const ok = await confirm(
-                      "Restaurar normativa",
-                      "¿Restaurar la normativa? Volverá a normativas despublicadas."
-                    );
-                    if (!ok) return;
-                    try {
-                      const data = await restoreApi(item.id, user?.id);
-                      if (!data?.ok && !data?.success) {
-                        throw new Error(
-                          data?.message || "No se pudo restaurar"
+                  if (tipo === "usuarios") {
+                    base.push({
+                      getLabel: (item) =>
+                        String(item?.estado || "").toLowerCase() === "activo"
+                          ? "Desactivar"
+                          : "Activar",
+
+                      getClassName: (item) =>
+                        String(item?.estado || "").toLowerCase() === "activo"
+                          ? "btn-primary"
+                          : "btn-success",
+
+                      onClick: async (item) => {
+                        const ahora = String(item?.estado || "").toLowerCase();
+                        const nuevo =
+                          ahora === "activo" ? "inactivo" : "activo";
+
+                        const ok = await confirm(
+                          "Confirmar acción",
+                          ahora === "activo"
+                            ? "¿Desactivar este usuario? No podrá iniciar sesión."
+                            : "¿Activar este usuario? Podrá iniciar sesión.",
                         );
-                      }
-                      reload();
-                    } catch (e) {
-                      console.error(e);
-                      setAlertData({
-                        id: Date.now(),
-                        title: "Error",
-                        message: "Error al restaurar la normativa",
-                        error: true,
-                      });
-                    }
-                  },
-                  type: "secondary",
-                },
-                { label: "Editar", onClick: onEdit, type: "primary" },
-                {
-                  label: "Ver Normativa",
-                  onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
-                  type: "primary",
-                  className: "btn btn-info",
-                }
-              );
-            } else if (tipo === "normativaDespublicadas") {
-              base.push(
-                { label: "Editar", onClick: onEdit, type: "primary" },
-                { label: "Eliminar", onClick: onDelete, type: "error" },
-                {
-                  label: "Ver Normativa",
-                  onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
-                  type: "primary",
-                  className: "btn btn-info",
-                }
-              );
+                        if (!ok) return;
 
-              if (isSupervisor || isSuperAdmin ) {
-                base.unshift({
-                  label: "Publicar",
-                  onClick: async (item) => {
-                    const ok = await confirm(
-                      "Publicar normativa",
-                      "¿Publicar la normativa? Volverá a normativas publicadas."
+                        try {
+                          const resp = await cambiarEstadoUsuario(
+                            item.id,
+                            nuevo,
+                          );
+                          if (!resp?.ok)
+                            throw new Error(
+                              resp?.message || "No se pudo cambiar el estado",
+                            );
+                          reload();
+                        } catch (e) {
+                          console.error(e);
+                          setAlertData({
+                            id: Date.now(),
+                            title: "Error",
+                            message: "Error al cambiar el estado del usuario.",
+                            error: true,
+                          });
+                        }
+                      },
+                    });
+                  }
+
+                  if (tipo === "normativasEliminadas") {
+                    base.push(
+                      {
+                        label: "Restaurar",
+                        onClick: async (item) => {
+                          const ok = await confirm(
+                            "Restaurar normativa",
+                            "¿Restaurar la normativa? Volverá a normativas despublicadas.",
+                          );
+                          if (!ok) return;
+                          try {
+                            const data = await restoreApi(item.id, user?.id);
+                            if (!data?.ok && !data?.success) {
+                              throw new Error(
+                                data?.message || "No se pudo restaurar",
+                              );
+                            }
+                            reload();
+                          } catch (e) {
+                            console.error(e);
+                            setAlertData({
+                              id: Date.now(),
+                              title: "Error",
+                              message: "Error al restaurar la normativa",
+                              error: true,
+                            });
+                          }
+                        },
+                        type: "secondary",
+                      },
+                      { label: "Editar", onClick: onEdit, type: "primary" },
+                      {
+                        label: "Ver Normativa",
+                        onClick: (item) =>
+                          navigate(`${baseDocPath}/${item.id}`),
+                        type: "primary",
+                        className: "btn btn-info",
+                      },
                     );
-                    if (!ok) return;
-                    try {
-                      const data = await publicarApi(item.id, user?.id);
-                      if (!data?.ok && !data?.success) {
-                        throw new Error(data?.message || "No se pudo publicar");
-                      }
-                      reload();
-                    } catch (e) {
-                      console.error(e);
-                      setAlertData({
-                        id: Date.now(),
-                        title: "Error",
-                        message: "Error al re-publicar la normativa",
-                        error: true,
+                  } else if (tipo === "normativaDespublicadas") {
+                    base.push(
+                      { label: "Editar", onClick: onEdit, type: "primary" },
+                      { label: "Eliminar", onClick: onDelete, type: "error" },
+                      {
+                        label: "Ver Normativa",
+                        onClick: (item) =>
+                          navigate(`${baseDocPath}/${item.id}`),
+                        type: "primary",
+                        className: "btn btn-info",
+                      },
+                    );
+
+                    if (isSupervisor || isSuperAdmin) {
+                      base.unshift({
+                        label: "Publicar",
+                        onClick: async (item) => {
+                          const ok = await confirm(
+                            "Publicar normativa",
+                            "¿Publicar la normativa? Volverá a normativas publicadas.",
+                          );
+                          if (!ok) return;
+                          try {
+                            const data = await publicarApi(item.id, user?.id);
+                            if (!data?.ok && !data?.success) {
+                              throw new Error(
+                                data?.message || "No se pudo publicar",
+                              );
+                            }
+                            reload();
+                          } catch (e) {
+                            console.error(e);
+                            setAlertData({
+                              id: Date.now(),
+                              title: "Error",
+                              message: "Error al re-publicar la normativa",
+                              error: true,
+                            });
+                          }
+                        },
+                        type: "secondary",
                       });
                     }
-                  },
-                  type: "secondary",
-                });
-              }
-            } else {
-              base.push(
-                { label: "Editar", onClick: onEdit, type: "secondary" },
-                { label: "Eliminar", onClick: onDelete, type: "error" }
-              );
-            }
-          } else {
-            // Público
-            base.push({
-              label: "Ver PDF",
-              onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
-              type: "primary",
-              className: "btn-outline btn-primary",
-            });
-          }
+                  } else {
+                    base.push(
+                      { label: "Editar", onClick: onEdit, type: "secondary" },
+                      { label: "Eliminar", onClick: onDelete, type: "error" },
+                    );
+                  }
+                } else {
+                  // Público
+                  base.push({
+                    label: "Ver PDF",
+                    onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
+                    type: "primary",
+                    className: "btn-outline btn-primary",
+                  });
+                }
 
-          return base;
-        })();
+                return base;
+              })();
 
   return (
     <>

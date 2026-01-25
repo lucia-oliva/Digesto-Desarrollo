@@ -90,7 +90,7 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
         accion: toAccionId(n.accion),
         comentario: n.comentario || "",
       },
-    ])
+    ]),
   );
 
   const handleSearch = (formValues) => {
@@ -126,7 +126,7 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
     setFormData((prev) => ({
       ...prev,
       normativas_modificadas: (prev.normativas_modificadas || []).filter(
-        (n) => n.id !== seleccionada.id
+        (n) => n.id !== seleccionada.id,
       ),
       normativas_bajas: eraOriginal
         ? [
@@ -162,20 +162,20 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
           estado === "modificar" && original?.id_relacion
             ? { ...nueva, estado, id_relacion: original.id_relacion }
             : estado
-            ? { ...nueva, estado }
-            : { ...nueva };
+              ? { ...nueva, estado }
+              : { ...nueva };
 
         const actualizada = lista.map((n) =>
-          n.id === prev.editingSelectedId ? { ...n, ...conEstado } : n
+          n.id === prev.editingSelectedId ? { ...n, ...conEstado } : n,
         );
         const {
-          // eslint-disable-next-line no-unused-vars     
+          // eslint-disable-next-line no-unused-vars
           modalSeleccionarNormativa,
-          // eslint-disable-next-line no-unused-vars     
+          // eslint-disable-next-line no-unused-vars
           accionSeleccionada,
-          // eslint-disable-next-line no-unused-vars     
+          // eslint-disable-next-line no-unused-vars
           comentarioSeleccionado,
-          // eslint-disable-next-line no-unused-vars     
+          // eslint-disable-next-line no-unused-vars
           editingSelectedId,
           ...rest
         } = prev;
@@ -187,21 +187,21 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
         estado === "modificar" && original?.id_relacion
           ? { ...nueva, estado, id_relacion: original.id_relacion }
           : estado
-          ? { ...nueva, estado }
-          : nueva;
+            ? { ...nueva, estado }
+            : nueva;
 
       const nuevasNormativas = yaExiste
         ? lista.map((n) => (n.id === nueva.id ? { ...n, ...conEstado } : n))
         : [...lista, conEstado];
 
       const {
-        // eslint-disable-next-line no-unused-vars        
+        // eslint-disable-next-line no-unused-vars
         modalSeleccionarNormativa,
-        // eslint-disable-next-line no-unused-vars     
+        // eslint-disable-next-line no-unused-vars
         accionSeleccionada,
-        // eslint-disable-next-line no-unused-vars     
+        // eslint-disable-next-line no-unused-vars
         comentarioSeleccionado,
-        // eslint-disable-next-line no-unused-vars     
+        // eslint-disable-next-line no-unused-vars
         editingSelectedId,
         ...rest
       } = prev;
@@ -228,7 +228,7 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
       setUiError({
         type: "decision",
         text: "Seleccioná una opción (Sí o No) para continuar.",
-        id: Date.now(), 
+        id: Date.now(),
       });
       return;
     }
@@ -236,7 +236,7 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
       setUiError({
         type: "seleccion",
         text: "Debés seleccionar al menos una normativa para continuar.",
-        id: Date.now(), 
+        id: Date.now(),
       });
       return;
     }
@@ -408,14 +408,16 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
         </div>
       </div>
 
-
       {showErrors && uiError?.type === "decision" && (
-  <div className="flex justify-center mt-3 mb-2">
-    <Alert key={`decision-${uiError?.id ?? 0}`}  title="Falta elegir una opción" message={uiError.text} error />
-  </div>
-)}
-
-
+        <div className="flex justify-center mt-3 mb-2">
+          <Alert
+            key={`decision-${uiError?.id ?? 0}`}
+            title="Falta elegir una opción"
+            message={uiError.text}
+            error
+          />
+        </div>
+      )}
 
       {formData.cambia_normativa === "NO" && (
         <div className="rounded-xl border border-base-300 bg-base-100 p-4 md:p-6 text-sm text-base-content/70">
@@ -442,6 +444,7 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
           <NormativaTable
             type="ListadoNormativa"
             filtros={filters}
+            isNormModificadas={true}
             onSeleccionar={(item) => {
               const yaSeleccionada = (
                 formData.normativas_modificadas || []
@@ -455,12 +458,16 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
             formData={formData}
           />
 
-          
-    {showErrors && uiError?.type === "seleccion" && (
-      <div className="flex justify-center mt-3 mb-2">
-        <Alert key={`decision-${uiError?.id ?? 0}`}  title="Sin normativa seleccionada" message={uiError.text} error />
-      </div>
-    )}
+          {showErrors && uiError?.type === "seleccion" && (
+            <div className="flex justify-center mt-3 mb-2">
+              <Alert
+                key={`decision-${uiError?.id ?? 0}`}
+                title="Sin normativa seleccionada"
+                message={uiError.text}
+                error
+              />
+            </div>
+          )}
 
           <ResumenSeleccionadas
             items={formData.normativas_modificadas || []}
@@ -469,9 +476,6 @@ function PasoNormativasModificadas({ formData, setFormData, onNext, onBack }) {
           />
         </>
       )}
-
- 
-
 
       <div className="flex max-[475px]:flex-col max-[475px]:gap-2 justify-between mt-6 pt-4 border-t border-base-300">
         <button

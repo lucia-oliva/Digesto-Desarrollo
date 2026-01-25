@@ -35,6 +35,7 @@ function useAsyncOptions(field, type) {
 
   useEffect(() => {
     let cancel = false;
+
     async function fetchOptions() {
       if (!field?.async || !field?.endpoint || !cacheKey) return;
       setLoading(true);
@@ -42,7 +43,8 @@ function useAsyncOptions(field, type) {
         const { data } = await api.get(field.endpoint);
         const list = Array.isArray(data?.data) ? data.data : [];
         if (cancel) return;
-         const mapped = list.map((it) => ({
+
+        const mapped = list.map((it) => ({
           label: String(it?.label ?? it?.[field.key] ?? it).trim(),
           value: String(it?.value ?? it?.[field.key] ?? it).trim(),
         }));
@@ -54,6 +56,7 @@ function useAsyncOptions(field, type) {
         if (!cancel) setLoading(false);
       }
     }
+
     fetchOptions();
     return () => {
       cancel = true;
@@ -123,6 +126,7 @@ function FieldRenderer({ field, value, onChange, disabled }) {
       </div>
     );
   }
+
   return null;
 }
 
@@ -135,33 +139,46 @@ export default function GenericFilterSearch({
   disabledFields = {},
 }) {
   const fields = useMemo(() => filterConfig?.[type] || [], [type]);
+
   const [formState, setFormState] = useState(() =>
-    pruneStateForFields({ ...initialState }, fields)
-  )
+    pruneStateForFields({ ...initialState }, fields),
+  );
+
+  // ✅ NUEVO: marca si el usuario ya tocó el formulario (evita que initialState lo pise)
+  const [isDirty, setIsDirty] = useState(false);
+
+  // ✅ Cambio mínimo: solo sincroniza initialState -> formState si el usuario NO editó
   useEffect(() => {
+    if (isDirty) return;
     const next = pruneStateForFields({ ...initialState }, fields);
     setFormState(next);
-  }, [initialState, fields]);
+  }, [initialState, fields, isDirty]);
+
   const handleInput = (key, value) => {
+    setIsDirty(true); // ✅ NUEVO
     setFormState((prev) => ({ ...prev, [key]: value }));
   };
+
   const handleBuscar = () => {
     const next = pruneStateForFields(formState, fields);
     onSearch(next);
   };
+
+  // ✅ Cambio mínimo: autoSearch debe reaccionar al cambio real de formState
   useEffect(() => {
-    if (autoSearch) {
-      const next = pruneStateForFields(formState, fields);
-      onSearch(next);
-    }
+    if (!autoSearch) return;
+    const next = pruneStateForFields(formState, fields);
+    onSearch(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoSearch, type, scope]);
+  }, [autoSearch, JSON.stringify(formState)]);
+
   const hasLetter = useMemo(
     () => fields.some((f) => f.name === "letra" || f.type === "custom"),
-    [fields]
+    [fields],
   );
 
   const handleLetterSelect = (letra) => {
+    setIsDirty(true); // ✅ NUEVO
     const next = { ...formState, letra };
     const pruned = pruneStateForFields(next, fields);
     setFormState(pruned);
@@ -169,9 +186,12 @@ export default function GenericFilterSearch({
   };
 
   return (
-     <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
-      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">Filtros de búsqueda</h2>
-       {hasLetter && (
+    <div className="p-6 rounded-2xl shadow-md border border-gray-200 bg-base-100 mb-4 hover:shadow-lg transition-shadow">
+      <h2 className="text-lg font-bold mb-4 max-[426px]:text-sm">
+        Filtros de búsqueda
+      </h2>
+
+      {hasLetter && (
         <div className="mt-3 mb-4">
           <AlphabetFilter
             value={formState.letra || ""}
@@ -179,6 +199,7 @@ export default function GenericFilterSearch({
           />
         </div>
       )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {fields
           .filter((f) => f.type !== "custom")
@@ -191,6 +212,7 @@ export default function GenericFilterSearch({
               disabled={!!disabledFields[field.name]}
             />
           ))}
+
         <div className="flex items-end">
           <button className="btn btn-primary w-full" onClick={handleBuscar}>
             Buscar
