@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useMemo, useEffect } from "react";
 import { camposPorEntidad } from "../config/formFields";
+import { CiCircleQuestion } from "react-icons/ci";
 import { usePasoForm, shouldShowField } from "./pasoFormLogic";
 import { useReferencias } from "../../../../context/referenciasContext";
 import { useAuth } from "../../../../context/useAuth";
@@ -32,7 +33,7 @@ function PasoForm({
         label: String(d.nombre ?? d.label ?? "").trim(),
         value: String(d.id ?? d.value ?? "").trim(),
       })),
-    [dependencias]
+    [dependencias],
   );
 
   const emiOptions = useMemo(
@@ -41,17 +42,17 @@ function PasoForm({
         label: String(e.nombre ?? e.label ?? "").trim(),
         value: String(e.id ?? e.value ?? "").trim(),
       })),
-    [emisores]
+    [emisores],
   );
 
   // map nombre -> id para bloquear por nombre
   const DEP_BY_NAME = useMemo(
     () => new Map(depOptions.map((d) => [d.label, d.value])),
-    [depOptions]
+    [depOptions],
   );
 
   const lockedDepValue = !isSuperAdmin
-    ? DEP_BY_NAME.get(userDepNombre) ?? ""
+    ? (DEP_BY_NAME.get(userDepNombre) ?? "")
     : "";
   const shouldLockDep = !!lockedDepValue && !isSuperAdmin;
 
@@ -187,6 +188,44 @@ function PasoForm({
             );
           }
 
+          //date- tooltip
+          if (type === "date") {
+            return (
+              <div key={name} className="relative group">
+                <div className="flex ">
+                  {commonLabel}{" "}
+                  <div
+                    className="tooltip md:tooltip-right"
+                    data-tip="Fecha en la que la normativa se publica oficialmente en el digesto."
+                  >
+                    <CiCircleQuestion className="ml-1 size-5 cursor-pointer" />
+                  </div>{" "}
+                </div>
+                <input
+                  id={name}
+                  type="date"
+                  name={name}
+                  className="input input-bordered w-full"
+                  value={formData[name] ?? ""}
+                  onChange={handleChange}
+                  aria-invalid={!!error}
+                  aria-describedby={error ? `${name}-error` : undefined}
+                  required={!!required}
+                />
+                {error && (
+                  <p id={`${name}-error`} className="text-red-500 text-sm mt-1">
+                    {error}
+                  </p>
+                )}
+                <div className="absolute top-0 right-0 mt-1 mr-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="bg-gray-700 text-white text-xs rounded py-1 px-2">
+                    Formato: DD/MM/AAAA
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
           // selects
           if (type === "select") {
             let resolvedOptions = [];
@@ -204,7 +243,7 @@ function PasoForm({
             const value =
               isEstadoField && shouldLockEstado
                 ? "despublicado"
-                : formData[name] ?? "";
+                : (formData[name] ?? "");
 
             return (
               <div key={name}>
@@ -232,7 +271,7 @@ function PasoForm({
                       <option key={opt} value={opt}>
                         {opt}
                       </option>
-                    )
+                    ),
                   )}
                 </select>
                 {error && (
@@ -280,7 +319,7 @@ function PasoForm({
                 name={name}
                 placeholder={placeholder || ""}
                 className="input input-bordered w-full"
-                value={type === "file" ? undefined : formData[name] ?? ""}
+                value={type === "file" ? undefined : (formData[name] ?? "")}
                 accept={type === "file" ? "application/pdf" : undefined}
                 onChange={handleChange}
                 aria-invalid={!!error}
@@ -300,7 +339,7 @@ function PasoForm({
               )}
             </div>
           );
-        }
+        },
       )}
 
       <div className="flex justify-between pt-2">
