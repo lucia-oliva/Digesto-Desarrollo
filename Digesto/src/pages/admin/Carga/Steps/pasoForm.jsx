@@ -188,7 +188,7 @@ function PasoForm({
             );
           }
 
-          //date- tooltip
+          //date-tooltip
           if (type === "date") {
             return (
               <div key={name} className="relative group">
