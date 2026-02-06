@@ -64,6 +64,7 @@ const Router = () => {
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="logout" element={<Logout />} />
+            <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route element={<RequireSuperAdmin />}>
               <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
               <Route
@@ -81,7 +82,6 @@ const Router = () => {
               <Route path="EditarUsuario/:id" element={<GenericEdit />} />
               <Route path="EditarDependencia/:id" element={<GenericEdit />} />
               <Route path="EditarEmisor/:id" element={<GenericEdit />} />
-              <Route path="EditarNormativa/:id" element={<GenericEdit />} />
               <Route path="usuario" element={<EditarUsuario />} />
             </Route>
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
