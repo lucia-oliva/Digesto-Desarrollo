@@ -10,7 +10,7 @@ const colors = [
   "bg-purple-300",
 ];
 
-const nombreToId = {
+const dependenciaNombreToId = {
   Aplicadas: "1",
   Exactas: "2",
   Salud: "3",
@@ -18,7 +18,6 @@ const nombreToId = {
   Humanas: "5",
   "C. Superior": "20",
   "C.Superior": "20",
-  "Asamblea Rector": "00",
   Chepes: "22",
   "Villa Union": "26",
   "Villa Unión": "26",
@@ -27,23 +26,36 @@ const nombreToId = {
   Catuna: "23",
 };
 
+const emisorNombreToId = {
+  Rector: "2",
+  Asamblea: "99",
+  "Cjo. Superior" : "4",
+  "Consejo Superior" : "4"
+}
+
 const normalizeLabel = (nombre) =>
   nombre === "C. Superior" ? "C.Superior" : String(nombre);
 
-const buildTo = (label, id) =>
-  label.toLowerCase() === "todas" || !id
+const buildTo = ({label,id,field}) =>
+  String(label).toLowerCase() === "todas" || !id
     ? "/busqueda"
-    : `/busqueda?dependencia=${encodeURIComponent(id)}`;
+    : `/busqueda?${field}=${encodeURIComponent(id)}`;
 
-export default function DependenciaCard({
+
+   export default function DependenciaCard({
   nombre,
   colorIndex = 0,
   colored = true,
   big = false,
+  kind = "dependencia" 
 }) {
   const label = normalizeLabel(nombre);
-  const id = nombreToId[nombre] ?? nombreToId[label] ?? "";
-  const to = buildTo(label, id);
+    const map = kind === "emisor" ? emisorNombreToId : dependenciaNombreToId;
+    const field = kind === "emisor" ? "emisor" : "dependencia";
+  const id = map[nombre] ?? map[label] ?? "";
+  const to = buildTo({ label, id, field });
+   console.log({nombre,label,kind,field,id,to});
+
 
   return (
     <Link
@@ -82,6 +94,7 @@ DependenciaCard.propTypes = {
   colorIndex: PropTypes.number,
   colored: PropTypes.bool,
   big: PropTypes.bool,
+  kind: PropTypes.oneOf(["dependencia", "emisor"])
 };
 
 export { normalizeLabel };

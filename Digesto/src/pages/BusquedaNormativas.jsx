@@ -9,7 +9,7 @@ import { getWithCancel } from "../api/cancellable";
 
 function NormativasContainer({ isAdmin = false }) {
   const [params] = useSearchParams();
-  const initial = { dependencia: params.get("dependencia") || "" };
+  const initial = { dependencia: params.get("dependencia") || "", emisor: params.get("emisor") || "" };
 
   const [tags, setTags] = useState("");
   const type = "ListadoNormativa";
@@ -34,6 +34,8 @@ function NormativasContainer({ isAdmin = false }) {
     const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
     if (res?.cancelled) return;
   }
+
+  
 
   const handleSearchTags = (selectedTags) => {
     setTags(selectedTags || "");

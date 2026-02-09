@@ -8,6 +8,7 @@ export default function DependenciasRow({
   big = false,
   startColor = 0,
   Colored = true,
+  getCardProps
 }) {
   if (!items?.length) return null;
 
@@ -20,15 +21,19 @@ export default function DependenciasRow({
       )}
 
       <div className={`grid gap-3 ${colsClass}`}>
-        {items.map((n, i) => (
+        {items.map((n, i) => {
+          const extra = getCardProps?.(n) || {};
+          return (
           <DependenciaCard
             key={normalizeLabel(n)}
             nombre={n}
             big={big}
             colored={Colored}
             colorIndex={startColor + i}
+            {...extra}
           />
-        ))}
+        );
+        })}
       </div>
     </div>
   );

@@ -39,6 +39,7 @@ export default function Dependencias({ dependencias }) {
     "Catuna",
   ]);
   const todas = pick(["Todas"])[0];
+  const topGetCardProps = () => ({kind: "emisor"});
 
   return (
     <section className="w-full">
@@ -49,6 +50,7 @@ export default function Dependencias({ dependencias }) {
           big
           colsClass="grid-cols-1 sm:grid-cols-3"
           startColor={4}
+          getCardProps={topGetCardProps}
         />
 
         {/* Fila 2 */}
