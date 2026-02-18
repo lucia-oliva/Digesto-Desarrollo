@@ -9,7 +9,10 @@ import { getWithCancel } from "../api/cancellable";
 
 function NormativasContainer({ isAdmin = false }) {
   const [params] = useSearchParams();
-  const initial = { dependencia: params.get("dependencia") || "", emisor: params.get("emisor") || "" };
+  const initial = {
+    dependencia: params.get("dependencia") || "",
+    emisor: params.get("emisor") || "",
+  };
 
   const [tags, setTags] = useState("");
   const type = "ListadoNormativa";
@@ -23,10 +26,10 @@ function NormativasContainer({ isAdmin = false }) {
     urlSync: true,
     nsStrategy: "byPath",
     persist: true,
-    requireQueryToPersist: true, 
-    ignoreStorageIfNoQuery: true, 
-    resetOnUnmount: true, 
-    clearStorageOnUnmount: true, 
+    requireQueryToPersist: true,
+    ignoreStorageIfNoQuery: true,
+    resetOnUnmount: true,
+    clearStorageOnUnmount: true,
     onHydrated: (f) => void fetchData(f),
   });
 
@@ -34,8 +37,6 @@ function NormativasContainer({ isAdmin = false }) {
     const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
     if (res?.cancelled) return;
   }
-
-  
 
   const handleSearchTags = (selectedTags) => {
     setTags(selectedTags || "");
@@ -79,7 +80,9 @@ function NormativasContainer({ isAdmin = false }) {
         isAdmin ? "w-full" : "w-screen items-center"
       }`}
     >
-      <div className="w-auto bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
+      <div className="w-auto gap-4 bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
+        <SearchBar value={tags} onSearch={handleSearchTags} />
+
         <GenericFilterSearch
           type="ListadoNormativa"
           scope="public"
@@ -88,9 +91,8 @@ function NormativasContainer({ isAdmin = false }) {
           onSearch={handleSearch}
         />
 
-        <div className="flex flex-wrap justify-between items-center border-b pb-4 mb-4 mt-4">
+        <div className="items-center border-b pb-4 mb-4 mt-4 gap-3">
           <h2 className="text-xl font-bold mb-2">Resultados de Normativas</h2>
-          <SearchBar onSearch={handleSearchTags} />
         </div>
 
         <NormativaTable type={type} filtros={filtros} modo={modo} />

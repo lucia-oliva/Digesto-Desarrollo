@@ -1,19 +1,48 @@
+import { useEffect, useMemo, useState } from "react";
 import NormativaTable from "../../components/Table/NormativasTable";
 import { useLocation } from "react-router";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
-import { getWithCancel } from "../../api/cancellable";
-import {useAuth} from "../../context/useAuth";
+import { useAuth } from "../../context/useAuth";
+import SearchBar from "../../components/layout/SearchBar";
+
 function VistaAdministrativa() {
   const location = useLocation();
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const user = auth?.user;
+
   const tipoUser = user?.tipo_usuario;
   const depName = user?.dependencia;
+
   const type = location.pathname.split("/")[2];
+
+  const showTagSearch = useMemo(
+    () =>
+      [
+        "ListadoNormativa",
+        "ListadoNormativaEliminadas",
+        "ListadoNormativaDespublicadas",
+      ].includes(type),
+    [type],
+  );
+
+  // Si salís de las pantallas de normativa, limpiamos tagQuery y el filtro
+  useEffect(() => {
+    if (!showTagSearch) {
+      setTagQuery("");
+      const next = { ...(state.filters || {}) };
+      delete next[TAG_PARAM];
+      setFilters(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTagSearch]);
+
   const modo = "admin";
 
-  const { ns, state, setFilters } = useNamespacedFilters({
+  // Tag buscado desde SearchBar
+  const [tagQuery, setTagQuery] = useState("");
+
+  const { state, setFilters } = useNamespacedFilters({
     scope: "admin",
     type,
     initial: {},
@@ -22,30 +51,52 @@ function VistaAdministrativa() {
     persist: false,
     resetOnUnmount: false,
     resetOnNsChange: true,
-    onHydrated: (f) => void fetchData(f),
   });
 
-  async function fetchData(filtros) {
-    const res = await getWithCancel(ns, "/normativas", { params: filtros });
-    if (res?.cancelled) return;
-  }
+  const TAG_PARAM = "tags";
 
-  const handleSearch = (formData) => {
-    const next = formData || {};
-    setFilters(next);
-    fetchData(next);
+  const mergeWithTag = (base = {}, tag = tagQuery) => {
+    const next = { ...(base || {}) };
+    const clean = (tag ?? "").trim();
+
+    if (clean) next[TAG_PARAM] = clean;
+    else delete next[TAG_PARAM];
+
+    return next;
   };
-const isSuperAdmin = tipoUser === "SuperAdministrador";
+
+  // viene del SearchFilter
+  const handleSearch = (formData) => {
+    const next = mergeWithTag(formData, tagQuery);
+    setFilters(next);
+  };
+
+  // viene del SearchBar
+  const handleSearchTags = (tagName) => {
+    const clean = (tagName ?? "").trim();
+    setTagQuery(clean);
+
+    const next = mergeWithTag(state.filters, clean);
+    setFilters(next);
+  };
+
+  const isSuperAdmin = tipoUser === "SuperAdministrador";
   const isAdminDependencia = tipoUser === "Administrador de Dependencia";
   const isSupervisor = tipoUser === "Supervisor";
 
   const lockDependencia =
-    !isSuperAdmin &&
-    (isAdminDependencia || isSupervisor) &&
-    !!depName;
+    !isSuperAdmin && (isAdminDependencia || isSupervisor) && !!depName;
 
   return (
     <div className="container">
+      {showTagSearch && (
+        <SearchBar
+          value={tagQuery}
+          onSearch={handleSearchTags}
+          onClear={() => handleSearchTags("")}
+        />
+      )}
+
       <GenericFilterSearch
         type={type}
         scope="admin"
@@ -56,6 +107,7 @@ const isSuperAdmin = tipoUser === "SuperAdministrador";
           dependencia: lockDependencia,
         }}
       />
+
       <NormativaTable type={type} filtros={state.filters} modo={modo} />
     </div>
   );
