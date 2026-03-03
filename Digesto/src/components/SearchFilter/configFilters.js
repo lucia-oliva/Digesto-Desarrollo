@@ -51,6 +51,22 @@ export const filterConfig = {
     },
   ],
 
+  ListadoNormativaPorAnio: [
+    {
+      name: "dependencia",
+      type: "select",
+      label: "Dependencia",
+      fromContext: "dependencias",
+    },
+    {
+      name: "anio",
+      type: "select",
+      label: "Año",
+      async: true,
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
+      key: "anio",
+    },
+  ],
   ListadoNormativaEliminadas: [
     {
       name: "numero",

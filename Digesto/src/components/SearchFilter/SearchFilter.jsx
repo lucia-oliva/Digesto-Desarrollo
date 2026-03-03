@@ -144,10 +144,8 @@ export default function GenericFilterSearch({
     pruneStateForFields({ ...initialState }, fields),
   );
 
-  // ✅ NUEVO: marca si el usuario ya tocó el formulario (evita que initialState lo pise)
   const [isDirty, setIsDirty] = useState(false);
 
-  // ✅ Cambio mínimo: solo sincroniza initialState -> formState si el usuario NO editó
   useEffect(() => {
     if (isDirty) return;
     const next = pruneStateForFields({ ...initialState }, fields);
@@ -155,7 +153,7 @@ export default function GenericFilterSearch({
   }, [initialState, fields, isDirty]);
 
   const handleInput = (key, value) => {
-    setIsDirty(true); // ✅ NUEVO
+    setIsDirty(true);
     setFormState((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -164,7 +162,7 @@ export default function GenericFilterSearch({
     onSearch(next);
   };
 
-  // ✅ Cambio mínimo: autoSearch debe reaccionar al cambio real de formState
+  //autoSearch debe reaccionar al cambio real de formState
   useEffect(() => {
     if (!autoSearch) return;
     const next = pruneStateForFields(formState, fields);
@@ -178,7 +176,7 @@ export default function GenericFilterSearch({
   );
 
   const handleLetterSelect = (letra) => {
-    setIsDirty(true); // ✅ NUEVO
+    setIsDirty(true);
     const next = { ...formState, letra };
     const pruned = pruneStateForFields(next, fields);
     setFormState(pruned);

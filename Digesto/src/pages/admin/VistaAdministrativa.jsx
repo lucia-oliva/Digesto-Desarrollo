@@ -16,6 +16,19 @@ function VistaAdministrativa() {
 
   const type = location.pathname.split("/")[2];
 
+  const isNormativaPorAnio =
+    type === "normativaPorAño" || type === "normativaPorAnio";
+
+  const isSuperAdmin = tipoUser === "SuperAdministrador";
+  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
+  const isSupervisor = tipoUser === "Supervisor";
+
+  const lockDependencia =
+    isNormativaPorAnio &&
+    !isSuperAdmin &&
+    (isAdminDependencia || isSupervisor) &&
+    !!depName;
+
   const showTagSearch = useMemo(
     () =>
       [
@@ -25,17 +38,6 @@ function VistaAdministrativa() {
       ].includes(type),
     [type],
   );
-
-  // Si salís de las pantallas de normativa, limpiamos tagQuery y el filtro
-  useEffect(() => {
-    if (!showTagSearch) {
-      setTagQuery("");
-      const next = { ...(state.filters || {}) };
-      delete next[TAG_PARAM];
-      setFilters(next);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showTagSearch]);
 
   const modo = "admin";
 
@@ -65,13 +67,35 @@ function VistaAdministrativa() {
     return next;
   };
 
-  // viene del SearchFilter
+  useEffect(() => {
+    if (!lockDependencia) return;
+
+    const current = state.filters?.dependencia;
+    if (String(current ?? "") === String(depName)) return;
+
+    setFilters({ ...(state.filters || {}), dependencia: depName });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockDependencia, depName]);
+
+  useEffect(() => {
+    if (!showTagSearch) {
+      setTagQuery("");
+      const next = { ...(state.filters || {}) };
+      delete next[TAG_PARAM];
+      setFilters(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTagSearch]);
+
   const handleSearch = (formData) => {
-    const next = mergeWithTag(formData, tagQuery);
+    const safeForm = lockDependencia
+      ? { ...(formData || {}), dependencia: depName }
+      : formData;
+
+    const next = mergeWithTag(safeForm, tagQuery);
     setFilters(next);
   };
 
-  // viene del SearchBar
   const handleSearchTags = (tagName) => {
     const clean = (tagName ?? "").trim();
     setTagQuery(clean);
@@ -79,13 +103,6 @@ function VistaAdministrativa() {
     const next = mergeWithTag(state.filters, clean);
     setFilters(next);
   };
-
-  const isSuperAdmin = tipoUser === "SuperAdministrador";
-  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
-  const isSupervisor = tipoUser === "Supervisor";
-
-  const lockDependencia =
-    !isSuperAdmin && (isAdminDependencia || isSupervisor) && !!depName;
 
   return (
     <div className="container">

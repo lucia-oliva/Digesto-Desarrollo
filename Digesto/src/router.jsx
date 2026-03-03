@@ -93,6 +93,12 @@ const Router = () => {
               path="ListadoNormativaDespublicadas"
               element={<VistaAdministrativa />}
             />
+
+            <Route
+              path="ListadoNormativaPorAnio"
+              element={<VistaAdministrativa />}
+            />
+
             <Route
               path="ListadoPalabrasClave"
               element={<VistaAdministrativa />}
