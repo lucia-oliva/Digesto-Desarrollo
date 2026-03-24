@@ -211,7 +211,7 @@ async function edit(data) {
     }
     if (userId) {
       await auditoriaService.crearRegistroAuditoria({
-        id_normativa: id,
+        id_normativa: id, 
         id_usuario: userId,
         tipo: "modificacion",
       });
@@ -448,6 +448,48 @@ async function searchById(id) {
   }
 }
 
+
+function buildResumenTagsCondition(resumen) {
+  if (!resumen || !resumen.trim()) {
+    return { sql: "", params: [] };
+  }
+
+  const textoCompleto = resumen.trim();
+
+  const tagsSeparados = textoCompleto.includes(",")
+    ? textoCompleto
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [textoCompleto];
+
+  const tagsConditions = tagsSeparados.map(() => `
+    EXISTS (
+      SELECT 1
+      FROM tag_normativa tn3
+      JOIN tag t3 ON t3.id = tn3.id_tag
+      WHERE tn3.id_normativa = n.id
+        AND t3.nombre LIKE ?
+    )
+  `);
+
+  const sql = `
+    AND (
+      n.resumen LIKE ?
+      ${tagsConditions.length ? `OR (${tagsConditions.join(" OR ")})` : ""}
+    )
+  `;
+
+  const params = [`%${textoCompleto}%`];
+
+  tagsSeparados.forEach((tag) => {
+    params.push(`%${tag}%`);
+  });
+
+  return { sql, params };
+}
+
+
 async function searchNormativaByParameters(
   numero,
   dependencia,
@@ -456,10 +498,17 @@ async function searchNormativaByParameters(
   anio,
   limite = null,
   offset = null,
-  tags,
   fechaOrder,
-  visitasOrder
+  visitasOrder,
+  resumen
 ) {
+
+console.log("ANTES DE LLAMAR:", {
+  numero, dependencia, emisor, documento, anio,
+  limite, offset, fechaOrder, visitasOrder,
+  resumen
+});
+  
   try {
     let sql = `
       SELECT
@@ -496,19 +545,15 @@ async function searchNormativaByParameters(
       sql += " AND n.anio = ?";
       params.push(anio);
     }
-    if (tags) {
-      sql += `
-        AND EXISTS (
-          SELECT 1 FROM tag_normativa tn2
-          JOIN tag t ON t.id = tn2.id_tag
-          WHERE tn2.id_normativa = n.id AND t.nombre = ?
-        )
-      `;
-      params.push(tags);
-    }
+    
+    const resumenFilter = buildResumenTagsCondition(resumen);
+    sql += resumenFilter.sql;
+    params.push(...resumenFilter.params);
+    
     sql += " GROUP BY n.id";
     const clauses = [];
     const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
+
     if(fechaOrder){
       clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
     }
@@ -632,6 +677,7 @@ async function searchNormativaEliminadaByParameters(
     throw err;
   }
 }
+
 async function searchNormativasByTags(dependencia, tags) {
   try {
     const placeholders = tags.map(() => "?").join(",");
