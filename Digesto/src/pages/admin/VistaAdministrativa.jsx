@@ -1,19 +1,50 @@
+import { useEffect, useMemo, useState } from "react";
 import NormativaTable from "../../components/Table/NormativasTable";
 import { useLocation } from "react-router";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
-import { getWithCancel } from "../../api/cancellable";
-import {useAuth} from "../../context/useAuth";
+import { useAuth } from "../../context/useAuth";
+import SearchBar from "../../components/layout/SearchBar";
+
 function VistaAdministrativa() {
   const location = useLocation();
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const user = auth?.user;
+
   const tipoUser = user?.tipo_usuario;
   const depName = user?.dependencia;
+
   const type = location.pathname.split("/")[2];
+
+  const isNormativaPorAnio =
+    type === "normativaPorAño" || type === "normativaPorAnio";
+
+  const isSuperAdmin = tipoUser === "SuperAdministrador";
+  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
+  const isSupervisor = tipoUser === "Supervisor";
+
+  const lockDependencia =
+    isNormativaPorAnio &&
+    !isSuperAdmin &&
+    (isAdminDependencia || isSupervisor) &&
+    !!depName;
+
+  const showTagSearch = useMemo(
+    () =>
+      [
+        "ListadoNormativa",
+        "ListadoNormativaEliminadas",
+        "ListadoNormativaDespublicadas",
+      ].includes(type),
+    [type],
+  );
+
   const modo = "admin";
 
-  const { ns, state, setFilters } = useNamespacedFilters({
+  // Tag buscado desde SearchBar
+  const [tagQuery, setTagQuery] = useState("");
+
+  const { state, setFilters } = useNamespacedFilters({
     scope: "admin",
     type,
     initial: {},
@@ -22,30 +53,67 @@ function VistaAdministrativa() {
     persist: false,
     resetOnUnmount: false,
     resetOnNsChange: true,
-    onHydrated: (f) => void fetchData(f),
   });
 
-  async function fetchData(filtros) {
-    const res = await getWithCancel(ns, "/normativas", { params: filtros });
-    if (res?.cancelled) return;
-  }
+  const TAG_PARAM = "tags";
+
+  const mergeWithTag = (base = {}, tag = tagQuery) => {
+    const next = { ...(base || {}) };
+    const clean = (tag ?? "").trim();
+
+    if (clean) next[TAG_PARAM] = clean;
+    else delete next[TAG_PARAM];
+
+    return next;
+  };
+
+  useEffect(() => {
+    if (!lockDependencia) return;
+
+    const current = state.filters?.dependencia;
+    if (String(current ?? "") === String(depName)) return;
+
+    setFilters({ ...(state.filters || {}), dependencia: depName });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockDependencia, depName]);
+
+  useEffect(() => {
+    if (!showTagSearch) {
+      setTagQuery("");
+      const next = { ...(state.filters || {}) };
+      delete next[TAG_PARAM];
+      setFilters(next);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showTagSearch]);
 
   const handleSearch = (formData) => {
-    const next = formData || {};
-    setFilters(next);
-    fetchData(next);
-  };
-const isSuperAdmin = tipoUser === "SuperAdministrador";
-  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
-  const isSupervisor = tipoUser === "Supervisor";
+    const safeForm = lockDependencia
+      ? { ...(formData || {}), dependencia: depName }
+      : formData;
 
-  const lockDependencia =
-    !isSuperAdmin &&
-    (isAdminDependencia || isSupervisor) &&
-    !!depName;
+    const next = mergeWithTag(safeForm, tagQuery);
+    setFilters(next);
+  };
+
+  const handleSearchTags = (tagName) => {
+    const clean = (tagName ?? "").trim();
+    setTagQuery(clean);
+
+    const next = mergeWithTag(state.filters, clean);
+    setFilters(next);
+  };
 
   return (
     <div className="container">
+      {showTagSearch && (
+        <SearchBar
+          value={tagQuery}
+          onSearch={handleSearchTags}
+          onClear={() => handleSearchTags("")}
+        />
+      )}
+
       <GenericFilterSearch
         type={type}
         scope="admin"
@@ -56,6 +124,7 @@ const isSuperAdmin = tipoUser === "SuperAdministrador";
           dependencia: lockDependencia,
         }}
       />
+
       <NormativaTable type={type} filtros={state.filters} modo={modo} />
     </div>
   );

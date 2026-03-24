@@ -44,15 +44,29 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
-        { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
+        { label: "Convenio", value: "3" },
+        { label: "Otros", value: "7" },
       ],
     },
   ],
 
+  ListadoNormativaPorAnio: [
+    {
+      name: "dependencia",
+      type: "select",
+      label: "Dependencia",
+      fromContext: "dependencias",
+    },
+    {
+      name: "anio",
+      type: "select",
+      label: "Año",
+      async: true,
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
+      key: "anio",
+    },
+  ],
   ListadoNormativaEliminadas: [
     {
       name: "numero",

@@ -1,110 +1,150 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from "react";
 import useAxios from "axios-hooks";
 import PropTypes from "prop-types";
-import { API_BASE } from '../../api/axiosPrivate';
-function SearchBar({onSearch}) {
-  const [inputValue, setInputValue] = useState('');
+import { API_BASE } from "../../api/axiosPrivate";
+
+function TagFilterHero({ value, onSearch, onClear }) {
+  const [inputValue, setInputValue] = useState(value ?? "");
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [isListVisible, setIsListVisible] = useState(false);
+
   const inputRef = useRef(null);
   const listRef = useRef(null);
 
-  const [{ data }] = useAxios(`${API_BASE}/tag/tags`);
+  const [{ data, loading }] = useAxios(`${API_BASE}/tag/tags`);
+  const tags = data?.tags ?? [];
+
+  // Mantener sincronizado si el padre cambia value (por urlSync, etc.)
+  useEffect(() => {
+    setInputValue(value ?? "");
+  }, [value]);
 
   const handleInputChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
-    
+    const v = e.target.value;
+    setInputValue(v);
 
-    if (value.length >= 2) {
-      const filtered = data.tags.filter((option) =>
-        option.nombre.toLowerCase().includes(value.toLowerCase())
+    if (v.trim().length >= 2) {
+      const filtered = tags.filter((t) =>
+        t.nombre.toLowerCase().includes(v.toLowerCase()),
       );
-      setFilteredOptions(filtered.slice(0, 8));
+      setFilteredOptions(filtered.slice(0, 10));
+    } else {
+      setFilteredOptions([]);
     }
-
     setIsListVisible(true);
   };
 
-  const handleOptionClick = (option) => {
-    setInputValue(option.nombre);   
-    onSearch(option.nombre);
-    setIsListVisible(false);       
+  const doSearch = (v) => {
+    const next = (v ?? "").trim();
+    onSearch(next);
+    setIsListVisible(false);
+  };
+
+  const handleSelect = (tag) => {
+    setInputValue(tag.nombre);
+    doSearch(tag.nombre);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // Si hay sugerencias, usa la primera (más rápido)
+      if (filteredOptions.length > 0) return handleSelect(filteredOptions[0]);
+      doSearch(inputValue);
+    }
+    if (e.key === "Escape") setIsListVisible(false);
   };
 
   const handleClickOutside = (e) => {
-    if (inputRef.current && !inputRef.current.contains(e.target) &&
-        listRef.current && !listRef.current.contains(e.target)) {
+    if (
+      inputRef.current &&
+      !inputRef.current.contains(e.target) &&
+      listRef.current &&
+      !listRef.current.contains(e.target)
+    ) {
       setIsListVisible(false);
     }
   };
 
-  const handleKeyPress =(e) => {
-    if (e.key === 'Enter' || inputValue.trim() == '') {
-      onSearch(inputValue);
-      setIsListVisible(false);
-    }
-  }
-
   useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className="flex flex-col items-start relative z-10">
-      <label className="input flex items-center gap-2">
-        <button
-          type="button"
-          className="text-gray-500 hover:text-primary"
-          onClick={() => {
-            if (inputValue.trim() !== "") {
-              onSearch(inputValue);
-              setIsListVisible(false);
-            }
-          }}
-        >
-          <svg
-            className="h-[1.2em] w-[1.2em]"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-          >
-            <g
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="2.5"
-              fill="none"
-              stroke="currentColor"
-            >
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="m21 21-4.3-4.3"></path>
-            </g>
-          </svg>
-        </button>
+    <div className="relative w-full">
+      {/* “Toolbar” destacada */}
+      <div className="w-full rounded-xl border border-base-300 bg-base-200/70 px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+          {/* Texto guía (protagonismo) */}
+          <div className="flex-1">
+            <div className="text-sm font-semibold opacity-80"></div>
+            <div className="text-lg font-bold leading-tight">
+              Buscar por TAGS
+            </div>
+            <div className="text-xs opacity-60">Escribe 2+ letras.</div>
+          </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-          onFocus={() => setIsListVisible(true)}
-          onKeyPress={handleKeyPress}
-          required
-          placeholder="Buscar por tags..."
-          className="flex-1 text-black"
-        />
-      </label>
-      {inputValue && isListVisible && filteredOptions.length > 0 && (
-        <ul ref={listRef} id='options' className="options-list mt-2 w-full p-0 m-0 absolute left-0 top-full">
-          {filteredOptions.map((option, index) => (
-            <li key={index} className="option-item">
+          <div className="w-full sm:w-[520px]">
+            <label className="input input-bordered input-lg flex items-center gap-3 w-full">
+              <span className="text-lg">🏷️</span>
+
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                onFocus={() => setIsListVisible(true)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ej: resolucion, becas, carrera…"
+                className="grow text-base-content placeholder:text-base-content/50"
+              />
+
+              {loading ? (
+                <span className="loading loading-spinner loading-sm opacity-70" />
+              ) : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => doSearch(inputValue)}
+                  disabled={inputValue.trim() === ""}
+                  title="Buscar"
+                >
+                  Buscar
+                </button>
+              )}
+
               <button
-                className="w-full text-left text-black text-sm bg-blue-200 hover:bg-blue-300 p-2"
-                onClick={() => handleOptionClick(option)} 
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  setInputValue("");
+                  setFilteredOptions([]);
+                  setIsListVisible(false);
+                  onClear?.();
+                  onSearch("");
+                  inputRef.current?.focus();
+                }}
+                disabled={inputValue.trim() === ""}
+                title="Limpiar"
               >
-                {option.nombre}
+                Limpiar
+              </button>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Dropdown */}
+      {isListVisible && filteredOptions.length > 0 && (
+        <ul
+          ref={listRef}
+          className="menu mt-2 w-full sm:w-[520px] sm:ml-auto rounded-box bg-base-100 border border-base-300 shadow-lg absolute z-50 max-h-72 overflow-auto"
+        >
+          {filteredOptions.map((tag) => (
+            <li key={tag.id}>
+              <button type="button" onClick={() => handleSelect(tag)}>
+                {tag.nombre}
               </button>
             </li>
           ))}
@@ -114,16 +154,10 @@ function SearchBar({onSearch}) {
   );
 }
 
-SearchBar.propTypes = {
-  dependencia: PropTypes.string,
+TagFilterHero.propTypes = {
+  value: PropTypes.string,
   onSearch: PropTypes.func.isRequired,
-  dependenciaMap: PropTypes.object.isRequired,
-  anio: PropTypes.number,
-  documento: PropTypes.number,
-  emisor: PropTypes.number,
-  numero: PropTypes.string,
-  onFormChange: PropTypes.func,
+  onClear: PropTypes.func,
 };
 
-
-export default SearchBar;
+export default TagFilterHero;

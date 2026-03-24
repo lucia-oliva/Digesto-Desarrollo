@@ -1,4 +1,3 @@
-
 import db from "./db.js";
 import tagService from "./tag.js";
 import auditoriaService from "./auditoria.js";
@@ -58,12 +57,11 @@ async function getNormativaCompletaById(id) {
   }
 }
 
-
 async function updateModificacion({ id_relacion, accion, comentario }) {
   try {
     const result = await db.execute(
       "UPDATE relacion SET id_acciones = ?, comentario = ? WHERE id = ?",
-      [accion, comentario, id_relacion]
+      [accion, comentario, id_relacion],
     );
     if (result.affectedRows === 0)
       throw httpError(404, `No se encontró la relación con ID ${id_relacion}`);
@@ -78,14 +76,14 @@ async function eliminarRelacionesDeNormativa(normativaId) {
   try {
     const exists = await db.queryOne(
       "SELECT id FROM relacion WHERE normativa_complementaria = ? LIMIT 1",
-      [normativaId]
+      [normativaId],
     );
     if (!exists)
       return { deleted: 0, message: "No hay relaciones para eliminar" };
 
     const delRes = await db.execute(
       "DELETE FROM relacion WHERE normativa_complementaria = ?",
-      [normativaId]
+      [normativaId],
     );
     return {
       deleted: delRes.affectedRows,
@@ -100,14 +98,14 @@ async function eliminarRelacionesDeNormativa(normativaId) {
 async function editNormativaModificada(
   normativas_modificadas,
   normativaId,
-  fechaSubida
+  fechaSubida,
 ) {
   for (const mod of normativas_modificadas) {
     const { id, id_relacion, accion, comentario, estado } = mod;
     if (!estado)
       throw httpError(
         400,
-        "El campo 'estado' es obligatorio en cada modificación"
+        "El campo 'estado' es obligatorio en cada modificación",
       );
 
     switch (estado) {
@@ -133,7 +131,7 @@ async function editNormativaModificada(
         if (!id_relacion || !accion)
           throw httpError(
             400,
-            "Faltan 'id_relacion' o 'accion' para modificar relación"
+            "Faltan 'id_relacion' o 'accion' para modificar relación",
           );
         await updateModificacion({ id_relacion, accion, comentario });
         break;
@@ -190,9 +188,7 @@ async function edit(data) {
     if (upd.affectedRows === 0)
       throw httpError(404, `No se encontró la normativa con ID ${id}`);
 
-  
     await tagService.insertTagsForNormativa(id, tags);
-
 
     const fechaSubida = new Date().toISOString().split("T")[0];
     if (cambia_normativa === "SI") {
@@ -203,7 +199,7 @@ async function edit(data) {
         await editNormativaModificada(normativas_modificadas, id, fechaSubida);
       } else {
         console.warn(
-          "Se indicó 'SI' en cambia_normativa pero no llegaron relaciones."
+          "Se indicó 'SI' en cambia_normativa pero no llegaron relaciones.",
         );
       }
     } else if (cambia_normativa === "NO") {
@@ -247,7 +243,7 @@ async function registrarModificacion({
     const ins = await db.execute(
       `INSERT INTO relacion (normativa_original, normativa_complementaria, comentario, fecha, id_acciones)
        VALUES (?, ?, ?, ?, ?)`,
-      [id, normativaId, comentario, fechaSubida, accion]
+      [id, normativaId, comentario, fechaSubida, accion],
     );
     if (ins.affectedRows === 0)
       throw httpError(400, "No se pudo registrar la modificación");
@@ -298,7 +294,7 @@ async function create(data) {
         archivo,
         fechaSubida,
         user.id,
-      ]
+      ],
     );
     if (ins.affectedRows === 0)
       throw httpError(400, "No se pudo crear la normativa");
@@ -323,10 +319,8 @@ async function create(data) {
       }
     }
 
- 
     await tagService.insertTagsForNormativa(normativaId, tags);
 
-  
     if (user?.id) {
       await auditoriaService.crearRegistroAuditoria({
         id_normativa: normativaId,
@@ -355,7 +349,7 @@ async function eliminar(id, userId, motivo = null) {
 
     const upd = await db.execute(
       "UPDATE normativa SET estado = 'eliminada' WHERE id = ?",
-      [id]
+      [id],
     );
     if (upd.affectedRows === 0)
       throw httpError(400, "No se pudo actualizar la normativa");
@@ -374,7 +368,6 @@ async function eliminar(id, userId, motivo = null) {
     throw error;
   }
 }
-
 
 async function getAllYears() {
   return db.query("SELECT DISTINCT anio FROM normativa");
@@ -416,7 +409,7 @@ async function searchByNumber(number) {
     const row = await db.queryOne("SELECT * FROM normativa WHERE numero = ?", [
       number,
     ]);
-    return row || null; 
+    return row || null;
   } catch (err) {
     console.error("Error al buscar normativa por número: ", err);
     throw err;
@@ -524,6 +517,7 @@ console.log("ANTES DE LLAMAR:", {
       WHERE 1=1 AND n.estado = 'publicado'
     `;
     const params = [];
+    console.log(tags);
 
     if (numero) {
       sql += " AND n.numero = ?";
@@ -557,20 +551,19 @@ console.log("ANTES DE LLAMAR:", {
     if(fechaOrder){
       clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
     }
-    if(visitasOrder){
+    if (visitasOrder) {
       clauses.push(`n.visitas ${normDir(visitasOrder)}`);
     }
 
-   if (clauses.length === 0) {
-    
-     sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
-   } else {
-     if (!fechaOrder && visitasOrder) {
-       clauses.push("n.fecha_normativa DESC");
-     }
-     clauses.push("n.id DESC");
-     sql += " ORDER BY " + clauses.join(", ");
-   }
+    if (clauses.length === 0) {
+      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+    } else {
+      if (!fechaOrder && visitasOrder) {
+        clauses.push("n.fecha_normativa DESC");
+      }
+      clauses.push("n.id DESC");
+      sql += " ORDER BY " + clauses.join(", ");
+    }
 
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
@@ -596,7 +589,7 @@ async function searchNormativaEliminadaByParameters(
   offset = null,
   tags,
   fechaOrder,
-  visitasOrder
+  visitasOrder,
 ) {
   try {
     let sql = `
@@ -648,17 +641,17 @@ async function searchNormativaEliminadaByParameters(
     sql += " GROUP BY n.id";
     const clauses = [];
     const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
-    if(fechaOrder){
+    if (fechaOrder) {
       clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
     }
-    if(visitasOrder){
+    if (visitasOrder) {
       clauses.push(`n.visitas ${normDir(visitasOrder)}`);
     }
 
-    if(clauses.length === 0){
+    if (clauses.length === 0) {
       sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
-    }else{
-      if(!fechaOrder && visitasOrder){
+    } else {
+      if (!fechaOrder && visitasOrder) {
         clauses.push("n.fecha_normativa DESC");
       }
       clauses.push("n.id DESC");
@@ -737,12 +730,12 @@ async function updateNormativa(id, dataToSend) {
     if (!archivo || String(archivo).trim() === "") {
       const row = await db.queryOne(
         "SELECT archivo FROM normativa WHERE id = ?",
-        [id]
+        [id],
       );
       if (!row)
         throw httpError(
           404,
-          "No se encontró la normativa para conservar el archivo"
+          "No se encontró la normativa para conservar el archivo",
         );
       archivoFinal = row.archivo;
     }
@@ -764,7 +757,7 @@ async function updateNormativa(id, dataToSend) {
         estado,
         archivoFinal,
         id,
-      ]
+      ],
     );
     if (upd.affectedRows === 0)
       throw httpError(404, `No se encontró la normativa con ID ${id}`);
@@ -790,7 +783,7 @@ async function restaurar(id, userId) {
 
     const upd = await db.execute(
       "UPDATE normativa SET estado='despublicado' WHERE id = ?",
-      [id]
+      [id],
     );
     if (upd.affectedRows === 0)
       throw httpError(400, "No se pudo restaurar la normativa");
@@ -820,7 +813,7 @@ async function publicar(id, userId) {
 
     const upd = await db.execute(
       "UPDATE normativa SET estado='publicado' WHERE id = ?",
-      [id]
+      [id],
     );
     if (upd.affectedRows === 0)
       throw httpError(400, "No se pudo publicar la normativa");
@@ -849,7 +842,7 @@ async function searchNormativaDespublicadasByParameters(
   offset = null,
   tags,
   fechaOrder,
-  visitasOrder
+  visitasOrder,
 ) {
   try {
     let sql = `
@@ -902,16 +895,16 @@ async function searchNormativaDespublicadasByParameters(
     sql += " GROUP BY n.id";
     const clauses = [];
     const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
-    if(fechaOrder){
+    if (fechaOrder) {
       clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
     }
-    if(visitasOrder){
+    if (visitasOrder) {
       clauses.push(`n.visitas ${normDir(visitasOrder)}`);
     }
-    if(clauses.length === 0){
+    if (clauses.length === 0) {
       sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
-    }else{
-      if(!fechaOrder && visitasOrder){
+    } else {
+      if (!fechaOrder && visitasOrder) {
         clauses.push("n.fecha_normativa DESC");
       }
       clauses.push("n.id DESC");
@@ -929,7 +922,7 @@ async function searchNormativaDespublicadasByParameters(
   } catch (err) {
     console.error(
       "Error al buscar normativa despublicada por parámetros:",
-      err
+      err,
     );
     throw err;
   }
