@@ -441,6 +441,9 @@ async function searchById(id) {
   }
 }
 
+function escapeRegex(texto) {
+  return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 function buildResumenTagsCondition(resumen) {
   if (!resumen || !resumen.trim()) {
@@ -456,28 +459,28 @@ function buildResumenTagsCondition(resumen) {
         .filter(Boolean)
     : [textoCompleto];
 
-  const tagsConditions = tagsSeparados.map(() => `
-    EXISTS (
-      SELECT 1
-      FROM tag_normativa tn3
-      JOIN tag t3 ON t3.id = tn3.id_tag
-      WHERE tn3.id_normativa = n.id
-        AND t3.nombre LIKE ?
-    )
-  `);
+  const tagsConditions = tagsSeparados.map(
+    () => `
+      EXISTS (
+        SELECT 1
+        FROM tag_normativa tn3
+        JOIN tag t3 ON t3.id = tn3.id_tag
+        WHERE tn3.id_normativa = n.id
+          AND t3.nombre = ?
+      )
+    `
+  );
+
+  const resumenRegex = `[[:<:]]${escapeRegex(textoCompleto)}[[:>:]]`;
 
   const sql = `
     AND (
-      n.resumen LIKE ?
-      ${tagsConditions.length ? `OR (${tagsConditions.join(" OR ")})` : ""}
+      n.resumen REGEXP ?
+      OR (${tagsConditions.join(" OR ")})
     )
   `;
 
-  const params = [`%${textoCompleto}%`];
-
-  tagsSeparados.forEach((tag) => {
-    params.push(`%${tag}%`);
-  });
+  const params = [resumenRegex, ...tagsSeparados];
 
   return { sql, params };
 }
