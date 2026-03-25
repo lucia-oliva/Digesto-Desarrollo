@@ -1,5 +1,4 @@
 import { useState } from "react";
-import SearchBar from "../components/layout/SearchBar";
 import ContactModal from "../components/layout/Contact";
 import NormativaTable from "../components/Table/NormativasTable";
 import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
@@ -81,8 +80,6 @@ function NormativasContainer({ isAdmin = false }) {
       }`}
     >
       <div className="w-auto gap-4 bg-gray-100 text-neutral text-center p-5 rounded-lg shadow-lg">
-        <SearchBar value={tags} onSearch={handleSearchTags} />
-
         <GenericFilterSearch
           type="ListadoNormativa"
           scope="public"

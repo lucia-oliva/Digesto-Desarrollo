@@ -4,7 +4,6 @@ import { useLocation } from "react-router";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
 import { useAuth } from "../../context/useAuth";
-import SearchBar from "../../components/layout/SearchBar";
 
 function VistaAdministrativa() {
   const location = useLocation();
@@ -15,9 +14,11 @@ function VistaAdministrativa() {
   const depName = user?.dependencia;
 
   const type = location.pathname.split("/")[2];
+  console.log("type", type);
+  
 
   const isNormativaPorAnio =
-    type === "normativaPorAño" || type === "normativaPorAnio";
+    type === "ListadoNormativaPorAnio" || type === "normativaPorAño" || type === "normativaPorAnio";
 
   const isSuperAdmin = tipoUser === "SuperAdministrador";
   const isAdminDependencia = tipoUser === "Administrador de Dependencia";
@@ -41,7 +42,6 @@ function VistaAdministrativa() {
 
   const modo = "admin";
 
-  // Tag buscado desde SearchBar
   const [tagQuery, setTagQuery] = useState("");
 
   const { state, setFilters } = useNamespacedFilters({
@@ -96,24 +96,9 @@ function VistaAdministrativa() {
     setFilters(next);
   };
 
-  const handleSearchTags = (tagName) => {
-    const clean = (tagName ?? "").trim();
-    setTagQuery(clean);
-
-    const next = mergeWithTag(state.filters, clean);
-    setFilters(next);
-  };
 
   return (
     <div className="container">
-      {showTagSearch && (
-        <SearchBar
-          value={tagQuery}
-          onSearch={handleSearchTags}
-          onClear={() => handleSearchTags("")}
-        />
-      )}
-
       <GenericFilterSearch
         type={type}
         scope="admin"

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import SearchBar from "../../components/layout/SearchBar";
 import NormativaTable from "../../components/Table/NormativasTable";
 
 function ConsejoNormativas() {
@@ -10,9 +9,7 @@ function ConsejoNormativas() {
     <div className="pt-20 overflow-x-visible">
       <div className="px-4 md:px-6 xl:px-8">
         <div className="flex flex-col gap-4 justify-between items-start border-b pb-2 mb-2">
-          <div className="w-full sm:w-auto text-base-content self-end">
-            <SearchBar value={tags} onSearch={(tag) => setTags(tag || "")} />
-          </div>
+          
           <h2 className="text-lg font-bold text-gray-700">
             Normativas del Consejo Superior
           </h2>

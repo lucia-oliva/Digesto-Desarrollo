@@ -38,4 +38,8 @@ export const adminConfig = {
     tipo: "normativaDespublicadas",
     columns: normativaColumns,
   },
+  ListadoNormativaPorAnio: {
+    tipo: "normativa",
+    columns: normativaColumns,
+  },
 };

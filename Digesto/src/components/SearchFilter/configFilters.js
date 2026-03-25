@@ -18,6 +18,11 @@ export const filterConfig = {
       label: "Número",
     },
     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
+    },
+    {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
@@ -73,6 +78,11 @@ export const filterConfig = {
       type: "text",
       label: "Número",
     },
+     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
+    },
     {
       name: "dependencia",
       type: "select",
@@ -114,6 +124,11 @@ export const filterConfig = {
       name: "numero",
       type: "text",
       label: "Número",
+    },
+     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
     },
     {
       name: "dependencia",

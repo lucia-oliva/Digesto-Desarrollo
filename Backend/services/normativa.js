@@ -517,7 +517,6 @@ console.log("ANTES DE LLAMAR:", {
       WHERE 1=1 AND n.estado = 'publicado'
     `;
     const params = [];
-    console.log(tags);
 
     if (numero) {
       sql += " AND n.numero = ?";
