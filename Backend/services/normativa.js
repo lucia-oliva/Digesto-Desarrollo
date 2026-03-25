@@ -497,14 +497,7 @@ async function searchNormativaByParameters(
   fechaOrder,
   visitasOrder,
   resumen
-) {
-
-console.log("ANTES DE LLAMAR:", {
-  numero, dependencia, emisor, documento, anio,
-  limite, offset, fechaOrder, visitasOrder,
-  resumen
-});
-  
+) {  
   try {
     let sql = `
       SELECT
@@ -589,9 +582,9 @@ async function searchNormativaEliminadaByParameters(
   anio,
   limite = null,
   offset = null,
-  tags,
   fechaOrder,
   visitasOrder,
+  resumen
 ) {
   try {
     let sql = `
@@ -629,16 +622,10 @@ async function searchNormativaEliminadaByParameters(
       sql += " AND n.anio = ?";
       params.push(anio);
     }
-    if (tags) {
-      sql += `
-        AND EXISTS (
-          SELECT 1 FROM tag_normativa tn2
-          JOIN tag t ON t.id = tn2.id_tag
-          WHERE tn2.id_normativa = n.id AND t.nombre = ?
-        )
-      `;
-      params.push(tags);
-    }
+   
+    const resumenFilter = buildResumenTagsCondition(resumen);
+    sql += resumenFilter.sql;
+    params.push(...resumenFilter.params);
 
     sql += " GROUP BY n.id";
     const clauses = [];
@@ -842,9 +829,9 @@ async function searchNormativaDespublicadasByParameters(
   anio,
   limite = null,
   offset = null,
-  tags,
   fechaOrder,
   visitasOrder,
+  resumen
 ) {
   try {
     let sql = `
@@ -883,16 +870,9 @@ async function searchNormativaDespublicadasByParameters(
       params.push(anio);
     }
 
-    if (tags) {
-      sql += `
-        AND EXISTS (
-          SELECT 1 FROM tag_normativa tn2
-          JOIN tag t ON t.id = tn2.id_tag
-          WHERE tn2.id_normativa = n.id AND t.nombre = ?
-        )
-      `;
-      params.push(tags);
-    }
+    const resumenFilter = buildResumenTagsCondition(resumen);
+    sql += resumenFilter.sql;
+    params.push(...resumenFilter.params);
 
     sql += " GROUP BY n.id";
     const clauses = [];

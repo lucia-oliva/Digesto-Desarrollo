@@ -72,7 +72,7 @@ router.post(
     const { numero, emisor, documento, anio, fechaOrder, visitasOrder, resumen} = req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
-    console.log("req.body:", req.body);
+  
 
     const { data, totalResults } =
       await normativaDB.searchNormativaByParameters(
@@ -87,8 +87,6 @@ router.post(
         visitasOrder,
         resumen
       );
-
-       console.log("req.body:", req.body);
   
     res.status(200).json({ ok: true, data: data || [], totalResults }); 
   } 
@@ -98,7 +96,7 @@ router.post(
 router.post(
   "/searchEliminadas",
   asyncHandler(async (req, res) => {
-    const { numero, emisor, documento, anio, tags, fechaOrder, visitasOrder } =
+    const { numero, emisor, documento, anio, fechaOrder, visitasOrder, resumen} =
       req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
@@ -112,9 +110,9 @@ router.post(
         anio,
         limite,
         offset,
-        tags,
         fechaOrder,
         visitasOrder,
+        resumen
       );
 
     res.status(200).json({ ok: true, data: data || [], totalResults });
@@ -124,7 +122,7 @@ router.post(
 router.post(
   "/searchDespublicadas",
   asyncHandler(async (req, res) => {
-    const { numero, emisor, documento, anio, tags, fechaOrder, visitasOrder } =
+    const { numero, emisor, documento, anio, fechaOrder, visitasOrder, resumen } =
       req.body;
     const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
     const { limite, offset } = getPagination(req, 10);
@@ -138,9 +136,9 @@ router.post(
         anio,
         limite,
         offset,
-        tags,
         fechaOrder,
         visitasOrder,
+        resumen
       );
 
     res.status(200).json({ ok: true, data: data || [], totalResults });
