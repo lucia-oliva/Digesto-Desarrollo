@@ -23,6 +23,7 @@ export const menuItems = [
         name: "Despublicadas",
         path: "./ListadoNormativaDespublicadas",
       },
+      { name: "Por Año", path: "./ListadoNormativaPorAnio" },
     ],
     roles: ["SuperAdministrador", "Supervisor", "Administrador de Dependencia"],
   },

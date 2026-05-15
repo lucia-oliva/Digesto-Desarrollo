@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import { IoIosMenu, IoIosClose } from "react-icons/io";
 
-const LOGO_UNLAR = "/src/assets/UnlarLogo.png";
+const LOGO_UNLAR = "/src/assets/IdentidadBlancoUNLAR.png";
 
 const BASE_LINKS = [
   { to: "/consejo-superior", label: "Inicio", end: true },
@@ -11,12 +11,12 @@ const BASE_LINKS = [
   { to: "/consejo-superior/comisiones", label: "Comisiones" },
   { to: "/consejo-superior/reglamento", label: "Reglamento" },
   { to: "/consejo-superior/normativas", label: "Normativas" }, 
-  { to: "/consejo-superior/sesiones", label: "Sesiones" },
    
 ];
 
 const ADMIN_LINKS = [
   { to: "/consejo-superior/addsesion", label: "Agregar Sesión" },
+  { to: "/consejo-superior/sesiones", label: "Sesiones" },
 ];
 
 

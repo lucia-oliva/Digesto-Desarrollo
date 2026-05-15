@@ -1,88 +1,85 @@
 import PropTypes from "prop-types";
-import { Link } from "react-router"; 
+import DependenciaCard, {
+  normalizeLabel,
+} from "./Dependencias/DependenciaCard";
+import DependenciasRow from "./Dependencias/DependenciasRow";
 
 const dependenciaEnum = [
+  "Consejo Superior",
+  "Rectorado",
+  "Asamblea",
   "Exactas",
   "Salud",
   "Humanas",
   "Sociales",
   "Aplicadas",
   "Chepes",
-  "Villa Union",
+  "Villa Unión",
   "Chamical",
   "Aimogasta",
   "Catuna",
-  "C. Superior",
   "Todas",
 ];
 
-const colors = [
-  "bg-blue-300",
-  "bg-green-300",
-  "bg-orange-300",
-  "bg-cyan-300",
-  "bg-red-300",
-];
+export default function Dependencias({ dependencias }) {
+  const list = dependencias?.length ? dependencias : dependenciaEnum;
 
-const nombreToId = {
-  Aplicadas: "1",
-  Exactas: "2",
-  Salud: "3",
-  Sociales: "4",
-  Humanas: "5",
-  "C. Superior": "20", 
-  "C.Superior": "20",
-  Chepes: "22",
-  "Villa Union": "26",
-  "Villa Unión": "26",
-  Chamical: "25",
-  Aimogasta: "24",
-  Catuna: "23",
-};
+  const pick = (labels) => {
+    const map = new Map(list.map((n) => [normalizeLabel(n), n]));
+    return labels.map((k) => map.get(k)).filter(Boolean);
+  };
 
-function Dependencias({ dependencias }) {
-  const displayedDependencias = dependencias.length
-    ? dependencias
-    : dependenciaEnum;
+  const top = pick(["Consejo Superior", "Asamblea", "Rectorado"]);
+  const facus = pick(["Exactas", "Salud", "Humanas", "Sociales", "Aplicadas"]);
+  const sedes = pick([
+    "Chepes",
+    "Villa Unión",
+    "Chamical",
+    "Aimogasta",
+    "Catuna",
+  ]);
+  const todas = pick(["Todas"])[0];
+  const topGetCardProps = () => ({kind: "emisor"});
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {displayedDependencias.map((nombre, index) => {
-        const label =
-          nombre === "C. Superior" ? "C.Superior" : String(nombre);
-        const id = nombreToId[nombre] ?? nombreToId[label] ?? "";
-        const to =
-          label.toLowerCase() === "todas" || !id
-            ? "/busqueda"
-            : `/busqueda?dependencia=${encodeURIComponent(id)}`;
+    <section className="w-full">
+      <div className="grid grid-cols-12 gap-4">
+        {/* Fila 1 */}
+        <DependenciasRow
+          items={top}
+          big
+          colsClass="grid-cols-1 sm:grid-cols-3"
+          startColor={1}
+          getCardProps={topGetCardProps}
+        />
 
-        return (
-          <Link
-            key={index}
-            to={to}
-            className={`card  flex flex-1/4 md:flex-1/5 items-center p-2
-            text-white font-medium md:text-xl
-            ${colors[index] || "bg-slate-400"}
-            hover:-translate-y-1 hover:shadow-lg
-            transition-all duration-300 ease-in-out 
-            `}
-          >
-            <figure className="flex items-center self-start justify-start w-10 h-10 rounded-full">
-              <img
-                src="src/assets/UnlarLogo.png"
-                alt=""
-                className="object-contain"
-              />
-            </figure>
-            {label}
-          </Link>
-        );
-      })}
-    </div>
+        {/* Fila 2 */}
+        <DependenciasRow
+          title="Departamentos"
+          items={facus}
+          colsClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
+          startColor={0}
+        />
+
+        {/* Fila 3 */}
+        <DependenciasRow
+          title="Sedes"
+          items={sedes}
+          colsClass="grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
+          Colored={false}
+        />
+
+        {/* Todas */}
+        {todas && (
+          <div className="col-span-5">
+            <DependenciaCard nombre={todas} colored={false} />
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
+
 Dependencias.propTypes = {
   dependencias: PropTypes.array.isRequired,
 };
-
-export default Dependencias;

@@ -2,11 +2,9 @@
 import { API_BASE } from "../../api/axiosPrivate.js";
 
 export const tipoNormativaOptions = [
-  { label: "Acta", value: 1 },
   { label: "Resolución", value: 2 },
   { label: "Convenio", value: 3 },
-  { label: "Nota", value: 4 },
-  { label: "Providencia", value: 5 },
+  { label: "Otros", value: 7 },
   { label: "Ordenanza", value: 6 },
 ];
 
@@ -18,6 +16,11 @@ export const filterConfig = {
       label: "Número",
     },
     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
+    },
+    {
       name: "dependencia",
       type: "select",
       label: "Dependencia",
@@ -44,21 +47,40 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
-        { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
+        { label: "Convenio", value: "3" },
+        { label: "Otros", value: "7" },
       ],
     },
   ],
 
+  ListadoNormativaPorAnio: [
+    {
+      name: "dependencia",
+      type: "select",
+      label: "Dependencia",
+      fromContext: "dependencias",
+    },
+    {
+      name: "anio",
+      type: "select",
+      label: "Año",
+      async: true,
+      endpoint: `${API_BASE}/normativa/yearNormativa`,
+      key: "anio",
+    },
+  ],
   ListadoNormativaEliminadas: [
     {
       name: "numero",
       type: "text",
       label: "Número",
     },
+     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
+    },
     {
       name: "dependencia",
       type: "select",
@@ -86,11 +108,9 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
+        { label: "Otros", value: "7" },
         { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
       ],
     },
   ],
@@ -101,6 +121,11 @@ export const filterConfig = {
       type: "text",
       label: "Número",
     },
+     {
+      name:"resumen",
+      type:"text",
+      label:"Palabras Clave"
+    },
     {
       name: "dependencia",
       type: "select",
@@ -128,11 +153,9 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
         { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
+        { label: "Otros", value: "7" },
       ],
     },
   ],

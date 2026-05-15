@@ -6,7 +6,7 @@ export const camposPorEntidad = {
     { name: "resumen", label: "Resumen", type: "textarea", required: true },
     {
       name: "fecha",
-      label: "Fecha de publicación",
+      label: "Fecha",
       type: "date",
       required: true,
     },

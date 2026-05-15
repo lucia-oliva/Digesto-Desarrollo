@@ -38,6 +38,7 @@ function GenericEdit() {
   const pathSegment = location.pathname
     .split("/")
     .find((s) => s.startsWith("Editar") || s.startsWith("Nuevo"));
+    
   const entidad = pathSegment
     ? pathSegment.replace("Editar", "").replace("Nuevo", "").toLowerCase()
     : null;

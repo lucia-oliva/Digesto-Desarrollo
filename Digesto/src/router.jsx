@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Header from "./components/layout/Header";
+import HelpPdfView from "./pages/Help.jsx";
 import BusquedaNormativas from "./pages/BusquedaNormativas.jsx";
 import DocumentView from "./pages/documentView";
 import Login from "./pages/auth/Login";
@@ -24,6 +25,7 @@ import AgregarSesion from "./pages/consejo-superior/Sesiones/AgregarSesion.jsx";
 import EditarSesion from "./pages/consejo-superior/Sesiones/EditarSesion.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import RequireSuperAdmin from "./components/routes/RequireSuperAdmin.jsx";
+import RequireConsejoSuperior from "./components/routes/RequireConsejoSuperior.jsx"
 
 const Router = () => {
   return (
@@ -32,6 +34,7 @@ const Router = () => {
         <Route element={<Header />}>
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
+          <Route path="ayuda" element={<HelpPdfView />} />
           <Route path="busqueda" element={<BusquedaNormativas />} />
           <Route path="document/:id" element={<DocumentView />} />
           <Route path="/consejo-superior" element={<ConsejoPage />}>
@@ -41,7 +44,9 @@ const Router = () => {
               element={<DocumentView variant="consejo" />}
             />
             <Route path="normativas" element={<ConsejoNormativas />} />
+            <Route element= {<RequireConsejoSuperior/>}>
             <Route path="sesiones" element={<ConsejoSesiones />} />
+            </Route>
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
             <Route path="reglamento" element={<ConsejoReglamento />} />
             <Route path="comisiones" element={<ConsejoComisiones />} />
@@ -62,6 +67,7 @@ const Router = () => {
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="logout" element={<Logout />} />
+            <Route path="EditarNormativa/:id" element={<GenericEdit />} />
             <Route element={<RequireSuperAdmin />}>
               <Route path="ListadoUsuarios" element={<VistaAdministrativa />} />
               <Route
@@ -79,8 +85,7 @@ const Router = () => {
               <Route path="EditarUsuario/:id" element={<GenericEdit />} />
               <Route path="EditarDependencia/:id" element={<GenericEdit />} />
               <Route path="EditarEmisor/:id" element={<GenericEdit />} />
-              <Route path="EditarNormativa/:id" element={<GenericEdit />} />
-               <Route path="usuario" element={<EditarUsuario />} />
+              <Route path="usuario" element={<EditarUsuario />} />
             </Route>
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
             <Route
@@ -91,6 +96,12 @@ const Router = () => {
               path="ListadoNormativaDespublicadas"
               element={<VistaAdministrativa />}
             />
+
+            <Route
+              path="ListadoNormativaPorAnio"
+              element={<VistaAdministrativa />}
+            />
+
             <Route
               path="ListadoPalabrasClave"
               element={<VistaAdministrativa />}

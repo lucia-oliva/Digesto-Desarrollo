@@ -7,13 +7,12 @@ export const rutasPorEntidad = {
     palabraclave: "tag",
 }
 
+//aqui cambiar
 export const tipoNormativaOptions = [
-  { label: "Acta", value: "2" },
   { label: "Resolución", value: "5" },
   { label: "Convenio", value: "3" },
-  { label: "Nota", value: "6" },
-  { label: "Providencia", value: "4" },
   { label: "Ordenanza", value: "1" },
+  { label: "Otros", value: "7" }
 ];
 
 

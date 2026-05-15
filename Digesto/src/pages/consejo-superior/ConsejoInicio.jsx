@@ -19,7 +19,7 @@ const ConsejoInicio = () => {
 
           <p className="text-gray-700 text-base sm:text-lg">
             El Consejo Superior es el órgano colegiado de gobierno universitario,
-            encargado de tomar decisiones clave para el desarrollo académico e
+            encargado de tomar decisiones claves para el desarrollo académico e
             institucional de la Universidad.
           </p>
 
@@ -30,11 +30,11 @@ const ConsejoInicio = () => {
             <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
               <li>
                 <span className="font-semibold text-gray-800">Autoridades:</span>{" "}
-                Rector/a, Vicerrector/a, Decanos/as
+                rector/a, vicerrector/a y decanos/as.
               </li>
               <li>
                 <span className="font-semibold text-gray-800">Estamentos:</span>{" "}
-                25 docentes, 15 estudiantes, 5 nodocentes, 5 graduados
+                25 docentes, 15 estudiantes, 5 nodocentes y 5 graduados/as.
               </li>
             </ul>
           </div>
@@ -44,7 +44,7 @@ const ConsejoInicio = () => {
               Funcionamiento
             </h2>
             <p className="text-sm text-gray-700">
-              Se reúne al menos una vez al mes entre el 15 de febrero y el 20 de
+              Se reúne de manera ordinaria una vez al mes entre el 15 de febrero y el 20 de
               diciembre. También puede convocar sesiones extraordinarias fuera de ese
               período.
             </p>

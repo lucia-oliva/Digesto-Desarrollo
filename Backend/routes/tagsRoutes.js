@@ -93,6 +93,7 @@ router.post(
     try {
       let { nombre, letra } = req.body;
       console.log("parametros:", nombre, letra);
+      console.log("query:", req.query);
       let page = req.query.page !== undefined ? req.query.page : 1;
       let limite = req.query.limite !== undefined ? req.query.limite : 10;
       limite = parseInt(limite, 10) || 10;

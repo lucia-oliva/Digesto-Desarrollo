@@ -2,7 +2,6 @@
 import { useMemo, useState } from "react";
 import defaultPalette from "./palette";
 
-
 export default function ConsejoBase({
   title = "Consejo Superior",
   subtitle = "",
@@ -37,11 +36,9 @@ export default function ConsejoBase({
           "4px 4px 19px 5px rgba(0,0,0,0.06), 0px 10px 15px -3px rgba(0,0,0,0.08)",
       }}
     >
-  
       <div className="h-1 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-sky-500" />
 
       <div className="flex flex-col md:flex-row">
-     
         <aside className="w-full bg-gray-50/80 md:w-72 md:border-r md:border-gray-200">
           <div className="sticky top-0 z-10 border-b border-gray-200 bg-gray-50/80 p-4">
             <p className="text-sm font-semibold text-gray-700">{title}</p>
@@ -122,15 +119,21 @@ export default function ConsejoBase({
     </div>
   );
 }
-export function PanelTitle({ children, colorMarker = "bg-blue-600", colorTitle = "text-gray-900" }) {
+
+export function PanelTitle({
+  children,
+  colorMarker = "bg-blue-600",
+  colorTitle = "text-gray-900",
+}) {
   return (
     <div className="flex items-center gap-3">
       <div className={["h-5 w-1 rounded-full", colorMarker].join(" ")} />
-      <h2 className={["text-xl font-semibold", colorTitle].join(" ")}>{children}</h2>
+      <h2 className={["text-xl font-semibold", colorTitle].join(" ")}>
+        {children}
+      </h2>
     </div>
   );
 }
-
 
 export function SectionList({ items = [], pal }) {
   if (!Array.isArray(items) || items.length === 0) {
@@ -153,11 +156,21 @@ export function SectionList({ items = [], pal }) {
           ].join(" ")}
         >
           <div className="space-y-1">
-            <p className={["text-xs font-semibold uppercase tracking-wide", pal?.label ?? "text-gray-600"].join(" ")}>
+            <p
+              className={[
+                "text-xs font-semibold uppercase tracking-wide",
+                pal?.label ?? "text-gray-600",
+              ].join(" ")}
+            >
               {row[0]} <span className="normal-case text-gray-900">{row[1]}</span>
             </p>
             {row[2] && (
-              <p className={["text-xs font-semibold uppercase tracking-wide", pal?.label ?? "text-gray-600"].join(" ")}>
+              <p
+                className={[
+                  "text-xs font-semibold uppercase tracking-wide",
+                  pal?.label ?? "text-gray-600",
+                ].join(" ")}
+              >
                 {row[2]} <span className="normal-case text-gray-900">{row[3]}</span>
               </p>
             )}
@@ -176,14 +189,26 @@ export function KeyValueGrid({ pairs = [], pal }) {
           key={label + i}
           className={[
             "rounded-xl border p-4 shadow-sm transition hover:shadow-md",
-            i % 2 === 0 ? pal?.tintBg ?? "bg-gray-50" : "bg-white",
-            i % 2 === 0 ? pal?.tintBorder ?? "border-gray-200" : "border-gray-200",
+            pal?.tintBg ?? "bg-gray-50",
+            pal?.tintBorder ?? "border-gray-200",
           ].join(" ")}
         >
-          <p className={["text-xs font-semibold uppercase tracking-wide", pal?.label ?? "text-gray-700"].join(" ")}>
+          <p
+            className={[
+              "text-xs font-semibold uppercase tracking-wide",
+              pal?.label ?? "text-gray-700",
+            ].join(" ")}
+          >
             {label}
           </p>
-          <p className="mt-1 text-sm text-gray-900">{value}</p>
+          <p
+            className={[
+              "mt-1 text-sm",
+              pal?.label ?? "text-gray-900",
+            ].join(" ")}
+          >
+            {value}
+          </p>
         </div>
       ))}
     </div>

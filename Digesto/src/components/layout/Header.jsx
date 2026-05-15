@@ -28,7 +28,11 @@ function Header() {
       href: "/consejo-superior",
       active: location.pathname.startsWith("/consejo-superior"),
     },
-    { name: "Ayuda", href: "#" },
+    {
+      name: "Ayuda",
+      href: "/ayuda",
+      active: location.pathname.startsWith("/ayuda"),
+    },
   ];
 
   return (
@@ -37,9 +41,9 @@ function Header() {
         <div className="navbar-start">
           <Link to="/" className="hover:opacity-80 transition duration-300">
             <img
-              src="/src/assets/UnlarLogo.png"
+              src="/src/assets/IdentidadBlancoUNLAR.png"
               alt="UNLaR Logo"
-              className="object-cover max-h-15 mask mask-squircle"
+              className="object-cover max-h-12 "
             />
           </Link>
         </div>
@@ -54,7 +58,10 @@ function Header() {
                   }`}
                 >
                   {link.name === "Ayuda" ? (
-                    <IoIosHelpCircleOutline size={30} />
+                    <>
+                      {link.name}
+                      <IoIosHelpCircleOutline size={30} />
+                    </>
                   ) : (
                     link.name
                   )}
