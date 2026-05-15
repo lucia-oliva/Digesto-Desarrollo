@@ -5,8 +5,8 @@ import DependenciaCard, {
 import DependenciasRow from "./Dependencias/DependenciasRow";
 
 const dependenciaEnum = [
-  "Cjo. Superior",
-  "Rector",
+  "Consejo Superior",
+  "Rectorado",
   "Asamblea",
   "Exactas",
   "Salud",
@@ -14,7 +14,7 @@ const dependenciaEnum = [
   "Sociales",
   "Aplicadas",
   "Chepes",
-  "Villa Union",
+  "Villa Unión",
   "Chamical",
   "Aimogasta",
   "Catuna",
@@ -29,11 +29,11 @@ export default function Dependencias({ dependencias }) {
     return labels.map((k) => map.get(k)).filter(Boolean);
   };
 
-  const top = pick(["Cjo. Superior", "Asamblea", "Rector"]);
+  const top = pick(["Consejo Superior", "Asamblea", "Rectorado"]);
   const facus = pick(["Exactas", "Salud", "Humanas", "Sociales", "Aplicadas"]);
   const sedes = pick([
     "Chepes",
-    "Villa Union",
+    "Villa Unión",
     "Chamical",
     "Aimogasta",
     "Catuna",
@@ -49,7 +49,7 @@ export default function Dependencias({ dependencias }) {
           items={top}
           big
           colsClass="grid-cols-1 sm:grid-cols-3"
-          startColor={4}
+          startColor={1}
           getCardProps={topGetCardProps}
         />
 

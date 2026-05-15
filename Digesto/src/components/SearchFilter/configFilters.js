@@ -2,11 +2,9 @@
 import { API_BASE } from "../../api/axiosPrivate.js";
 
 export const tipoNormativaOptions = [
-  { label: "Acta", value: 1 },
   { label: "Resolución", value: 2 },
   { label: "Convenio", value: 3 },
-  { label: "Nota", value: 4 },
-  { label: "Providencia", value: 5 },
+  { label: "Otros", value: 7 },
   { label: "Ordenanza", value: 6 },
 ];
 
@@ -110,11 +108,9 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
+        { label: "Otros", value: "7" },
         { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
       ],
     },
   ],
@@ -157,11 +153,9 @@ export const filterConfig = {
       options: [
         { label: "Todos", value: "" },
         { label: "Ordenanza", value: "1" },
-        { label: "Acta", value: "2" },
         { label: "Convenio", value: "3" },
-        { label: "Providencia", value: "4" },
         { label: "Resolución", value: "5" },
-        { label: "Nota", value: "6" },
+        { label: "Otros", value: "7" },
       ],
     },
   ],

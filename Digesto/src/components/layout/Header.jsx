@@ -41,9 +41,9 @@ function Header() {
         <div className="navbar-start">
           <Link to="/" className="hover:opacity-80 transition duration-300">
             <img
-              src="/src/assets/UnlarLogo.png"
+              src="/src/assets/IdentidadBlancoUNLAR.png"
               alt="UNLaR Logo"
-              className="object-cover max-h-15 mask mask-squircle"
+              className="object-cover max-h-12 "
             />
           </Link>
         </div>

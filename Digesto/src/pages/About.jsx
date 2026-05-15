@@ -25,18 +25,11 @@ function About() {
 
               <h1 className="mt-4 text-3xl md:text-5xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                  Digesto
+                El Digesto UNLaR
                 </span>{" "}
-                ayuda a los administrativos a gestionar y revisar las
-                normativas de la institución.
+                es una aplicación web que permite consultar, filtrar y acceder a resoluciones, ordenanzas y convenios de forma simple y rápida.
               </h1>
-
-              <p className="mt-4 text-base md:text-lg text-slate-700">
-                Una aplicación web para consultar, filtrar y resguardar
-                resoluciones, ordenanzas, actas y convenios de forma simple y
-                rápida.
-              </p>
-
+            
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link to="/busqueda" className="btn btn-primary">
                   <FiSearch className="mr-2" />
@@ -50,8 +43,8 @@ function About() {
             </div>
             <div className="w-full md:w-1/2 flex justify-center">
               <img
-                src="https://www.cellmark.com/wp-content/uploads/2019/10/office-papers.jpg"
-                alt="Gestión de documentos"
+                src="src/assets/AcercaDeImage.jpg"
+                alt="Mujer buscando documentacion en una estanteria"
                 className="w-full max-w-md sm:max-w-lg md:max-w-xl aspect-[4/3] object-cover rounded-3xl shadow-2xl ring-1 ring-black/5"
               />
             </div>
@@ -60,39 +53,29 @@ function About() {
       </section>
       <section className="container mx-auto px-4 py-12">
         <h2 className="text-2xl md:text-3xl font-bold text-slate-800 text-center">
-          Características de Digesto
+          Características del Digesto
         </h2>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Feature
             icon={<FiFileText />}
             title="Acceso a Normativas"
-            text="Consultá Ordenanzas, Resoluciones y Actas. Todo en un solo lugar."
+            text="Consulta ordenanzas, resoluciones y convenios. Todo en un solo lugar."
           />
           <Feature
             icon={<FiShield />}
             title="Resguardo Digital"
-            text="Conserva y consulta documentación histórica con respaldo centralizado."
+            text="Conserva documentación normativa con respaldo centralizado."
           />
           <Feature
             icon={<FiSearch />}
-            title="Búsqueda Inteligente"
-            text="Filtros por año, emisor, dependencia y mas para encontrar en segundos."
-          />
-          <Feature
-            icon={<FiZap />}
-            title="Interfaz ágil"
-            text="Diseñada para uso cotidiano garantizando la experiencia de usuario."
+            title="Búsqueda Agil"
+            text="Filtra por año, emisor y dependencia garantizando la experiencia de usuario."
           />
           <Feature
             icon={<FiUsers />}
             title="Dependencias"
-            text="Navegá por la documentacion de todas las dependencias de la universidad."
-          />
-          <Feature
-            icon={<FiBookOpen />}
-            title="Convenios"
-            text="Consulta acuerdos y convenios institucionales de forma simple."
+            text="Navega por la documentacion de todas las dependencias de la universidad."
           />
         </div>
       </section>
@@ -103,14 +86,11 @@ function About() {
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-800">
-                  Empezá a consultar normativas ahora
+                  Empieza a consultar normativas ahora
                 </h3>
-                <p className="text-slate-600">
-                  Búsqueda rápida por dependencia, emisor, año y otros filtros.
-                </p>
               </div>
               <Link to="/busqueda" className="btn btn-primary btn-lg">
-                Abrir Búsqueda
+                Abrir búsqueda
               </Link>
             </div>
           </div>

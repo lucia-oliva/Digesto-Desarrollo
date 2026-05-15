@@ -27,7 +27,7 @@ function Home() {
    className="hero min-h-screen bg-no-repeat bg-cover bg-center"
         style={{
           backgroundImage:
-            "url(https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg)",
+            "url(src/assets/UNLaREntrada.jpg)",
         }}
       >
         <div className="hero-overlay bg-black/40"></div>
@@ -35,7 +35,7 @@ function Home() {
 
           <div className="w-full lg:w-2/3 px-2 sm:px-4 mx-auto">
             <h1 className="mb-4 text-5xl font-sans font-semibold text-base-100">
-              Bienvenido a Digesto UNLaR
+              Bienvenido al Digesto UNLaR
             </h1>
             <p className=" mb-4 text-xl font-sans font-light text-base-100">
               La plataforma que sirve como espacio digital para consultar las
@@ -46,7 +46,7 @@ function Home() {
               className="btn bg-primary border-slate-800 text-base-200 shadow-none hover:bg-primary hover:border-primary"
               href="/busqueda"
             >
-              Búsqueda Avanzada <IoMdSearch size={20} className="ml-2" />
+              Búsqueda avanzada <IoMdSearch size={20} className="ml-2" />
             </a>
           </div>
         </div>

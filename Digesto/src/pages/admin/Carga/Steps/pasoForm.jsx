@@ -26,7 +26,6 @@ function PasoForm({
   const shouldLockEstado = esAdminDep;
   const userDepNombre = String(user?.dependencia ?? "").trim();
 
-  // opciones base desde contexto
   const depOptions = useMemo(
     () =>
       (dependencias ?? []).map((d) => ({
@@ -45,7 +44,6 @@ function PasoForm({
     [emisores],
   );
 
-  // map nombre -> id para bloquear por nombre
   const DEP_BY_NAME = useMemo(
     () => new Map(depOptions.map((d) => [d.label, d.value])),
     [depOptions],
@@ -56,10 +54,8 @@ function PasoForm({
     : "";
   const shouldLockDep = !!lockedDepValue && !isSuperAdmin;
 
-  // campos base por entidad
   const baseCampos = useMemo(() => camposPorEntidad[entidad] || [], [entidad]);
 
-  // si es normativa, agregamos el select extra
   const campos = useMemo(() => {
     if (entidad !== "normativa") return baseCampos;
     return [
@@ -68,14 +64,13 @@ function PasoForm({
         name: "normativa_interdepartamental",
         label: "Resolución Interdepartamental",
         type: "select",
-        fromContext: "dependencia", // <- para unificar con el resto
+        fromContext: "dependencia",
         required: true,
         placeholder: "Seleccione la dependencia",
       },
     ];
   }, [entidad, baseCampos, depOptions]);
 
-  // forzar la dependencia bloqueada al formData
   useEffect(() => {
     if (shouldLockEstado) {
       setFormData((prev) => {
@@ -113,7 +108,6 @@ function PasoForm({
     omitPwdFields,
   });
 
-  // prioridad a errores externos
   const mergedErrors = Object.keys(errores || {}).length ? errores : errors;
 
   return (
@@ -143,7 +137,6 @@ function PasoForm({
             </label>
           );
 
-          // caso especial tags
           if (entidad === "normativa" && name === "tags") {
             return (
               <div key={name}>
@@ -188,7 +181,6 @@ function PasoForm({
             );
           }
 
-          //date-tooltip
           if (type === "date") {
             return (
               <div key={name} className="relative group">
@@ -196,7 +188,7 @@ function PasoForm({
                   {commonLabel}{" "}
                   <div
                     className="tooltip md:tooltip-right"
-                    data-tip="Fecha en la que la normativa se publica oficialmente en el digesto."
+                    data-tip="Fecha en el que se dictó el acto administrativo."
                   >
                     <CiCircleQuestion className="ml-1 size-5 cursor-pointer" />
                   </div>{" "}
@@ -226,7 +218,6 @@ function PasoForm({
             );
           }
 
-          // selects
           if (type === "select") {
             let resolvedOptions = [];
             if (fromContext === "dependencia") resolvedOptions = depOptions;
@@ -283,7 +274,6 @@ function PasoForm({
             );
           }
 
-          // textarea
           if (type === "textarea") {
             return (
               <div key={name}>
@@ -309,10 +299,23 @@ function PasoForm({
             );
           }
 
-          // input normal
+          const isAnioField = name === "anio";
+
           return (
             <div key={name}>
-              {commonLabel}
+              {isAnioField ? (
+                <div className="flex items-center gap-1">
+                  {commonLabel}
+                  <div
+                    className="tooltip md:tooltip-right"
+                    data-tip="Año del acto administrativo."
+                  >
+                    <CiCircleQuestion className="mb-1 size-5 cursor-pointer" />
+                  </div>
+                </div>
+              ) : (
+                commonLabel
+              )}
               <input
                 id={name}
                 type={type}

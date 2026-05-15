@@ -65,7 +65,7 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
     const payload = { nombre, email, mensaje, destinatario };
 
     try {
-      const res = await fetch(`${API_BASE}/api/contacto`, {
+      const res = await fetch(`${API_BASE}/contacto`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

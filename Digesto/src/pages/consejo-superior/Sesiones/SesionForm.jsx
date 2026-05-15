@@ -176,9 +176,9 @@ export default function SesionForm({
                         ].join(" ")}
                       >
                         <p className="text-sm text-gray-600">
-                          Arrastrá tu archivo o{" "}
+                          Arrastre su archivo o{" "}
                           <label className="link text-blue-700 cursor-pointer">
-                            buscá un archivo
+                            busque un archivo
                             <input
                               type="file"
                               accept={f.accept}

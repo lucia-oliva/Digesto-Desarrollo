@@ -11,6 +11,7 @@ function Login() {
   const [response, setResponse] = useState({ msg: null, isError: false });
   const [form, setForm] = useState({ email: "", password: "" });
 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -50,7 +51,7 @@ function Login() {
         className="md:w-3/5 w-full bg-primary text-primary-content flex flex-col justify-center items-center px-10 py-12 relative"
         style={{
           backgroundImage:
-            "url('https://www.unlar.edu.ar/images/fotos-noticias/Enero2025/UNLaR.jpg')",
+            "url('src/assets/UNLaREntrada.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -63,11 +64,11 @@ function Login() {
         <div className="p-10 text-center max-w-xl w-full relative z-10">
           <div className="mb-6">
             <div className="text-white flex justify-center font-bold text-3xl">
-              <img src="src\assets\unlar-white.png" alt="Unlar logo" />
+              <img className="w-80" src="src\assets\Identidad Vertical Blanco.png" alt="Unlar logo" />
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            ¡Hola, bienvenido!
+            ¡Bienvenido!
           </h1>
         </div>
       </div>

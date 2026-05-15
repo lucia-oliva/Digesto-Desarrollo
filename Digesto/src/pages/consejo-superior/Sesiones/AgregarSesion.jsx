@@ -20,13 +20,13 @@ export default function AgregarSesion() {
         label: "Nombre de la sesión",
         type: "text",
         placeholder: "Ej.: Orden Marzo 2025",
-        validate: (v) => (!String(v ?? "").trim() ? "Ingresá un nombre para la sesión." : ""),
+        validate: (v) => (!String(v ?? "").trim() ? "Ingrese un nombre para la sesión." : ""),
       },
       {
         key: "fecha",
         label: "Fecha",
         type: "date",
-        validate: (v) => (!v ? "Seleccioná la fecha de la sesión." : ""),
+        validate: (v) => (!v ? "Seleccione la fecha de la sesión." : ""),
       },
       {
         key: "orden",
@@ -35,7 +35,7 @@ export default function AgregarSesion() {
         accept: "application/pdf",
         help: "Formato PDF. Tamaño máximo 20 MB.",
         validate: (file) => {
-          if (!file) return "Adjuntá el PDF del orden del día.";
+          if (!file) return "Adjunte el PDF del orden del día.";
           if (file.type !== "application/pdf") return "El archivo debe ser un PDF (.pdf).";
           if (file.size > 20 * 1024 * 1024) return "El PDF no puede superar los 20 MB.";
           return "";
@@ -53,7 +53,7 @@ export default function AgregarSesion() {
       },
       {
         title: "Sugerencias",
-        items: ["Revisá que el PDF se abra correctamente.", "Mantené una convención de nombres consistente."],
+        items: ["Revise que el PDF se abra correctamente.", "Mantenga una convención de nombres consistente."],
       },
     ],
     []
@@ -108,7 +108,7 @@ export default function AgregarSesion() {
   return (
     <SesionForm
       title="Agregar Sesión del Consejo"
-      subtitle="Registrá la sesión y adjuntá el orden del día en PDF."
+      subtitle="Registre la sesión y adjunte el orden del día en PDF."
       initialValues={initialValues}
       fields={fields}
       sidebar={sidebar}

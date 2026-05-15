@@ -2,12 +2,8 @@ import PropTypes from "prop-types";
 import { Link } from "react-router";
 
 const colors = [
-  "bg-blue-300",
-  "bg-green-300",
-  "bg-orange-300",
-  "bg-cyan-300",
-  "bg-red-300",
-  "bg-purple-300",
+  "bg-[#526cc4]",
+  "bg-[#193db7]",
 ];
 
 const dependenciaNombreToId = {
@@ -27,7 +23,7 @@ const dependenciaNombreToId = {
 };
 
 const emisorNombreToId = {
-  Rector: "2",
+  Rectorado: "2",
   Asamblea: "99",
   "Cjo. Superior" : "4",
   "Consejo Superior" : "4"
@@ -63,7 +59,7 @@ const buildTo = ({label,id,field}) =>
       className={[
         "group flex items-center gap-3 rounded-xl",
         "transition hover:-translate-y-0.5 hover:shadow-md",
-        colored ? colors[colorIndex % colors.length] : "bg-slate-200",
+        colored ? (colors[colorIndex] ?? colors[0]) : "bg-slate-200",
         colored ? "text-white" : "text-slate-900",
         big
           ? "p-3 sm:p-4 text-base sm:text-lg"

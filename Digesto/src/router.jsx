@@ -25,6 +25,7 @@ import AgregarSesion from "./pages/consejo-superior/Sesiones/AgregarSesion.jsx";
 import EditarSesion from "./pages/consejo-superior/Sesiones/EditarSesion.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import RequireSuperAdmin from "./components/routes/RequireSuperAdmin.jsx";
+import RequireConsejoSuperior from "./components/routes/RequireConsejoSuperior.jsx"
 
 const Router = () => {
   return (
@@ -43,7 +44,9 @@ const Router = () => {
               element={<DocumentView variant="consejo" />}
             />
             <Route path="normativas" element={<ConsejoNormativas />} />
+            <Route element= {<RequireConsejoSuperior/>}>
             <Route path="sesiones" element={<ConsejoSesiones />} />
+            </Route>
             <Route path="integrantes" element={<ConsejoIntegrantes />} />
             <Route path="reglamento" element={<ConsejoReglamento />} />
             <Route path="comisiones" element={<ConsejoComisiones />} />

@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import ConsejoBase, { SectionList, KeyValueGrid } from "./ConsejoBase";
+import ConsejoBase from "./ConsejoBase";
 import defaultPalette from "./palette";
 
 function ConsejoComisiones() {
@@ -8,17 +8,18 @@ function ConsejoComisiones() {
     { key: "interpretacion", label: "Interpretación y Reglamento" },
     { key: "presupuesto", label: "Presupuesto y Hacienda" },
     { key: "asuntosGenerales", label: "Asuntos Generales" },
-    { key: "extension", label: "Extensión, Género y RR. Institucionales" },
+    { key: "extension", label: "Extensión, Género y Relaciones Institucionales" },
   ];
 
   const palette = {
-    default: defaultPalette.default,
+    default: defaultPalette.blue,
     asuntosAcademicos: defaultPalette.blue,
-    interpretacion: defaultPalette.emerald,
-    presupuesto: defaultPalette.violet,
-    asuntosGenerales: defaultPalette.amber,
+    interpretacion: defaultPalette.blue,
+    presupuesto: defaultPalette.blue,
+    asuntosGenerales: defaultPalette.blue,
     extension: defaultPalette.blue,
   };
+
   const pal = (k) => palette[k] ?? palette.default;
 
   const aaAutoridades = [
@@ -28,9 +29,10 @@ function ConsejoComisiones() {
     ],
     [
       "Vicepresidente:",
-      "Decano Sede Regional Aimogasta — Ing. Luis Eduardo Luna Mercado",
+      "Decano Sede Regional Aimogasta — Luna Mercado, Luis Eduardo",
     ],
   ];
+
   const aaDocentes = [
     [
       "Titular:",
@@ -58,9 +60,11 @@ function ConsejoComisiones() {
     ],
     ["Titular:", "Porras, Ogelia Gerónima", "Suplente:", "Bertetto, Alejandra"],
   ];
+
   const aaNoDoc = [
     ["Titular:", "Avallay, Hugo Hernán", "Suplente:", "Gómez, Diego Fernando"],
   ];
+
   const aaEst = [
     [
       "Titular:",
@@ -76,16 +80,19 @@ function ConsejoComisiones() {
       "Sánchez Cohen, Augusto Rene",
     ],
   ];
+
   const aaGrad = [
     ["Titular:", "Ávila, Rosario", "Suplente:", "Páez, María Vanesa"],
   ];
+
   const irAutoridades = [
     [
-      "Presidente:",
+      "Presidenta:",
       "Decana del Dpto. Cs. Sociales, Jurídicas y Económicas — Peralta de la Fuente, María Inés",
     ],
-    ["Vicepresidente:", "Decana Sede Regional Chepes — Lucero, Nancy Beatriz"],
+    ["Vicepresidenta:", "Decana Sede Regional Chepes — Lucero, Nancy Beatriz"],
   ];
+
   const irDocentes = [
     [
       "Titular:",
@@ -113,6 +120,7 @@ function ConsejoComisiones() {
       "Quiroga, Sonia Beatriz",
     ],
   ];
+
   const irNoDoc = [
     [
       "Titular:",
@@ -121,6 +129,7 @@ function ConsejoComisiones() {
       "Reinoso, Carlos Alberto",
     ],
   ];
+
   const irEst = [
     [
       "Titular:",
@@ -136,11 +145,12 @@ function ConsejoComisiones() {
     ],
     [
       "Titular:",
-      "Bruni, Giuliana del Rocío",
+      "Díaz Chacoma, Victoria Canela",
       "Suplente:",
-      "González Carrizo, Rocío Abigail",
+      "Bracamonte Arias, Cristela Rocio",
     ],
   ];
+
   const irGrad = [
     [
       "Titular:",
@@ -149,6 +159,7 @@ function ConsejoComisiones() {
       "Aguirre Mercado Luna, Lucrecia",
     ],
   ];
+
   const phAutoridades = [
     [
       "Presidente:",
@@ -159,6 +170,7 @@ function ConsejoComisiones() {
       "Decana Sede Regional Chamical — Quintero, Stella Maris",
     ],
   ];
+
   const phDocentes = [
     [
       "Titular:",
@@ -174,9 +186,9 @@ function ConsejoComisiones() {
     ],
     [
       "Titular:",
-      "Ibáñez, Yanina María",
+      "Sánchez, Elvira Carla",
       "Suplente:",
-      "Melidoro, Marcela Analía",
+      "Ortiz, Jorge Mario",
     ],
     [
       "Titular:",
@@ -191,6 +203,7 @@ function ConsejoComisiones() {
       "Mazzucchelli, Hernán Javier",
     ],
   ];
+
   const phNoDoc = [
     [
       "Titular:",
@@ -199,6 +212,7 @@ function ConsejoComisiones() {
       "Mediavilla, Carlos Héctor",
     ],
   ];
+
   const phEst = [
     [
       "Titular:",
@@ -208,9 +222,9 @@ function ConsejoComisiones() {
     ],
     [
       "Titular:",
-      "Díaz Chacoma, Victoria Canela",
+      "Peralta Juan Esteban",
       "Suplente:",
-      "Bracamonte Arias, Cristela Rocío",
+      "Navarro, Aylen Lucila",
     ],
     [
       "Titular:",
@@ -219,6 +233,7 @@ function ConsejoComisiones() {
       "Pérez, Valeria Elizabeth",
     ],
   ];
+
   const phGrad = [
     [
       "Titular:",
@@ -227,15 +242,17 @@ function ConsejoComisiones() {
       "Corzo, Alejandro Javier",
     ],
   ];
+
   const agAutoridades = [
     [
-      "Presidente:",
+      "Presidenta:",
       "Decana del Dpto. Cs. Humanas y de la Educación — Fernández, Cynthia Noelia Del Valle",
     ],
-    ["Vicepresidente:", "Decana Sede Regional Catuna — Muñoz, Gladys Viviana"],
+    ["Vicepresidenta:", "Decana Sede Regional Catuna — Muñoz, Gladys Viviana"],
   ];
+
   const agDocentes = [
-    ["Titular:", "Sánchez, Elvira Carla", "Suplente:", "Ortiz, Jorge Mario"],
+    ["Titular:", "Ibañez, Yanina María", "Suplente:", "Melidoro, Marcela Analia"],
     ["Titular:", "Orona, Mario David", "Suplente:", "Romero, Carlos Horacio"],
     [
       "Titular:",
@@ -251,6 +268,7 @@ function ConsejoComisiones() {
     ],
     ["Titular:", "Palis, Estela Maris", "Suplente:", "Robledo, Diego"],
   ];
+
   const agNoDoc = [
     [
       "Titular:",
@@ -259,6 +277,7 @@ function ConsejoComisiones() {
       "Moran, José Edgar",
     ],
   ];
+
   const agEst = [
     [
       "Titular:",
@@ -266,7 +285,7 @@ function ConsejoComisiones() {
       "Suplente:",
       "Reyes Romero, Irina Lara",
     ],
-    ["Titular:", "Peralta, Juan Esteban", "Suplente:", "Navarro, Aylen Lucila"],
+    ["Titular:", "Rodríguez, Guillermo Martin", "Suplente:", "Castillo, Rubén Daniel"],
     [
       "Titular:",
       "Artaza, Yamila Mariel",
@@ -274,6 +293,7 @@ function ConsejoComisiones() {
       "Gallardo, Franco Manuel",
     ],
   ];
+
   const agGrad = [
     [
       "Titular:",
@@ -282,13 +302,15 @@ function ConsejoComisiones() {
       "Bazán Lucero, Marcos David Alberto",
     ],
   ];
+
   const exAutoridades = [
     [
-      "Presidente:",
+      "Presidenta:",
       "Decana del Dpto. Ciencias de la Salud — Feryala, Cecilia Sara",
     ],
     ["Vicepresidente:", "Decano Sede Regional Villa Unión — Brac, Luis Ángel"],
   ];
+
   const exDocentes = [
     [
       "Titular:",
@@ -316,15 +338,17 @@ function ConsejoComisiones() {
       "Córdoba, Beatriz del Valle",
     ],
   ];
+
   const exNoDoc = [
     ["Titular:", "Romero, Valeria Dolores", "Suplente:", "Díaz Bazán, Ruth"],
   ];
+
   const exEst = [
     [
       "Titular:",
-      "Rodríguez, Guillermo Martin",
+      "González Carrizo, Rocio Abigail",
       "Suplente:",
-      "Castillo, Rubén Daniel",
+      "-",
     ],
     [
       "Titular:",
@@ -339,6 +363,7 @@ function ConsejoComisiones() {
       "Torres Karen, Viviana",
     ],
   ];
+
   const exGrad = [
     [
       "Titular:",
@@ -351,7 +376,7 @@ function ConsejoComisiones() {
   const content = {
     asuntosAcademicos: (
       <div className="space-y-6">
-        <KeyValueGrid pairs={aaAutoridades} pal={pal("asuntosAcademicos")} />
+        <LocalKeyValueGrid pairs={aaAutoridades} pal={pal("asuntosAcademicos")} />
         <SectionBlock
           title="Docentes"
           items={aaDocentes}
@@ -376,7 +401,7 @@ function ConsejoComisiones() {
     ),
     interpretacion: (
       <div className="space-y-6">
-        <KeyValueGrid pairs={irAutoridades} pal={pal("interpretacion")} />
+        <LocalKeyValueGrid pairs={irAutoridades} pal={pal("interpretacion")} />
         <SectionBlock
           title="Docentes"
           items={irDocentes}
@@ -401,7 +426,7 @@ function ConsejoComisiones() {
     ),
     presupuesto: (
       <div className="space-y-6">
-        <KeyValueGrid pairs={phAutoridades} pal={pal("presupuesto")} />
+        <LocalKeyValueGrid pairs={phAutoridades} pal={pal("presupuesto")} />
         <SectionBlock
           title="Docentes"
           items={phDocentes}
@@ -426,7 +451,7 @@ function ConsejoComisiones() {
     ),
     asuntosGenerales: (
       <div className="space-y-6">
-        <KeyValueGrid pairs={agAutoridades} pal={pal("asuntosGenerales")} />
+        <LocalKeyValueGrid pairs={agAutoridades} pal={pal("asuntosGenerales")} />
         <SectionBlock
           title="Docentes"
           items={agDocentes}
@@ -451,7 +476,7 @@ function ConsejoComisiones() {
     ),
     extension: (
       <div className="space-y-6">
-        <KeyValueGrid pairs={exAutoridades} pal={pal("extension")} />
+        <LocalKeyValueGrid pairs={exAutoridades} pal={pal("extension")} />
         <SectionBlock
           title="Docentes"
           items={exDocentes}
@@ -524,12 +549,109 @@ function SectionBlock({ title, items, pal }) {
       <h3
         className={[
           "mb-2 text-sm font-semibold",
-          pal?.label ?? "text-gray-900",
+          pal?.label ?? "text-blue-700",
         ].join(" ")}
       >
         {title}
       </h3>
-      <SectionList items={items} pal={pal} />
+      <LocalSectionList items={items} pal={pal} />
+    </div>
+  );
+}
+
+function LocalSectionList({ items = [], pal }) {
+  if (!Array.isArray(items) || items.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-blue-200 p-6 text-center text-sm text-blue-700">
+        No hay datos disponibles.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {items.map((row, i) => (
+        <div
+          key={i}
+          className={[
+            "rounded-xl border p-4 shadow-sm transition hover:shadow-md",
+            pal?.tintBg ?? "bg-blue-50",
+            pal?.tintBorder ?? "border-blue-200",
+          ].join(" ")}
+        >
+          <div className="space-y-1">
+            <p
+              className={[
+                "text-xs font-semibold uppercase tracking-wide",
+                pal?.label ?? "text-blue-700",
+              ].join(" ")}
+            >
+              {row[0]}{" "}
+              <span
+                className={[
+                  "normal-case",
+                  pal?.label ?? "text-blue-700",
+                ].join(" ")}
+              >
+                {row[1]}
+              </span>
+            </p>
+
+            {row[2] && (
+              <p
+                className={[
+                  "text-xs font-semibold uppercase tracking-wide",
+                  pal?.label ?? "text-blue-700",
+                ].join(" ")}
+              >
+                {row[2]}{" "}
+                <span
+                  className={[
+                    "normal-case",
+                    pal?.label ?? "text-blue-700",
+                  ].join(" ")}
+                >
+                  {row[3]}
+                </span>
+              </p>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LocalKeyValueGrid({ pairs = [], pal }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      {pairs.map(([label, value], i) => (
+        <div
+          key={label + i}
+          className={[
+            "rounded-xl border p-4 shadow-sm transition hover:shadow-md",
+            pal?.tintBg ?? "bg-blue-50",
+            pal?.tintBorder ?? "border-blue-200",
+          ].join(" ")}
+        >
+          <p
+            className={[
+              "text-xs font-semibold uppercase tracking-wide",
+              pal?.label ?? "text-blue-700",
+            ].join(" ")}
+          >
+            {label}
+          </p>
+          <p
+            className={[
+              "mt-1 text-sm",
+              pal?.label ?? "text-blue-700",
+            ].join(" ")}
+          >
+            {value}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }

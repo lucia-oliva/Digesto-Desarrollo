@@ -10,19 +10,20 @@ function ConsejoIntegrantes() {
     { key: "estudiantes", label: "Estudiantes" },
   ];
 
+ 
+
   const palette = {
     default: defaultPalette.default,
-    autoridades: defaultPalette.blue,
-    docentes: defaultPalette.emerald,
-    nodocentes: defaultPalette.violet,
-    estudiantes: defaultPalette.amber,
+    docentes: defaultPalette.blue,
+    nodocentes: defaultPalette.blue,
+    estudiantes: defaultPalette.blue,
   };
 
-  const pal = (k) => palette[k] ?? palette.autoridades;
+  const pal = (k) => palette[k] ?? palette.default;
 
   const autoridadesPairs = [
-    ["Rector:", "Dra. Natalia Álvarez"],
-    ["Vice Rector:", "Ing. Luis Oscar Oviedo"],
+    ["Rector:", "Natalia Álbarez Gomez"],
+    ["Vice Rector:", "Luis Oscar Oviedo"],
     [
       "Decano/a Dpto. Ciencias y Tecnologías Aplicadas a la Producción, al Ambiente y al Urbanismo:",
       "Cabrera, Villafañe Luis Alfredo",
@@ -173,9 +174,9 @@ function ConsejoIntegrantes() {
 
   const counts = {
     autoridades: autoridadesPairs.length,
-    docentes: docentesItems.length,
-    nodocentes: nodocentesItems.length,
-    estudiantes: estudiantesItems.length,
+    docentes: docentesItems.titulares.length,
+    nodocentes: nodocentesItems.titulares.length,
+    estudiantes: estudiantesItems.titulares.length,
   };
 
   return (

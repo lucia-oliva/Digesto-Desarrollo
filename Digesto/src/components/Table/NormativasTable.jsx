@@ -220,22 +220,12 @@ const NormativaTable = ({
             ]
           : effectiveModo === "seleccionar"
             ? [
-                {
-                  getLabel: (item) =>
-                    (formData?.normativas_modificadas || []).some(
-                      (n) => n.id === item.id,
-                    )
-                      ? "Seleccionado"
-                      : "Seleccionar",
-                  onClick: onSeleccionar,
-                  getType: (item) =>
-                    (formData?.normativas_modificadas || []).some(
-                      (n) => n.id === item.id,
-                    )
-                      ? "secondary"
-                      : "primary",
-                },
-              ]
+      {
+        label: "Agregar acción",
+        onClick: onSeleccionar,
+        type: "primary",
+      },
+    ]
             : (() => {
                 const base = [];
                 const isAdminLike =

@@ -29,7 +29,7 @@ export default function DependenciasRow({
             nombre={n}
             big={big}
             colored={Colored}
-            colorIndex={startColor + i}
+            colorIndex={startColor}
             {...extra}
           />
         );
