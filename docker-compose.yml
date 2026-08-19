@@ -1,0 +1,64 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: digesto-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root}
+      MARIADB_DATABASE: ${DB_NAME:-bs_digesto}
+      MARIADB_USER: ${DB_USER:-digesto}
+      MARIADB_PASSWORD: ${DB_PASS:-digesto}
+    ports:
+      - "${MARIADB_PORT:-3306}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  backend:
+    build:
+      context: ./Backend
+    container_name: digesto-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mariadb
+      PORT: ${BACKEND_PORT:-3000}
+      NODE_ENV: development
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    volumes:
+      - ./Backend:/app
+      - backend_node_modules:/app/node_modules
+      - backend_archivos:/app/archivos
+      - ./.env:/app/.env:ro
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./Digesto
+    container_name: digesto-frontend
+    restart: unless-stopped
+    environment:
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-false}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./Digesto:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  mariadb_data:
+  backend_node_modules:
+  backend_archivos:
+  frontend_node_modules:
