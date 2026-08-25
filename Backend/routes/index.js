@@ -17,7 +17,7 @@ import auditoriaRoutes from "./auditoriaRoute.js";
 
 const api = Router();
 
-const routesMap = [
+export const ROUTES_MAP = Object.freeze([
   ["/usuarios", usuarios],
   ["/dependencia", dependencia],
   ["/emisores", emisores],
@@ -31,9 +31,9 @@ const routesMap = [
   ["/dashboard", dashboardRoutes],
   ["/auditoria", auditoriaRoutes],
   ["/relaciones", relaciones],
-];
+]);
 
-for (const [prefix, router] of routesMap) {
+for (const [prefix, router] of ROUTES_MAP) {
   api.use(prefix, router);
 }
 
