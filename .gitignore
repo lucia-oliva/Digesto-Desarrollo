@@ -1,0 +1,24 @@
+# Variables de entorno (locales)
+.env
+.env.*
+!.env.example
+
+# Documentación local (fuera de git)
+/constitucion
+contexto.md
+
+# Dependencias
+node_modules/
+
+# Volumen local generado al correr el backend sin Docker
+/Backend/archivos/
+
+# Base de datos (dump SQL, no se versiona en el repositorio)
+/db/*.sql
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

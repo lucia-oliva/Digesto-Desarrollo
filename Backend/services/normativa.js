@@ -207,7 +207,7 @@ async function edit(data) {
     }
     if (userId) {
       await auditoriaService.crearRegistroAuditoria({
-        id_normativa: id, 
+        id_normativa: id,
         id_usuario: userId,
         tipo: "modificacion",
       });
@@ -468,7 +468,7 @@ function buildResumenTagsCondition(resumen) {
         WHERE tn3.id_normativa = n.id
           AND t3.nombre = ?
       )
-    `
+    `,
   );
 
   const resumenRegex = `[[:<:]]${escapeRegex(textoCompleto)}[[:>:]]`;
@@ -485,7 +485,6 @@ function buildResumenTagsCondition(resumen) {
   return { sql, params };
 }
 
-
 async function searchNormativaByParameters(
   numero,
   dependencia,
@@ -496,8 +495,8 @@ async function searchNormativaByParameters(
   offset = null,
   fechaOrder,
   visitasOrder,
-  resumen
-) {  
+  resumen,
+) {
   try {
     let sql = `
       SELECT
@@ -534,16 +533,16 @@ async function searchNormativaByParameters(
       sql += " AND n.anio = ?";
       params.push(anio);
     }
-    
+
     const resumenFilter = buildResumenTagsCondition(resumen);
     sql += resumenFilter.sql;
     params.push(...resumenFilter.params);
-    
+
     sql += " GROUP BY n.id";
     const clauses = [];
     const normDir = (d) => (String(d).toUpperCase() === "ASC" ? "ASC" : "DESC");
 
-    if(fechaOrder){
+    if (fechaOrder) {
       clauses.push(`n.fecha_normativa ${normDir(fechaOrder)}`);
     }
     if (visitasOrder) {
@@ -551,15 +550,18 @@ async function searchNormativaByParameters(
     }
 
     if (clauses.length === 0) {
-      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+      sql +=
+        " ORDER BY n.fecha_normativa ASC, CAST(n.numero AS UNSIGNED) ASC, n.id ASC";
     } else {
       if (!fechaOrder && visitasOrder) {
-        clauses.push("n.fecha_normativa DESC");
+        clauses.push("n.fecha_normativa ASC");
       }
-      clauses.push("n.id DESC");
+
+      clauses.push("CAST(n.numero AS UNSIGNED) ASC");
+      clauses.push("n.id ASC");
+
       sql += " ORDER BY " + clauses.join(", ");
     }
-
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);
@@ -584,7 +586,7 @@ async function searchNormativaEliminadaByParameters(
   offset = null,
   fechaOrder,
   visitasOrder,
-  resumen
+  resumen,
 ) {
   try {
     let sql = `
@@ -622,7 +624,7 @@ async function searchNormativaEliminadaByParameters(
       sql += " AND n.anio = ?";
       params.push(anio);
     }
-   
+
     const resumenFilter = buildResumenTagsCondition(resumen);
     sql += resumenFilter.sql;
     params.push(...resumenFilter.params);
@@ -638,14 +640,19 @@ async function searchNormativaEliminadaByParameters(
     }
 
     if (clauses.length === 0) {
-      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+      sql +=
+        " ORDER BY n.fecha_normativa ASC, CAST(n.numero AS UNSIGNED) ASC, n.id ASC";
     } else {
       if (!fechaOrder && visitasOrder) {
-        clauses.push("n.fecha_normativa DESC");
+        clauses.push("n.fecha_normativa ASC");
       }
-      clauses.push("n.id DESC");
+
+      clauses.push("CAST(n.numero AS UNSIGNED) ASC");
+      clauses.push("n.id ASC");
+
       sql += " ORDER BY " + clauses.join(", ");
     }
+
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);
@@ -831,7 +838,7 @@ async function searchNormativaDespublicadasByParameters(
   offset = null,
   fechaOrder,
   visitasOrder,
-  resumen
+  resumen,
 ) {
   try {
     let sql = `
@@ -884,14 +891,19 @@ async function searchNormativaDespublicadasByParameters(
       clauses.push(`n.visitas ${normDir(visitasOrder)}`);
     }
     if (clauses.length === 0) {
-      sql += " ORDER BY n.fecha_normativa DESC, n.id DESC";
+      sql +=
+        " ORDER BY n.fecha_normativa ASC, CAST(n.numero AS UNSIGNED) ASC, n.id ASC";
     } else {
       if (!fechaOrder && visitasOrder) {
-        clauses.push("n.fecha_normativa DESC");
+        clauses.push("n.fecha_normativa ASC");
       }
-      clauses.push("n.id DESC");
+
+      clauses.push("CAST(n.numero AS UNSIGNED) ASC");
+      clauses.push("n.id ASC");
+
       sql += " ORDER BY " + clauses.join(", ");
     }
+
     if (limite !== null && offset !== null) {
       sql += " LIMIT ? OFFSET ?";
       params.push(Number(limite) || 10, Number(offset) || 0);
