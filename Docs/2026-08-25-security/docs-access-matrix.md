@@ -9,13 +9,13 @@ Inventario de endpoints Express y definición de acceso por política, rol, depe
 | Métrica | Total |
 | --- | ---: |
 | Routers Express | 13 |
-| Endpoints | 65 |
+| Endpoints | 63 |
 | Públicos | 13 |
 | Condicionales | 5 |
-| Protegidos | 45 |
-| Internos/no externos | 2 |
-| Activos | 61 |
-| Legacy | 2 |
+| Protegidos | 44 |
+| Internos/no externos | 1 |
+| Activos | 62 |
+| Legacy | 0 |
 
 ## 3. Roles
 
@@ -114,11 +114,9 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | usuarios | GET | `/api/usuarios` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | usuarios | GET | `/api/usuarios/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | usuarios | GET | `/api/usuarios/datos/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
-| usuarios | POST | `/api/usuarios` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
 | usuarios | DELETE | `/api/usuarios/eliminar/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
-| usuarios | PUT | `/api/usuarios/:id` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
+| usuarios | PUT | `/api/usuarios/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | usuarios | GET | `/api/usuarios/filter/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
-| usuarios | POST | `/api/usuarios/userEmail` | Interna | `INTERNAL_REMOVE` | Ninguno | No externo | remove |
 | usuarios | POST | `/api/usuarios/search` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 
 ## 7. Fuentes y Validaciones

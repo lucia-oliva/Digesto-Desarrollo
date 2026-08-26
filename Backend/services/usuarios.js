@@ -126,24 +126,6 @@ async function create(data) {
   }
 }
 
-async function createUsuario(user) {
-  console.log("user model", user);
-
-  const sql =
-    "INSERT INTO usuario (nombre , telefono , email , clave , id_tipo_usuario, id_dependencia, fecha_alta,ultima_visita) VALUES (?,?,?,?,?,?,?,?)";
-  const results = await db.query(sql, [
-    user.nombre,
-    user.telefono,
-    user.email,
-    user.clave,
-    user.id_tipo_usuario,
-    user.id_dependencia,
-    user.fecha_alta,
-    user.ultima_visita,
-  ]);
-  return results;
-}
-
 export async function updateUsuario(id, datos) {
 
   const campos = [];
@@ -208,13 +190,6 @@ async function filterUsuariosporDepartament(id) {
   return results;
 }
 
-
-async function UsuarioByEmailAndEstado(email) {
-  const sql = "SELECT * FROM usuario WHERE email = ? AND estado = 'activo' ";
-  const results = await db.query(sql, [email]);
-  return results;
-}
-
 async function searchUsuariosByParameters(
   rol,
   nombre,
@@ -261,11 +236,9 @@ async function searchUsuariosByParameters(
 
 export default {
   getUsuarioByIdDatos,
-  createUsuario,
   updateUsuario,
   eliminar,
   filterUsuariosporDepartament,
-  UsuarioByEmailAndEstado,
   searchUsuariosByParameters,
   create,
   edit,cambiarEstado
