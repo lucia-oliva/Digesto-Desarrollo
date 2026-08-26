@@ -387,35 +387,6 @@ async function getEliminatedNormatives() {
   return db.query(sql);
 }
 
-async function getAllNormativas() {
-  const sql = `
-    SELECT n.titulo, e.nombre AS emisor, n.numero,
-           DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha,
-           tn.nombre AS tipo_normativa, n.visitas, d.nombre AS dependencia,
-           COUNT(*) AS total_busqueda
-    FROM normativa n
-    JOIN emisor e ON n.id_emisor = e.id
-    JOIN dependencia d ON d.id = n.id_dependencia
-    JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa
-    GROUP BY n.id, n.titulo, e.nombre, n.numero, n.fecha_normativa, tn.nombre, n.visitas
-    ORDER BY n.visitas DESC
-    LIMIT 10
-  `;
-  return db.query(sql);
-}
-
-async function searchByNumber(number) {
-  try {
-    const row = await db.queryOne("SELECT * FROM normativa WHERE numero = ?", [
-      number,
-    ]);
-    return row || null;
-  } catch (err) {
-    console.error("Error al buscar normativa por número: ", err);
-    throw err;
-  }
-}
-
 async function searchById(id) {
   try {
     const sql = `
@@ -667,26 +638,6 @@ async function searchNormativaEliminadaByParameters(
   }
 }
 
-async function searchNormativasByTags(dependencia, tags) {
-  try {
-    const placeholders = tags.map(() => "?").join(",");
-    const sql = `
-      SELECT n.id, n.titulo, n.numero, n.id_dependencia,
-             n.id_tipo_normativa, n.resumen, n.anio, n.estado,
-             GROUP_CONCAT(t.nombre SEPARATOR ',') AS tags
-      FROM normativa n
-      JOIN tag_normativa tn ON n.id = tn.id_normativa
-      JOIN tag t ON tn.id_tag = t.id
-      WHERE n.id_dependencia = ? AND LOWER(t.nombre) IN (${placeholders})
-      GROUP BY n.id
-    `;
-    return await db.query(sql, [dependencia, ...tags]);
-  } catch (error) {
-    console.log("Error en la consulta de normativas:", error);
-    throw error;
-  }
-}
-
 async function getMostPopularNormatives() {
   const sql = `
     SELECT n.titulo, n.resumen, n.id, e.nombre AS emisor, n.numero,
@@ -702,70 +653,6 @@ async function getMostPopularNormatives() {
     LIMIT 10
   `;
   return db.query(sql);
-}
-
-async function updateNormativa(id, dataToSend) {
-  const {
-    numero,
-    anio,
-    titulo,
-    resumen,
-    fecha,
-    dependencia,
-    emisor,
-    tipo_normativa,
-    estado,
-    tags,
-    archivo,
-  } = dataToSend;
-
-  try {
-    if (!Array.isArray(tags))
-      throw httpError(400, "El campo 'tags' debe ser un array");
-    let archivoFinal = archivo;
-    if (!archivo || String(archivo).trim() === "") {
-      const row = await db.queryOne(
-        "SELECT archivo FROM normativa WHERE id = ?",
-        [id],
-      );
-      if (!row)
-        throw httpError(
-          404,
-          "No se encontró la normativa para conservar el archivo",
-        );
-      archivoFinal = row.archivo;
-    }
-
-    const upd = await db.execute(
-      `UPDATE normativa
-         SET numero=?, anio=?, titulo=?, resumen=?, fecha_normativa=?,
-             id_dependencia=?, id_emisor=?, id_tipo_normativa=?, estado=?, archivo=?
-       WHERE id=?`,
-      [
-        numero,
-        anio,
-        titulo,
-        resumen,
-        fecha,
-        dependencia,
-        emisor,
-        tipo_normativa,
-        estado,
-        archivoFinal,
-        id,
-      ],
-    );
-    if (upd.affectedRows === 0)
-      throw httpError(404, `No se encontró la normativa con ID ${id}`);
-
-    await db.execute("DELETE FROM tag_normativa WHERE id_normativa = ?", [id]);
-    await tagService.insertTagsForNormativa(id, tags);
-
-    return { message: "Normativa actualizada correctamente" };
-  } catch (error) {
-    console.error("Error al actualizar la normativa:", error);
-    throw error;
-  }
 }
 
 async function restaurar(id, userId) {
@@ -924,15 +811,11 @@ async function searchNormativaDespublicadasByParameters(
 
 export default {
   getAllYears,
-  searchByNumber,
   searchNormativaByParameters,
-  getAllNormativas,
-  searchNormativasByTags,
   getMostPopularNormatives,
   searchById,
   getEliminatedNormatives,
   eliminar,
-  updateNormativa,
   create,
   edit,
   searchNormativaDespublicadasByParameters:
