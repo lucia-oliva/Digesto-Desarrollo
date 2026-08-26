@@ -86,4 +86,5 @@ docker compose down -v
 
 ## Documentación de la feature
 
-La especificación de esta fase (alcance, decisiones, plan y validación) está en `Specs/2026-08-19-dockerizacion-digesto/`.
+- Dockerización del entorno: `Specs/2026-08-19-dockerizacion-digesto/`.
+- Contrato único de autenticación (JWT): `Specs/2026-08-25-contrato-unico-autenticacion/`.
