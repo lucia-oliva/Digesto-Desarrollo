@@ -102,64 +102,6 @@ router.get(
   })
 );
 
-router.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const users = await dependenciaDB.getUsuarioById(id);
-    res.json(users);
-  })
-);
-
-router.post(
-  "/",
-  asyncHandler(async (req, res) => {
-    const data = req.body;
-    try {
-      const users = await dependenciaDB.createUsuario(data);
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  })
-);
-
-router.delete(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const data = req.params.id;
-    try {
-      const users = await dependenciaDB.deleteUsuario(data);
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  })
-);
-
-router.put(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id; 
-    const data = req.body; 
-
-    try {
-      const result = await dependenciaDB.updateUsuario(id, data);
-
-      if (result.affectedRows === 0) {
-        return res
-          .status(404)
-          .json({ error: "Usuario no encontrado o sin cambios" });
-      }
-
-      res.json({ message: "Usuario actualizado correctamente" });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  })
-);
-
-
 router.post(
   "/search",
   asyncHandler(async (req, res) => {
