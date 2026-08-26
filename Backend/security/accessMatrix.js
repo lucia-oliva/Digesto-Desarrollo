@@ -94,15 +94,10 @@ const endpointRows = [
   [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/search", POLICIES.PUBLIC],
   [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/searchEliminadas", POLICIES.NORM_ADMIN],
   [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/searchDespublicadas", POLICIES.NORM_ADMIN],
-  [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/search/tag", POLICIES.INTERNAL_REMOVE, ENDPOINT_LIFECYCLE.REMOVE],
   [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/publicar/:id", POLICIES.PUBLISH_NORM],
   [ROUTE_GROUPS.NORMATIVA, "GET", "/api/normativa/yearNormativa", POLICIES.PUBLIC],
-  [ROUTE_GROUPS.NORMATIVA, "GET", "/api/normativa/year/:year", POLICIES.INTERNAL_REMOVE, ENDPOINT_LIFECYCLE.REMOVE],
-  [ROUTE_GROUPS.NORMATIVA, "GET", "/api/normativa/normativas", POLICIES.INTERNAL_REMOVE, ENDPOINT_LIFECYCLE.REMOVE],
   [ROUTE_GROUPS.NORMATIVA, "GET", "/api/normativa/deleted", POLICIES.NORM_ADMIN],
   [ROUTE_GROUPS.NORMATIVA, "GET", "/api/normativa/mas-buscadas", POLICIES.PUBLIC],
-  [ROUTE_GROUPS.NORMATIVA, "PUT", "/api/normativa/update/:id", POLICIES.NORM_ADMIN, ENDPOINT_LIFECYCLE.LEGACY],
-  [ROUTE_GROUPS.NORMATIVA, "PUT", "/api/normativa/edit", POLICIES.NORM_ADMIN, ENDPOINT_LIFECYCLE.LEGACY],
   [ROUTE_GROUPS.NORMATIVA, "POST", "/api/normativa/restaurar/:id", POLICIES.NORM_ADMIN],
 
   // Relaciones 

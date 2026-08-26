@@ -146,25 +146,6 @@ router.post(
 );
 
 router.post(
-  "/search/tag",
-  asyncHandler(async (req, res) => {
-    const dependencia = req.query.dependencia ?? req.body.dependencia ?? null;
-    const { tags } = req.body;
-
-    if (!Array.isArray(tags) || tags.length === 0) {
-      const err = new Error(
-        "Debe especificar al menos un tag (array no vacío)",
-      );
-      err.status = 400;
-      throw err;
-    }
-
-    const data = await normativaDB.searchNormativasByTags(dependencia, tags);
-    res.status(200).json({ ok: true, data: data || [] });
-  }),
-);
-
-router.post(
   "/publicar/:id",
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -183,35 +164,6 @@ router.get(
 );
 
 router.get(
-  "/year/:year",
-  asyncHandler(async (req, res) => {
-    const year = Number(req.params.year);
-    if (!Number.isInteger(year)) {
-      const err = new Error("El año debe ser un número entero válido");
-      err.status = 400;
-      throw err;
-    }
-    const row = await normativaDB.searchByNumber(year);
-    if (!row) {
-      const err = new Error(
-        "No se encontró la normativa para el año solicitado",
-      );
-      err.status = 404;
-      throw err;
-    }
-    res.json({ data: row });
-  }),
-);
-
-router.get(
-  "/normativas",
-  asyncHandler(async (_req, res) => {
-    const rows = await normativaDB.getAllNormativas();
-    res.json({ data: rows || [] });
-  }),
-);
-
-router.get(
   "/deleted",
   asyncHandler(async (_req, res) => {
     const rows = await normativaDB.getEliminatedNormatives();
@@ -224,23 +176,6 @@ router.get(
   asyncHandler(async (_req, res) => {
     const rows = await normativaDB.getMostPopularNormatives();
     res.status(200).json(rows);
-  }),
-);
-
-router.put(
-  "/update/:id",
-  asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const result = await normativaDB.updateNormativa(id, req.body);
-    res.status(200).json({ ok: true, ...result });
-  }),
-);
-
-router.put(
-  "/edit",
-  asyncHandler(async (req, res) => {
-    const result = await normativaDB.edit(req.body);
-    res.status(200).json({ ok: true, ...result });
   }),
 );
 

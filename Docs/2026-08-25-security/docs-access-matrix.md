@@ -9,13 +9,13 @@ Inventario de endpoints Express y definición de acceso por política, rol, depe
 | Métrica | Total |
 | --- | ---: |
 | Routers Express | 13 |
-| Endpoints | 70 |
+| Endpoints | 65 |
 | Públicos | 13 |
 | Condicionales | 5 |
-| Protegidos | 47 |
-| Internos/no externos | 5 |
+| Protegidos | 45 |
+| Internos/no externos | 2 |
 | Activos | 61 |
-| Legacy | 4 |
+| Legacy | 2 |
 
 ## 3. Roles
 
@@ -89,15 +89,10 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | normativa | POST | `/api/normativa/search` | Pública | `PUBLIC` | — | Público | active |
 | normativa | POST | `/api/normativa/searchEliminadas` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | active |
 | normativa | POST | `/api/normativa/searchDespublicadas` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | active |
-| normativa | POST | `/api/normativa/search/tag` | Interna | `INTERNAL_REMOVE` | Ninguno | No externo | remove |
 | normativa | POST | `/api/normativa/publicar/:id` | Protegida | `PUBLISH_NORM` | SA/SUP | Propia/global | active |
 | normativa | GET | `/api/normativa/yearNormativa` | Pública | `PUBLIC` | — | Público | active |
-| normativa | GET | `/api/normativa/year/:year` | Interna | `INTERNAL_REMOVE` | Ninguno | No externo | remove |
-| normativa | GET | `/api/normativa/normativas` | Interna | `INTERNAL_REMOVE` | Ninguno | No externo | remove |
 | normativa | GET | `/api/normativa/deleted` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | active |
 | normativa | GET | `/api/normativa/mas-buscadas` | Pública | `PUBLIC` | — | Público | active |
-| normativa | PUT | `/api/normativa/update/:id` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | legacy |
-| normativa | PUT | `/api/normativa/edit` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | legacy |
 | normativa | POST | `/api/normativa/restaurar/:id` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | active |
 | relaciones | GET | `/api/relaciones/:id` | Condicional | `PUBLIC_PUBLISHED` | SA/SUP/AD* | Publicado/recurso | active |
 | relaciones | GET | `/api/relaciones/complementaria/:id` | Condicional | `PUBLIC_PUBLISHED` | SA/SUP/AD* | Publicado/recurso | active |
