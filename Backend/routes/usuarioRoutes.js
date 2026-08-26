@@ -64,15 +64,6 @@ router.get(
   })
 );
 
-router.post(
-  "/",
-  asyncHandler(async (req, res) => {
-    const data = req.body;
-    const users = await UsuariosDB.createUsuario(data);
-    res.json(users);
-  })
-);
-
 router.delete(
   "/eliminar/:id",
   asyncHandler(async (req, res) => {
@@ -104,21 +95,6 @@ router.get(
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
     res.json(users);
-  })
-);
-
-router.post(
-  "/userEmail",
-  asyncHandler(async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ error: "Faltan parámetros 'email'" });
-    }
-    const result = await UsuariosDB.UsuarioByEmailAndEstado(email);
-    if (!result || result.affectedRows === 0) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-    res.json(result);
   })
 );
 
