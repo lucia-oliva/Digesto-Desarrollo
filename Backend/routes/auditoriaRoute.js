@@ -27,28 +27,4 @@ router.post(
   })
 );
 
-router.post(
-  "/create",
-  asyncHandler(async (req, res) => {
-    const { id_normativa, id_usuario, tipo } = req.body;
-    if (!id_normativa || !id_usuario || !tipo) {
-      return res.status(400).json({ error: "Faltan datos obligatorios" });
-    }
-    try {
-      const result = await auditoriaDB.crearRegistroAuditoria({
-        id_normativa,
-        id_usuario,
-        tipo,
-      });
-      if (result.success) {
-        res.status(201).json(result);
-      } else {
-        res.status(500).json(result);
-      }
-    } catch (error) {
-      res.status(500).json({ error: "Error al crear registro de auditoría" });
-    }
-  })
-);
-
 export default router;

@@ -9,11 +9,11 @@ Inventario de endpoints Express y definición de acceso por política, rol, depe
 | Métrica | Total |
 | --- | ---: |
 | Routers Express | 13 |
-| Endpoints | 63 |
+| Endpoints | 62 |
 | Públicos | 13 |
 | Condicionales | 5 |
 | Protegidos | 44 |
-| Internos/no externos | 1 |
+| Internos/no externos | 0 |
 | Activos | 62 |
 | Legacy | 0 |
 
@@ -56,7 +56,6 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | Grupo | Método | Endpoint | Acceso | Política | Roles | Alcance | Estado |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | auditoria | POST | `/api/auditoria/search` | Protegida | `SUPER_ADMIN` | SA | Global | active |
-| auditoria | POST | `/api/auditoria/create` | Interna | `INTERNAL_REMOVE` | Ninguno | No externo | remove |
 | auth | POST | `/api/auth/login` | Pública | `PUBLIC` | — | Público | active |
 | auth | POST | `/api/auth/refresh-token` | Pública | `PUBLIC` | — | Público | active |
 | auth | POST | `/api/auth/logout` | Pública | `PUBLIC` | — | Público | active |
