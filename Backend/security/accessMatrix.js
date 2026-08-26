@@ -47,7 +47,6 @@ function defineEndpoint(
 const endpointRows = [
   // Auditoría 
   [ROUTE_GROUPS.AUDITORIA, "POST", "/api/auditoria/search", POLICIES.SUPER_ADMIN],
-  [ROUTE_GROUPS.AUDITORIA, "POST", "/api/auditoria/create", POLICIES.INTERNAL_REMOVE, ENDPOINT_LIFECYCLE.REMOVE],
 
   // Autenticación 
   [ROUTE_GROUPS.AUTH, "POST", "/api/auth/login", POLICIES.PUBLIC],
