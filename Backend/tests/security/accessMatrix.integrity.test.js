@@ -16,8 +16,8 @@ const ALLOWED_HTTP_METHODS = Object.freeze([
 ]);
 
 describe("integridad de la matriz de acceso", () => {
-  test("contiene los 74 endpoints relevados", () => {
-    expect(ACCESS_MATRIX).toHaveLength(74);
+  test("contiene los 70 endpoints relevados", () => {
+    expect(ACCESS_MATRIX).toHaveLength(70);
   });
 
   test("no contiene combinaciones de método y ruta repetidas", () => {

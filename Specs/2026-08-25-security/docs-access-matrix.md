@@ -9,13 +9,13 @@ Inventario de endpoints Express y definición de acceso por política, rol, depe
 | Métrica | Total |
 | --- | ---: |
 | Routers Express | 13 |
-| Endpoints | 74 |
+| Endpoints | 70 |
 | Públicos | 13 |
 | Condicionales | 5 |
-| Protegidos | 51 |
+| Protegidos | 47 |
 | Internos/no externos | 5 |
 | Activos | 61 |
-| Legacy | 8 | 
+| Legacy | 4 |
 
 ## 3. Roles
 
@@ -46,8 +46,8 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | Estado | Significado |
 | --- | --- |
 | `active` | Vigente. |
-| `legacy` | Vigente, sujeto a revisión. (Rutas Duplicadas o No Consumidas)
-| `remove` | Candidato a retirar o internalizar. 
+| `legacy` | Vigente, sujeto a revisión. (Rutas duplicadas o no consumidas). |
+| `remove` | Candidato a retirar o internalizar. |
 
 ## 6. Matriz completa de endpoints
 
@@ -68,10 +68,6 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | dependencia | GET | `/api/dependencia/getDependencias` | Pública | `PUBLIC` | — | Público | active |
 | dependencia | GET | `/api/dependencia/sesiones` | Protegida | `CONSEJO` | SA/SUP/AD* | Consejo Superior | active |
 | dependencia | GET | `/api/dependencia/name` | Pública | `PUBLIC` | — | Público | active |
-| dependencia | GET | `/api/dependencia/:id` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
-| dependencia | POST | `/api/dependencia` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
-| dependencia | DELETE | `/api/dependencia/:id` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
-| dependencia | PUT | `/api/dependencia/:id` | Protegida | `SUPER_ADMIN` | SA | Global | legacy |
 | dependencia | POST | `/api/dependencia/search` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | dependencia | DELETE | `/api/dependencia/eliminar/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | emisores | GET | `/api/emisores/datos/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
