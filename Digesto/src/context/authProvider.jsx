@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContext";
 import { setAccessToken, clearAccessToken } from "../services/authservices";
 import { setGlobalLogout } from "./globalLogout";
-import api, { refreshClient } from "../api/axiosPrivate";
+import api from "../api/axiosPrivate";
 
 // eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const hardLogout = async (expired = false) => {
     try {
-      await refreshClient.post("/auth/logout");
+      await api.post("/auth/logout");
     } catch {
       return null;
     }
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await refreshClient.post("/auth/refresh-token");
+        const { data } = await api.post("/auth/refresh-token");
         setAccessToken(data.accessToken);
 
         setAuth({ user: data.user, loading: false, sessionExpired: false });

@@ -1,25 +1,45 @@
 import { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
-import useAxios from "axios-hooks";
-import {API_BASE} from "../api/axiosPrivate"
+import api from "../api/axiosPrivate";
 import NormativaTable from "../components/Table/NormativasTable";
 import Dependencias from "../components/Listas/Dependencias";
 import { Alert, Loading } from "../components/ui/Ui";
 
 function Home() {
   const [normativas, setNormativas] = useState([]);
-
-  const [{ data, loading, error }] = useAxios({
-    url: `${API_BASE}/normativa/mas-buscadas`,
-    method: "GET",
-  });
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   useEffect(() => {
-    if (Array.isArray(data) && data.length > 0) {
-      setNormativas(data);
-    }
-  }, [data]);
+    let cancelled = false;
 
+    const cargarNormativas = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await api.get("/normativa/mas-buscadas");
+
+        if (!cancelled && Array.isArray(response.data)) {
+          setNormativas(response.data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarNormativas();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
      <div className="overflow-x-hidden">

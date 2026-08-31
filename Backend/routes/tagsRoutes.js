@@ -1,10 +1,12 @@
 import tagsDB from "../services/tag.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 const router = express.Router();
 
 router.delete(
   "/eliminar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await tagsDB.eliminar(id);
@@ -14,6 +16,7 @@ router.delete(
 
 router.get(
   "/datos/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     console.log(id);
@@ -35,6 +38,7 @@ router.get(
 
 router.post(
   "/edit",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     console.log("Cuerpo de la solicitud:", req.body);
     const dataTagEdit = req.body;
@@ -49,6 +53,7 @@ router.post(
 
 router.post(
   "/create",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const tagData = req.body; 
     const result = await tagsDB.create(tagData);
@@ -71,6 +76,7 @@ router.get(
 
 router.post(
   "/tags/normativa/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params; 
     const { tags } = req.body; 
@@ -89,6 +95,7 @@ router.post(
 
 router.post(
   "/search",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     try {
       let { nombre, letra } = req.body;

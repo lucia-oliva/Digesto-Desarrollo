@@ -1,31 +1,28 @@
-import axios from "axios";
-import { API_BASE } from "../../api/axiosPrivate";
-
+import api from "../../api/axiosPrivate";
 
 export const cambiarEstadoUsuario = async (id_usuario, nuevo_estado) => {
   try {
-    const { data } = await axios.post(
-        `${API_BASE}/usuarios/cambiar-estado`,
-      { id_usuario, nuevo_estado },
-      { headers: { "Content-Type": "application/json" } }
-    );
-    return data; 
+    const { data } = await api.post("/usuarios/cambiar-estado", {
+      id_usuario,
+      nuevo_estado,
+    });
+
+    return data;
   } catch (error) {
     console.error("Error al cambiar estado de usuario:", error);
     throw error;
   }
 };
 
-export const searchNormativas = async (page, limit, type, filtros={}) => {
-  console.log("tipo:",type, "filtros:",filtros);
+export const searchNormativas = async (page, limit, type, filtros = {}) => {
+  console.log("tipo:", type, "filtros:", filtros);
+
   try {
-    const response = await axios.post(
-      `${API_BASE}/${type}/search?page=${page}&limite=${limit}`,
-      filtros,
-      {
-        headers: { "Content-Type": "application/json" }
-      }
+    const response = await api.post(
+      `/${type}/search?page=${page}&limite=${limit}`,
+      filtros
     );
+
     return response.data;
   } catch (error) {
     console.error("Error al buscar normativas:", error);
@@ -33,79 +30,71 @@ export const searchNormativas = async (page, limit, type, filtros={}) => {
   }
 };
 
-export const searchNormativasEliminadas = async (page, limit, type, filtros={}) =>{
+export const searchNormativasEliminadas = async (
+  page,
+  limit,
+  type,
+  filtros = {},
+) => {
   console.log("tipo:", type, "filtros:", filtros);
-  try{
-    const response = await axios.post(
-      `${API_BASE}/normativa/searchEliminadas?page=${page}&limite=${limit}`,
+  try {
+    const response = await api.post(
+      `/normativa/searchEliminadas?page=${page}&limite=${limit}`,
       filtros,
-      {
-        headers: { "Content-Type": "application/json" }
-      }
     );
     return response.data;
-  }catch(error){
+  } catch (error) {
     console.error("Error al buscar normativas eliminadas", error);
     throw error;
   }
-}
+};
 
-export const searchNormativasDespublicadas = async (page, limit, type, filtros={}) =>{
+export const searchNormativasDespublicadas = async (
+  page,
+  limit,
+  type,
+  filtros = {},
+) => {
   console.log("tipo:", type, "filtros:", filtros);
-  try{
-    const response = await axios.post(
-      `${API_BASE}/normativa/searchDespublicadas?page=${page}&limite=${limit}`,
+  try {
+    const response = await api.post(
+      `/normativa/searchDespublicadas?page=${page}&limite=${limit}`,
       filtros,
-      {
-        headers: { "Content-Type": "application/json" }
-      }
     );
     return response.data;
-  }catch(error){
+  } catch (error) {
     console.error("Error al buscar normativas despublicadas", error);
     throw error;
   }
-}
+};
 
-
-
-
-export const deleteApi = async (id,type,userId) => {
+export const deleteApi = async (id, type, userId) => {
   try {
-    console.log(id , type, userId);
-    if(type==="normativaDespublicadas"){
-      type="normativa"
+    console.log(id, type, userId);
+    if (type === "normativaDespublicadas") {
+      type = "normativa";
     }
-    const response = await fetch(`${API_BASE}/${type}/eliminar/${id}`, {
-      method: "DELETE",
+    const response = await api.delete(`/${type}/eliminar/${id}`, {
       headers: {
-        "Content-Type": "application/json",
-        "x-user-id": userId,  
+        "x-user-id": userId,
       },
     });
-    return response.json();
+
+    return response.data;
   } catch (error) {
     console.error("Error al eliminar normativa:", error);
     throw error;
   }
-}
-  
+};
 
 export const editApi = async (dataToEdit, type, userId) => {
   try {
     const payload = {
       ...dataToEdit,
-      userId, 
+      userId,
     };
 
-    const response = await axios.post(
-      `${API_BASE}/${type}/edit`,
-      payload,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
+    const response = await api.post(`/${type}/edit`, payload);
     return response.data;
   } catch (error) {
     console.error(`Error al editar ${type}:`, error);
@@ -115,15 +104,14 @@ export const editApi = async (dataToEdit, type, userId) => {
 
 export const restoreApi = async (id, userId) => {
   try {
-    const response = await axios.post(
-      `${API_BASE}/normativa/restaurar/${id}`,
+    const response = await api.post(
+      `/normativa/restaurar/${id}`,
       {},
       {
         headers: {
-          "Content-Type": "application/json",
           "x-user-id": userId,
         },
-      }
+      },
     );
     return response.data;
   } catch (error) {
@@ -132,22 +120,20 @@ export const restoreApi = async (id, userId) => {
   }
 };
 
-
 export const publicarApi = async (id, userId) => {
-  try{
-      const response = await axios.post(
-         `${API_BASE}/normativa/publicar/${id}`,
-          {},
-          {
-            headers: {
-              "Content-Type" : "application/json",
-              "x-user-id": userId,
-            },
-          }
-        );
-        return response.data;
-  }catch(error){
+  try {
+    const response = await api.post(
+      `/normativa/publicar/${id}`,
+      {},
+      {
+        headers: {
+          "x-user-id": userId,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
     console.error("Error al restaurar normativa:", error);
     throw error;
   }
-}
+};

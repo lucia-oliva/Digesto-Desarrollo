@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs/promises";
 import { pdfHandler } from "../Middleware/fileMiddleware.js";
 import fileDB from "../services/file.js";
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -60,7 +61,7 @@ router.get("/download", async (req, res) => {
   }
 });
 
-router.post("/upload/:id", pdfHandler.single("file"), async (req, res) => {
+router.post("/upload/:id", authenticateToken, pdfHandler.single("file"), async (req, res) => {
   try {
     const resultado = await fileDB.procesarArchivoDeNormativa({
       file: req.file,
@@ -78,7 +79,7 @@ router.post("/upload/:id", pdfHandler.single("file"), async (req, res) => {
   }
 });
 
-router.post("/upload", pdfHandler.single("file"), async (req, res) => {
+router.post("/upload", authenticateToken, pdfHandler.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res

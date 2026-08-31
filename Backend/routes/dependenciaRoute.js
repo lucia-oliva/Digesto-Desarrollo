@@ -1,11 +1,12 @@
 import dependenciaDB from "../services/dependencia.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get(
   "/datos/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const id = req.params.id;
     try {
@@ -23,6 +24,7 @@ router.get(
 
 router.post(
   "/create",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const dependenciaData = req.body;
     try {
@@ -37,6 +39,7 @@ router.post(
 
 router.post(
   "/edit",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     console.log("Cuerpo de la solicitud:", req.body);
     const dependenciaDataEdit = req.body;
@@ -56,6 +59,7 @@ router.post(
 
 router.get(
   "/",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const dependencias = await dependenciaDB.getAllDependencias();
     res.json(dependencias);
@@ -74,6 +78,7 @@ router.get(
 
 router.get(
   "/sesiones",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limite = parseInt(req.query.limite) || 10;
@@ -104,6 +109,7 @@ router.get(
 
 router.post(
   "/search",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     let { nombre, estado } = req.body;
     console.log("parametros:", nombre, estado);
@@ -135,6 +141,7 @@ router.post(
 
 router.delete(
   "/eliminar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const id = req.params.id;
       const result = await dependenciaDB.eliminar(id);

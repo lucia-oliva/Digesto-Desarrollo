@@ -7,7 +7,7 @@ import PasoVerificacion from "./Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "./config/flujoSteps.js";
 import { getRuta } from "./config/mapeo.js";
 import { useAuth } from "../../../context/useAuth.jsx";
-import { API_BASE } from "../../../api/axiosPrivate.js";
+import api from "../../../api/axiosPrivate.js";
 import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericCarga() {
@@ -30,34 +30,30 @@ function GenericCarga() {
     setCurrentStep(0);
   }, [location.pathname]);
 
-   const handleNext = () =>
-   setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
-   const handleBack = () =>
-   setCurrentStep((prev) => Math.max(0, prev - 1));
-   const canBack = currentStep > 0;
+  const handleNext = () =>
+    setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
+  const handleBack = () => setCurrentStep((prev) => Math.max(0, prev - 1));
+  const canBack = currentStep > 0;
 
   const handleSubmit = () => {
     const dataToSend = { ...formData };
     const ruta = getRuta(entidad);
 
     try {
-      
-      console.log("verificando data to Send:", dataToSend);
-      fetch(`${API_BASE}/${ruta}/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      api
+        .post(`/${ruta}/create`, {
           ...dataToSend,
-          archivo: dataToSend.archivo?.name || "", 
+          archivo: dataToSend.archivo?.name || "",
           user,
-        }),
-      })
+        })
         .then(async (res) => {
-          const data = await res.json();
+          const data = res.data;
+
           console.log(`[POST] /api/${ruta}/create =>`, data);
-          if(!res.ok || data.ok ===false){
+
+          if (data.ok === false) {
             throw new Error(data.msg || "Error al crear registro");
-            }
+          }
           if (
             entidad === "normativa" &&
             dataToSend.archivo instanceof File &&
@@ -70,52 +66,40 @@ function GenericCarga() {
             formDataUpload.append("titulo", dataToSend.titulo);
             formDataUpload.append(
               "id_dependencia",
-              String(dataToSend.dependencia)
+              String(dataToSend.dependencia),
             );
             formDataUpload.append("id_emisor", dataToSend.emisor);
             formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
 
-            const resUpload = await fetch(
-              `${API_BASE}/file/upload/${data.id}`,
-              {
-                method: "POST",
-                body: formDataUpload,
-              }
+            const resUpload = await api.post(
+              `/file/upload/${data.id}`,
+              formDataUpload,
             );
 
-            const resJson = await resUpload.json();
+            const resJson = resUpload.data;
             console.log("Resultado de subida de archivo:", resJson);
-
-            if (!resUpload.ok) {
-                setAlertData({
-                  id: Date.now(),
-                  title: "Error",
-                  message:"Error al subir PDF",
-                  error: true
-                });
-              
-            }
-          }        
+          }
           setFormData({});
           setErrores({});
           setCurrentStep(0);
           setAlertData({
             id: Date.now(),
             title: "Exito",
-            message: data.msg || `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
-            error: false
-
-          })
+            message:
+              data.msg ||
+              `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
+            error: false,
+          });
         })
-        .catch((err) => 
+        .catch((err) =>
           setAlertData({
             id: Date.now(),
             title: "Error",
             message: err.message || "Error al crear registro",
             error: true,
-          })
-      );
-      }catch (err) {
+          }),
+        );
+    } catch (err) {
       console.log("Error al serializar JSON:", err);
     }
   };
@@ -162,7 +146,7 @@ function GenericCarga() {
             formData={formData}
             onBack={handleBack}
             onSubmit={handleSubmit}
-             canBack={canBack}
+            canBack={canBack}
           />
         );
       default:
@@ -172,7 +156,7 @@ function GenericCarga() {
 
   return (
     <div className="w-full rounded-lg text-neutral">
-       {alertData && (
+      {alertData && (
         <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
           <Alert
             key={alertData.id}

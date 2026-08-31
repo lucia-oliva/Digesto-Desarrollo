@@ -1,12 +1,13 @@
 import emisoresDB from "../services/emisores.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 const router = express.Router();
 
 
 router.get(
   "/datos/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const emisor = await emisoresDB.getById(id);
@@ -27,6 +28,7 @@ router.get(
 
 router.post(
   "/edit",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const emisorDataEdit = req.body;
     const result = await emisoresDB.edit(emisorDataEdit);
@@ -44,6 +46,7 @@ router.get(
 
 router.post(
   "/create",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const emisorData = req.body;
     const result = await emisoresDB.create(emisorData);
@@ -58,6 +61,7 @@ router.post(
 
 router.post(
   "/search",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     let { nombre, estado } = req.body;
     let { page, limite } = req.query;
@@ -82,6 +86,7 @@ router.post(
 
 router.delete(
   "/eliminar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await emisoresDB.eliminar(id);

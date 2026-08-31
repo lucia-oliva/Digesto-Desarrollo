@@ -2,7 +2,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import SesionForm from "../Sesiones/SesionForm";
-import { API_BASE } from "../../../api/axiosPrivate";
+import api from "../../../api/axiosPrivate";
 
 export default function AgregarSesion() {
   const navigate = useNavigate();
@@ -70,13 +70,8 @@ export default function AgregarSesion() {
           orden_url: values.orden?.name ?? "",
         };
 
-        const res = await fetch(`${API_BASE}/sesiones/create`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error("Error al guardar la sesión.");
-        const data = await res.json();
+        const res = await api.post("/sesiones/create", payload);
+        const data = res.data;
         if (values.orden && data?.id_sesion) {
           const formDataUpload = new FormData();
           formDataUpload.append("file", values.orden);
@@ -84,14 +79,10 @@ export default function AgregarSesion() {
           formDataUpload.append("fecha_sesion", values.fecha);
           formDataUpload.append("type", "consejo");
 
-          const uploadRes = await fetch(`${API_BASE}/file/upload/${data.id_sesion}`, {
-            method: "POST",
-            body: formDataUpload,
-          });
-          const uploadJson = await uploadRes.json();
-          if (!uploadRes.ok) {
-            throw new Error(uploadJson?.message || "Error al subir el archivo PDF");
-          }
+          await api.post(
+            `/file/upload/${data.id_sesion}`,
+            formDataUpload,
+          );
         }
 
         navigate("/consejo-superior/sesiones");

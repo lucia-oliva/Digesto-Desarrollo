@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
-import { API_BASE } from "../../api/axiosPrivate";
 import {Alert} from "../ui/Ui";
+import api from "../../api/axiosPrivate";
 
 export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   const modalRef = useRef(null);
@@ -58,46 +58,45 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    const destinatario =
-      dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
+  setIsLoading(true);
 
-    const payload = { nombre, email, mensaje, destinatario };
+  const destinatario =
+    dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
 
-    try {
-      const res = await fetch(`${API_BASE}/contacto`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        setSuccess(true);
-        setNombre("");
-        setEmail("");
-        setMensaje("");
-        setTimeout(() => {
-          setSuccess(false);
-          setIsModalOpen(false);
-        }, 3000);
-      } else {
-        setAlertData({
-          title: "Error",
-          message: "Hubo un error al enviar el mensaje.",
-          error: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      setAlertData({
-        title: "Error de conexion",
-        message: "No se puede conectar con el servidor",
-        error: true
-      })
-    } finally {
-      setIsLoading(false);
-    }
+  const payload = {
+    nombre,
+    email,
+    mensaje,
+    destinatario,
   };
+
+  try {
+    await api.post("/contacto", payload);
+
+    setSuccess(true);
+    setNombre("");
+    setEmail("");
+    setMensaje("");
+
+    setTimeout(() => {
+      setSuccess(false);
+      setIsModalOpen(false);
+    }, 3000);
+  } catch (error) {
+    console.error("Error:", error);
+
+    setAlertData({
+      title: "Error de conexion",
+      message:
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "No se puede conectar con el servidor",
+      error: true,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (!isVisible) return null;
 

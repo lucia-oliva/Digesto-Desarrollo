@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "../../context/useAuth";
-import useAxios from "axios-hooks";
+import api from "../../api/axiosPrivate";
 import { useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router";
-import { API_BASE } from "../../api/axiosPrivate";
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
   const { id } = useParams();
@@ -19,30 +18,29 @@ export default function EditarUsuario() {
   });
 
   console.log(`Editando usuario con ID: ${userId}`);
-  
+  useEffect(() => {
+  const cargarUsuario = async () => {
+    try {
+      const response = await api.get(`/usuarios/${userId}`);
+      const usuario2 = response.data;
 
-  
-    const [{ data: usuario2 }] = useAxios({
-      url: `${API_BASE}/usuarios/${userId}`,
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    
-    
-    useEffect(() => {
-    if (usuario2) {
-      setUsuario((prev) => ({
-        ...prev,
-        nombre: usuario2[0].nombre || "",
-        email: usuario2[0].email || "",
-        telefono: usuario2[0].telefono || "",
-        tipo_usuario_id: usuario2.tipo_usuario_id || "",
-      }));
+      if (usuario2) {
+        setUsuario((prev) => ({
+          ...prev,
+          nombre: usuario2[0].nombre || "",
+          email: usuario2[0].email || "",
+          telefono: usuario2[0].telefono || "",
+          tipo_usuario_id: usuario2.tipo_usuario_id || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error al cargar usuario:", error);
     }
-  }, [usuario2]);
-  
+  };
+
+  cargarUsuario();
+}, [userId]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUsuario((prev) => ({ ...prev, [name]: value }));
@@ -62,30 +60,19 @@ export default function EditarUsuario() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/usuarios/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    await api.put(`/usuarios/${userId}`, payload);
 
-    const data = await response.json();
-
-    if (response.ok) {
       alert("Usuario actualizado correctamente");
+
       setUsuario((prev) => ({
         ...prev,
         clave_actual: "",
         clave_nueva: "",
       }));
-    } else {
-      alert(data.error || "Error al actualizar usuario");
-    }
-  } catch (e) {
-    alert("Error de red o servidor",e);
-  }
-};
+        } catch (e) {
+            alert(e.response?.data?.error || "Error de red o servidor");
+        }
+      };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center ">
