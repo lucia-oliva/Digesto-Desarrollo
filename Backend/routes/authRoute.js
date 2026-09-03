@@ -30,7 +30,7 @@ router.post(
     }
 
     const rows = await db.queryOne(
-      "SELECT usuario.id, usuario.email, usuario.nombre,usuario.estado, usuario.clave, tu.nombre AS tipo_usuario, de.nombre AS dependencia FROM usuario LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario LEFT JOIN dependencia de ON de.id = usuario.id_dependencia WHERE usuario.email = ?",
+      "SELECT usuario.id, usuario.email, usuario.nombre,usuario.estado, usuario.clave, usuario.id_dependencia AS dependenciaId, tu.nombre AS tipo_usuario, de.nombre AS dependencia FROM usuario LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario LEFT JOIN dependencia de ON de.id = usuario.id_dependencia WHERE usuario.email = ?",
       [email]
     );
 
@@ -66,17 +66,18 @@ router.post(
       email: user.email,
       nombre: user.nombre,
       tipo_usuario: user.tipo_usuario,
-      dependencia: user.dependencia,
+      dependencia: user.dependencia, //Nombre dependencia
+      dependenciaId: user.dependenciaId ?? null, //Id dependencia
     };
 
   
     const accessToken = generateAccessToken({
       id: user.id,
-      rol: user.tipo_usuario,
+      roles: [user.tipo_usuario],
+      dependenciaId: user.dependenciaId ?? null,
     });
     const refreshToken = generateRefreshToken({
       id: user.id,
-      rol: user.tipo_usuario,
     });
 
     res
@@ -95,7 +96,7 @@ router.post(
       const payload = verifyRefreshToken(token);
       const userId = payload.sub;
       const user = await db.queryOne(
-        "SELECT usuario.id, usuario.email, usuario.estado , usuario.nombre, tu.nombre AS tipo_usuario, de.nombre AS dependencia " +
+        "SELECT usuario.id, usuario.email, usuario.estado , usuario.nombre,usuario.id_dependencia AS dependenciaId, tu.nombre AS tipo_usuario, de.nombre AS dependencia " +
           "FROM usuario " +
           "LEFT JOIN tipo_usuario tu ON tu.id = usuario.id_tipo_usuario " +
           "LEFT JOIN dependencia de ON de.id = usuario.id_dependencia " +
@@ -121,15 +122,16 @@ router.post(
         nombre: user.nombre,
         tipo_usuario: user.tipo_usuario,
         dependencia: user.dependencia,
+        dependenciaId: user.dependenciaId ?? null,
       };
 
-      const newAccess = generateAccessToken({
+     const newAccess = generateAccessToken({
         id: user.id,
         roles: [user.tipo_usuario],
+        dependenciaId: user.dependenciaId ?? null,
       });
       const newRefresh = generateRefreshToken({
         id: user.id,
-        roles: [user.tipo_usuario],
       });
 
       res

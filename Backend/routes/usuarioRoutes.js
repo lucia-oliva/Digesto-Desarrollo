@@ -1,8 +1,11 @@
 import express from "express";
 import UsuariosDB from "../services/usuarios.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
+import { POLICIES } from "../security/policies.js";
 
 const router = express.Router();
+router.use(authorizePolicy(POLICIES.SUPER_ADMIN));
 
 router.post(
   "/cambiar-estado",

@@ -1,7 +1,11 @@
 import express from "express";
 import auditoriaDB from "../services/auditoria.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
+import { POLICIES } from "../security/policies.js";
+
 const router = express.Router();
+router.use(authorizePolicy(POLICIES.SUPER_ADMIN));
 
 router.post(
   "/search",

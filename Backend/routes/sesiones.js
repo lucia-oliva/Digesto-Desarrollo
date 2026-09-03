@@ -1,8 +1,18 @@
 import express from "express";
 import sesionesDB from "../services/sesiones.js";
+import dependenciaDB from "../services/dependencia.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
+import { POLICIES } from "../security/policies.js";
 
 const router = express.Router();
+
+router.use(
+  authorizePolicy(POLICIES.CONSEJO, {
+    getUserDependency: (req) =>
+      dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
+  }),
+);
 
 router.delete(
   "/eliminar/:id",
@@ -14,15 +24,17 @@ router.delete(
       err.status = 404;
       throw err;
     }
-    res.status(200).json({ ok: true, msg: "Sesion eliminada correctamente" });
-  })
+    res.status(200).json({
+      ok: true,
+      msg: "Sesion eliminada correctamente",
+    });
+  }),
 );
 
 router.post(
   "/create",
   asyncHandler(async (req, res) => {
     const { fecha_sesion, orden_url, nombre_orden } = req.body;
-
     console.log("Datos recibidos para crear sesión:", req.body);
     const result = await sesionesDB.create({
       fecha_sesion,
@@ -34,7 +46,7 @@ router.post(
       msg: "Sesión creada correctamente",
       id_sesion: result.id_sesion,
     });
-  })
+  }),
 );
 
 router.get(
@@ -43,7 +55,7 @@ router.get(
     const { id } = req.params;
     const sesion = await sesionesDB.getSesionById(id);
     res.status(200).json(sesion);
-  })
+  }),
 );
 
 export default router;

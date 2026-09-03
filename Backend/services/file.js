@@ -25,7 +25,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
     const normativa = await db.queryOne(
       "SELECT * FROM normativa WHERE id = ?",
-      [normativaId]
+      [normativaId],
     );
     if (!normativa || normativa.length === 0) {
       throw new Error("Normativa no encontrada");
@@ -33,7 +33,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
     const resultado = await db.queryOne(
       "SELECT codificacion FROM dependencia WHERE id = ?",
-      [id_dependencia]
+      [id_dependencia],
     );
 
     if (!resultado || resultado.length === 0) {
@@ -49,7 +49,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
     const result = await db.execute(
       "UPDATE normativa SET archivo = ? WHERE id = ?",
-      [nuevoNombre, normativaId]
+      [nuevoNombre, normativaId],
     );
 
     if (result.affectedRows === 0) {
@@ -64,11 +64,11 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
-      [id_sesion]
+      [id_sesion],
     );
     if (!sesion || sesion.length === 0) {
       throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion
+        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
       );
     }
 
@@ -81,7 +81,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
     const result = await db.execute(
       "UPDATE sesiones SET orden_url = ? WHERE id_sesion = ?",
-      [nuevoNombre, id_sesion]
+      [nuevoNombre, id_sesion],
     );
 
     if (result.affectedRows === 0) {
@@ -97,11 +97,11 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
-      [id_sesion]
+      [id_sesion],
     );
     if (!sesion || sesion.length === 0) {
       throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion
+        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
       );
     }
 
@@ -112,7 +112,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     await fs.rename(viejoPath, nuevoPath);
     const result = await db.execute(
       "UPDATE sesiones SET acta_url = ?, nombre_acta = ? WHERE id_sesion = ?",
-      [nuevoNombre, nombre_acta, id_sesion]
+      [nuevoNombre, nombre_acta, id_sesion],
     );
     if (result.affectedRows === 0) {
       throw new Error("No se pudo actualizar la sesión");
@@ -123,6 +123,58 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
   }
 }
 
+function httpError(status, message) {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+}
+
+export async function getFileAccessContext(filename) {
+  if (!filename) {
+    throw httpError(400, "Filename is required");
+  }
+
+  const normativa = await db.queryOne(
+    `
+      SELECT
+        estado,
+        id_dependencia AS dependenciaId
+      FROM normativa
+      WHERE archivo = ?
+    `,
+    [filename],
+  );
+
+  if (normativa) {
+    return {
+      ...normativa,
+      resourceType: "normativa",
+    };
+  }
+
+  const sesion = await db.queryOne(
+    `
+      SELECT
+        id_sesion
+      FROM sesiones
+      WHERE orden_url = ?
+         OR acta_url = ?
+    `,
+    [filename, filename],
+  );
+
+  if (sesion) {
+    return {
+      estado: "privado",
+      dependenciaId: null,
+      resourceType: "consejo",
+    };
+  }
+
+  throw httpError(404, "Archivo no asociado a un recurso");
+}
+
 export default {
   procesarArchivoDeNormativa,
+  getFileAccessContext
 };
