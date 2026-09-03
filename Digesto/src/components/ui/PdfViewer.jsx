@@ -11,7 +11,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
   const [blobUrl, setBlobUrl] = useState(null);
   const lastBlobUrlRef = useRef(null);
 
- useEffect(() => {
+  useEffect(() => {
     if (pdfUrl || !filename) return;
 
     let cancelled = false;
@@ -48,15 +48,22 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
     };
   }, [filename, pdfUrl]);
 
-  // Si NO viene pdfUrl, usamos back
+  // Si este visor descargó el PDF, genera su propia URL.
   useEffect(() => {
     if (!data) return;
 
     const url = URL.createObjectURL(
-      new Blob([data], { type: "application/pdf" }),
+      new Blob([data], {
+        type: "application/pdf",
+      }),
     );
 
-    if (lastBlobUrlRef.current) URL.revokeObjectURL(lastBlobUrlRef.current);
+    if (lastBlobUrlRef.current) {
+      URL.revokeObjectURL(
+        lastBlobUrlRef.current,
+      );
+    }
+
     lastBlobUrlRef.current = url;
 
     setBlobUrl(url);
@@ -64,18 +71,34 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
 
     return () => {
       if (lastBlobUrlRef.current) {
-        URL.revokeObjectURL(lastBlobUrlRef.current);
+        URL.revokeObjectURL(
+          lastBlobUrlRef.current,
+        );
+
         lastBlobUrlRef.current = null;
       }
     };
   }, [data, setPdfUrl]);
 
-  const showLoading = loading && !blobUrl && !pdfUrl;
+  /*
+   * Puede usar:
+   * - su propio blobUrl, si este visor descargó el PDF;
+   * - pdfUrl, si ya fue generado por otro PdfViewer.
+   */
+  const effectivePdfUrl =
+    blobUrl || pdfUrl;
+
+  const showLoading =
+    loading && !effectivePdfUrl;
 
   return (
     <div className="w-full h-full min-h-[60vh] bg-neutral-900 flex flex-col text-neutral-100">
       <div
-        className={` flex items-center justify-between px-3 py-2 bg-neutral-800 border-b border-neutral-700 text-xs sm:text-sm ${pdfUrl ? "hidden" : ""} `}
+        className={`flex items-center justify-between px-3 py-2 bg-neutral-800 border-b border-neutral-700 text-xs sm:text-sm ${
+          effectivePdfUrl
+            ? "hidden"
+            : ""
+        }`}
       >
         <div className="truncate max-w-[80%]">
           {filename || "Documento PDF"}
@@ -89,20 +112,24 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
           </div>
         )}
 
-        {!pdfUrl && error && (
-          <div className="w-full h-full flex items-center justify-center p-4">
-            <Alert
-              title="No se encontró el documento"
-              message={error.message}
-              error={false}
-            />
-          </div>
-        )}
+        {!effectivePdfUrl &&
+          error && (
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <Alert
+                title="No se encontró el documento"
+                message={error.message}
+                error={false}
+              />
+            </div>
+          )}
 
-        {blobUrl && (
+        {effectivePdfUrl && (
           <iframe
-            title={filename || "Documento PDF"}
-            src={blobUrl}
+            title={
+              filename ||
+              "Documento PDF"
+            }
+            src={effectivePdfUrl}
             className="w-full h-full border-0"
           />
         )}
