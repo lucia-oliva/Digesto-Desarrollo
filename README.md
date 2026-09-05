@@ -84,7 +84,20 @@ Para eliminar también los volúmenes de datos:
 docker compose down -v
 ```
 
+## Tests
+
+El backend usa Jest + Supertest. Para ejecutar la suite:
+
+```bash
+cd Backend
+npm install
+npm test
+```
+
+Los tests de seguridad viven en `Backend/tests/security/`.
+
 ## Documentación de la feature
 
 - Dockerización del entorno: `Specs/2026-08-19-dockerizacion-digesto/`.
 - Contrato único de autenticación (JWT): `Specs/2026-08-25-contrato-unico-autenticacion/`.
+- Tests base de autenticación (Jest + Supertest): `Docs/2026-08-31-tests-base-autenticacion/`.
