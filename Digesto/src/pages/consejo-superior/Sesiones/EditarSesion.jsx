@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
 import SesionForm from "../Sesiones/SesionForm";
-import { API_BASE } from "../../../api/axiosPrivate";
+import api from "../../../api/axiosPrivate";
 
 export default function EditarSesion() {
   const { id } = useParams();
@@ -15,8 +15,8 @@ export default function EditarSesion() {
   useEffect(() => {
     const fetchSesion = async () => {
       try {
-        const res = await fetch(`${API_BASE}/sesiones/${id}`);
-        const data = await res.json();
+        const res = await api.get(`/sesiones/${id}`);
+        const data = res.data;
         setSesion(data);
       } catch (err) {
         console.error(err);
@@ -115,12 +115,7 @@ export default function EditarSesion() {
         formDataUpload.append("fecha_sesion", sesion.fecha_sesion);
         formDataUpload.append("nombre_acta", values.nombreActa);
 
-        const res = await fetch(`${API_BASE}/file/upload/${id}`, {
-          method: "POST",
-          body: formDataUpload,
-        });
-
-        if (!res.ok) throw new Error("Error al subir acta");
+        await api.post(`/file/upload/${id}`, formDataUpload);
 
         // Éxito
         navigate("/consejo-superior/sesiones");

@@ -1,22 +1,49 @@
-import jwt from "jsonwebtoken";
-
-const ACCESS_SECRET = process.env.ACCESS_SECRET;
+import { verifyAccessToken } from "../utils/authToken.js";
 
 export const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ error: "No se proporcionó un token" });
+  if (!authHeader) {
+    return res.status(401).json({
+      error: "No se proporcionó un token",
+    });
   }
 
-  jwt.verify(token, ACCESS_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: "Token inválido" });
+  const parts = authHeader.trim().split(/\s+/);
+
+  if (
+    parts.length !== 2 ||
+    parts[0].toLowerCase() !== "bearer" ||
+    !parts[1]
+  ) {
+    return res.status(401).json({
+      error: "Token de autenticación inválido",
+    });
+  }
+
+  const token = parts[1];
+
+  try {
+    const payload = verifyAccessToken(token);
+
+    if (payload.sub == null) {
+      return res.status(401).json({
+        error: "Token de autenticación inválido",
+      });
     }
-    req.user = user;
+
+    req.user = {
+      sub: String(payload.sub),
+      roles: Array.isArray(payload.roles) ? payload.roles : [],
+      dependenciaId: payload.dependenciaId ?? null,
+    };
+
     next();
-  });
+  } catch {
+    return res.status(401).json({
+      error: "Token de autenticación inválido o vencido",
+    });
+  }
 };
 
 

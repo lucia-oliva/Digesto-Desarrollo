@@ -1,6 +1,7 @@
 import express from "express";
 import normativaDB from "../services/normativa.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 function getPagination(req, defaultLimit = 10) {
@@ -22,6 +23,7 @@ router.get(
 
 router.post(
   "/edit",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const result = await normativaDB.edit(req.body);
     res.status(200).json({ ok: true, ...result });
@@ -30,6 +32,7 @@ router.post(
 
 router.post(
   "/create",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { numero, titulo, fecha } = req.body;
     if (!numero || !titulo || !fecha) {
@@ -46,6 +49,7 @@ router.post(
 
 router.get(
   "/traer/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const row = await normativaDB.searchById(req.params.id);
     res.json({ data: row });
@@ -54,6 +58,7 @@ router.get(
 
 router.delete(
   "/eliminar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const userId = req.header("x-user-id");
     if (!userId) {
@@ -95,6 +100,7 @@ router.post(
 
 router.post(
   "/searchEliminadas",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { numero, emisor, documento, anio, fechaOrder, visitasOrder, resumen} =
       req.body;
@@ -121,6 +127,7 @@ router.post(
 
 router.post(
   "/searchDespublicadas",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { numero, emisor, documento, anio, fechaOrder, visitasOrder, resumen } =
       req.body;
@@ -147,6 +154,7 @@ router.post(
 
 router.post(
   "/publicar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.header("x-user-id") || req.body.userId || null;
@@ -165,6 +173,7 @@ router.get(
 
 router.get(
   "/deleted",
+  authenticateToken,
   asyncHandler(async (_req, res) => {
     const rows = await normativaDB.getEliminatedNormatives();
     res.json({ ok: true, data: rows || [] });
@@ -181,6 +190,7 @@ router.get(
 
 router.post(
   "/restaurar/:id",
+  authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.header("x-user-id") || req.body.userId || null;

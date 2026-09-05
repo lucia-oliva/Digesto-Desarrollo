@@ -13,11 +13,6 @@ const api = axios.create({
   withCredentials: true, 
 });
 
-export const refreshClient = axios.create({
-  baseURL: API_BASE,
-  withCredentials: true,
-});
-
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -43,10 +38,14 @@ api.interceptors.response.use(
   async (err) => {
     const originalRequest = err.config || {};
     const status = err.response?.status;
-    const isLoginRequest = originalRequest?.url?.includes("/auth/login");
-    const hasRetried = originalRequest?._retry;
+    const isAuthRequest =
+    originalRequest?.url?.includes("/auth/login") ||
+    originalRequest?.url?.includes("/auth/refresh-token") ||
+    originalRequest?.url?.includes("/auth/logout");
 
-    if (status === 401 && !hasRetried && !isLoginRequest) {
+  const hasRetried = originalRequest?._retry;
+
+  if (status === 401 && !hasRetried && !isAuthRequest) {
       originalRequest._retry = true;
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -62,7 +61,7 @@ api.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        const { data } = await refreshClient.post("/auth/refresh-token");
+        const { data } = await api.post("/auth/refresh-token");
         const newToken = data.accessToken;
 
         setAccessToken(newToken);

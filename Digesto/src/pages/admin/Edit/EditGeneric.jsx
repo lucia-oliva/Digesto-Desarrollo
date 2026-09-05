@@ -11,7 +11,7 @@ import { mapCamposEditar } from "./mapeoCamposEdit.js";
 import { useReferencias } from "../../../context/referenciasContext.js";
 import { buildRelacionesNormativas } from "../Carga/config/mapeo.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
-import { API_BASE } from "../../../api/axiosPrivate.js";
+import api from "../../../api/axiosPrivate.js";
 import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericEdit() {
@@ -55,12 +55,9 @@ function GenericEdit() {
     if (entidad && id) {
       const ruta = getRuta(entidad);
       console.log(ruta);
-
-      fetch(`${API_BASE}/${ruta}/datos/${id}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Error al buscar");
-          return res.json();
-        })
+      api
+        .get(`/${ruta}/datos/${id}`)
+        .then((res) => res.data)
         .then((data) => {
           if (!data) {
             setAlertData({
@@ -191,12 +188,9 @@ function GenericEdit() {
         ? formData.password.trim()
         : null;
     }
-    fetch(`${API_BASE}/${ruta}/edit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dataToSend),
-    })
-      .then((res) => res.json())
+    api
+      .post(`/${ruta}/edit`, dataToSend)
+      .then((res) => res.data)
       .then((data) => {
         console.log(`[POST] /api/${ruta}/edit =>`, data);
         if (
@@ -213,14 +207,9 @@ function GenericEdit() {
           formDataUpload.append("id_emisor", String(safeEmi || formData.emisor || ""));
           formDataUpload.append("tipo_normativa", String(safeTipo || formData.tipo_normativa || ""));
 
-          return fetch(`${API_BASE}/file/upload/${formData.id}`, {
-            method: "POST",
-            body: formDataUpload,
-          })
-            .then((resUpload) => {
-              if (!resUpload.ok) throw new Error("Error al subir archivo PDF");
-              return resUpload.json();
-            })
+          return api
+            .post(`/file/upload/${formData.id}`, formDataUpload)
+            .then((resUpload) => resUpload.data)
             .then((resJson) => {
               console.log("Resultado de subida de archivo:", resJson);
               setAlertData({

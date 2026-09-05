@@ -7,8 +7,7 @@ import {
 } from "./NormativaApi";
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
-import { API_BASE } from "../../api/axiosPrivate.js";
-import axios from "axios";
+import api from "../../api/axiosPrivate.js";
 import { useAuth } from "../../context/useAuth";
 
 /**
@@ -76,7 +75,7 @@ export const useNormativas = (type, filtros, options = {}) => {
       setLoading(true);
       setError(null);
       if (type === "sesiones") {
-        const response = await axios.get(`${API_BASE}/dependencia/sesiones`, {
+        const response = await api.get("/dependencia/sesiones", {
           params: { page: pageToLoad, limite: pageSize },
         });
         if (requestSeqRef.current !== mySeq) return;

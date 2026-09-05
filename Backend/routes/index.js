@@ -1,6 +1,6 @@
 // src/routes/index.js
 import { Router } from "express";
-
+import { authenticateToken } from "../Middleware/authMiddleware.js";
 import relaciones from "./relacionesRoutes.js";
 import usuarios from "./usuarioRoutes.js";
 import dependencia from "./dependenciaRoute.js";
@@ -33,7 +33,19 @@ export const ROUTES_MAP = Object.freeze([
   ["/relaciones", relaciones],
 ]);
 
+const AUTHENTICATED_ROUTER_PREFIXES = new Set([
+  "/usuarios",
+  "/sesiones",
+  "/dashboard",
+  "/auditoria",
+]);
+
 for (const [prefix, router] of ROUTES_MAP) {
+  if (AUTHENTICATED_ROUTER_PREFIXES.has(prefix)) {
+    api.use(prefix, authenticateToken, router);
+    continue;
+  }
+
   api.use(prefix, router);
 }
 

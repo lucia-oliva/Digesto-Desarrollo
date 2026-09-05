@@ -1,12 +1,11 @@
 /* eslint-disable react/prop-types */
-import useAxios from "axios-hooks";
 import { LuArrowRightToLine } from "react-icons/lu";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
 import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
-import { API_BASE } from "../api/axiosPrivate";
+import api  from "../api/axiosPrivate";
 
 const ACCION_BADGE = {
   1: {
@@ -164,19 +163,88 @@ function DocumentView({ variant = "auto" }) {
   const [pdfUrl, setPdfUrl] = useState("");
   const [resumenOpen, setResumenOpen] = useState(false);
 
-  const [{ data: normativa, loading }] = useAxios({
-    url: `${API_BASE}/normativa/datos/${id}`,
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-  const [{ data: vinculosData }] = useAxios({
-    url: `${API_BASE}/relaciones/${id}`,
-    method: "GET",
-  });
-  const [{ data: vinculosInvData }] = useAxios({
-    url: `${API_BASE}/relaciones/complementaria/${id}`,
-    method: "GET",
-  });
+  const [normativa, setNormativa] = useState(null);
+const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      let cancelled = false;
+
+      const cargarNormativa = async () => {
+        try {
+          setLoading(true);
+
+          const response = await api.get(`/normativa/datos/${id}`);
+
+          if (!cancelled) {
+            setNormativa(response.data);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error("Error al cargar normativa:", error);
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        }
+      };
+
+      cargarNormativa();
+
+      return () => {
+        cancelled = true;
+      };
+    }, [id]);
+  const [vinculosData, setVinculosData] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cargarVinculos = async () => {
+      try {
+        const response = await api.get(`/relaciones/${id}`);
+
+        if (!cancelled) {
+          setVinculosData(response.data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Error al cargar relaciones:", error);
+        }
+      }
+    };
+
+    cargarVinculos();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+  const [vinculosInvData, setVinculosInvData] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const cargarVinculosComplementarios = async () => {
+      try {
+        const response = await api.get(`/relaciones/complementaria/${id}`);
+
+        if (!cancelled) {
+          setVinculosInvData(response.data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Error al cargar relaciones complementarias:", error);
+        }
+      }
+    };
+
+    cargarVinculosComplementarios();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
   const vinculosEntrada = vinculosData?.data || [];
   const vinculosSalida = vinculosInvData?.data || [];

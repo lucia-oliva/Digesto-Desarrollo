@@ -7,9 +7,9 @@ import {
   FaUser,
   FaUserGroup,
 } from "react-icons/fa6";
-import axios from "axios";
+import api from "../../api/axiosPrivate";
 import { useEffect, useState } from "react";
-import { API_BASE } from "../../api/axiosPrivate";
+
 
 function Dashboard() {
   const [totales, setTotales] = useState({
@@ -23,12 +23,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          `${API_BASE}/dashboard/resumen`,
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await api.get("/dashboard/resumen");
         console.log("Datos reales:", res.data);
         setTotales(res.data);
       } catch (err) {

@@ -1,37 +1,52 @@
-import useAxios from "axios-hooks";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Loading } from "components/ui/Ui";
 import propTypes from "prop-types";
-import { API_BASE } from "../../api/axiosPrivate";
+import api from "../../api/axiosPrivate";
 
 export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
-  const [{ data, loading, error }, fetchPdf] = useAxios(
-    {
-      url: `${API_BASE}/file/download`,
-      method: "GET",
-      responseType: "blob",
-    },
-    { manual: true },
-  );
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [blobUrl, setBlobUrl] = useState(null);
   const lastBlobUrlRef = useRef(null);
 
-  useEffect(() => {
-    if (!pdfUrl) return;
-    setBlobUrl(pdfUrl);
-    setPdfUrl?.(pdfUrl);
-  }, [pdfUrl, setPdfUrl]);
+ useEffect(() => {
+    if (pdfUrl || !filename) return;
 
-  // Si viene pdfUrl , no hace nada
-  useEffect(() => {
-    if (pdfUrl) return;
-    if (!filename) return;
+    let cancelled = false;
 
-    fetchPdf({ params: { filename } }).catch((e) => {
-      console.error(e.message);
-    });
-  }, [filename, pdfUrl, fetchPdf]);
+    const cargarPdf = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.get("/file/download", {
+          params: { filename },
+          responseType: "blob",
+        });
+
+        if (!cancelled) {
+          setData(response.data);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setError(e);
+          console.error(e.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarPdf();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filename, pdfUrl]);
 
   // Si NO viene pdfUrl, usamos back
   useEffect(() => {
