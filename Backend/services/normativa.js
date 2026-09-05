@@ -373,18 +373,27 @@ async function getAllYears() {
   return db.query("SELECT DISTINCT anio FROM normativa");
 }
 
-async function getEliminatedNormatives() {
-  const sql = `
+async function getEliminatedNormatives(dependenciaId = null) {
+  let sql = `
     SELECT n.titulo, e.nombre AS emisor, n.numero,
            DATE_FORMAT(n.fecha_normativa, '%Y-%m-%d') AS fecha,
-           tn.nombre AS tipo_normativa, n.visitas, d.nombre AS dependencia
+           tn.nombre AS tipo_normativa, n.visitas,
+           d.nombre AS dependencia
     FROM normativa n
     JOIN emisor e ON n.id_emisor = e.id
     JOIN dependencia d ON d.id = n.id_dependencia
     JOIN tipo_normativa tn ON tn.id = n.id_tipo_normativa
     WHERE n.estado = 'eliminada'
   `;
-  return db.query(sql);
+
+  const params = [];
+
+  if (dependenciaId != null) {
+    sql += " AND n.id_dependencia = ?";
+    params.push(dependenciaId);
+  }
+
+  return db.query(sql, params);
 }
 
 async function searchById(id) {
@@ -809,6 +818,34 @@ async function searchNormativaDespublicadasByParameters(
   }
 }
 
+async function getNormativaAccessContext(id) {
+  const row = await db.queryOne(
+    `
+      SELECT
+        estado,
+        id_dependencia AS dependenciaId
+      FROM normativa
+      WHERE id = ?
+    `,
+    [id],
+  );
+
+  if (!row) {
+    throw httpError(404, `No se encontró la normativa con ID ${id}`);
+  }
+
+  return {
+    ...row,
+    resourceType: "normativa",
+  };
+}
+
+async function getNormativaDependencyById(id) {
+  const resource = await getNormativaAccessContext(id);
+
+  return resource.dependenciaId;
+}
+
 export default {
   getAllYears,
   searchNormativaByParameters,
@@ -829,4 +866,6 @@ export default {
   searchNormativaEliminadaByParameters,
   restaurar,
   publicar,
+  getNormativaDependencyById,
+  getNormativaAccessContext,
 };
