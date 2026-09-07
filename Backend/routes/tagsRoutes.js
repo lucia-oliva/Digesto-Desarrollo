@@ -1,7 +1,13 @@
 import tagsDB from "../services/tag.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { authenticateToken } from "../Middleware/authMiddleware.js";
+import normativaDB from "../services/normativa.js";
+import {
+  authenticateToken,
+  optionalAuthenticateToken,
+} from "../Middleware/authMiddleware.js";
+import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
+import { POLICIES } from "../security/policies.js";
 const router = express.Router();
 
 router.delete(
@@ -67,6 +73,11 @@ router.post(
 
 router.get(
   "/tags/:id",
+  optionalAuthenticateToken,
+  authorizePolicy(POLICIES.PUBLIC_PUBLISHED, {
+    getResourceAccessContext: (req) =>
+      normativaDB.getNormativaAccessContext(req.params.id),
+  }),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const tags = await tagsDB.getTagsByNormativaId(id);

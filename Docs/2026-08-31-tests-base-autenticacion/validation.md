@@ -1,17 +1,54 @@
-# Validation — Criterios de aceptación
+# Validación — Tests de autenticación y matriz RBAC
 
-La feature se considera exitosa (y mergeable) cuando se cumplan todos los siguientes criterios:
+## Criterios de aceptación
 
-1. `Backend/package.json` declara `supertest` en `devDependencies`.
-2. `Backend/jest.config.js` registra el setup de entorno (`setupFiles`).
-3. Existen tests unitarios para `authToken` y `authMiddleware`.
-4. Existe un test de integración HTTP del middleware (`supertest`) con los 5 casos.
-5. Existe un test de integración de rutas (`supertest` contra `app.js`) para las rutas representativas.
-6. `npm test` ejecuta toda la suite sin errores de infraestructura.
-7. Quedan documentados los tests en rojo esperados (inválido/expirado y rutas sin enforcement) hasta el fix de SEC-01.
-8. `constitucion/roadmap.md`, `constitucion/techStack.md`, `contexto.md` y `README.md` quedan actualizados.
+- [x] Jest ejecuta el backend ESM en entorno Node.js.
+- [x] Supertest está declarado como dependencia de desarrollo.
+- [x] Las pruebas están separadas en `unit/` e `integration/`.
+- [x] Los mocks y utilidades reutilizables están centralizados en `helpers/`.
+- [x] Existen tokens de prueba para cada rol de la matriz.
+- [x] Todos los endpoints con autenticación obligatoria se prueban sin token.
+- [x] Los roles no autorizados se prueban con resultado 403.
+- [x] Los roles autorizados se prueban con acceso permitido.
+- [x] Se validan restricciones por dependencia y Consejo Superior.
+- [x] Se validan recursos publicados y no publicados.
+- [x] El inventario de rutas Express coincide con `ACCESS_MATRIX`.
+- [x] Los nombres parametrizados identifican método, ruta, rol o condición.
+- [x] La suite no requiere servidor ni base de datos externos.
 
-## Resultado esperado de la suite
+## Cobertura implementada
 
-- **Verdes**: unit `authToken`; unit `authMiddleware` (sin token/malformado/válido); integration de middleware (sin token/malformado/válido).
-- **Rojos (esperados)**: unit `authMiddleware` (inválido/expirado → hoy `403`); integration de middleware (inválido/expirado); integration de rutas (todos los casos que exigen `401`, porque el middleware no está cableado).
+| Nivel | Suites | Casos | Resultado |
+| --- | ---: | ---: | --- |
+| Unitario | 5 | 62 | Aprobado |
+| Integración | 4 | 238 | Aprobado |
+| Total | 9 | 300 | Aprobado |
+
+La matriz contiene 62 endpoints. La automatización cubre los 44 endpoints con autenticación obligatoria frente a los tres roles y los endpoints cuyo acceso depende del estado de publicación del recurso.
+
+## Comandos validados
+
+Ejecutados desde `Backend/`:
+
+```bash
+npm run test:unit
+npm run test:integration
+npm test
+```
+
+Resultado final:
+
+```text
+Test Suites: 9 passed, 9 total
+Tests:       300 passed, 300 total
+Snapshots:   0 total
+```
+
+## Hallazgos detectados durante la validación
+
+La matriz automatizada identificó diferencias entre las políticas declaradas y las aplicadas en rutas de emisores, relaciones y tags. Se incorporaron los controles RBAC correspondientes y se confirmó el resultado positivo de la suite completa.
+
+## Pendientes posteriores
+
+- Incorporar la ejecución automática en GitHub Actions.
+- Implementar pruebas E2E con frontend, backend y base de datos de prueba.
