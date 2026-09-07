@@ -2,12 +2,15 @@ import emisoresDB from "../services/emisores.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authenticateToken } from "../Middleware/authMiddleware.js";
+import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
+import { POLICIES } from "../security/policies.js";
 const router = express.Router();
 
 
 router.get(
   "/datos/:id",
   authenticateToken,
+  authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const emisor = await emisoresDB.getById(id);
@@ -29,6 +32,7 @@ router.get(
 router.post(
   "/edit",
   authenticateToken,
+  authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const emisorDataEdit = req.body;
     const result = await emisoresDB.edit(emisorDataEdit);
@@ -47,6 +51,7 @@ router.get(
 router.post(
   "/create",
   authenticateToken,
+  authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const emisorData = req.body;
     const result = await emisoresDB.create(emisorData);
@@ -62,6 +67,7 @@ router.post(
 router.post(
   "/search",
   authenticateToken,
+  authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     let { nombre, estado } = req.body;
     let { page, limite } = req.query;
@@ -87,6 +93,7 @@ router.post(
 router.delete(
   "/eliminar/:id",
   authenticateToken,
+  authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await emisoresDB.eliminar(id);
