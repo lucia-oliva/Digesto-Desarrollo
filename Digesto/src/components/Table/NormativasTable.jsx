@@ -177,13 +177,13 @@ const NormativaTable = ({
             const base = [
               {
                 label: "Ver Orden",
-                onClick: (item) => abrirPdfDesdeBlobUrl(item.orden_url),
+                onClick: (item) => abrirPdfDesdeBlobUrl("consejo", item.id_sesion),
                 type: "primary",
                 className: "btn-outline btn-primary",
               },
               {
                 label: "Ver Acta",
-                onClick: (item) => abrirPdfDesdeBlobUrl(item.acta_url),
+                onClick: (item) => abrirPdfDesdeBlobUrl("acta", item.id_sesion),
                 type: "primary",
                 className: "btn-outline btn-primary",
               },

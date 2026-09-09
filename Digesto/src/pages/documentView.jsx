@@ -360,6 +360,8 @@ const [loading, setLoading] = useState(true);
         <div className="flex-1 flex justify-center px-0 sm:px-2 max-[426px]:hidden">
           <div className="w-full max-w-full sm:max-w-3xl lg:max-w-5xl xl:max-w-6xl rounded-xl overflow-hidden bg-base-300">
             <PdfViewer
+              tipo="normativa"
+              id={id}
               filename={normativa?.archivo}
               pdfUrl={pdfUrl}
               setPdfUrl={setPdfUrl}
@@ -451,6 +453,8 @@ const [loading, setLoading] = useState(true);
           <div className="flex-1 flex justify-center px-0 sm:px-2 max-[426px]:hidden">
             <div className="w-full max-w-full sm:max-w-3xl lg:max-w-5xl rounded-xl overflow-hidden bg-base-300">
               <PdfViewer
+                tipo="normativa"
+                id={id}
                 filename={normativa?.archivo}
                 pdfUrl={pdfUrl}
                 setPdfUrl={setPdfUrl}
@@ -468,6 +472,8 @@ const [loading, setLoading] = useState(true);
             <div className="drawer-content flex flex-col items-stretch justify-start">
               <div className="flex-1 min-h-0 bg-base-300 overflow-hidden">
                 <PdfViewer
+                  tipo="normativa"
+                  id={id}
                   filename={normativa?.archivo}
                   pdfUrl={pdfUrl}
                   setPdfUrl={setPdfUrl}
@@ -616,6 +622,8 @@ const [loading, setLoading] = useState(true);
         <div className="flex-1 flex justify-center px-0 sm:px-2 max-[426px]:hidden">
           <div className="w-full max-w-full sm:max-w-3xl lg:max-w-5xl rounded-xl overflow-hidden bg-base-300">
             <PdfViewer
+              tipo="normativa"
+              id={id}
               filename={normativa?.archivo}
               pdfUrl={pdfUrl}
               setPdfUrl={setPdfUrl}
@@ -633,6 +641,8 @@ const [loading, setLoading] = useState(true);
           <div className="drawer-content flex flex-col items-stretch justify-start">
             <div className="flex-1 min-h-0 bg-base-300 overflow-hidden">
               <PdfViewer
+                tipo="normativa"
+                id={id}
                 filename={normativa?.archivo}
                 pdfUrl={pdfUrl}
                 setPdfUrl={setPdfUrl}

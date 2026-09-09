@@ -129,23 +129,64 @@ function httpError(status, message) {
   return err;
 }
 
-export async function getFileAccessContext(filename) {
-  if (!filename) {
-    throw httpError(400, "Filename is required");
+const FILES_ROOT = path.resolve("archivos");
+
+const ALLOWED_FILE_TYPES = Object.freeze([
+  "normativa",
+  "consejo",
+  "acta",
+]);
+
+function normalizeFileType(tipo) {
+  const value = String(tipo ?? "").trim().toLowerCase();
+
+  if (!ALLOWED_FILE_TYPES.includes(value)) {
+    throw httpError(400, "Tipo de recurso inválido");
   }
 
-  const normativa = await db.queryOne(
-    `
-      SELECT
-        estado,
-        id_dependencia AS dependenciaId
-      FROM normativa
-      WHERE archivo = ?
-    `,
-    [filename],
-  );
+  return value;
+}
 
-  if (normativa) {
+export function resolveSafePath(relativePath) {
+  if (path.isAbsolute(relativePath)) {
+    throw httpError(400, "Ruta absoluta no permitida");
+  }
+
+  const absolute = path.resolve(FILES_ROOT, relativePath);
+  const rootWithSeparator = FILES_ROOT.endsWith(path.sep)
+    ? FILES_ROOT
+    : FILES_ROOT + path.sep;
+
+  if (absolute !== FILES_ROOT && !absolute.startsWith(rootWithSeparator)) {
+    throw httpError(400, "Ruta de archivo no permitida");
+  }
+
+  return absolute;
+}
+
+export async function getFileAccessContextById(tipo, id) {
+  const normalizedTipo = normalizeFileType(tipo);
+
+  if (!id) {
+    throw httpError(400, "ID de recurso requerido");
+  }
+
+  if (normalizedTipo === "normativa") {
+    const normativa = await db.queryOne(
+      `
+        SELECT
+          estado,
+          id_dependencia AS dependenciaId
+        FROM normativa
+        WHERE id = ?
+      `,
+      [id],
+    );
+
+    if (!normativa) {
+      throw httpError(404, "Normativa no encontrada");
+    }
+
     return {
       ...normativa,
       resourceType: "normativa",
@@ -153,28 +194,76 @@ export async function getFileAccessContext(filename) {
   }
 
   const sesion = await db.queryOne(
-    `
-      SELECT
-        id_sesion
-      FROM sesiones
-      WHERE orden_url = ?
-         OR acta_url = ?
-    `,
-    [filename, filename],
+    "SELECT id_sesion FROM sesiones WHERE id_sesion = ?",
+    [id],
   );
 
-  if (sesion) {
+  if (!sesion) {
+    throw httpError(404, "Sesión no encontrada");
+  }
+
+  return {
+    estado: "privado",
+    dependenciaId: null,
+    resourceType: "consejo",
+  };
+}
+
+export async function getFileDownloadInfo(tipo, id) {
+  const normalizedTipo = normalizeFileType(tipo);
+
+  if (!id) {
+    throw httpError(400, "ID de recurso requerido");
+  }
+
+  if (normalizedTipo === "normativa") {
+    const normativa = await db.queryOne(
+      "SELECT archivo FROM normativa WHERE id = ?",
+      [id],
+    );
+
+    if (!normativa || !normativa.archivo) {
+      throw httpError(404, "Archivo no encontrado");
+    }
+
+    const filename = String(normativa.archivo);
+
     return {
-      estado: "privado",
-      dependenciaId: null,
-      resourceType: "consejo",
+      absolutePath: resolveSafePath(filename),
+      downloadName: filename,
+      tipo: normalizedTipo,
     };
   }
 
-  throw httpError(404, "Archivo no asociado a un recurso");
+  const sesion = await db.queryOne(
+    "SELECT orden_url, acta_url FROM sesiones WHERE id_sesion = ?",
+    [id],
+  );
+
+  if (!sesion) {
+    throw httpError(404, "Sesión no encontrada");
+  }
+
+  const column = normalizedTipo === "consejo" ? "orden_url" : "acta_url";
+  const filename = sesion[column];
+
+  if (!filename) {
+    throw httpError(404, "Archivo no encontrado");
+  }
+
+  const dir = normalizedTipo === "consejo" ? "OrdenesDelDia" : "Actas";
+  const name = String(filename);
+
+  return {
+    absolutePath: resolveSafePath(path.join(dir, name)),
+    downloadName: name,
+    tipo: normalizedTipo,
+  };
 }
 
 export default {
   procesarArchivoDeNormativa,
-  getFileAccessContext
+  getFileAccessContextById,
+  getFileDownloadInfo,
+  resolveSafePath,
 };

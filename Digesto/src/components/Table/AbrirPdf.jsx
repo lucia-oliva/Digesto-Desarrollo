@@ -1,11 +1,11 @@
 import api from "../../api/axiosPrivate";
 
-export async function abrirPdfDesdeBlobUrl(nombreArchivo) {
+export async function abrirPdfDesdeBlobUrl(tipo, id) {
   try {
     const response = await api.get(
       "/file/download",
       {
-        params: { filename: nombreArchivo },
+        params: { tipo, id },
         responseType: "blob",
       }
     );
