@@ -10,6 +10,6 @@ Feature: `2026-09-15-dump_bd`
 6. Sanitizar `usuario`, `visita_normativa`, `visita_usuario` y `auditoria_usuario`.
 7. Generar hashes bcrypt (cost 10) por rol y reemplazar `usuario.clave`.
 8. Re-dump con `mysqldump` a `db/bs_digesto.sql`.
-9. Verificar carga limpia en un stack aislado (`docker-compose.test.yml`) y login por rol.
+9. Verificar carga limpia en un stack aislado y login por rol.
 10. Verificar `docker compose up`/`down` repetido sin afectar el volumen real.
 11. Actualizar `README.md`, `contexto.md` y `Constitucion/roadmap.md`.
