@@ -4,13 +4,13 @@ Sistema de gestión administrativa de documentos institucionales. Repositorio mo
 
 - `backend/`: API Node.js + Express (ESM).
 - `digesto/`: Frontend React + Vite.
-- `db/`: dump SQL para inicializar MariaDB.
+- `db/`: dump sanitizado (`bs_digesto.sql`) para inicializar MariaDB.
 - `docker-compose.yml`: orquestación del entorno de desarrollo.
 
 ## Requisitos
 
 - Docker con Docker Compose (se probó con Docker Engine 27 y Compose v2).
-- Tener el dump de base de datos en `db/bs_digesto.sql`. Este archivo **no se versiona** (está en `.gitignore`), por lo que debe colocarse manualmente antes de levantar el entorno. El directorio `db/` debe contener el archivo `bs_digesto.sql`.
+- Dump sanitizado en `db/bs_digesto.sql` (versionado).
 
 ## Puesta en marcha
 
@@ -42,6 +42,14 @@ Sistema de gestión administrativa de documentos institucionales. Repositorio mo
 | Frontend | http://localhost:5173 | Vite HMR |
 | Backend | http://localhost:3000 | `/health`, `/api/...` |
 | MariaDB | `localhost:3307` | usuario `digesto` / `digesto`, base `bs_digesto` |
+
+## Credenciales de prueba
+
+| Rol | Usuario | Contraseña |
+| --- | --- | --- |
+| SuperAdministrador | `usuario47@example.com` | `DigestoSuper123!` |
+| Administrador de Dependencia | `usuario48@example.com` | `DigestoAdmin123!` |
+| Supervisor | `usuario51@example.com` | `DigestoSupervisor123!` |
 
 > El puerto 3306 del host suele estar ocupado por un MySQL/MariaDB local; por eso MariaDB se publica en `3307` por defecto (ver `MARIADB_PORT` en `.env`). El backend se conecta internamente mediante el alias `mariadb` en el puerto 3306 de la red de Docker.
 
@@ -104,3 +112,4 @@ Los tests de seguridad viven en `Backend/tests/security/`.
 - Dockerización del entorno: `Specs/2026-08-19-dockerizacion-digesto/`.
 - Contrato único de autenticación (JWT): `Specs/2026-08-25-contrato-unico-autenticacion/`.
 - Tests base de autenticación (Jest + Supertest): `Docs/2026-08-31-tests-base-autenticacion/`.
+- Dump sanitizado de base de datos: `Docs/2026-09-15-dump_bd/`.
