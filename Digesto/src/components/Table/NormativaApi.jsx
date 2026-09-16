@@ -1,18 +1,12 @@
 import api from "../../api/axiosPrivate";
 
 export const cambiarEstadoUsuario = async (id_usuario, nuevo_estado) => {
-  try {
     const { data } = await api.post("/usuarios/cambiar-estado", {
       id_usuario,
       nuevo_estado,
     });
-
     return data;
-  } catch (error) {
-    console.error("Error al cambiar estado de usuario:", error);
-    throw error;
   }
-};
 
 export const searchNormativas = async (page, limit, type, filtros = {}) => {
   console.log("tipo:", type, "filtros:", filtros);
@@ -70,7 +64,6 @@ export const searchNormativasDespublicadas = async (
 
 export const deleteApi = async (id, type, userId) => {
   try {
-    console.log(id, type, userId);
     if (type === "normativaDespublicadas") {
       type = "normativa";
     }

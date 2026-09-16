@@ -7,7 +7,7 @@ import { useParams } from "react-router";
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
   const { id } = useParams();
-  const userId = id || user.id; 
+  const userId = id || user.id;
   const [usuario, setUsuario] = useState({
     nombre: "",
     email: "",
@@ -17,7 +17,6 @@ export default function EditarUsuario() {
     tipo_usuario_id: "",
   });
 
-  console.log(`Editando usuario con ID: ${userId}`);
   useEffect(() => {
   const cargarUsuario = async () => {
     try {
@@ -33,8 +32,8 @@ export default function EditarUsuario() {
           tipo_usuario_id: usuario2.tipo_usuario_id || "",
         }));
       }
-    } catch (error) {
-      console.error("Error al cargar usuario:", error);
+    } catch {
+      console.error("No se pudo cargar el usuario");
     }
   };
 

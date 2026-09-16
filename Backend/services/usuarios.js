@@ -66,7 +66,6 @@ async function edit(data) {
       mensaje: "Usuario editado correctamente",
     };
   } catch (error) {
-    console.error("Error al editar el usuario:", error);
     throw error;
   }
 }
@@ -74,7 +73,7 @@ async function edit(data) {
 
 async function getUsuarioByIdDatos(id) {
   const sql =
-    "SELECT *, id, telefono, estado, email, nombre, id_tipo_usuario as rol, id_dependencia as dependencia FROM usuario WHERE id = ?";
+    "SELECT id, telefono, estado, email, nombre, id_tipo_usuario as rol, id_dependencia as dependencia FROM usuario WHERE id = ?";
   const results = await db.queryOne(sql, [id]);
   if (!results) {
     const error = new Error("Usuario no encontrado");
@@ -87,7 +86,6 @@ async function getUsuarioByIdDatos(id) {
 async function create(data) {
   const { nombre, telefono, email, password, rol, dependencia } = data;
   const dependenciaFinal = dependencia ?? 0;
-  console.log("user model", data);
 
   try {
     const fechaSubida = new Date().toISOString().split("T")[0];
@@ -121,7 +119,6 @@ async function create(data) {
       mensaje: "Usuario creado correctamente",
     };
   } catch (error) {
-    console.error("Error al crear el usuario:", error);
     throw error;
   }
 }
@@ -150,7 +147,6 @@ export async function updateUsuario(id, datos) {
  
   if (datos.clave && datos.clave_actual) {
    
-    console.log("ID recibido:", id);
     const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [
       id,
     ]);
@@ -160,7 +156,6 @@ export async function updateUsuario(id, datos) {
     const claveGuardada = result[0].clave;
     const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
     if (!isMatch) {
-      console.log("Contraseña actual incorrecta");
       throw new Error("La contraseña actual es incorrecta");
     }
     const nuevaClave = await hashPasswordBcrypt(datos.clave);
@@ -185,7 +180,7 @@ async function eliminar(id) {
 }
 
 async function filterUsuariosporDepartament(id) {
-  const sql = "SELECT * FROM usuario WHERE id_dependencia LIKE ? ";
+  const sql = "SELECT id, nombre, telefono, email, fecha_alta, ultima_visita, estado, id_tipo_usuario, id_dependencia FROM usuario WHERE id_dependencia LIKE ?";
   const results = await db.query(sql, [id]);
   return results;
 }

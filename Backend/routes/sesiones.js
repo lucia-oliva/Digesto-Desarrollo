@@ -35,7 +35,6 @@ router.post(
   "/create",
   asyncHandler(async (req, res) => {
     const { fecha_sesion, orden_url, nombre_orden } = req.body;
-    console.log("Datos recibidos para crear sesión:", req.body);
     const result = await sesionesDB.create({
       fecha_sesion,
       orden_url,

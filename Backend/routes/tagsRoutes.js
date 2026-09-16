@@ -19,7 +19,6 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(id);
 
     const tag = await tagsDB.getById(id);
     res.status(200).json(tag);
@@ -40,7 +39,6 @@ router.post(
   "/edit",
   authenticateToken,
   asyncHandler(async (req, res) => {
-    console.log("Cuerpo de la solicitud:", req.body);
     const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
     if(!result.success){

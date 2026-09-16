@@ -40,7 +40,6 @@ router.post(
 
     const user = rows;
 
-    console.log("user", user);
 
     const { isMatch, newHash } = await verifyPassword(password, user.clave);
     if (!isMatch) {

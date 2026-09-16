@@ -47,7 +47,6 @@ router.post(
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    console.log("Cuerpo de la solicitud:", req.body);
     const dependenciaDataEdit = req.body;
     try {
       const result = await dependenciaDB.edit(dependenciaDataEdit);
@@ -130,7 +129,6 @@ router.post(
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     let { nombre, estado } = req.body;
-    console.log("parametros:", nombre, estado);
     let { page, limite } = req.query;
     limite = parseInt(limite, 10) || 10;
     page = parseInt(page, 10) || 1;
