@@ -69,7 +69,7 @@ function PasoForm({
         placeholder: "Seleccione la dependencia",
       },
     ];
-  }, [entidad, baseCampos, depOptions]);
+  }, [entidad, baseCampos]);
 
   useEffect(() => {
     if (shouldLockEstado) {
@@ -86,7 +86,7 @@ function PasoForm({
         return { ...prev, dependencia: String(lockedDepValue) };
       });
     }
-  }, [shouldLockDep, lockedDepValue, setFormData]);
+  }, [shouldLockDep, shouldLockEstado, lockedDepValue, setFormData]);
 
   const {
     tagInput,

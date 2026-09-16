@@ -1,9 +1,7 @@
-import { useState } from "react";
 import NormativaTable from "../../components/Table/NormativasTable";
 
 function ConsejoNormativas() {
-  const [tags, setTags] = useState("");
-  const filtros = { dependencia: "20", tags };
+  const filtros = { dependencia: "20", tags: "" };
 
   return (
     <div className="pt-20 overflow-x-visible">

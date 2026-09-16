@@ -1,9 +1,9 @@
 import { Link } from "react-router";
+import PropTypes from "prop-types";
 import {
   FiSearch,
   FiFileText,
   FiShield,
-  FiZap,
   FiBookOpen,
   FiUsers,
 } from "react-icons/fi";
@@ -111,5 +111,11 @@ function Feature({ icon, title, text }) {
     </div>
   );
 }
+
+Feature.propTypes = {
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+};
 
 export default About;

@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from "react";
 import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
 import GenericTable from "./GenericTable";
@@ -20,7 +19,6 @@ const NormativaTable = ({
   onSeleccionar,
   modo,
   isNormModificadas = false,
-  formData,
   data: dataOverride = null,
   hidePagination = false,
 }) => {
@@ -30,7 +28,6 @@ const NormativaTable = ({
   const user = auth?.user;
   const tipoUser = auth.user?.tipo_usuario;
   const depName = auth.user?.dependencia;
-  const isDepAdmin = tipoUser === "Administrador de Dependencia";
   const isSupervisor = tipoUser === "Supervisor";
   const isSuperAdmin = tipoUser === "SuperAdministrador";
   const isSupervisorCS =
@@ -87,6 +84,7 @@ const NormativaTable = ({
             : isConsejo
               ? "consejo"
               : "ver");
+  const filtrosKey = JSON.stringify(filtros);
   const filtrosEfectivos = useMemo(() => {
     if (
       isAdminRoute &&
@@ -105,7 +103,7 @@ const NormativaTable = ({
     isSuperAdmin,
     userDepId,
     depName,
-    JSON.stringify(filtros),
+    filtrosKey,
   ]);
 
   const { tipo = "", columns = [] } = adminConfig[type] || {};
@@ -430,7 +428,9 @@ NormativaTable.propTypes = {
     "inicio",
   ]),
   onSeleccionar: PropTypes.func,
-  formData: PropTypes.object,
+  isNormModificadas: PropTypes.bool,
+  data: PropTypes.array,
+  hidePagination: PropTypes.bool,
 };
 
 export default NormativaTable;
