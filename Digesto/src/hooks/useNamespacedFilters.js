@@ -1,7 +1,7 @@
 /* eslint-disable no-empty */
 import { useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
-import { useFiltersContext } from "../context/FiltersContext";
+import { useFiltersContext } from "./useFiltersContext";
 
 function buildNs({ scope, type, pathname, nsStrategy }) {
   if (nsStrategy === "byType") return `ns:${scope}:${type}`;

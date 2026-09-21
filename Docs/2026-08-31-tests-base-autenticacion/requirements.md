@@ -1,62 +1,86 @@
-# Requirements — Tests base de autenticación (Jest + Supertest)
+# Requisitos — Tests de autenticación y matriz RBAC
 
-## Alcance
+## Identificación
 
-Crear la base de tests de autenticación del backend, cubriendo los niveles **unit** e **integration**, y dejando codificado el contrato SEC-01 (401/403). Esta feature **no corrige** la implementación de autenticación; el fix queda en una issue posterior.
+- Issues: AUD-03 y AUD-05.
+- Hallazgos asociados: SEC-01 y CQ-01.
+- Componente: backend Node.js/Express.
+- Herramientas: Jest y Supertest.
 
-## Contexto
+## Objetivo
 
-- Backend ESM (`"type": "module"`), Jest 30 ya configurado (`testMatch: tests/**/*.test.js`).
-- Ya existen 3 tests de `accessMatrix` en `Backend/tests/security/` (AUD-02).
-- `supertest` no estaba instalado; `node_modules/` local está vacío (dependencias se instalan con `npm install`).
+Mantener una suite automatizada que verifique el contrato de autenticación y autorización del backend, incluida la correspondencia entre los endpoints registrados en Express y la matriz RBAC definida en `Backend/security/accessMatrix.js`.
 
-## Hallazgos relevantes (SEC-01)
+## Contrato de autenticación y autorización
 
-1. `Backend/Middleware/authMiddleware.js` define `authenticateToken`, pero **no se aplica en ninguna ruta** (búsqueda: solo 1 aparición, en el propio middleware).
-2. El middleware responde:
-   - Sin token → `401` (correcto).
-   - Token inválido/expirado → `403` (SEC-01 exige `401`).
-
-## Contrato a codificar en los tests (SEC-01)
-
-| Caso | Status esperado |
+| Condición | Resultado esperado |
 | --- | --- |
-| Sin `Authorization` | 401 |
-| Token malformado | 401 |
-| Token inválido | 401 |
-| Token expirado | 401 |
-| Token válido | no 401 |
+| Endpoint privado sin token | 401 |
+| Token malformado, inválido o expirado | 401 |
+| Token válido con rol insuficiente | 403 |
+| Token válido con rol y alcance autorizados | Acceso permitido |
+| Recurso no publicado sin token | 401 |
+| Recurso no publicado de otra dependencia | 403 |
+| Recurso publicado | Acceso público permitido |
 
-Definiciones:
+La autorización se verifica para los roles:
 
-- **malformado**: header sin el esquema `Bearer <token>` o `Bearer` sin token.
-- **inválido**: JWT firmado con otra clave o corrupto.
-- **expirado**: JWT con `exp` en el pasado.
+- `SuperAdministrador`.
+- `Supervisor`.
+- `Administrador de Dependencia`.
 
-## Decisiones
+También se verifican los alcances por dependencia, Consejo Superior, destino de uploads y estado de publicación del recurso.
 
-- Framework: **Jest** (ya presente) + **Supertest** (nuevo).
-- Entorno: `Backend/tests/setup-env.cjs` fija `NODE_ENV=test`, `ACCESS_SECRET` y `REFRESH_SECRET` de prueba; se registra en `jest.config.js` (`setupFiles`).
-- Script: mantener `npm test` (Jest `--runInBand`).
-- Rutas representativas: `GET /api/usuarios`, `POST /api/normativa/create`, `POST /api/auditoria/search`, `POST /api/file/upload`.
-- Mocks: en la integración de rutas se mockean los servicios (`usuarios`, `normativa`, `auditoria`, `db`) para evitar dependencia de MariaDB y hacer deterministas los resultados.
+## Organización
 
-## Restricciones
+```text
+Backend/tests/
+├── unit/
+├── integration/
+├── helpers/
+├── e2e/
+└── setup-env.cjs
+```
 
-- No modificar la implementación de autenticación ni las rutas (el fix es otra issue).
-- Mantener las convenciones ESM y de nombre de los tests existentes (`*.test.js`).
+- `unit/`: contratos de tokens, middleware, políticas y definición de la matriz.
+- `integration/`: solicitudes HTTP contra Express mediante Supertest.
+- `helpers/`: tokens, solicitudes y mocks reutilizables; no contiene suites.
+- `e2e/`: reservada para pruebas futuras con infraestructura completa.
+
+
+## Matriz automatizada
+
+`Backend/tests/integration/rbacMatrix.test.js` genera casos parametrizados a partir de `ACCESS_MATRIX` y separa las suites de:
+
+1. cobertura de endpoints protegidos;
+2. respuestas 401 sin autenticación;
+3. respuestas 403 para roles rechazados;
+4. acceso para roles permitidos;
+5. restricciones por dependencia;
+6. acceso condicionado por publicación.
+
+Cada caso informa método, ruta, rol o condición y resultado esperado.
+
+## Aislamiento
+
+- Los tokens se generan con la implementación real del backend y secretos exclusivos de prueba.
+- Las integraciones reemplazan servicios de persistencia y correo mediante mocks deterministas.
+- La suite no requiere iniciar el servidor ni disponer de una base MariaDB.
+- `NODE_ENV`, `ACCESS_SECRET` y `REFRESH_SECRET` se establecen en `Backend/tests/setup-env.cjs`.
+
+## Ejecución
+
+Desde `Backend/`:
+
+```bash
+npm ci
+npm run test:unit
+npm run test:integration
+npm test
+```
 
 ## Fuera de alcance
 
-- Corregir `authMiddleware.js` (403→401) o cablearlo a las rutas.
-- Nivel **E2E** (browser testing): no se implementa en AUD-03; ver definición abajo.
-
-## E2E — definición (browser testing)
-
-El nivel **E2E** de los tests de autenticación se define como **browser testing**: automatizar el navegador para probar el flujo completo desde el frontend.
-
-- Herramienta sugerida: **Playwright** o **Cypress** (ninguno está en el repo todavía).
-- Alcance típico: intento de **login** en la UI, navegación autenticada y acceso a pantallas protegidas (usuarios, normativas, auditoría, archivos).
-- No es un "E2E de backend contra la BD real" (eso sería un test de integración con infraestructura real, no browser testing).
-
-**Estado:** fuera del alcance de AUD-03 (que cubre unit + integration). Se implementará en una fase posterior, cuando se incorpore el framework de browser testing.
+- Pruebas E2E con frontend, servidor y base de datos reales.
+- Integración continua con GitHub Actions.
+- Pruebas de carga, rendimiento y disponibilidad.

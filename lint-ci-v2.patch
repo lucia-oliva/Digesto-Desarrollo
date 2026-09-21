@@ -1,0 +1,563 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+new file mode 100644
+index 0000000..7b5729a
+--- /dev/null
++++ b/.github/workflows/ci.yml
+@@ -0,0 +1,60 @@
++name: CI
++
++on:
++  push:
++  pull_request:
++  workflow_dispatch:
++
++permissions:
++  contents: read
++
++concurrency:
++  group: ci-${{ github.workflow }}-${{ github.ref }}
++  cancel-in-progress: true
++
++jobs:
++  quality:
++    name: Install, lint, test, build and audit
++    runs-on: ubuntu-latest
++    timeout-minutes: 15
++
++    steps:
++      - name: Checkout repository
++        uses: actions/checkout@v7
++
++      - name: Set up Node.js
++        uses: actions/setup-node@v7
++        with:
++          node-version: 22
++          cache: npm
++          cache-dependency-path: |
++            Digesto/package-lock.json
++            Backend/package-lock.json
++
++      - name: Install frontend dependencies
++        working-directory: Digesto
++        run: npm ci
++
++      - name: Install backend dependencies
++        working-directory: Backend
++        run: npm ci
++
++      - name: Lint frontend
++        working-directory: Digesto
++        run: npm run lint
++
++      - name: Test backend
++        working-directory: Backend
++        run: npm test
++
++      - name: Build frontend
++        working-directory: Digesto
++        run: npm run build
++
++      - name: Audit frontend dependencies
++        working-directory: Digesto
++        run: npm audit --audit-level=high
++
++      - name: Audit backend dependencies
++        working-directory: Backend
++        run: npm audit --audit-level=high
+diff --git a/Digesto/eslint.config.js b/Digesto/eslint.config.js
+index 238d2e4..472585d 100644
+--- a/Digesto/eslint.config.js
++++ b/Digesto/eslint.config.js
+@@ -17,7 +17,7 @@ export default [
+         sourceType: 'module',
+       },
+     },
+-    settings: { react: { version: '18.3' } },
++    settings: { react: { version: 'detect' } },
+     plugins: {
+       react,
+       'react-hooks': reactHooks,
+diff --git a/Digesto/src/components/Listas/Dependencias.jsx b/Digesto/src/components/Listas/Dependencias.jsx
+index 264b773..09a9a2f 100644
+--- a/Digesto/src/components/Listas/Dependencias.jsx
++++ b/Digesto/src/components/Listas/Dependencias.jsx
+@@ -1,8 +1,7 @@
+ import PropTypes from "prop-types";
+-import DependenciaCard, {
+-  normalizeLabel,
+-} from "./Dependencias/DependenciaCard";
++import DependenciaCard from "./Dependencias/DependenciaCard";
+ import DependenciasRow from "./Dependencias/DependenciasRow";
++import { normalizeDependenciaLabel } from "../../utils/dependencias";
+ 
+ const dependenciaEnum = [
+   "Consejo Superior",
+@@ -25,7 +24,7 @@ export default function Dependencias({ dependencias }) {
+   const list = dependencias?.length ? dependencias : dependenciaEnum;
+ 
+   const pick = (labels) => {
+-    const map = new Map(list.map((n) => [normalizeLabel(n), n]));
++    const map = new Map(list.map((n) => [normalizeDependenciaLabel(n), n]));
+     return labels.map((k) => map.get(k)).filter(Boolean);
+   };
+ 
+diff --git a/Digesto/src/components/Listas/Dependencias/DependenciaCard.jsx b/Digesto/src/components/Listas/Dependencias/DependenciaCard.jsx
+index 8ef4ee3..5fe9292 100644
+--- a/Digesto/src/components/Listas/Dependencias/DependenciaCard.jsx
++++ b/Digesto/src/components/Listas/Dependencias/DependenciaCard.jsx
+@@ -1,5 +1,6 @@
+ import PropTypes from "prop-types";
+ import { Link } from "react-router";
++import { normalizeDependenciaLabel } from "../../../utils/dependencias";
+ 
+ const colors = [
+   "bg-[#526cc4]",
+@@ -29,9 +30,6 @@ const emisorNombreToId = {
+   "Consejo Superior" : "4"
+ }
+ 
+-const normalizeLabel = (nombre) =>
+-  nombre === "C. Superior" ? "C.Superior" : String(nombre);
+-
+ const buildTo = ({label,id,field}) =>
+   String(label).toLowerCase() === "todas" || !id
+     ? "/busqueda"
+@@ -45,7 +43,7 @@ const buildTo = ({label,id,field}) =>
+   big = false,
+   kind = "dependencia" 
+ }) {
+-  const label = normalizeLabel(nombre);
++  const label = normalizeDependenciaLabel(nombre);
+     const map = kind === "emisor" ? emisorNombreToId : dependenciaNombreToId;
+     const field = kind === "emisor" ? "emisor" : "dependencia";
+   const id = map[nombre] ?? map[label] ?? "";
+@@ -92,5 +90,3 @@ DependenciaCard.propTypes = {
+   big: PropTypes.bool,
+   kind: PropTypes.oneOf(["dependencia", "emisor"])
+ };
+-
+-export { normalizeLabel };
+diff --git a/Digesto/src/components/Listas/Dependencias/DependenciasRow.jsx b/Digesto/src/components/Listas/Dependencias/DependenciasRow.jsx
+index fdeb390..00ed668 100644
+--- a/Digesto/src/components/Listas/Dependencias/DependenciasRow.jsx
++++ b/Digesto/src/components/Listas/Dependencias/DependenciasRow.jsx
+@@ -1,5 +1,6 @@
+ import PropTypes from "prop-types";
+-import DependenciaCard, { normalizeLabel } from "./DependenciaCard";
++import DependenciaCard from "./DependenciaCard";
++import { normalizeDependenciaLabel } from "../../../utils/dependencias";
+ 
+ export default function DependenciasRow({
+   title,
+@@ -21,11 +22,11 @@ export default function DependenciasRow({
+       )}
+ 
+       <div className={`grid gap-3 ${colsClass}`}>
+-        {items.map((n, i) => {
++        {items.map((n) => {
+           const extra = getCardProps?.(n) || {};
+           return (
+           <DependenciaCard
+-            key={normalizeLabel(n)}
++            key={normalizeDependenciaLabel(n)}
+             nombre={n}
+             big={big}
+             colored={Colored}
+@@ -46,4 +47,5 @@ DependenciasRow.propTypes = {
+   big: PropTypes.bool,
+   startColor: PropTypes.number,
+   Colored: PropTypes.bool,
++  getCardProps: PropTypes.func,
+ };
+diff --git a/Digesto/src/components/SearchFilter/AlphabetFilter.jsx b/Digesto/src/components/SearchFilter/AlphabetFilter.jsx
+index 737ec46..a03727b 100644
+--- a/Digesto/src/components/SearchFilter/AlphabetFilter.jsx
++++ b/Digesto/src/components/SearchFilter/AlphabetFilter.jsx
+@@ -1,5 +1,7 @@
+-// src/components/SearchFilter/AlphabetFilter.jsx
+-export default function AlphabetFilter({ value = "", onChange = () => {} }) {
++// src/components/SearchFilter/AlphabetFilter.jsx
++import PropTypes from "prop-types";
++
++export default function AlphabetFilter({ value = "", onChange = () => {} }) {
+   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+   return (
+     <div className="flex flex-wrap gap-2">
+@@ -24,5 +26,10 @@ export default function AlphabetFilter({ value = "", onChange = () => {} }) {
+         Limpiar
+       </button>
+     </div>
+-  );
+-}
++  );
++}
++
++AlphabetFilter.propTypes = {
++  value: PropTypes.string,
++  onChange: PropTypes.func,
++};
+diff --git a/Digesto/src/components/SearchFilter/SearchFilter.jsx b/Digesto/src/components/SearchFilter/SearchFilter.jsx
+index bcc8e96..a9f4458 100644
+--- a/Digesto/src/components/SearchFilter/SearchFilter.jsx
++++ b/Digesto/src/components/SearchFilter/SearchFilter.jsx
+@@ -80,11 +80,11 @@ function FieldRenderer({ field, value, onChange, disabled }) {
+   const ctxOptions = useContextOptions(fromContext);
+   const { options: asyncOpts, loading: asyncLoading } = useAsyncOptions(field);
+ 
+-  const effectiveOptions = useMemo(() => {
+-    if (field?.async) return asyncOpts;
+-    if (fromContext) return ctxOptions;
+-    return options || [];
+-  }, [field, asyncOpts, ctxOptions, options]);
++  const effectiveOptions = field?.async
++    ? asyncOpts
++    : fromContext
++      ? ctxOptions
++      : options || [];
+ 
+   if (type === "text") {
+     return (
+@@ -130,10 +130,9 @@ function FieldRenderer({ field, value, onChange, disabled }) {
+   return null;
+ }
+ 
+-export default function GenericFilterSearch({
+-  type,
+-  scope,
+-  initialState = {},
++export default function GenericFilterSearch({
++  type,
++  initialState = {},
+   autoSearch = false,
+   onSearch = () => {},
+   disabledFields = {},
+diff --git a/Digesto/src/components/Table/NormativasTable.jsx b/Digesto/src/components/Table/NormativasTable.jsx
+index 90d2113..ee0a342 100644
+--- a/Digesto/src/components/Table/NormativasTable.jsx
++++ b/Digesto/src/components/Table/NormativasTable.jsx
+@@ -1,4 +1,3 @@
+-/* eslint-disable react/prop-types */
+ import { useEffect, useMemo, useState } from "react";
+ import { abrirPdfDesdeBlobUrl } from "./AbrirPdf";
+ import GenericTable from "./GenericTable";
+@@ -20,7 +19,6 @@ const NormativaTable = ({
+   onSeleccionar,
+   modo,
+   isNormModificadas = false,
+-  formData,
+   data: dataOverride = null,
+   hidePagination = false,
+ }) => {
+@@ -30,7 +28,6 @@ const NormativaTable = ({
+   const user = auth?.user;
+   const tipoUser = auth.user?.tipo_usuario;
+   const depName = auth.user?.dependencia;
+-  const isDepAdmin = tipoUser === "Administrador de Dependencia";
+   const isSupervisor = tipoUser === "Supervisor";
+   const isSuperAdmin = tipoUser === "SuperAdministrador";
+   const isSupervisorCS =
+@@ -87,6 +84,7 @@ const NormativaTable = ({
+             : isConsejo
+               ? "consejo"
+               : "ver");
++  const filtrosKey = JSON.stringify(filtros);
+   const filtrosEfectivos = useMemo(() => {
+     if (
+       isAdminRoute &&
+@@ -105,7 +103,7 @@ const NormativaTable = ({
+     isSuperAdmin,
+     userDepId,
+     depName,
+-    JSON.stringify(filtros),
++    filtrosKey,
+   ]);
+ 
+   const { tipo = "", columns = [] } = adminConfig[type] || {};
+@@ -430,7 +428,9 @@ NormativaTable.propTypes = {
+     "inicio",
+   ]),
+   onSeleccionar: PropTypes.func,
+-  formData: PropTypes.object,
++  isNormModificadas: PropTypes.bool,
++  data: PropTypes.array,
++  hidePagination: PropTypes.bool,
+ };
+ 
+ export default NormativaTable;
+diff --git a/Digesto/src/context/AppProviders.jsx b/Digesto/src/context/AppProviders.jsx
+index 672a278..18c5028 100644
+--- a/Digesto/src/context/AppProviders.jsx
++++ b/Digesto/src/context/AppProviders.jsx
+@@ -1,6 +1,7 @@
++import PropTypes from "prop-types";
+ import { AuthProvider } from "./authProvider";
+ import ReferenciasProvider from "./ReferenciasProvider";
+-import { FiltersProvider } from "./FiltersContext";
++import { FiltersProvider } from "./FiltersProvider";
+ 
+ export default function AppProviders({ children }) {
+   return (
+@@ -11,3 +12,7 @@ export default function AppProviders({ children }) {
+     </AuthProvider>
+   );
+ }
++
++AppProviders.propTypes = {
++  children: PropTypes.node.isRequired,
++};
+diff --git a/Digesto/src/context/FiltersContext.jsx b/Digesto/src/context/FiltersProvider.jsx
+similarity index 78%
+rename from Digesto/src/context/FiltersContext.jsx
+rename to Digesto/src/context/FiltersProvider.jsx
+index d97b5d0..294f270 100644
+--- a/Digesto/src/context/FiltersContext.jsx
++++ b/Digesto/src/context/FiltersProvider.jsx
+@@ -1,6 +1,6 @@
+-import { createContext, useContext, useMemo, useReducer } from "react";
+-
+-const FiltersContext = createContext(null);
++import PropTypes from "prop-types";
++import { useMemo, useReducer } from "react";
++import { FiltersContext } from "./filtersContext";
+ 
+ function reducer(state, action) {
+   switch (action.type) {
+@@ -43,14 +43,12 @@ export function FiltersProvider({ children }) {
+     }),
+     [state]
+   );
++
+   return (
+     <FiltersContext.Provider value={api}>{children}</FiltersContext.Provider>
+   );
+ }
+ 
+-export function useFiltersContext() {
+-  const ctx = useContext(FiltersContext);
+-  if (!ctx)
+-    throw new Error("useFiltersContext must be used within FiltersProvider");
+-  return ctx;
+-}
++FiltersProvider.propTypes = {
++  children: PropTypes.node.isRequired,
++};
+diff --git a/Digesto/src/context/authProvider.jsx b/Digesto/src/context/authProvider.jsx
+index 9442031..81e0c32 100644
+--- a/Digesto/src/context/authProvider.jsx
++++ b/Digesto/src/context/authProvider.jsx
+@@ -1,10 +1,10 @@
+-import { useEffect, useMemo, useState } from "react";
++import PropTypes from "prop-types";
++import { useEffect, useState } from "react";
+ import { AuthContext } from "./authContext";
+ import { setAccessToken, clearAccessToken } from "../services/authservices";
+ import { setGlobalLogout } from "./globalLogout";
+ import api from "../api/axiosPrivate";
+ 
+-// eslint-disable-next-line react/prop-types
+ export const AuthProvider = ({ children }) => {
+   const [auth, setAuth] = useState({
+     user: null,
+@@ -56,15 +56,11 @@ export const AuthProvider = ({ children }) => {
+     })();
+   }, []);
+ 
+-  const value = useMemo(
+-    () => ({
+-      auth,
+-      logout,
+-      login,
+-      api,
+-    }),
+-    [auth]
+-  );
++  const value = { auth, logout, login, api };
+ 
+   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+ };
++
++AuthProvider.propTypes = {
++  children: PropTypes.node.isRequired,
++};
+diff --git a/Digesto/src/context/filtersContext.js b/Digesto/src/context/filtersContext.js
+new file mode 100644
+index 0000000..a2486e7
+--- /dev/null
++++ b/Digesto/src/context/filtersContext.js
+@@ -0,0 +1,3 @@
++import { createContext } from "react";
++
++export const FiltersContext = createContext(null);
+diff --git a/Digesto/src/hooks/useFiltersContext.js b/Digesto/src/hooks/useFiltersContext.js
+new file mode 100644
+index 0000000..c39c783
+--- /dev/null
++++ b/Digesto/src/hooks/useFiltersContext.js
+@@ -0,0 +1,12 @@
++import { useContext } from "react";
++import { FiltersContext } from "../context/filtersContext";
++
++export function useFiltersContext() {
++  const context = useContext(FiltersContext);
++
++  if (!context) {
++    throw new Error("useFiltersContext must be used within FiltersProvider");
++  }
++
++  return context;
++}
+diff --git a/Digesto/src/hooks/useNamespacedFilters.js b/Digesto/src/hooks/useNamespacedFilters.js
+index aa13047..9791d27 100644
+--- a/Digesto/src/hooks/useNamespacedFilters.js
++++ b/Digesto/src/hooks/useNamespacedFilters.js
+@@ -1,7 +1,7 @@
+ /* eslint-disable no-empty */
+ import { useEffect, useMemo, useRef } from "react";
+ import { useLocation, useNavigate, useSearchParams } from "react-router";
+-import { useFiltersContext } from "../context/FiltersContext";
++import { useFiltersContext } from "./useFiltersContext";
+ 
+ function buildNs({ scope, type, pathname, nsStrategy }) {
+   if (nsStrategy === "byType") return `ns:${scope}:${type}`;
+diff --git a/Digesto/src/pages/About.jsx b/Digesto/src/pages/About.jsx
+index 8fe911b..6a67ea8 100644
+--- a/Digesto/src/pages/About.jsx
++++ b/Digesto/src/pages/About.jsx
+@@ -1,9 +1,9 @@
+-import { Link } from "react-router";
+-import {
++import { Link } from "react-router";
++import PropTypes from "prop-types";
++import {
+   FiSearch,
+   FiFileText,
+   FiShield,
+-  FiZap,
+   FiBookOpen,
+   FiUsers,
+ } from "react-icons/fi";
+@@ -100,7 +100,7 @@ function About() {
+   );
+ }
+ 
+-function Feature({ icon, title, text }) {
++function Feature({ icon, title, text }) {
+   return (
+     <div className="rounded-2xl border border-base-300 bg-gradient-to-br from-white to-base-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+       <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+@@ -110,6 +110,12 @@ function Feature({ icon, title, text }) {
+       <p className="mt-1 text-sm text-slate-600">{text}</p>
+     </div>
+   );
+-}
+-
+-export default About;
++}
++
++Feature.propTypes = {
++  icon: PropTypes.node.isRequired,
++  title: PropTypes.string.isRequired,
++  text: PropTypes.string.isRequired,
++};
++
++export default About;
+diff --git a/Digesto/src/pages/BusquedaNormativas.jsx b/Digesto/src/pages/BusquedaNormativas.jsx
+index 0bc5cc8..f5c020a 100644
+--- a/Digesto/src/pages/BusquedaNormativas.jsx
++++ b/Digesto/src/pages/BusquedaNormativas.jsx
+@@ -1,4 +1,4 @@
+-import { useState } from "react";
++import PropTypes from "prop-types";
+ import ContactModal from "../components/layout/Contact";
+ import NormativaTable from "../components/Table/NormativasTable";
+ import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
+@@ -13,10 +13,9 @@ function NormativasContainer({ isAdmin = false }) {
+     emisor: params.get("emisor") || "",
+   };
+ 
+-  const [tags, setTags] = useState("");
+-  const type = "ListadoNormativa";
+-  const scope = "public";
+-  const modo = "busqueda";
++  const tags = "";
++  const type = "ListadoNormativa";
++  const modo = "busqueda";
+ 
+   const { ns, state, setFilters } = useNamespacedFilters({
+     scope: "public",
+@@ -37,13 +36,6 @@ function NormativasContainer({ isAdmin = false }) {
+     if (res?.cancelled) return;
+   }
+ 
+-  const handleSearchTags = (selectedTags) => {
+-    setTags(selectedTags || "");
+-    const next = { ...state.filters, tags: selectedTags || "" };
+-    setFilters(next);
+-    fetchData(next);
+-  };
+-
+   const handleSearch = (filtersFromGeneric) => {
+     const next = { ...(filtersFromGeneric || {}), tags };
+     setFilters(next);
+@@ -98,6 +90,10 @@ function NormativasContainer({ isAdmin = false }) {
+       {!isAdmin && <ContactModal dependencia={dependenciaSeleccionada} />}
+     </div>
+   );
+-}
+-
+-export default NormativasContainer;
++}
++
++NormativasContainer.propTypes = {
++  isAdmin: PropTypes.bool,
++};
++
++export default NormativasContainer;
+diff --git a/Digesto/src/pages/admin/Carga/Steps/pasoForm.jsx b/Digesto/src/pages/admin/Carga/Steps/pasoForm.jsx
+index 1aed661..38bbdfc 100644
+--- a/Digesto/src/pages/admin/Carga/Steps/pasoForm.jsx
++++ b/Digesto/src/pages/admin/Carga/Steps/pasoForm.jsx
+@@ -69,7 +69,7 @@ function PasoForm({
+         placeholder: "Seleccione la dependencia",
+       },
+     ];
+-  }, [entidad, baseCampos, depOptions]);
++  }, [entidad, baseCampos]);
+ 
+   useEffect(() => {
+     if (shouldLockEstado) {
+@@ -86,7 +86,7 @@ function PasoForm({
+         return { ...prev, dependencia: String(lockedDepValue) };
+       });
+     }
+-  }, [shouldLockDep, lockedDepValue, setFormData]);
++  }, [shouldLockDep, shouldLockEstado, lockedDepValue, setFormData]);
+ 
+   const {
+     tagInput,
+diff --git a/Digesto/src/pages/consejo-superior/ConsejoNormativas.jsx b/Digesto/src/pages/consejo-superior/ConsejoNormativas.jsx
+index 52ff532..89326df 100644
+--- a/Digesto/src/pages/consejo-superior/ConsejoNormativas.jsx
++++ b/Digesto/src/pages/consejo-superior/ConsejoNormativas.jsx
+@@ -1,9 +1,7 @@
+-import { useState } from "react";
+-import NormativaTable from "../../components/Table/NormativasTable";
+-
+-function ConsejoNormativas() {
+-  const [tags, setTags] = useState("");
+-  const filtros = { dependencia: "20", tags };
++import NormativaTable from "../../components/Table/NormativasTable";
++
++function ConsejoNormativas() {
++  const filtros = { dependencia: "20", tags: "" };
+ 
+   return (
+     <div className="pt-20 overflow-x-visible">
+diff --git a/Digesto/src/utils/dependencias.js b/Digesto/src/utils/dependencias.js
+new file mode 100644
+index 0000000..11c76e0
+--- /dev/null
++++ b/Digesto/src/utils/dependencias.js
+@@ -0,0 +1,2 @@
++export const normalizeDependenciaLabel = (nombre) =>
++  nombre === "C. Superior" ? "C.Superior" : String(nombre);

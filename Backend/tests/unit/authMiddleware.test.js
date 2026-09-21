@@ -1,7 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import jwt from "jsonwebtoken";
 
-import { authenticateToken } from "../../Middleware/authMiddleware.js";
+import {
+  authenticateToken,
+  optionalAuthenticateToken,
+} from "../../Middleware/authMiddleware.js";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 
@@ -100,5 +103,50 @@ describe("authenticateToken (unit)", () => {
     expect(next).toHaveBeenCalled();
     expect(req.user.sub).toBe("1");
     expect(req.user.roles).toEqual(["SuperAdministrador"]);
+  });
+});
+
+describe("optionalAuthenticateToken (unit)", () => {
+  test("permite continuar cuando no se envía Authorization", () => {
+    const req = createReq(undefined);
+    const res = createRes();
+    const next = jest.fn();
+
+    optionalAuthenticateToken(req, res, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.user).toBeUndefined();
+    expect(res.status).not.toHaveBeenCalled();
+  });
+
+  test("rechaza un header Bearer malformado", () => {
+    const req = createReq("Bearer");
+    const res = createRes();
+    const next = jest.fn();
+
+    optionalAuthenticateToken(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test("adjunta el usuario cuando recibe un token válido", () => {
+    const token = jwt.sign(
+      { sub: "1", roles: ["Supervisor"], dependenciaId: 3 },
+      ACCESS_SECRET,
+      { expiresIn: "15m" },
+    );
+    const req = createReq(`Bearer ${token}`);
+    const res = createRes();
+    const next = jest.fn();
+
+    optionalAuthenticateToken(req, res, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.user).toEqual({
+      sub: "1",
+      roles: ["Supervisor"],
+      dependenciaId: 3,
+    });
   });
 });

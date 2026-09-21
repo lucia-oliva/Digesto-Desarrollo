@@ -86,14 +86,17 @@ docker compose down -v
 
 ## Tests
 
-El backend usa Jest + Supertest. Para ejecutar la suite:
+El backend usa Jest y Supertest. Las pruebas están organizadas en `Backend/tests/unit/`, `Backend/tests/integration/` y `Backend/tests/helpers/`.
+
+No es necesario iniciar el backend ni MariaDB. Desde `Backend/`:
 
 ```bash
 cd Backend
-npm install
+npm ci
+npm run test:unit
+npm run test:integration
 npm test
 ```
-
 Los tests de seguridad viven en `Backend/tests/security/`.
 
 ## Documentación de la feature

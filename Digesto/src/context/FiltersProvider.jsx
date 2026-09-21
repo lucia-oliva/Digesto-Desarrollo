@@ -1,6 +1,6 @@
-import { createContext, useContext, useMemo, useReducer } from "react";
-
-const FiltersContext = createContext(null);
+import PropTypes from "prop-types";
+import { useMemo, useReducer } from "react";
+import { FiltersContext } from "./filtersContext";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -43,14 +43,12 @@ export function FiltersProvider({ children }) {
     }),
     [state]
   );
+
   return (
     <FiltersContext.Provider value={api}>{children}</FiltersContext.Provider>
   );
 }
 
-export function useFiltersContext() {
-  const ctx = useContext(FiltersContext);
-  if (!ctx)
-    throw new Error("useFiltersContext must be used within FiltersProvider");
-  return ctx;
-}
+FiltersProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

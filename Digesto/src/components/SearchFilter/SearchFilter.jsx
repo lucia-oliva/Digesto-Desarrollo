@@ -80,11 +80,11 @@ function FieldRenderer({ field, value, onChange, disabled }) {
   const ctxOptions = useContextOptions(fromContext);
   const { options: asyncOpts, loading: asyncLoading } = useAsyncOptions(field);
 
-  const effectiveOptions = useMemo(() => {
-    if (field?.async) return asyncOpts;
-    if (fromContext) return ctxOptions;
-    return options || [];
-  }, [field, asyncOpts, ctxOptions, options]);
+  const effectiveOptions = field?.async
+    ? asyncOpts
+    : fromContext
+      ? ctxOptions
+      : options || [];
 
   if (type === "text") {
     return (
@@ -132,7 +132,6 @@ function FieldRenderer({ field, value, onChange, disabled }) {
 
 export default function GenericFilterSearch({
   type,
-  scope,
   initialState = {},
   autoSearch = false,
   onSearch = () => {},

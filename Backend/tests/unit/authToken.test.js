@@ -16,12 +16,23 @@ describe("utils/authToken", () => {
     const token = generateAccessToken({
       id: "47",
       roles: ["SuperAdministrador"],
+      dependenciaId: 20,
     });
 
     const payload = jwt.verify(token, ACCESS_SECRET);
 
     expect(payload.sub).toBe("47");
     expect(payload.roles).toEqual(["SuperAdministrador"]);
+    expect(payload.dependenciaId).toBe(20);
+  });
+
+  test("generateAccessToken aplica claims seguros por defecto", () => {
+    const token = generateAccessToken({ id: "47" });
+
+    const payload = jwt.verify(token, ACCESS_SECRET);
+
+    expect(payload.roles).toEqual([]);
+    expect(payload.dependenciaId).toBeNull();
   });
 
   test("generateRefreshToken firma sub con REFRESH_SECRET", () => {
