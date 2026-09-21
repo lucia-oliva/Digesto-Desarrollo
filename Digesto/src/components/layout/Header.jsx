@@ -53,8 +53,10 @@ function Header() {
               <li key={index}>
                 <Link
                   to={link.href}
-                  className={`text-primary-content text-lg hover:bg-primary ${
-                    link.active ? "menu-active" : "after-line"
+                  className={`text-lg ${
+                    link.active
+                      ? "bg-primary-content text-primary"
+                      : "text-primary-content after-line hover:bg-primary"
                   }`}
                 >
                   {link.name === "Ayuda" ? (
@@ -86,8 +88,10 @@ function Header() {
                   <Link
                     to={link.href}
                     className={`${
-                      link.active ? "menu-active" : "after-line"
-                    } text-2xl pl-20 `}
+                      link.active
+                        ? "bg-primary-content text-primary"
+                        : "text-primary-content after-line"
+                    } text-2xl pl-20`}
                   >
                     | {link.name}
                   </Link>

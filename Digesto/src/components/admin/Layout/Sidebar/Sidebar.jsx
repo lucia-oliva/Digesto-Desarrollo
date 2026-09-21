@@ -118,11 +118,11 @@ export default function Sidebar() {
                       <Link
                         to={childDisabled ? "#" : child.path}
                         className={[
-                          "relative flex items-center justify-start w-full text-left px-3 py-2 rounded-md transition",
+                          "relative flex items-center justify-start w-full text-left px-3 py-2 rounded-md transition text-primary-content",
                           childActive ? "bg-white/10" : "hover:bg-white/5",
                           childDisabled
                             ? "opacity-60 pointer-events-none cursor-not-allowed"
-                            : "btn-ghost",
+                            : "",
                         ].join(" ")}
                         tabIndex={childDisabled ? -1 : 0}
                         aria-disabled={childDisabled}
