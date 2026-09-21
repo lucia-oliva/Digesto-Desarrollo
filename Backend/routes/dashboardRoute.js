@@ -7,14 +7,9 @@ const router = express.Router();
 router.get(
   "/resumen",
   asyncHandler(async (req, res) => {
-    try {
-      const resumen = await dashboardDB.getDashboardCounts();
-      res.status(200).json(resumen);
-    } catch (error) {
-      console.error("Error al obtener resumen del dashboard:", error);
-      res.status(500).json({ error: "Error al obtener datos del dashboard" });
-    }
-  })
+    const resumen = await dashboardDB.getDashboardCounts();
+    return res.status(200).json(resumen);
+  }),
 );
 
 export default router;

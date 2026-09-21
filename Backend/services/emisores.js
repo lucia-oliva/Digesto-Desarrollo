@@ -1,17 +1,12 @@
 import db from "./db.js";
 
-
 async function getById(id) {
-  try {
-    const result = await db.queryOne(
-      "SELECT id, nombre, estado FROM emisor WHERE id = ?",
-      [id]
-    );
-    return result || null;
-  } catch (e) {
-    console.error("Error en obtener ID de emisor", e);
-    throw e;
-  }
+  const result = await db.queryOne(
+    "SELECT id, nombre, estado FROM emisor WHERE id = ?",
+    [id]
+  );
+
+  return result || null;
 }
 
 async function getAllEmisoresName() {
@@ -20,18 +15,14 @@ async function getAllEmisoresName() {
   return results;
 }
 
-
-async function getEmisores(){
+async function getEmisores() {
   const sql = "SELECT id, nombre FROM emisor where estado = 'publicado'";
   const results = await db.query(sql, []);
   return results;
 }
 
 async function edit(data) {
-  console.log(data);
-
   const { id, nombre, estado } = data;
-
 
   const duplicado = await db.queryOne(
     "SELECT id FROM emisor WHERE nombre = ? AND id != ?",
@@ -39,16 +30,22 @@ async function edit(data) {
   );
 
   if (duplicado) {
-
-    console.log({ mensaje: `Emisor '${nombre}' ya existe` });
-    throw new Error(`Emisor '${nombre}' ya existe`, 400);
+    const error = new Error("Emisor duplicado");
+    error.status = 409;
+    error.publicMessage = "Ya existe un emisor con ese nombre.";
+    throw error;
   }
 
   const sqlUpdate = "UPDATE emisor SET nombre = ?, estado = ? WHERE id = ?";
   const result = await db.execute(sqlUpdate, [nombre, estado, id]);
+
   if (result.affectedRows === 0) {
-    throw new Error(`No se encontró el emisor con ID ${id}`, 404);
+    const error = new Error("Emisor no encontrado");
+    error.status = 404;
+    error.publicMessage = "Emisor no encontrado.";
+    throw error;
   }
+
   return {
     mensaje: "Emisor editado correctamente",
   };
@@ -56,19 +53,15 @@ async function edit(data) {
 
 async function create(data) {
   const { nombre, estado } = data;
-  try {
-    const sqlInsert = `INSERT INTO emisor (nombre, estado) VALUES (?, ?)`;
-    const result = await db.execute(sqlInsert, [nombre, estado]);
-    const emisorId = result.insertId;
-    return {
-      success: true,
-      mensaje: "Emisor creado correctamente",
-      id: emisorId,
-    };
-  } catch (error) {
-    console.error("Error al crear el emisor:", error);
-    throw error;
-  }
+
+  const sqlInsert = "INSERT INTO emisor (nombre, estado) VALUES (?, ?)";
+  const result = await db.execute(sqlInsert, [nombre, estado]);
+
+  return {
+    success: true,
+    mensaje: "Emisor creado correctamente",
+    id: result.insertId,
+  };
 }
 
 async function eliminar(id) {
@@ -83,30 +76,32 @@ async function searchEmisorByParameters(
   limite = null,
   offset = null
 ) {
-  try {
-    let sql =
-      "SELECT e.id,e.nombre, e.estado, COUNT(*)OVER() AS total FROM emisor e WHERE 1=1";
-    const params = [];
-    if (nombre) {
-      sql += " AND e.nombre LIKE ?";
-      params.push(`%${nombre}%`);
-    }
-    if (estado) {
-      sql += " AND e.estado = ?";
-      params.push(estado);
-    }
-    sql += " GROUP BY e.id";
-    if (limite !== null && offset !== null) {
-      sql += " LIMIT ? OFFSET ?";
-      params.push(Number(limite) || 10, Number(offset) || 0);
-    }
-    const results = await db.query(sql, params);
-    const totalResults = results?.length > 0 ? results[0].total : 0;
-    return { data: results, totalResults };
-  } catch (error) {
-    console.error("Error al buscar emisores por parámetros:", error);
-    throw new Error(error);
+  let sql =
+    "SELECT e.id,e.nombre, e.estado, COUNT(*)OVER() AS total FROM emisor e WHERE 1=1";
+
+  const params = [];
+
+  if (nombre) {
+    sql += " AND e.nombre LIKE ?";
+    params.push(`%${nombre}%`);
   }
+
+  if (estado) {
+    sql += " AND e.estado = ?";
+    params.push(estado);
+  }
+
+  sql += " GROUP BY e.id";
+
+  if (limite !== null && offset !== null) {
+    sql += " LIMIT ? OFFSET ?";
+    params.push(Number(limite) || 10, Number(offset) || 0);
+  }
+
+  const results = await db.query(sql, params);
+  const totalResults = results?.length > 0 ? results[0].total : 0;
+
+  return { data: results, totalResults };
 }
 
 export default {
@@ -116,5 +111,5 @@ export default {
   create,
   edit,
   getById,
-  getEmisores
+  getEmisores,
 };

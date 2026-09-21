@@ -13,16 +13,15 @@ router.get(
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const id = req.params.id;
-    try {
-      const dependencia = await dependenciaDB.getDepenendenciaById(id);
-      if (!dependencia) {
-        return res.status(404).json({ error: "Dependencia no encontrada" });
-      }
-      res.json(dependencia);
-    } catch (error) {
-      console.error("Error al obtener la dependencia:", error);
-      res.status(500).json({ error: "Error al obtener la dependencia" });
+    const dependencia = await dependenciaDB.getDepenendenciaById(id);
+
+    if (!dependencia) {
+      return res.status(404).json({
+        error: "Dependencia no encontrada",
+      });
     }
+
+    return res.json(dependencia);
   }),
 );
 
@@ -32,13 +31,9 @@ router.post(
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const dependenciaData = req.body;
-    try {
-      const result = await dependenciaDB.create(dependenciaData);
-      res.status(201).json(result);
-    } catch (error) {
-      console.error("Error al crear la dependencia:", error);
-      res.status(500).json({ error: "Error al crear la dependencia" });
-    }
+    const result = await dependenciaDB.create(dependenciaData);
+
+    return res.status(201).json(result);
   }),
 );
 
@@ -48,17 +43,17 @@ router.post(
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const dependenciaDataEdit = req.body;
-    try {
-      const result = await dependenciaDB.edit(dependenciaDataEdit);
-      if (result.success) {
-        res.status(200).json({ message: "Dependencia editada correctamente." });
-      } else {
-        res.status(400).json({ error: result.mensaje });
-      }
-    } catch (error) {
-      console.error("Error al editar la dependencia:", error);
-      res.status(500).json({ error: "Error al editar la dependencia" });
+    const result = await dependenciaDB.edit(dependenciaDataEdit);
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: result.mensaje,
+      });
     }
+
+    return res.status(200).json({
+      message: "Dependencia editada correctamente.",
+    });
   }),
 );
 
@@ -68,7 +63,8 @@ router.get(
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
     const dependencias = await dependenciaDB.getAllDependencias();
-    res.json(dependencias);
+
+    return res.json(dependencias);
   }),
 );
 
@@ -76,7 +72,8 @@ router.get(
   "/getDependencias",
   asyncHandler(async (req, res) => {
     const dependencias = await dependenciaDB.getDependencias();
-    res.json(dependencias);
+
+    return res.json(dependencias);
   }),
 );
 
@@ -87,39 +84,26 @@ router.get(
     getUserDependency: (req) =>
       dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
   }),
-
   asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page);
-    const limite = parseInt(req.query.limite);
+    const page = parseInt(req.query.page, 10);
+    const limite = parseInt(req.query.limite, 10);
 
-    try {
-      const { data, totalResults } = await dependenciaDB.getSesionesPaginado(
-        page,
-        limite,
-      );
+    const { data, totalResults } =
+      await dependenciaDB.getSesionesPaginado(page, limite);
 
-      res.json({
-        data,
-        totalResults,
-      });
-    } catch (error) {
-      res.status(500).json({
-        error: error.message,
-      });
-    }
+    return res.json({
+      data,
+      totalResults,
+    });
   }),
 );
 
 router.get(
   "/name",
   asyncHandler(async (req, res) => {
-    try {
-      const dependencias = await dependenciaDB.getAllNamesDependencias();
-      res.json(dependencias);
-    } catch (err) {
-      console.log("No se puedo mostrar las dependencias", err);
-      res.status(500).json({ error: err.message });
-    }
+    const dependencias = await dependenciaDB.getAllNamesDependencias();
+
+    return res.json(dependencias);
   }),
 );
 
@@ -128,30 +112,33 @@ router.post(
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
   asyncHandler(async (req, res) => {
-    let { nombre, estado } = req.body;
+    const { nombre, estado } = req.body;
     let { page, limite } = req.query;
+
     limite = parseInt(limite, 10) || 10;
     page = parseInt(page, 10) || 1;
-    try {
-      const offset = (page - 1) * limite;
-      const { data, totalResults } =
-        await dependenciaDB.searchDependenciaByParameters(
-          nombre,
-          estado,
-          limite,
-          offset,
-        );
-      if (!data || data.length === 0) {
-        return res.status(404).json({
-          error:
-            "No se encontró las dependencias que coincidan con su búsqueda",
-        });
-      }
-      res.status(200).json({ data, totalResults });
-    } catch (err) {
-      console.log("Error al buscar la dependencia", err);
-      res.status(500).json({ error: "Error al buscar la dependencia" });
+
+    const offset = (page - 1) * limite;
+
+    const { data, totalResults } =
+      await dependenciaDB.searchDependenciaByParameters(
+        nombre,
+        estado,
+        limite,
+        offset,
+      );
+
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        error:
+          "No se encontraron dependencias que coincidan con la búsqueda",
+      });
     }
+
+    return res.status(200).json({
+      data,
+      totalResults,
+    });
   }),
 );
 
@@ -162,14 +149,19 @@ router.delete(
   asyncHandler(async (req, res) => {
     const id = req.params.id;
     const result = await dependenciaDB.eliminar(id);
+
     if (result.affectedRows === 0) {
-      const err = new Error("Dependencia no encontrada o ya eliminado");
+      const err = new Error(
+        "Dependencia no encontrada o ya eliminada",
+      );
       err.status = 404;
       throw err;
     }
-    res
-      .status(200)
-      .json({ ok: true, msg: "Dependencia eliminada correctamente" });
+
+    return res.status(200).json({
+      ok: true,
+      msg: "Dependencia eliminada correctamente",
+    });
   }),
 );
 

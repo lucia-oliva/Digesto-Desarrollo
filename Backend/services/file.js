@@ -2,7 +2,18 @@ import path from "path";
 import fs from "fs/promises";
 import db from "./db.js";
 
-export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
+function httpError(status, publicMessage) {
+  const error = new Error(publicMessage);
+  error.status = status;
+  error.publicMessage = publicMessage;
+  return error;
+}
+
+export async function procesarArchivoDeNormativa({
+  file,
+  body,
+  normativaId,
+}) {
   const {
     id_sesion,
     fecha_sesion,
@@ -13,22 +24,28 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     type = "normativa",
   } = body;
 
-  if (!file) throw new Error("No se ha proporcionado un archivo");
+  if (!file) {
+    throw httpError(400, "No se ha proporcionado un archivo.");
+  }
 
   const carpeta = path.join("archivos");
   const viejoPath = path.join(carpeta, file.filename);
 
   if (type === "normativa") {
     if (!id_dependencia || !resolucion || !anio) {
-      throw new Error("Faltan parámetros obligatorios para normativa");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la normativa.",
+      );
     }
 
     const normativa = await db.queryOne(
       "SELECT * FROM normativa WHERE id = ?",
       [normativaId],
     );
-    if (!normativa || normativa.length === 0) {
-      throw new Error("Normativa no encontrada");
+
+    if (!normativa) {
+      throw httpError(404, "Normativa no encontrada.");
     }
 
     const resultado = await db.queryOne(
@@ -36,13 +53,14 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
       [id_dependencia],
     );
 
-    if (!resultado || resultado.length === 0) {
-      throw new Error("Dependencia no encontrada");
+    if (!resultado) {
+      throw httpError(404, "Dependencia no encontrada.");
     }
 
     const { codificacion } = resultado;
     const timestamp = Date.now();
-    const nuevoNombre = `${codificacion}_${resolucion}_${anio}_${timestamp}.pdf`;
+    const nuevoNombre =
+      `${codificacion}_${resolucion}_${anio}_${timestamp}.pdf`;
     const nuevoPath = path.join(carpeta, nuevoNombre);
 
     await fs.rename(viejoPath, nuevoPath);
@@ -56,23 +74,31 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
       throw new Error("No se pudo actualizar la normativa");
     }
 
-    return { id: normativaId, filename: nuevoNombre };
+    return {
+      id: normativaId,
+      filename: nuevoNombre,
+    };
   } else if (type === "consejo") {
     if (!id_sesion || !fecha_sesion) {
-      throw new Error("Faltan parámetros obligatorios para sesión");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la sesión.",
+      );
     }
-    console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
+
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
       [id_sesion],
     );
-    if (!sesion || sesion.length === 0) {
-      throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
-      );
+
+    if (!sesion) {
+      throw httpError(404, "Sesión no encontrada.");
     }
 
-    const fechaFormateada = new Date(fecha_sesion).toISOString().split("T")[0];
+    const fechaFormateada = new Date(fecha_sesion)
+      .toISOString()
+      .split("T")[0];
+
     const nuevoNombre = `ORDEN_DEL_DIA_${fechaFormateada}.pdf`;
     const carpetaOrdenes = path.join(carpeta, "OrdenesDelDia");
     const nuevoPath = path.join(carpetaOrdenes, nuevoNombre);
@@ -88,50 +114,58 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
       throw new Error("No se pudo actualizar la sesión");
     }
 
-    return { id: id_sesion, filename: nuevoNombre };
+    return {
+      id: id_sesion,
+      filename: nuevoNombre,
+    };
   } else if (type === "acta") {
-    console.log("entro al acta:", id_sesion, fecha_sesion, nombre_acta);
     if (!id_sesion || !fecha_sesion || !nombre_acta) {
-      throw new Error("Faltan parámetros obligatorios para sesión");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la sesión.",
+      );
     }
-    console.log("Procesando archivo de consejo con ID de sesión:", id_sesion);
+
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
       [id_sesion],
     );
-    if (!sesion || sesion.length === 0) {
-      throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
-      );
+
+    if (!sesion) {
+      throw httpError(404, "Sesión no encontrada.");
     }
 
-    const fechaFormateada = new Date(fecha_sesion).toISOString().split("T")[0];
+    const fechaFormateada = new Date(fecha_sesion)
+      .toISOString()
+      .split("T")[0];
+
     const nuevoNombre = `ACTA_DEL_DIA_${fechaFormateada}.pdf`;
     const carpetaOrdenes = path.join(carpeta, "Actas");
     const nuevoPath = path.join(carpetaOrdenes, nuevoNombre);
+
     await fs.rename(viejoPath, nuevoPath);
+
     const result = await db.execute(
       "UPDATE sesiones SET acta_url = ?, nombre_acta = ? WHERE id_sesion = ?",
       [nuevoNombre, nombre_acta, id_sesion],
     );
+
     if (result.affectedRows === 0) {
       throw new Error("No se pudo actualizar la sesión");
     }
-    return { id: id_sesion, filename: nuevoNombre };
-  } else {
-    throw new Error("Tipo de procesamiento no reconocido");
-  }
-}
 
-function httpError(status, message) {
-  const err = new Error(message);
-  err.status = status;
-  return err;
+    return {
+      id: id_sesion,
+      filename: nuevoNombre,
+    };
+  } else {
+    throw httpError(400, "Tipo de procesamiento no reconocido.");
+  }
 }
 
 export async function getFileAccessContext(filename) {
   if (!filename) {
-    throw httpError(400, "Filename is required");
+    throw httpError(400, "El nombre del archivo es obligatorio.");
   }
 
   const normativa = await db.queryOne(
@@ -171,10 +205,10 @@ export async function getFileAccessContext(filename) {
     };
   }
 
-  throw httpError(404, "Archivo no asociado a un recurso");
+  throw httpError(404, "Archivo no asociado a un recurso.");
 }
 
 export default {
   procesarArchivoDeNormativa,
-  getFileAccessContext
+  getFileAccessContext,
 };

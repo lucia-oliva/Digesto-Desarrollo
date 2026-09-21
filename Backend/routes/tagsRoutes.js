@@ -95,29 +95,24 @@ router.post(
   "/search",
   authenticateToken,
   asyncHandler(async (req, res) => {
-    try {
-      let { nombre, letra } = req.body;
-      console.log("parametros:", nombre, letra);
-      console.log("query:", req.query);
-      let page = req.query.page !== undefined ? req.query.page : 1;
-      let limite = req.query.limite !== undefined ? req.query.limite : 10;
-      limite = parseInt(limite, 10) || 10;
-      page = parseInt(page, 10) || 1;
-  
-      const offset = (page - 1) * limite;
-   
-      const { data, totalResults } = await tagsDB.searchTagsByParameters(
+    const { nombre, letra } = req.body;
+    let page = req.query.page ?? 1;
+    let limite = req.query.limite ?? 10;
+    limite = parseInt(limite, 10) || 10;
+    page = parseInt(page, 10) || 1;
+    const offset = (page - 1) * limite;
+    const { data, totalResults } =
+      await tagsDB.searchTagsByParameters(
         nombre,
         letra,
         limite,
-        offset
+        offset,
       );
-      res.status(200).json({ data, totalResults });
-    } catch (error) {
-      console.error("Error en /search:", error);
-      res.status(500).json({ error: "Error interno del servidor." });
-    }
-  })
+    return res.status(200).json({
+      data,
+      totalResults,
+    });
+  }),
 );
 
 export default router;

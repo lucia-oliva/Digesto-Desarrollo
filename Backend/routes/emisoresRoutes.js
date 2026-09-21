@@ -2,8 +2,8 @@ import emisoresDB from "../services/emisores.js";
 import express from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authenticateToken } from "../Middleware/authMiddleware.js";
-const router = express.Router();
 
+const router = express.Router();
 
 router.get(
   "/datos/:id",
@@ -11,9 +11,14 @@ router.get(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const emisor = await emisoresDB.getById(id);
+
     if (!emisor) {
-      throw new Error("Emisor no encontrado", 404);
+      const error = new Error("Emisor no encontrado");
+      error.status = 404;
+      error.publicMessage = "Emisor no encontrado.";
+      throw error;
     }
+
     res.json(emisor);
   })
 );
@@ -32,7 +37,11 @@ router.post(
   asyncHandler(async (req, res) => {
     const emisorDataEdit = req.body;
     const result = await emisoresDB.edit(emisorDataEdit);
-    res.status(200).json({ ok: true, msg: result.mensaje });
+
+    res.status(200).json({
+      ok: true,
+      msg: result.mensaje,
+    });
   })
 );
 
@@ -50,11 +59,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const emisorData = req.body;
     const result = await emisoresDB.create(emisorData);
-    if (result.affectedRows === 0) {
-      const err = new Error("Error al crear el emisor");
-      err.status = 400;
-      throw err;
-    }
+
     res.status(201).json(result);
   })
 );
@@ -65,22 +70,32 @@ router.post(
   asyncHandler(async (req, res) => {
     let { nombre, estado } = req.body;
     let { page, limite } = req.query;
+
     limite = parseInt(limite, 10) || 10;
     page = parseInt(page, 10) || 1;
+
     const offset = (page - 1) * limite;
-    const { data, totalResults } = await emisoresDB.searchEmisorByParameters(
-      nombre,
-      estado,
-      limite,
-      offset
-    );
-    if (!data || data.length === 0) {
-      throw new Error(
-        "No se encontraron emisores con los parámetros especificados",
-        404
+
+    const { data, totalResults } =
+      await emisoresDB.searchEmisorByParameters(
+        nombre,
+        estado,
+        limite,
+        offset
       );
+
+    if (!data || data.length === 0) {
+      const error = new Error("No se encontraron emisores");
+      error.status = 404;
+      error.publicMessage =
+        "No se encontraron emisores con los parámetros especificados.";
+      throw error;
     }
-    res.status(200).json({ data, totalResults });
+
+    res.status(200).json({
+      data,
+      totalResults,
+    });
   })
 );
 
@@ -90,12 +105,18 @@ router.delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     const result = await emisoresDB.eliminar(id);
+
     if (result.affectedRows === 0) {
-      const err = new Error("Emisor no encontrado o ya eliminado");
-      err.status = 404;
-      throw err;
+      const error = new Error("Emisor no encontrado o ya eliminado");
+      error.status = 404;
+      error.publicMessage = "Emisor no encontrado o ya eliminado.";
+      throw error;
     }
-    res.status(200).json({ ok: true, msg: "Emisor eliminado correctamente" });
+
+    res.status(200).json({
+      ok: true,
+      msg: "Emisor eliminado correctamente",
+    });
   })
 );
 
