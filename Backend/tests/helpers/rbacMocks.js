@@ -162,7 +162,12 @@ jest.unstable_mockModule("../../services/sesiones.js", () => ({
 }));
 jest.unstable_mockModule("../../services/file.js", () => ({
   default: {
-    getFileAccessContext: jest.fn(async () => resourceAccessContext()),
+    getFileAccessContextById: jest.fn(async () => resourceAccessContext()),
+    getFileDownloadInfo: jest.fn(async () => ({
+      absolutePath: "/app/archivos/test.pdf",
+      downloadName: "test.pdf",
+      tipo: "normativa",
+    })),
     procesarArchivoDeNormativa: jest.fn(async () => ({
       filename: "test.pdf",
     })),
