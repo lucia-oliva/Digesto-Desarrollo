@@ -4,9 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ReferenciasCtx } from "./referenciasContext";
 import { fetchDependencias, fetchEmisores } from "../services/referencias";
 
-
-export default function ReferenciasProvider({ children, preload = true, fallback = null }) {
-  const [dependencias, setDependencias] = useState(null); 
+export default function ReferenciasProvider({
+  children,
+  preload = true,
+  fallback = null,
+}) {
+  const [dependencias, setDependencias] = useState(null);
   const [emisores, setEmisores] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setLoading] = useState(false);
@@ -14,18 +17,29 @@ export default function ReferenciasProvider({ children, preload = true, fallback
   const loadAll = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       const [dep, emi] = await Promise.all([
         fetchDependencias(),
         fetchEmisores(),
       ]);
+
       setDependencias(dep);
       setEmisores(emi);
-    } catch (e) {
-      console.error(e);
-      setError(e);
-      if (fallback?.dependencias) setDependencias(fallback.dependencias);
-      if (fallback?.emisores) setEmisores(fallback.emisores);
+    } catch (loadError) {
+      setError({
+        message:
+          loadError?.response?.data?.msg ||
+          "No se pudieron cargar las referencias.",
+      });
+
+      if (fallback?.dependencias) {
+        setDependencias(fallback.dependencias);
+      }
+
+      if (fallback?.emisores) {
+        setEmisores(fallback.emisores);
+      }
     } finally {
       setLoading(false);
     }
@@ -36,28 +50,31 @@ export default function ReferenciasProvider({ children, preload = true, fallback
   }, [loadAll, preload]);
 
   const depById = useMemo(
-    () => new Map((dependencias || []).map(o => [String(o.value), o.label])),
-    [dependencias]
-  );
-  const emiById = useMemo(
-    () => new Map((emisores || []).map(o => [String(o.value), o.label])),
-    [emisores]
+    () => new Map((dependencias || []).map((o) => [String(o.value), o.label])),
+    [dependencias],
   );
 
-  const value = useMemo(() => ({
-    dependencias,
-    emisores,
-    isLoading,
-    error,
-    maps: { depById, emiById },
-    refresh: loadAll,
-    labelFromDependenciaId: (id) => depById.get(String(id)) ?? String(id ?? "—"),
-    labelFromEmisorId: (id) => emiById.get(String(id)) ?? String(id ?? "—"),
-  }), [dependencias, emisores, isLoading, error, depById, emiById, loadAll]);
+  const emiById = useMemo(
+    () => new Map((emisores || []).map((o) => [String(o.value), o.label])),
+    [emisores],
+  );
+
+  const value = useMemo(
+    () => ({
+      dependencias,
+      emisores,
+      isLoading,
+      error,
+      maps: { depById, emiById },
+      refresh: loadAll,
+      labelFromDependenciaId: (id) =>
+        depById.get(String(id)) ?? String(id ?? "—"),
+      labelFromEmisorId: (id) => emiById.get(String(id)) ?? String(id ?? "—"),
+    }),
+    [dependencias, emisores, isLoading, error, depById, emiById, loadAll],
+  );
 
   return (
-    <ReferenciasCtx.Provider value={value}>
-      {children}
-    </ReferenciasCtx.Provider>
+    <ReferenciasCtx.Provider value={value}>{children}</ReferenciasCtx.Provider>
   );
 }

@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { FaUserCircle } from "react-icons/fa";
 import { useAuth } from "../../context/useAuth";
 import api from "../../api/axiosPrivate";
-import { useEffect } from "react";
-import { FaUserCircle } from "react-icons/fa";
-import { useParams } from "react-router";
+
 export default function EditarUsuario() {
   const user = useAuth().auth.user;
   const { id } = useParams();
   const userId = id || user.id;
+
   const [usuario, setUsuario] = useState({
     nombre: "",
     email: "",
@@ -18,27 +19,27 @@ export default function EditarUsuario() {
   });
 
   useEffect(() => {
-  const cargarUsuario = async () => {
-    try {
-      const response = await api.get(`/usuarios/${userId}`);
-      const usuario2 = response.data;
+    const cargarUsuario = async () => {
+      try {
+        const response = await api.get(`/usuarios/${userId}`);
+        const usuario2 = response.data;
 
-      if (usuario2) {
-        setUsuario((prev) => ({
-          ...prev,
-          nombre: usuario2[0].nombre || "",
-          email: usuario2[0].email || "",
-          telefono: usuario2[0].telefono || "",
-          tipo_usuario_id: usuario2.tipo_usuario_id || "",
-        }));
+        if (usuario2) {
+          setUsuario((prev) => ({
+            ...prev,
+            nombre: usuario2[0].nombre || "",
+            email: usuario2[0].email || "",
+            telefono: usuario2[0].telefono || "",
+            tipo_usuario_id: usuario2.tipo_usuario_id || "",
+          }));
+        }
+      } catch {
+        alert("No se pudo cargar el usuario.");
       }
-    } catch {
-      console.error("No se pudo cargar el usuario");
-    }
-  };
+    };
 
-  cargarUsuario();
-}, [userId]);
+    cargarUsuario();
+  }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,20 +47,21 @@ export default function EditarUsuario() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const payload = {
-    nombre: usuario.nombre,
-    email: usuario.email,
-    telefono: usuario.telefono,
-  };
-  if (usuario.clave_actual && usuario.clave_nueva) {
-    payload.clave_actual = usuario.clave_actual;
-    payload.clave = usuario.clave_nueva;
-  }
+    const payload = {
+      nombre: usuario.nombre,
+      email: usuario.email,
+      telefono: usuario.telefono,
+    };
 
-  try {
-    await api.put(`/usuarios/${userId}`, payload);
+    if (usuario.clave_actual && usuario.clave_nueva) {
+      payload.clave_actual = usuario.clave_actual;
+      payload.clave = usuario.clave_nueva;
+    }
+
+    try {
+      await api.put(`/usuarios/${userId}`, payload);
 
       alert("Usuario actualizado correctamente");
 
@@ -68,18 +70,22 @@ export default function EditarUsuario() {
         clave_actual: "",
         clave_nueva: "",
       }));
-        } catch (e) {
-            alert(e.response?.data?.error || "Error de red o servidor");
-        }
-      };
+    } catch (error) {
+      alert(
+        error?.response?.data?.msg ||
+          "No se pudo actualizar el usuario. Intente nuevamente.",
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center ">
       <div className="w-full rounded-2xl shadow-md p-8 space-y-6">
         <h2 className="text-2xl font-bold text-center text-primary">
-           <FaUserCircle className="mx-auto text-5xl text-primary mb-4"/>
+          <FaUserCircle className="mx-auto text-5xl text-primary mb-4" />
           Editar Perfil
         </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="label">
@@ -122,7 +128,7 @@ export default function EditarUsuario() {
             />
           </div>
 
-           <div>
+          <div>
             <label className="label">
               <span className="label-text">Contraseña actual</span>
             </label>

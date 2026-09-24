@@ -8,17 +8,27 @@ function Login() {
   const { login } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState({ msg: null, isError: false });
-  const [form, setForm] = useState({ email: "", password: "" });
-
+  const [response, setResponse] = useState({
+    msg: null,
+    isError: false,
+  });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const { email, password } = form;
 
     if (!email || !password) {
@@ -33,13 +43,27 @@ function Login() {
 
     try {
       const data = await login(email, password);
-      setResponse({ msg: data.msg, isError: false });
+
+      setResponse({
+        msg: data.msg,
+        isError: false,
+      });
+
       navigate("/admin");
     } catch (error) {
-      const msg = error?.response?.data?.msg || "Error al iniciar sesión.";
-      console.log(error);
-      setForm({ email: "", password: "" });
-      setResponse({ msg, isError: true });
+      const msg =
+        error?.response?.data?.msg ||
+        "Error al iniciar sesión.";
+
+      setForm({
+        email: "",
+        password: "",
+      });
+
+      setResponse({
+        msg,
+        isError: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -61,23 +85,34 @@ function Login() {
 
  z-0"
         ></div>
+
         <div className="p-10 text-center max-w-xl w-full relative z-10">
           <div className="mb-6">
             <div className="text-white flex justify-center font-bold text-3xl">
-              <img className="w-80" src="src\assets\Identidad Vertical Blanco.png" alt="Unlar logo" />
+              <img
+                className="w-80"
+                src="src\assets\Identidad Vertical Blanco.png"
+                alt="Unlar logo"
+              />
             </div>
           </div>
+
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             ¡Bienvenido!
           </h1>
         </div>
       </div>
+
       <div className="md:w-2/5 w-full bg-base-100 flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <h2 className="text-center text-3xl font-bold text-primary mb-6">
             Iniciar sesión
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-6">
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
             <div>
               <label
                 htmlFor="email"
@@ -85,6 +120,7 @@ function Login() {
               >
                 Correo electrónico
               </label>
+
               <input
                 id="email"
                 name="email"
@@ -95,6 +131,7 @@ function Login() {
                 className="mt-2 block w-full px-4 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
               />
             </div>
+
             <div>
               <label
                 htmlFor="password"
@@ -102,6 +139,7 @@ function Login() {
               >
                 Contraseña
               </label>
+
               <input
                 id="password"
                 name="password"
@@ -112,6 +150,7 @@ function Login() {
                 className="mt-2 block w-full px-4 py-3 bg-base-200 border border-neutral rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-primary"
               />
             </div>
+
             <button
               type="submit"
               className="w-full py-3 px-6 bg-primary text-primary-content font-semibold rounded-xl hover:bg-primary-content hover:text-primary transition-all"
@@ -131,6 +170,7 @@ function Login() {
           />
         </div>
       )}
+
       {loading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center">
           <Loading />

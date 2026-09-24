@@ -34,10 +34,13 @@ const NormativaTable = ({
     (tipoUser === "Supervisor" ||
       tipoUser === "Administrador de Dependencia") &&
     depName === "Consejo Superior";
+
   const { dependencias } = useReferencias();
   const { confirm, ConfirmUI } = useConfirm();
+
   const depOptions = useMemo(() => {
     const list = Array.isArray(dependencias) ? dependencias : [];
+
     return list.map((d) => ({
       label: String(d.nombre ?? d.label ?? "").trim(),
       value: String(d.id ?? d.value ?? "").trim(),
@@ -59,15 +62,24 @@ const NormativaTable = ({
   const isEditarNormativa = /^\/admin\/EditarNormativa\/\d+$/i.test(path);
   const isNuevaNormativa = /^\/admin\/NuevaNormativa$/i.test(path);
   const isConsejo = path.startsWith("/consejo-superior/normativas");
+
   const [alertData, setAlertData] = useState(location.state?.alert || null);
+
   const scope = isAdminRoute ? "admin" : "public";
+
   const ns = isAdminRoute
     ? `ns:${scope}:${type}`
-    : nsKey({ scope, type, pathname: path });
+    : nsKey({
+        scope,
+        type,
+        pathname: path,
+      });
 
   useEffect(() => {
     if (location.state?.alert) {
-      navigate(location.pathname, { replace: true });
+      navigate(location.pathname, {
+        replace: true,
+      });
     }
   }, [location, navigate]);
 
@@ -84,7 +96,9 @@ const NormativaTable = ({
             : isConsejo
               ? "consejo"
               : "ver");
+
   const filtrosKey = JSON.stringify(filtros);
+
   const filtrosEfectivos = useMemo(() => {
     if (
       isAdminRoute &&
@@ -93,9 +107,14 @@ const NormativaTable = ({
       !isNormModificadas &&
       (userDepId || depName)
     ) {
-      return { ...filtros, dependencia: String(userDepId ?? depName) };
+      return {
+        ...filtros,
+        dependencia: String(userDepId ?? depName),
+      };
     }
+
     return filtros;
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAdminRoute,
@@ -115,7 +134,11 @@ const NormativaTable = ({
       : "/document";
 
   const filteredColumns = (columns || []).filter(
-    (c) => !(Array.isArray(c.hiddenIn) && c.hiddenIn.includes(effectiveModo)),
+    (column) =>
+      !(
+        Array.isArray(column.hiddenIn) &&
+        column.hiddenIn.includes(effectiveModo)
+      ),
   );
 
   const { filtrosEfectivos: filtrosConOrden, headerProps } = useTablaOrden({
@@ -142,12 +165,16 @@ const NormativaTable = ({
   });
 
   const usingStatic = Array.isArray(dataOverride) && dataOverride.length > 0;
+
   const normativas = usingStatic ? dataOverride : hookNormativas;
+
   const page = usingStatic ? 1 : hookPage;
+
   const totalPages = usingStatic ? 1 : hookTotalPages;
 
   useEffect(() => {
     if (!usingStatic) reload();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [path, JSON.stringify(filtrosConOrden), usingStatic]);
 
@@ -155,6 +182,7 @@ const NormativaTable = ({
     if (!usingStatic) {
       onPageChange(1);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tipo, JSON.stringify(filtrosConOrden)]);
 
@@ -162,10 +190,9 @@ const NormativaTable = ({
     if (!usingStatic && totalPages && page > totalPages) {
       onPageChange(Math.max(1, totalPages));
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [totalPages]);
-
-  console.log("totalPages y page: ", totalPages, page);
 
   const actions =
     type === "ListadoAuditoria"
@@ -186,16 +213,26 @@ const NormativaTable = ({
                 className: "btn-outline btn-primary",
               },
             ];
+
             if (
               isAdminRoute ||
               effectiveModo === "admin" ||
               effectiveModo === "crear_edit"
             ) {
               base.push(
-                { label: "Editar", type: "secondary", onClick: onEdit },
-                { label: "Eliminar", type: "error", onClick: onDelete },
+                {
+                  label: "Editar",
+                  type: "secondary",
+                  onClick: onEdit,
+                },
+                {
+                  label: "Eliminar",
+                  type: "error",
+                  onClick: onDelete,
+                },
               );
             }
+
             if (isSuperAdmin || isSupervisorCS) {
               base.push({
                 label: "Editar Sesión",
@@ -205,6 +242,7 @@ const NormativaTable = ({
                 className: "btn btn-info",
               });
             }
+
             return base;
           })()
         : effectiveModo === "ver"
@@ -218,14 +256,15 @@ const NormativaTable = ({
             ]
           : effectiveModo === "seleccionar"
             ? [
-      {
-        label: "Agregar acción",
-        onClick: onSeleccionar,
-        type: "primary",
-      },
-    ]
+                {
+                  label: "Agregar acción",
+                  onClick: onSeleccionar,
+                  type: "primary",
+                },
+              ]
             : (() => {
                 const base = [];
+
                 const isAdminLike =
                   isAdminRoute ||
                   effectiveModo === "admin" ||
@@ -255,6 +294,7 @@ const NormativaTable = ({
 
                       onClick: async (item) => {
                         const ahora = String(item?.estado || "").toLowerCase();
+
                         const nuevo =
                           ahora === "activo" ? "inactivo" : "activo";
 
@@ -264,6 +304,7 @@ const NormativaTable = ({
                             ? "¿Desactivar este usuario? No podrá iniciar sesión."
                             : "¿Activar este usuario? Podrá iniciar sesión.",
                         );
+
                         if (!ok) return;
 
                         try {
@@ -271,17 +312,27 @@ const NormativaTable = ({
                             item.id,
                             nuevo,
                           );
-                          if (!resp?.ok)
-                            throw new Error(
-                              resp?.message || "No se pudo cambiar el estado",
-                            );
+
+                          if (!resp?.ok) {
+                            setAlertData({
+                              id: Date.now(),
+                              title: "Error",
+                              message:
+                                resp?.msg ||
+                                "No se pudo cambiar el estado del usuario.",
+                              error: true,
+                            });
+                            return;
+                          }
+
                           reload();
-                        } catch (e) {
-                          console.error(e);
+                        } catch (error) {
                           setAlertData({
                             id: Date.now(),
                             title: "Error",
-                            message: "Error al cambiar el estado del usuario.",
+                            message:
+                              error?.response?.data?.msg ||
+                              "Error al cambiar el estado del usuario.",
                             error: true,
                           });
                         }
@@ -298,28 +349,43 @@ const NormativaTable = ({
                             "Restaurar normativa",
                             "¿Restaurar la normativa? Volverá a normativas despublicadas.",
                           );
+
                           if (!ok) return;
+
                           try {
                             const data = await restoreApi(item.id, user?.id);
+
                             if (!data?.ok && !data?.success) {
-                              throw new Error(
-                                data?.message || "No se pudo restaurar",
-                              );
+                              setAlertData({
+                                id: Date.now(),
+                                title: "Error",
+                                message:
+                                  data?.msg ||
+                                  "No se pudo restaurar la normativa.",
+                                error: true,
+                              });
+                              return;
                             }
+
                             reload();
-                          } catch (e) {
-                            console.error(e);
+                          } catch (error) {
                             setAlertData({
                               id: Date.now(),
                               title: "Error",
-                              message: "Error al restaurar la normativa",
+                              message:
+                                error?.response?.data?.msg ||
+                                "Error al restaurar la normativa.",
                               error: true,
                             });
                           }
                         },
                         type: "secondary",
                       },
-                      { label: "Editar", onClick: onEdit, type: "primary" },
+                      {
+                        label: "Editar",
+                        onClick: onEdit,
+                        type: "primary",
+                      },
                       {
                         label: "Ver Normativa",
                         onClick: (item) =>
@@ -330,8 +396,16 @@ const NormativaTable = ({
                     );
                   } else if (tipo === "normativaDespublicadas") {
                     base.push(
-                      { label: "Editar", onClick: onEdit, type: "primary" },
-                      { label: "Eliminar", onClick: onDelete, type: "error" },
+                      {
+                        label: "Editar",
+                        onClick: onEdit,
+                        type: "primary",
+                      },
+                      {
+                        label: "Eliminar",
+                        onClick: onDelete,
+                        type: "error",
+                      },
                       {
                         label: "Ver Normativa",
                         onClick: (item) =>
@@ -349,21 +423,32 @@ const NormativaTable = ({
                             "Publicar normativa",
                             "¿Publicar la normativa? Volverá a normativas publicadas.",
                           );
+
                           if (!ok) return;
+
                           try {
                             const data = await publicarApi(item.id, user?.id);
+
                             if (!data?.ok && !data?.success) {
-                              throw new Error(
-                                data?.message || "No se pudo publicar",
-                              );
+                              setAlertData({
+                                id: Date.now(),
+                                title: "Error",
+                                message:
+                                  data?.msg ||
+                                  "No se pudo publicar la normativa.",
+                                error: true,
+                              });
+                              return;
                             }
+
                             reload();
-                          } catch (e) {
-                            console.error(e);
+                          } catch (error) {
                             setAlertData({
                               id: Date.now(),
                               title: "Error",
-                              message: "Error al re-publicar la normativa",
+                              message:
+                                error?.response?.data?.msg ||
+                                "Error al re-publicar la normativa.",
                               error: true,
                             });
                           }
@@ -373,12 +458,19 @@ const NormativaTable = ({
                     }
                   } else {
                     base.push(
-                      { label: "Editar", onClick: onEdit, type: "secondary" },
-                      { label: "Eliminar", onClick: onDelete, type: "error" },
+                      {
+                        label: "Editar",
+                        onClick: onEdit,
+                        type: "secondary",
+                      },
+                      {
+                        label: "Eliminar",
+                        onClick: onDelete,
+                        type: "error",
+                      },
                     );
                   }
                 } else {
-                  // Público
                   base.push({
                     label: "Ver PDF",
                     onClick: (item) => navigate(`${baseDocPath}/${item.id}`),
@@ -397,10 +489,15 @@ const NormativaTable = ({
         columns={filteredColumns}
         actions={actions}
         {...(!(usingStatic || hidePagination)
-          ? { page, totalPages, onPageChange }
+          ? {
+              page,
+              totalPages,
+              onPageChange,
+            }
           : {})}
         headerProps={headerProps}
       />
+
       {alertData && (
         <div className="fixed top-18 left-1/2 -translate-x-1/2 z-50 flex justify-center w-full max-w-md px-4">
           <Alert
@@ -412,6 +509,7 @@ const NormativaTable = ({
           />
         </div>
       )}
+
       {ConfirmUI}
     </>
   );

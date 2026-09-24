@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import NormativaTable from "../../components/Table/NormativasTable";
 import { useLocation } from "react-router";
+import NormativaTable from "../../components/Table/NormativasTable";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
 import { useAuth } from "../../context/useAuth";
@@ -9,19 +9,18 @@ function VistaAdministrativa() {
   const location = useLocation();
   const { auth } = useAuth();
   const user = auth?.user;
-
   const tipoUser = user?.tipo_usuario;
   const depName = user?.dependencia;
-
   const type = location.pathname.split("/")[2];
-  console.log("type", type);
-  
 
   const isNormativaPorAnio =
-    type === "ListadoNormativaPorAnio" || type === "normativaPorAño" || type === "normativaPorAnio";
+    type === "ListadoNormativaPorAnio" ||
+    type === "normativaPorAño" ||
+    type === "normativaPorAnio";
 
   const isSuperAdmin = tipoUser === "SuperAdministrador";
-  const isAdminDependencia = tipoUser === "Administrador de Dependencia";
+  const isAdminDependencia =
+    tipoUser === "Administrador de Dependencia";
   const isSupervisor = tipoUser === "Supervisor";
 
   const lockDependencia =
@@ -41,7 +40,6 @@ function VistaAdministrativa() {
   );
 
   const modo = "admin";
-
   const [tagQuery, setTagQuery] = useState("");
 
   const { state, setFilters } = useNamespacedFilters({
@@ -71,19 +69,27 @@ function VistaAdministrativa() {
     if (!lockDependencia) return;
 
     const current = state.filters?.dependencia;
+
     if (String(current ?? "") === String(depName)) return;
 
-    setFilters({ ...(state.filters || {}), dependencia: depName });
+    setFilters({
+      ...(state.filters || {}),
+      dependencia: depName,
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockDependencia, depName]);
 
   useEffect(() => {
     if (!showTagSearch) {
       setTagQuery("");
+
       const next = { ...(state.filters || {}) };
       delete next[TAG_PARAM];
+
       setFilters(next);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showTagSearch]);
 
@@ -95,7 +101,6 @@ function VistaAdministrativa() {
     const next = mergeWithTag(safeForm, tagQuery);
     setFilters(next);
   };
-
 
   return (
     <div className="container">
@@ -110,7 +115,11 @@ function VistaAdministrativa() {
         }}
       />
 
-      <NormativaTable type={type} filtros={state.filters} modo={modo} />
+      <NormativaTable
+        type={type}
+        filtros={state.filters}
+        modo={modo}
+      />
     </div>
   );
 }
