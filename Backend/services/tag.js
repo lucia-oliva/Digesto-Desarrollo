@@ -42,6 +42,7 @@ async function edit(data) {
   }
 
   return {
+    success: true,
     message: `Tag '${nombre}' actualizado correctamente`,
   };
 }

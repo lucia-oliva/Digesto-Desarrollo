@@ -51,7 +51,10 @@ router.post(
     if(!result.success){
       throw httpError(400, result.message);
     }
-    res.status(200).json({ ok: true, msg: "Tag editado correctamente." });
+    res.status(200).json({
+      ok: true,
+      msg: result.message || "Tag editado correctamente.",
+    });
   })
 );
 

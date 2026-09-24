@@ -4,7 +4,6 @@ import NormativaTable from "../components/Table/NormativasTable";
 import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
 import { useSearchParams } from "react-router";
 import { useNamespacedFilters } from "../hooks/useNamespacedFilters";
-import { getWithCancel } from "../api/cancellable";
 
 function NormativasContainer({ isAdmin = false }) {
   const [params] = useSearchParams();
@@ -17,7 +16,7 @@ function NormativasContainer({ isAdmin = false }) {
   const type = "ListadoNormativa";
   const modo = "busqueda";
 
-  const { ns, state, setFilters } = useNamespacedFilters({
+  const { state, setFilters } = useNamespacedFilters({
     scope: "public",
     type: "ListadoNormativa",
     initial,
@@ -28,18 +27,11 @@ function NormativasContainer({ isAdmin = false }) {
     ignoreStorageIfNoQuery: true,
     resetOnUnmount: true,
     clearStorageOnUnmount: true,
-    onHydrated: (f) => void fetchData(f),
   });
-
-  async function fetchData(filtros) {
-    const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
-    if (res?.cancelled) return;
-  }
 
   const handleSearch = (filtersFromGeneric) => {
     const next = { ...(filtersFromGeneric || {}), tags };
     setFilters(next);
-    fetchData(next);
   };
 
   const dependenciaIdToNombre = {
