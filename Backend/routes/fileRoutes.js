@@ -13,6 +13,7 @@ import normativaDB from "../services/normativa.js";
 import dependenciaDB from "../services/dependencia.js";
 import { POLICIES } from "../security/policies.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { httpError } from "../utils/httpError.js";
 
 const router = express.Router();
 
@@ -26,85 +27,71 @@ router.get(
     getUserDependency: (req) =>
       dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
   }),
-  async (req, res) => {
-    try {
-      const filename = req.query.filename;
+  asyncHandler(async (req, res, next) => {
+    const filename = req.query.filename;
 
-      if (!filename) {
-        return res.status(400).json({
-          error: "Filename is required",
-        });
+    if (!filename) {
+      throw httpError(400, "Archivo requerido.");
+    }
+
+    const base = path.resolve("archivos");
+
+    const candidates = [
+      {
+        dir: base,
+        updateVisita: true,
+      },
+      {
+        dir: path.join(base, "Actas"),
+        updateVisita: false,
+      },
+      {
+        dir: path.join(base, "OrdenesDelDia"),
+        updateVisita: false,
+      },
+    ];
+
+    let foundPath = null;
+    let shouldUpdateVisita = false;
+
+    for (const candidate of candidates) {
+      const candidatePath = path.join(candidate.dir, filename);
+
+      try {
+        await fs.access(candidatePath);
+
+        foundPath = candidatePath;
+        shouldUpdateVisita = candidate.updateVisita;
+
+        break;
+      } catch {
+        continue;
       }
+    }
 
-      const base = path.resolve("archivos");
+    if (!foundPath) {
+      throw httpError(404, "Archivo no encontrado.");
+    }
 
-      const candidates = [
-        {
-          dir: base,
-          updateVisita: true,
-        },
-        {
-          dir: path.join(base, "Actas"),
-          updateVisita: false,
-        },
-        {
-          dir: path.join(base, "OrdenesDelDia"),
-          updateVisita: false,
-        },
-      ];
-
-      let foundPath = null;
-      let shouldUpdateVisita = false;
-
-      for (const candidate of candidates) {
-        const candidatePath = path.join(candidate.dir, filename);
-
-        try {
-          await fs.access(candidatePath);
-
-          foundPath = candidatePath;
-          shouldUpdateVisita = candidate.updateVisita;
-
-          break;
-        } catch {
-          // Continúa buscando en los demás directorios permitidos.
-        }
+    if (shouldUpdateVisita) {
+      try {
+        await db.query(
+          "UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?",
+          [filename],
+        );
+      } catch {
+        console.error("No se pudo actualizar el contador de visitas.");
       }
+    }
 
-      if (!foundPath) {
-        return res.status(404).json({
-          error: "File not found",
-        });
-      }
-
-      if (shouldUpdateVisita) {
-        try {
-          await db.query(
-            "UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?",
-            [filename],
-          );
-        } catch {
-          console.error("No se pudo actualizar el contador de visitas.");
-        }
-      }
-
-      return res.download(foundPath, filename, (error) => {
-        if (error && !res.headersSent) {
-          res.status(500).json({
-            error: "Error downloading file",
-          });
-        }
-      });
-    } catch {
-      if (!res.headersSent) {
-        return res.status(500).json({
-          error: "Unexpected server error",
-        });
+    return res.download(foundPath, filename, (error) => {
+      if (error) {
+        return next(error);
       }
 
       return undefined;
-    }
-  },
+    });
+  }),
 );
 
 router.post(
@@ -145,9 +132,7 @@ router.post(
   }),
   asyncHandler(async (req, res) => {
     if (!req.file) {
-      return res.status(400).json({
-        error: "No se ha proporcionado un archivo",
-      });
+      throw httpError(400, "No se ha proporcionado un archivo.");
     }
 
     const {
@@ -165,9 +150,7 @@ router.post(
     );
 
     if (existingNormativa && existingNormativa.length > 0) {
-      return res.status(400).json({
-        error: "Ya existe un archivo con los mismos parámetros",
-      });
+      throw httpError(400, "Ya existe un archivo con los mismos parámetros.");
     }
 
     const result = await db.query(

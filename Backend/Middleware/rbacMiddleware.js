@@ -6,6 +6,7 @@ import {
 } from "../security/policies.js";
 
 import { ROLES } from "../security/roles.js";
+import { httpError } from "../utils/httpError.js";
 
 export function authorizePolicy(
   policy,
@@ -53,9 +54,7 @@ export function authorizePolicy(
         }
 
         if (!req.user) {
-          return res.status(401).json({
-            error: "Usuario no autenticado",
-          });
+          throw httpError(401);
         }
 
         const userRoles = Array.isArray(req.user.roles) ? req.user.roles : [];
@@ -67,9 +66,7 @@ export function authorizePolicy(
         );
 
         if (!hasNormAdminRole) {
-          return res.status(403).json({
-            error: "No tiene permisos para acceder a este recurso",
-          });
+          throw httpError(403);
         }
 
         const isSuperAdmin = userRoles.includes(ROLES.SUPER_ADMIN);
@@ -80,9 +77,7 @@ export function authorizePolicy(
 
         if (resource.resourceType === "consejo") {
           if (!req.user.dependenciaId) {
-            return res.status(403).json({
-              error: "No tiene una dependencia autorizada",
-            });
+            throw httpError(403);
           }
 
           if (typeof getUserDependency !== "function") {
@@ -99,10 +94,7 @@ export function authorizePolicy(
               .toLowerCase() === "consejo superior";
 
           if (!isConsejoSuperior) {
-            return res.status(403).json({
-              error:
-                "No tiene permisos sobre este recurso del Consejo Superior",
-            });
+            throw httpError(403);
           }
 
           return next();
@@ -113,33 +105,25 @@ export function authorizePolicy(
           resource.resourceType == null
         ) {
           if (!req.user.dependenciaId) {
-            return res.status(403).json({
-              error: "No tiene una dependencia autorizada",
-            });
+            throw httpError(403);
           }
 
           const sameDependency =
             String(resource.dependenciaId) === String(req.user.dependenciaId);
 
           if (!sameDependency) {
-            return res.status(403).json({
-              error: "No tiene permisos sobre este recurso",
-            });
+            throw httpError(403);
           }
 
           return next();
         }
 
-        return res.status(403).json({
-          error: "Tipo de recurso no autorizado",
-        });
+        throw httpError(403);
       }
 
   
       if (!req.user) {
-        return res.status(401).json({
-          error: "Usuario no autenticado",
-        });
+        throw httpError(401);
       }
 
       const userRoles = Array.isArray(req.user.roles) ? req.user.roles : [];
@@ -149,9 +133,7 @@ export function authorizePolicy(
       );
 
       if (!hasAllowedRole) {
-        return res.status(403).json({
-          error: "No tiene permisos para realizar esta operación",
-        });
+        throw httpError(403);
       }
 
       if (definition.scope === ACCESS_SCOPES.CONSEJO_SUPERIOR) {
@@ -162,9 +144,7 @@ export function authorizePolicy(
         }
 
         if (!req.user.dependenciaId) {
-          return res.status(403).json({
-            error: "No tiene una dependencia autorizada",
-          });
+          throw httpError(403);
         }
 
         if (typeof getUserDependency !== "function") {
@@ -176,9 +156,7 @@ export function authorizePolicy(
         const userDependency = await getUserDependency(req);
 
         if (!userDependency) {
-          return res.status(403).json({
-            error: "No tiene una dependencia autorizada",
-          });
+          throw httpError(403);
         }
 
         const isConsejoSuperior =
@@ -186,10 +164,7 @@ export function authorizePolicy(
           "consejo superior";
 
         if (!isConsejoSuperior) {
-          return res.status(403).json({
-            error:
-              "No tiene permisos para acceder a sesiones del Consejo Superior",
-          });
+          throw httpError(403);
         }
 
         return next();
@@ -203,9 +178,7 @@ export function authorizePolicy(
         }
 
         if (!req.user.dependenciaId) {
-          return res.status(403).json({
-            error: "No tiene una dependencia autorizada",
-          });
+          throw httpError(403);
         }
 
         if (typeof getDestinationType !== "function") {
@@ -231,10 +204,7 @@ export function authorizePolicy(
               .toLowerCase() === "consejo superior";
 
           if (!isConsejoSuperior) {
-            return res.status(403).json({
-              error:
-                "No tiene permisos para subir archivos del Consejo Superior",
-            });
+            throw httpError(403);
           }
 
           return next();
@@ -260,9 +230,7 @@ export function authorizePolicy(
               String(resourceDependencyId) === String(req.user.dependenciaId);
 
             if (!sameResourceDependency) {
-              return res.status(403).json({
-                error: "No tiene permisos sobre el recurso destino",
-              });
+              throw httpError(403);
             }
           }
 
@@ -273,19 +241,14 @@ export function authorizePolicy(
               String(targetDependencyId) === String(req.user.dependenciaId);
 
             if (!sameTargetDependency) {
-              return res.status(403).json({
-                error:
-                  "No tiene permisos para subir archivos a esa dependencia",
-              });
+              throw httpError(403);
             }
           }
 
           return next();
         }
 
-        return res.status(403).json({
-          error: "Tipo de recurso destino no autorizado",
-        });
+        throw httpError(403);
       }
 
       const requiresOwnDependency =
@@ -300,9 +263,7 @@ export function authorizePolicy(
         }
 
         if (!req.user.dependenciaId) {
-          return res.status(403).json({
-            error: "No tiene una dependencia autorizada",
-          });
+          throw httpError(403);
         }
 
         const hasResourceDependencyResolver =
@@ -324,9 +285,7 @@ export function authorizePolicy(
             String(resourceDependencyId) === String(req.user.dependenciaId);
 
           if (!sameResourceDependency) {
-            return res.status(403).json({
-              error: "No tiene permisos sobre este recurso",
-            });
+            throw httpError(403);
           }
         }
 
@@ -337,10 +296,7 @@ export function authorizePolicy(
             String(targetDependencyId) === String(req.user.dependenciaId);
 
           if (!sameTargetDependency) {
-            return res.status(403).json({
-              error:
-                "No tiene permisos para asignar el recurso a esa dependencia",
-            });
+            throw httpError(403);
           }
         }
       }

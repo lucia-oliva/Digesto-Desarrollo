@@ -9,6 +9,7 @@ import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
 import { ROLES } from "../security/roles.js";
 import { getAuthorizedDependency } from "../security/accessScope.js";
+import { httpError } from "../utils/httpError.js";
 
 const router = express.Router();
 
@@ -109,9 +110,7 @@ router.delete(
     const userId = req.header("x-user-id");
 
     if (!userId) {
-      const err = new Error("Usuario no autenticado");
-      err.status = 401;
-      throw err;
+      throw httpError(401);
     }
 
     const result = await normativaDB.eliminar(req.params.id, userId);

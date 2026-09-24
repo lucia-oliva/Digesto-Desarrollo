@@ -7,6 +7,7 @@ import {
   verifyRefreshToken,
 } from "../utils/authToken.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { httpError } from "../utils/httpError.js";
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.post(
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: "Faltan datos" });
+      throw httpError(400, "Faltan datos obligatorios.");
     }
 
     const rows = await db.queryOne(
@@ -35,7 +36,7 @@ router.post(
     );
 
     if (rows == null || rows.length === 0) {
-      return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
+      throw httpError(401, "Email o contraseña incorrectos.");
     }
 
     const user = rows;
@@ -43,7 +44,7 @@ router.post(
 
     const { isMatch, newHash } = await verifyPassword(password, user.clave);
     if (!isMatch) {
-      return res.status(401).json({ msg: "Email o contraseña Incorrectos" });
+      throw httpError(401, "Email o contraseña incorrectos.");
     }
 
     if (newHash) {
@@ -54,9 +55,7 @@ router.post(
     }
 
     if (user.estado != "activo") {
-      return res.status(403).json({
-        msg: "Usuario Inactivo contactese con la Secretaria Informatica",
-      });
+      throw httpError(403, "Usuario inactivo. Contacte con la Secretaría Informática.");
     }
 
 
@@ -65,8 +64,8 @@ router.post(
       email: user.email,
       nombre: user.nombre,
       tipo_usuario: user.tipo_usuario,
-      dependencia: user.dependencia, //Nombre dependencia
-      dependenciaId: user.dependenciaId ?? null, //Id dependencia
+      dependencia: user.dependencia,
+      dependenciaId: user.dependenciaId ?? null,
     };
 
   
@@ -89,7 +88,7 @@ router.post(
   "/refresh-token",
   asyncHandler(async (req, res) => {
     const token = req.cookies?.refreshToken;
-    if (!token) return res.status(401).json({ msg: "No hay refresh token" });
+    if (!token) throw httpError(401);
 
     try {
       const payload = verifyRefreshToken(token);
@@ -105,14 +104,12 @@ router.post(
 
       if (!user) {
         res.clearCookie("refreshToken", cookieOpts);
-        return res.status(401).json({ msg: "Usuario no encontrado" });
+        throw httpError(401);
       }
 
       if (user.estado !== "activo") {
         res.clearCookie("refreshToken", cookieOpts);
-        return res.status(403).json({
-          msg: "Usuario Inactivo contactese con la Secretaria Informatica",
-        });
+        throw httpError(403, "Usuario inactivo. Contacte con la Secretaría Informática.");
       }
 
       const userClaims = {
@@ -136,9 +133,14 @@ router.post(
       res
         .cookie("refreshToken", newRefresh, cookieOpts)
         .json({ accessToken: newAccess, user: userClaims });
-    } catch (e) {
+    } catch (error) {
       res.clearCookie("refreshToken", cookieOpts);
-      return res.status(401).json({ msg: "Refresh inválido o vencido" });
+
+      if (error?.status) {
+        throw error;
+      }
+
+      throw httpError(401);
     }
   })
 );

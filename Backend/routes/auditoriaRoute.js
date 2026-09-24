@@ -14,20 +14,18 @@ router.post(
     const page = parseInt(req.query.page) || 1;
     const limite = parseInt(req.query.limite) || 10;
     const offset = (page - 1) * limite;
-    try {
-      const { data, totalResults } =
-        await auditoriaDB.searchAuditoriaByParameters(
-          titulo,
-          usuario,
-          accion,
-          dependencia,
-          limite,
-          offset
-        );
-      res.status(200).json({ data, totalResults });
-    } catch (error) {
-      res.status(500).json({ error: "Error al buscar auditorías" });
-    }
+
+    const { data, totalResults } =
+      await auditoriaDB.searchAuditoriaByParameters(
+        titulo,
+        usuario,
+        accion,
+        dependencia,
+        limite,
+        offset
+      );
+
+    res.status(200).json({ data, totalResults });
   })
 );
 

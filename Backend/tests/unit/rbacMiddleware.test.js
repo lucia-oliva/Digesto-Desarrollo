@@ -27,6 +27,13 @@ async function executeMiddleware(policy, req, resolvers = {}) {
   return { res, next };
 }
 
+function expectNextHttpError(next, status) {
+  expect(next).toHaveBeenCalledTimes(1);
+  const [error] = next.mock.calls[0];
+  expect(error).toBeInstanceOf(Error);
+  expect(error.status).toBe(status);
+}
+
 function authenticatedUser(role, dependenciaId = 3) {
   return {
     user: {
@@ -55,23 +62,23 @@ describe("authorizePolicy: configuración", () => {
 });
 
 describe("authorizePolicy: autenticación y rol", () => {
-  test("responde 401 cuando la política obligatoria no recibe usuario", async () => {
+  test("delega error 401 cuando la política obligatoria no recibe usuario", async () => {
     const { res, next } = await executeMiddleware(
       POLICIES.AUTHENTICATED,
       {},
     );
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
-  test("responde 403 cuando el rol no está autorizado", async () => {
+  test("delega error 403 cuando el rol no está autorizado", async () => {
     const { res, next } = await executeMiddleware(POLICIES.SUPER_ADMIN, {
       user: { sub: "47", roles: [ROLES.SUPERVISOR], dependenciaId: 3 },
     });
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 403);
   });
 
   test("permite continuar al rol autorizado", async () => {
@@ -103,8 +110,8 @@ describe("authorizePolicy: alcance por dependencia", () => {
       { getResourceDependencyId: async () => 4 },
     );
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 403);
   });
 
   test("no permite publicar a un Administrador de Dependencia", async () => {
@@ -114,8 +121,8 @@ describe("authorizePolicy: alcance por dependencia", () => {
       { getResourceDependencyId: async () => 3 },
     );
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 403);
   });
 
   test("permite publicar al Supervisor dentro de su dependencia", async () => {
@@ -147,8 +154,8 @@ describe("authorizePolicy: Consejo Superior y uploads", () => {
       { getUserDependency: async () => ({ nombre: "Ciencias de la Salud" }) },
     );
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 403);
   });
 
   test("permite subir una normativa a la misma dependencia", async () => {
@@ -174,8 +181,8 @@ describe("authorizePolicy: Consejo Superior y uploads", () => {
       },
     );
 
-    expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 403);
   });
 });
 
@@ -209,8 +216,8 @@ describe("authorizePolicy: recurso publicado o condicionado", () => {
       },
     );
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("permite un recurso no publicado de la misma dependencia", async () => {

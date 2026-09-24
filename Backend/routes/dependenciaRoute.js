@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { authenticateToken } from "../Middleware/authMiddleware.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
+import { httpError } from "../utils/httpError.js";
 
 const router = express.Router();
 
@@ -16,9 +17,7 @@ router.get(
     const dependencia = await dependenciaDB.getDepenendenciaById(id);
 
     if (!dependencia) {
-      return res.status(404).json({
-        error: "Dependencia no encontrada",
-      });
+      throw httpError(404, "Dependencia no encontrada.");
     }
 
     return res.json(dependencia);
@@ -46,9 +45,7 @@ router.post(
     const result = await dependenciaDB.edit(dependenciaDataEdit);
 
     if (!result.success) {
-      return res.status(400).json({
-        error: result.mensaje,
-      });
+      throw httpError(400, result.mensaje);
     }
 
     return res.status(200).json({
@@ -129,10 +126,10 @@ router.post(
       );
 
     if (!data || data.length === 0) {
-      return res.status(404).json({
-        error:
-          "No se encontraron dependencias que coincidan con la búsqueda",
-      });
+      throw httpError(
+        404,
+        "No se encontraron dependencias que coincidan con la búsqueda.",
+      );
     }
 
     return res.status(200).json({

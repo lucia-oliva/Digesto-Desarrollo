@@ -8,6 +8,7 @@ import {
 } from "../Middleware/authMiddleware.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
+import { httpError } from "../utils/httpError.js";
 const router = express.Router();
 
 router.delete(
@@ -48,7 +49,7 @@ router.post(
     const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
     if(!result.success){
-      return res.status(400).json({ ok: false, msg: result.message });
+      throw httpError(400, result.message);
     }
     res.status(200).json({ ok: true, msg: "Tag editado correctamente." });
   })
@@ -62,7 +63,7 @@ router.post(
     const tagData = req.body; 
     const result = await tagsDB.create(tagData);
     if(!result.success){
-      return res.status(400).json({ ok: false, msg: result.message });
+      throw httpError(400, result.message);
     }
     res.status(200).json({ ok: true, msg: "Tags insertados correctamente." });
   })
@@ -90,9 +91,7 @@ router.post(
     const { id } = req.params; 
     const { tags } = req.body; 
     if (!Array.isArray(tags) || tags.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "No se proporcionaron tags válidos." });
+      throw httpError(400, "No se proporcionaron tags válidos.");
     }
     await tagsDB.insertTagsForNormativa(id, tags);
     res

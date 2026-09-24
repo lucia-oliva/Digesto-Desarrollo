@@ -1,4 +1,5 @@
 import { verifyAccessToken } from "../utils/authToken.js";
+import { httpError } from "../utils/httpError.js";
 
 function getBearerToken(authHeader) {
   if (!authHeader) {
@@ -36,9 +37,7 @@ function authenticateRequest(req, token) {
   const payload = verifyAccessToken(token);
 
   if (payload.sub == null) {
-    throw new Error(
-      "Token sin identificador de usuario",
-    );
+    throw httpError(401);
   }
 
   req.user = {
@@ -63,17 +62,11 @@ export const authenticateToken = (
   );
 
   if (auth.missing) {
-    return res.status(401).json({
-      error:
-        "No se proporcionó un token",
-    });
+    return next(httpError(401));
   }
 
   if (auth.invalid) {
-    return res.status(401).json({
-      error:
-        "Token de autenticación inválido",
-    });
+    return next(httpError(401));
   }
 
   try {
@@ -81,10 +74,7 @@ export const authenticateToken = (
 
     return next();
   } catch {
-    return res.status(401).json({
-      error:
-        "Token de autenticación inválido o vencido",
-    });
+    return next(httpError(401));
   }
 };
 
@@ -102,10 +92,7 @@ export const optionalAuthenticateToken = (
   }
 
   if (auth.invalid) {
-    return res.status(401).json({
-      error:
-        "Token de autenticación inválido",
-    });
+    return next(httpError(401));
   }
 
   try {
@@ -113,9 +100,6 @@ export const optionalAuthenticateToken = (
 
     return next();
   } catch {
-    return res.status(401).json({
-      error:
-        "Token de autenticación inválido o vencido",
-    });
+    return next(httpError(401));
   }
 };

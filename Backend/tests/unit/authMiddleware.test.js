@@ -22,16 +22,23 @@ function createRes() {
   return res;
 }
 
+function expectNextHttpError(next, status) {
+  expect(next).toHaveBeenCalledTimes(1);
+  const [error] = next.mock.calls[0];
+  expect(error).toBeInstanceOf(Error);
+  expect(error.status).toBe(status);
+}
+
 describe("authenticateToken (unit)", () => {
-  test("sin Authorization responde 401 y no llama next", () => {
+  test("sin Authorization delega error 401", () => {
     const req = createReq(undefined);
     const res = createRes();
     const next = jest.fn();
 
     authenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("token malformado sin prefijo Bearer responde 401", () => {
@@ -41,8 +48,8 @@ describe("authenticateToken (unit)", () => {
 
     authenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("header Bearer sin token responde 401", () => {
@@ -52,8 +59,8 @@ describe("authenticateToken (unit)", () => {
 
     authenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("token inválido responde 401 (SEC-01)", () => {
@@ -68,8 +75,8 @@ describe("authenticateToken (unit)", () => {
 
     authenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("token expirado responde 401 (SEC-01)", () => {
@@ -84,8 +91,8 @@ describe("authenticateToken (unit)", () => {
 
     authenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("token válido llama next y expone req.user", () => {
@@ -126,8 +133,8 @@ describe("optionalAuthenticateToken (unit)", () => {
 
     optionalAuthenticateToken(req, res, next);
 
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(next).not.toHaveBeenCalled();
+    expect(res.status).not.toHaveBeenCalled();
+    expectNextHttpError(next, 401);
   });
 
   test("adjunta el usuario cuando recibe un token válido", () => {
