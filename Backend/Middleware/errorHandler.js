@@ -37,7 +37,13 @@ export function errorHandler(err, req, res, next) {
 
   console.log(status, message);
 
-  if (connectionIssues.has(err.code) || err.errno === 1045) {
+  if (err.name === "MulterError") {
+    status = err.code === "LIMIT_FILE_SIZE" ? 413 : 400;
+    message =
+      err.code === "LIMIT_FILE_SIZE"
+        ? "El archivo excede el tamaño máximo permitido"
+        : "Error al procesar el archivo subido";
+  } else if (connectionIssues.has(err.code) || err.errno === 1045) {
     status = 503;
     message = "Servicio de base de datos no disponible. Intente más tarde.";
   } else if (err.errno === 1213) {

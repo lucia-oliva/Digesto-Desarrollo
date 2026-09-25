@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import db from "./db.js";
+import { FILES_ROOT } from "../config/files.js";
 
 export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
   const {
@@ -15,7 +16,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
   if (!file) throw new Error("No se ha proporcionado un archivo");
 
-  const carpeta = path.join("archivos");
+  const carpeta = FILES_ROOT;
   const viejoPath = path.join(carpeta, file.filename);
 
   if (type === "normativa") {
@@ -128,8 +129,6 @@ function httpError(status, message) {
   err.status = status;
   return err;
 }
-
-const FILES_ROOT = path.resolve("archivos");
 
 const ALLOWED_FILE_TYPES = Object.freeze([
   "normativa",

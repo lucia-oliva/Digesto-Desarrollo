@@ -210,4 +210,7 @@ jest.unstable_mockModule("../../Middleware/fileMiddleware.js", () => ({
       next();
     },
   },
+  handleUploadError: (err, _req, _res, next) => next(err),
+  cleanupTempFileOnError: (_req, _res, next) => next(),
+  validatePdfContent: (_req, _res, next) => next(),
 }));

@@ -1,7 +1,12 @@
 import express from "express";
 import db from "../services/db.js";
 import fs from "fs/promises";
-import { pdfHandler } from "../Middleware/fileMiddleware.js";
+import {
+  pdfHandler,
+  handleUploadError,
+  cleanupTempFileOnError,
+  validatePdfContent,
+} from "../Middleware/fileMiddleware.js";
 import {
   authenticateToken,
   optionalAuthenticateToken,
@@ -83,6 +88,10 @@ router.post(
 
   pdfHandler.single("file"),
 
+  handleUploadError,
+
+  cleanupTempFileOnError,
+
   authorizePolicy(POLICIES.RESOURCE_UPLOAD, {
     getDestinationType: (req) => req.body.type ?? "normativa",
 
@@ -92,6 +101,8 @@ router.post(
     getUserDependency: (req) =>
       dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
   }),
+
+  validatePdfContent,
 
   async (req, res) => {
     try {
@@ -122,11 +133,17 @@ router.post(
 
   pdfHandler.single("file"),
 
+  handleUploadError,
+
+  cleanupTempFileOnError,
+
   authorizePolicy(POLICIES.RESOURCE_UPLOAD, {
     getDestinationType: () => "normativa",
 
     getTargetDependencyId: (req) => req.body.id_dependencia,
   }),
+
+  validatePdfContent,
 
   async (req, res) => {
     try {
