@@ -5,8 +5,27 @@ import { authenticateToken } from "../Middleware/authMiddleware.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
 import { httpError } from "../utils/httpError.js";
+import {
+  normalizeOptionalFields,
+  validateRequiredFields,
+} from "../utils/requestValidation.js";
 
 const router = express.Router();
+
+const DEPENDENCIA_REQUIRED_FIELDS = [
+  { key: "nombre", label: "nombre" },
+  { key: "estado", label: "estado" },
+];
+
+const DEPENDENCIA_EDIT_REQUIRED_FIELDS = [
+  { key: "id", label: "id" },
+  ...DEPENDENCIA_REQUIRED_FIELDS,
+];
+
+const DEPENDENCIA_OPTIONAL_DEFAULTS = {
+  nombre_completo: "",
+  codificacion: "",
+};
 
 router.get(
   "/datos/:id",
@@ -28,6 +47,8 @@ router.post(
   "/create",
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
+  validateRequiredFields(DEPENDENCIA_REQUIRED_FIELDS),
+  normalizeOptionalFields(DEPENDENCIA_OPTIONAL_DEFAULTS),
   asyncHandler(async (req, res) => {
     const dependenciaData = req.body;
     const result = await dependenciaDB.create(dependenciaData);
@@ -40,6 +61,8 @@ router.post(
   "/edit",
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
+  validateRequiredFields(DEPENDENCIA_EDIT_REQUIRED_FIELDS),
+  normalizeOptionalFields(DEPENDENCIA_OPTIONAL_DEFAULTS),
   asyncHandler(async (req, res) => {
     const dependenciaDataEdit = req.body;
     const result = await dependenciaDB.edit(dependenciaDataEdit);

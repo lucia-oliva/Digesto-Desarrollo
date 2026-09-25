@@ -28,12 +28,12 @@ async function cambiarEstado({ id_usuario, nuevo_estado}) {
 
 
 async function edit(data) {
-  const { id, rol, nombre, telefono, email, password, estado, dependencia } =
-    data;
+  const { id, rol, nombre, email, password, estado, dependencia } = data;
+  const telefono = data.telefono ?? "";
 
-  const dependenciaFinal = dependencia ?? 0; 
+  const dependenciaFinal = dependencia ?? 0;
 
-  const fechaSubida = new Date().toISOString().split("T")[0]; 
+  const fechaSubida = new Date().toISOString().split("T")[0];
 
 
   let claveHasheada = null;
@@ -41,7 +41,7 @@ async function edit(data) {
     claveHasheada = await hashPasswordBcrypt(password.trim());
   }
   try {
-  
+
     const sqlUpdate =
       "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = COALESCE(?, clave), estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
     const result = await db.execute(sqlUpdate, [
@@ -84,7 +84,8 @@ async function getUsuarioByIdDatos(id) {
 }
 
 async function create(data) {
-  const { nombre, telefono, email, password, rol, dependencia } = data;
+  const { nombre, email, password, rol, dependencia } = data;
+  const telefono = data.telefono ?? "";
   const dependenciaFinal = dependencia ?? 0;
 
   try {
@@ -144,9 +145,9 @@ export async function updateUsuario(id, datos) {
     campos.push("id_tipo_usuario=?");
     valores.push(datos.id_tipo_usuario);
   }
- 
+
   if (datos.clave && datos.clave_actual) {
-   
+
     const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [
       id,
     ]);

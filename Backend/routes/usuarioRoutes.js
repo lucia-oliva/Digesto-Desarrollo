@@ -4,8 +4,44 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
 import { httpError } from "../utils/httpError.js";
+import {
+  normalizeOptionalFields,
+  validateRequiredFields,
+} from "../utils/requestValidation.js";
 
 const router = express.Router();
+
+const userRoleRequiresDependency = (source) =>
+  ["2", "4"].includes(String(source?.rol ?? ""));
+
+const USUARIO_CREATE_REQUIRED_FIELDS = [
+  { key: "rol", label: "rol" },
+  { key: "nombre", label: "nombre" },
+  { key: "email", label: "correo" },
+  { key: "password", label: "contraseña" },
+  {
+    key: "dependencia",
+    label: "dependencia",
+    when: userRoleRequiresDependency,
+  },
+];
+
+const USUARIO_EDIT_REQUIRED_FIELDS = [
+  { key: "id", label: "id" },
+  { key: "rol", label: "rol" },
+  { key: "nombre", label: "nombre" },
+  { key: "email", label: "correo" },
+  { key: "estado", label: "estado" },
+  {
+    key: "dependencia",
+    label: "dependencia",
+    when: userRoleRequiresDependency,
+  },
+];
+
+const USUARIO_OPTIONAL_DEFAULTS = {
+  telefono: "",
+};
 router.use(authorizePolicy(POLICIES.SUPER_ADMIN));
 
 router.post(
@@ -26,6 +62,8 @@ router.post(
 
 router.post(
   "/create",
+  validateRequiredFields(USUARIO_CREATE_REQUIRED_FIELDS),
+  normalizeOptionalFields(USUARIO_OPTIONAL_DEFAULTS),
   asyncHandler(async (req, res) => {
     const usuarioData = req.body;
     const result = await UsuariosDB.create(usuarioData);
@@ -35,6 +73,8 @@ router.post(
 
 router.post(
   "/edit",
+  validateRequiredFields(USUARIO_EDIT_REQUIRED_FIELDS),
+  normalizeOptionalFields(USUARIO_OPTIONAL_DEFAULTS),
   asyncHandler(async (req, res) => {
     const usuarioDataEdit = req.body;
     const result = await UsuariosDB.edit(usuarioDataEdit);

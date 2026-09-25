@@ -115,7 +115,6 @@ const endpointRows = [
   [ROUTE_GROUPS.TAG, "POST", "/api/tag/edit", POLICIES.AUTHENTICATED],
   [ROUTE_GROUPS.TAG, "POST", "/api/tag/create", POLICIES.AUTHENTICATED],
   [ROUTE_GROUPS.TAG, "GET", "/api/tag/tags/:id", POLICIES.PUBLIC_PUBLISHED],
-  [ROUTE_GROUPS.TAG, "POST", "/api/tag/tags/normativa/:id", POLICIES.NORM_ADMIN],
   [ROUTE_GROUPS.TAG, "POST", "/api/tag/search", POLICIES.AUTHENTICATED],
 
   // Tipo de normativa 

@@ -81,52 +81,89 @@ async function create(data) {
   };
 }
 
-async function insertTagsForNormativa(normativaId, tags) {
-  if (!Array.isArray(tags) || tags.length === 0) {
-    return;
+function normalizeTags(tags) {
+  if (!Array.isArray(tags)) {
+    return [];
   }
 
-  for (const tag of tags) {
-    if (!tag) {
-      continue;
-    }
+  return [
+    ...new Set(
+      tags
+        .map((tag) => String(tag ?? "").trim())
+        .filter(Boolean),
+    ),
+  ];
+}
 
-    try {
-      const existingTagRow = await db.queryOne(
-        "SELECT id FROM tag WHERE nombre = ?",
-        [tag],
-      );
+function assertAtLeastOneTag(tags) {
+  const normalizedTags = normalizeTags(tags);
 
-      let tagId;
+  if (normalizedTags.length === 0) {
+    throw httpError(400, "Debe ingresar al menos un tag.");
+  }
 
-      if (!existingTagRow) {
-        const result = await db.execute(
-          "INSERT INTO tag (nombre) VALUES (?)",
-          [tag],
-        );
+  return normalizedTags;
+}
 
-        tagId = result.insertId;
-      } else {
-        tagId = existingTagRow.id;
-      }
+async function getOrCreateTagId(nombre) {
+  const existingTagRow = await db.queryOne(
+    "SELECT id FROM tag WHERE nombre = ?",
+    [nombre],
+  );
 
-      const existingLink = await db.queryOne(
-        "SELECT 1 FROM tag_normativa WHERE id_normativa = ? AND id_tag = ?",
+  if (existingTagRow) {
+    return existingTagRow.id;
+  }
+
+  const result = await db.execute(
+    "INSERT INTO tag (nombre) VALUES (?)",
+    [nombre],
+  );
+
+  return result.insertId;
+}
+
+async function setTagsForNormativa(normativaId, tags) {
+  const normalizedTags = assertAtLeastOneTag(tags);
+  const desiredTagIds = [];
+
+  for (const tag of normalizedTags) {
+    const tagId = await getOrCreateTagId(tag);
+    desiredTagIds.push(tagId);
+
+    const existingLink = await db.queryOne(
+      "SELECT 1 FROM tag_normativa WHERE id_normativa = ? AND id_tag = ?",
+      [normativaId, tagId],
+    );
+
+    if (!existingLink) {
+      await db.execute(
+        "INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)",
         [normativaId, tagId],
       );
+    }
+  }
 
-      if (!existingLink) {
-        await db.execute(
-          "INSERT INTO tag_normativa (id_normativa, id_tag) VALUES (?, ?)",
-          [normativaId, tagId],
-        );
-      }
-    } catch {
-      console.error(
-        "No se pudo procesar una etiqueta de la normativa.",
+  const currentLinks = await db.query(
+    "SELECT id_tag FROM tag_normativa WHERE id_normativa = ?",
+    [normativaId],
+  );
+
+  const desiredTagIdsSet = new Set(desiredTagIds);
+
+  for (const link of currentLinks) {
+    if (!desiredTagIdsSet.has(link.id_tag)) {
+      await db.execute(
+        "DELETE FROM tag_normativa WHERE id_normativa = ? AND id_tag = ?",
+        [normativaId, link.id_tag],
       );
     }
   }
+
+  return {
+    success: true,
+    tags: normalizedTags,
+  };
 }
 
 async function getTagsByNormativaId(id) {
@@ -232,7 +269,7 @@ export default {
   getAllTags,
   eliminar,
   getTagsByNormativaId,
-  insertTagsForNormativa,
+  setTagsForNormativa,
   searchTagsByParameters,
   create,
   edit,

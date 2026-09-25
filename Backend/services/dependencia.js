@@ -40,7 +40,9 @@ async function getDependencias() {
 }
 
 async function create(data) {
-  const { nombre, estado, codificacion, nombre_completo } = data;
+  const { nombre, estado } = data;
+  const codificacion = data.codificacion ?? "";
+  const nombre_completo = data.nombre_completo ?? "";
   const color = "#00000";
 
   const sqlInsert = `
@@ -70,7 +72,9 @@ async function create(data) {
 }
 
 async function edit(data) {
-  const { id, nombre, nombre_completo, estado, codificacion } = data;
+  const { id, nombre, estado } = data;
+  const nombre_completo = data.nombre_completo ?? "";
+  const codificacion = data.codificacion ?? "";
 
   const existing = await db.queryOne(
     "SELECT id FROM dependencia WHERE nombre = ? AND id != ?",
