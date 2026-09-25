@@ -206,6 +206,8 @@ export const useNormativas = (type, filtros, options = {}) => {
     const msg =
       type === "tag"
         ? "¿Eliminar Tag?"
+        : type === "sesiones"
+          ? "¿Eliminar Sesión?"
         : type === "usuarios"
           ? "¿Eliminar Usuario?"
           : type === "dependencia"

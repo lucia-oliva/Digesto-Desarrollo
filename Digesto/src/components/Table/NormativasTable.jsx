@@ -214,11 +214,15 @@ const NormativaTable = ({
               },
             ];
 
-            if (
+            const isAdminLike =
               isAdminRoute ||
               effectiveModo === "admin" ||
-              effectiveModo === "crear_edit"
-            ) {
+              effectiveModo === "crear_edit";
+
+            const canManageConsejoSession =
+              isAdminLike || isSuperAdmin || isSupervisorCS;
+
+            if (isAdminLike) {
               base.push(
                 {
                   label: "Editar",
@@ -240,6 +244,14 @@ const NormativaTable = ({
                   navigate(`/consejo-superior/EditarSesion/${item.id_sesion}`),
                 type: "success",
                 className: "btn btn-info",
+              });
+            }
+
+            if (!isAdminLike && canManageConsejoSession) {
+              base.push({
+                label: "Eliminar",
+                type: "error",
+                onClick: onDelete,
               });
             }
 

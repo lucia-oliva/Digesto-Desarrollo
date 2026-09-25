@@ -9,6 +9,7 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState({
+    id: null,
     msg: null,
     isError: false,
   });
@@ -26,16 +27,21 @@ function Login() {
     }));
   };
 
+  const showResponse = (msg, isError) => {
+    setResponse({
+      id: Date.now(),
+      msg,
+      isError,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const { email, password } = form;
 
     if (!email || !password) {
-      setResponse({
-        msg: "Por favor, complete todos los campos.",
-        isError: true,
-      });
+      showResponse("Por favor, complete todos los campos.", true);
       return;
     }
 
@@ -44,10 +50,7 @@ function Login() {
     try {
       const data = await login(email, password);
 
-      setResponse({
-        msg: data.msg,
-        isError: false,
-      });
+      showResponse(data.msg, false);
 
       navigate("/admin");
     } catch (error) {
@@ -60,10 +63,7 @@ function Login() {
         password: "",
       });
 
-      setResponse({
-        msg,
-        isError: true,
-      });
+      showResponse(msg, true);
     } finally {
       setLoading(false);
     }
@@ -164,6 +164,7 @@ function Login() {
       {response.msg && (
         <div className="absolute top-0 left-0 right-0 z-50 flex justify-center">
           <Alert
+            key={response.id}
             message={response.msg}
             title="Login"
             error={response.isError}
