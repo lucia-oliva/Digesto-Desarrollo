@@ -104,7 +104,6 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | tag | POST | `/api/tag/edit` | Protegida | `AUTHENTICATED` | SA/SUP/AD | Global | active |
 | tag | POST | `/api/tag/create` | Protegida | `AUTHENTICATED` | SA/SUP/AD | Global | active |
 | tag | GET | `/api/tag/tags/:id` | Condicional | `PUBLIC_PUBLISHED` | SA/SUP/AD* | Publicado/recurso | active |
-| tag | POST | `/api/tag/tags/normativa/:id` | Protegida | `NORM_ADMIN` | SA/SUP/AD | Propia/global | active |
 | tag | POST | `/api/tag/search` | Protegida | `AUTHENTICATED` | SA/SUP/AD | Global | active |
 | tipo_normativa | GET | `/api/tipo_normativa/name` | Pública | `PUBLIC` | — | Público | active |
 | usuarios | POST | `/api/usuarios/cambiar-estado` | Protegida | `SUPER_ADMIN` | SA | Global | active |

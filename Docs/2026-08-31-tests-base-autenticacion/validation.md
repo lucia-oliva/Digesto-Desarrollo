@@ -21,10 +21,10 @@
 | Nivel | Suites | Casos | Resultado |
 | --- | ---: | ---: | --- |
 | Unitario | 5 | 62 | Aprobado |
-| Integración | 4 | 238 | Aprobado |
-| Total | 9 | 300 | Aprobado |
+| Integración | 4 | 234 | Aprobado |
+| Total | 9 | 296 | Aprobado |
 
-La matriz contiene 62 endpoints. La automatización cubre los 44 endpoints con autenticación obligatoria frente a los tres roles y los endpoints cuyo acceso depende del estado de publicación del recurso.
+La matriz contiene 61 endpoints. La automatización cubre los 43 endpoints con autenticación obligatoria frente a los tres roles y los endpoints cuyo acceso depende del estado de publicación del recurso.
 
 ## Comandos validados
 
