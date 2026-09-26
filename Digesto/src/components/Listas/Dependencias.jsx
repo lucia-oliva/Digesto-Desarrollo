@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
-import DependenciaCard, {
-  normalizeLabel,
-} from "./Dependencias/DependenciaCard";
+import DependenciaCard from "./Dependencias/DependenciaCard";
 import DependenciasRow from "./Dependencias/DependenciasRow";
+import { normalizeDependenciaLabel } from "../../utils/dependencias";
 
 const dependenciaEnum = [
   "Consejo Superior",
@@ -25,7 +24,7 @@ export default function Dependencias({ dependencias }) {
   const list = dependencias?.length ? dependencias : dependenciaEnum;
 
   const pick = (labels) => {
-    const map = new Map(list.map((n) => [normalizeLabel(n), n]));
+    const map = new Map(list.map((n) => [normalizeDependenciaLabel(n), n]));
     return labels.map((k) => map.get(k)).filter(Boolean);
   };
 

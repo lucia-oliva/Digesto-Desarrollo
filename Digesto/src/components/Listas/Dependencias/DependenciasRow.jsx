@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
-import DependenciaCard, { normalizeLabel } from "./DependenciaCard";
+import DependenciaCard from "./DependenciaCard";
+import { normalizeDependenciaLabel } from "../../../utils/dependencias";
 
 export default function DependenciasRow({
   title,
@@ -21,11 +22,11 @@ export default function DependenciasRow({
       )}
 
       <div className={`grid gap-3 ${colsClass}`}>
-        {items.map((n, i) => {
+        {items.map((n) => {
           const extra = getCardProps?.(n) || {};
           return (
           <DependenciaCard
-            key={normalizeLabel(n)}
+            key={normalizeDependenciaLabel(n)}
             nombre={n}
             big={big}
             colored={Colored}
@@ -46,4 +47,5 @@ DependenciasRow.propTypes = {
   big: PropTypes.bool,
   startColor: PropTypes.number,
   Colored: PropTypes.bool,
+  getCardProps: PropTypes.func,
 };

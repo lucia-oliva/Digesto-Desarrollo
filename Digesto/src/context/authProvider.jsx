@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
 import { AuthContext } from "./authContext";
 import { setAccessToken, clearAccessToken } from "../services/authservices";
 import { setGlobalLogout } from "./globalLogout";
 import api from "../api/axiosPrivate";
 
-// eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     user: null,
@@ -56,15 +56,11 @@ export const AuthProvider = ({ children }) => {
     })();
   }, []);
 
-  const value = useMemo(
-    () => ({
-      auth,
-      logout,
-      login,
-      api,
-    }),
-    [auth]
-  );
+  const value = { auth, logout, login, api };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

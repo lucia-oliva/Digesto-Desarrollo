@@ -1,4 +1,6 @@
 // src/components/SearchFilter/AlphabetFilter.jsx
+import PropTypes from "prop-types";
+
 export default function AlphabetFilter({ value = "", onChange = () => {} }) {
   const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   return (
@@ -26,3 +28,8 @@ export default function AlphabetFilter({ value = "", onChange = () => {} }) {
     </div>
   );
 }
+
+AlphabetFilter.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+};

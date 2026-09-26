@@ -1,4 +1,4 @@
-import { useState } from "react";
+import PropTypes from "prop-types";
 import ContactModal from "../components/layout/Contact";
 import NormativaTable from "../components/Table/NormativasTable";
 import GenericFilterSearch from "../components/SearchFilter/SearchFilter";
@@ -13,9 +13,8 @@ function NormativasContainer({ isAdmin = false }) {
     emisor: params.get("emisor") || "",
   };
 
-  const [tags, setTags] = useState("");
+  const tags = "";
   const type = "ListadoNormativa";
-  const scope = "public";
   const modo = "busqueda";
 
   const { ns, state, setFilters } = useNamespacedFilters({
@@ -36,13 +35,6 @@ function NormativasContainer({ isAdmin = false }) {
     const res = await getWithCancel(ns, "/api/normativas", { params: filtros });
     if (res?.cancelled) return;
   }
-
-  const handleSearchTags = (selectedTags) => {
-    setTags(selectedTags || "");
-    const next = { ...state.filters, tags: selectedTags || "" };
-    setFilters(next);
-    fetchData(next);
-  };
 
   const handleSearch = (filtersFromGeneric) => {
     const next = { ...(filtersFromGeneric || {}), tags };
@@ -99,5 +91,9 @@ function NormativasContainer({ isAdmin = false }) {
     </div>
   );
 }
+
+NormativasContainer.propTypes = {
+  isAdmin: PropTypes.bool,
+};
 
 export default NormativasContainer;

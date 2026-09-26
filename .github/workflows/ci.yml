@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Install, lint, test, build and audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            Digesto/package-lock.json
+            Backend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: Digesto
+        run: npm ci
+
+      - name: Install backend dependencies
+        working-directory: Backend
+        run: npm ci
+
+      - name: Lint frontend
+        working-directory: Digesto
+        run: npm run lint
+
+      - name: Test backend
+        working-directory: Backend
+        run: npm test
+
+      - name: Build frontend
+        working-directory: Digesto
+        run: npm run build
+
+      - name: Audit frontend dependencies
+        working-directory: Digesto
+        run: npm audit --audit-level=high
+
+      - name: Audit backend dependencies
+        working-directory: Backend
+        run: npm audit --audit-level=high

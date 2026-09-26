@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router";
+import { normalizeDependenciaLabel } from "../../../utils/dependencias";
 
 const colors = [
   "bg-[#526cc4]",
@@ -29,9 +30,6 @@ const emisorNombreToId = {
   "Consejo Superior" : "4"
 }
 
-const normalizeLabel = (nombre) =>
-  nombre === "C. Superior" ? "C.Superior" : String(nombre);
-
 const buildTo = ({label,id,field}) =>
   String(label).toLowerCase() === "todas" || !id
     ? "/busqueda"
@@ -45,12 +43,12 @@ const buildTo = ({label,id,field}) =>
   big = false,
   kind = "dependencia" 
 }) {
-  const label = normalizeLabel(nombre);
+  const label = normalizeDependenciaLabel(nombre);
     const map = kind === "emisor" ? emisorNombreToId : dependenciaNombreToId;
     const field = kind === "emisor" ? "emisor" : "dependencia";
   const id = map[nombre] ?? map[label] ?? "";
   const to = buildTo({ label, id, field });
-   console.log({nombre,label,kind,field,id,to});
+  
 
 
   return (
@@ -92,5 +90,3 @@ DependenciaCard.propTypes = {
   big: PropTypes.bool,
   kind: PropTypes.oneOf(["dependencia", "emisor"])
 };
-
-export { normalizeLabel };
