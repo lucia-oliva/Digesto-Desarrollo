@@ -4,6 +4,7 @@ import NormativaTable from "../../components/Table/NormativasTable";
 import GenericFilterSearch from "../../components/SearchFilter/SearchFilter";
 import { useNamespacedFilters } from "../../hooks/useNamespacedFilters";
 import { useAuth } from "../../context/useAuth";
+import { useReferencias } from "../../context/referenciasContext";
 
 function VistaAdministrativa() {
   const location = useLocation();
@@ -11,23 +12,51 @@ function VistaAdministrativa() {
   const user = auth?.user;
   const tipoUser = user?.tipo_usuario;
   const depName = user?.dependencia;
+  const { dependencias } = useReferencias();
   const type = location.pathname.split("/")[2];
-
-  const isNormativaPorAnio =
-    type === "ListadoNormativaPorAnio" ||
-    type === "normativaPorAño" ||
-    type === "normativaPorAnio";
 
   const isSuperAdmin = tipoUser === "SuperAdministrador";
   const isAdminDependencia =
     tipoUser === "Administrador de Dependencia";
   const isSupervisor = tipoUser === "Supervisor";
 
+  const normativeTypesWithDependencyFilter = useMemo(
+    () =>
+      new Set([
+        "ListadoNormativa",
+        "ListadoNormativaEliminadas",
+        "ListadoNormativaDespublicadas",
+        "ListadoNormativaPorAnio",
+        "normativaPorAño",
+        "normativaPorAnio",
+      ]),
+    [],
+  );
+
+  const userDepId = useMemo(() => {
+    const directId = user?.dependenciaId ?? user?.id_dependencia;
+
+    if (directId) return String(directId);
+
+    const normalizedDepName = String(depName ?? "").trim().toLowerCase();
+
+    const hit = (dependencias ?? []).find(
+      (dependencia) =>
+        String(dependencia?.nombre ?? dependencia?.label ?? "")
+          .trim()
+          .toLowerCase() === normalizedDepName,
+    );
+
+    return hit ? String(hit.id ?? hit.value ?? "") : "";
+  }, [dependencias, depName, user]);
+
+  const lockedDependenciaValue = userDepId || depName || "";
+
   const lockDependencia =
-    isNormativaPorAnio &&
+    normativeTypesWithDependencyFilter.has(type) &&
     !isSuperAdmin &&
     (isAdminDependencia || isSupervisor) &&
-    !!depName;
+    !!lockedDependenciaValue;
 
   const showTagSearch = useMemo(
     () =>
@@ -70,15 +99,15 @@ function VistaAdministrativa() {
 
     const current = state.filters?.dependencia;
 
-    if (String(current ?? "") === String(depName)) return;
+    if (String(current ?? "") === String(lockedDependenciaValue)) return;
 
     setFilters({
       ...(state.filters || {}),
-      dependencia: depName,
+      dependencia: lockedDependenciaValue,
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lockDependencia, depName]);
+  }, [lockDependencia, lockedDependenciaValue]);
 
   useEffect(() => {
     if (!showTagSearch) {
@@ -95,7 +124,7 @@ function VistaAdministrativa() {
 
   const handleSearch = (formData) => {
     const safeForm = lockDependencia
-      ? { ...(formData || {}), dependencia: depName }
+      ? { ...(formData || {}), dependencia: lockedDependenciaValue }
       : formData;
 
     const next = mergeWithTag(safeForm, tagQuery);

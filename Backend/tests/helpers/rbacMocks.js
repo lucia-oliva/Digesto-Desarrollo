@@ -111,7 +111,7 @@ const tagsMock = {
   edit: jest.fn(async () => ({ success: true })),
   create: jest.fn(async () => ({ success: true })),
   getTagsByNormativaId: jest.fn(async () => []),
-  insertTagsForNormativa: jest.fn(async () => ({ affectedRows: 1 })),
+  setTagsForNormativa: jest.fn(async () => ({ success: true })),
   searchTagsByParameters: jest.fn(async () => ({
     data: [],
     totalResults: 0,

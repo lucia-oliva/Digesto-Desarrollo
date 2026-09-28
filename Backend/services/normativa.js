@@ -207,7 +207,7 @@ async function edit(data) {
     throw httpError(404, `No se encontró la normativa con ID ${id}`);
   }
 
-  await tagService.insertTagsForNormativa(id, tags);
+  await tagService.setTagsForNormativa(id, tags);
 
   const fechaSubida = new Date().toISOString().split("T")[0];
 
@@ -355,7 +355,7 @@ async function create(data) {
     }
   }
 
-  await tagService.insertTagsForNormativa(normativaId, tags);
+  await tagService.setTagsForNormativa(normativaId, tags);
 
   if (user?.id) {
     await auditoriaService.crearRegistroAuditoria({

@@ -9,7 +9,9 @@ import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
 import { ROLES } from "../security/roles.js";
 import { getAuthorizedDependency } from "../security/accessScope.js";
-import { httpError } from "../utils/httpError.js";
+import {
+  validateRequiredFields,
+} from "../utils/requestValidation.js";
 
 const router = express.Router();
 
@@ -20,6 +22,43 @@ function getPagination(req, defaultLimit = 10) {
   const offset = (p - 1) * l;
   return { page: p, limite: l, offset };
 }
+
+
+function attachAuthenticatedUserToBody(req, _res, next) {
+  req.body.user = {
+    ...(req.body.user || {}),
+    id: req.user?.sub,
+  };
+
+  next();
+}
+
+const NORMATIVA_CREATE_REQUIRED_FIELDS = [
+  { key: "numero", label: "número" },
+  { key: "anio", label: "año" },
+  { key: "titulo", label: "título" },
+  { key: "resumen", label: "resumen" },
+  { key: "fecha", label: "fecha" },
+  { key: "dependencia", label: "dependencia" },
+  { key: "emisor", label: "emisor" },
+  { key: "tipo_normativa", label: "tipo de normativa" },
+  { key: "estado", label: "estado" },
+  { key: "tags", label: "tags" },
+];
+
+const NORMATIVA_EDIT_REQUIRED_FIELDS = [
+  { key: "id", label: "id" },
+  { key: "numero", label: "número" },
+  { key: "anio", label: "año" },
+  { key: "titulo", label: "título" },
+  { key: "resumen", label: "resumen" },
+  { key: "fecha_normativa", label: "fecha" },
+  { key: "id_dependencia", label: "dependencia" },
+  { key: "id_emisor", label: "emisor" },
+  { key: "id_tipo_normativa", label: "tipo de normativa" },
+  { key: "estado", label: "estado" },
+  { key: "tags", label: "tags" },
+];
 
 router.get(
   "/datos/:id",
@@ -43,6 +82,7 @@ router.get(
 router.post(
   "/edit",
   authenticateToken,
+  validateRequiredFields(NORMATIVA_EDIT_REQUIRED_FIELDS),
   authorizePolicy(POLICIES.NORM_ADMIN, {
     getResourceDependencyId: (req) =>
       normativaDB.getNormativaDependencyById(req.body.id),
@@ -62,20 +102,12 @@ router.post(
 router.post(
   "/create",
   authenticateToken,
+  attachAuthenticatedUserToBody,
+  validateRequiredFields(NORMATIVA_CREATE_REQUIRED_FIELDS),
   authorizePolicy(POLICIES.NORM_ADMIN, {
     getTargetDependencyId: (req) => req.body.dependencia,
   }),
   asyncHandler(async (req, res) => {
-    const { numero, titulo, fecha } = req.body;
-
-    if (!numero || !titulo || !fecha) {
-      const err = new Error(
-        "Faltan datos obligatorios (numero, titulo, fecha)",
-      );
-      err.status = 400;
-      throw err;
-    }
-
     const result = await normativaDB.create(req.body);
 
     res.status(201).json({
