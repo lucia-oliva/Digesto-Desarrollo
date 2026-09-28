@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { SiGmail } from "react-icons/si";
 import { useLocation } from "react-router";
-import {Alert} from "../ui/Ui";
+import { Alert } from "../ui/Ui";
 import api from "../../api/axiosPrivate";
 
 export default function ContactModal({ dependencia: dependenciaProp = "" }) {
@@ -38,7 +38,6 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       return;
     }
 
-   
     const searchParams = new URLSearchParams(location.search);
     const depFromUrl = searchParams.get("dependencia") || "";
     const decoded = decodeURIComponent(depFromUrl);
@@ -58,45 +57,42 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
   };
 
   const handleSubmit = async () => {
-  setIsLoading(true);
+    setIsLoading(true);
 
-  const destinatario =
-    dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
+    const destinatario =
+      dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
 
-  const payload = {
-    nombre,
-    email,
-    mensaje,
-    destinatario,
+    const payload = {
+      nombre,
+      email,
+      mensaje,
+      destinatario,
+    };
+
+    try {
+      await api.post("/contacto", payload);
+
+      setSuccess(true);
+      setNombre("");
+      setEmail("");
+      setMensaje("");
+
+      setTimeout(() => {
+        setSuccess(false);
+        setIsModalOpen(false);
+      }, 3000);
+    } catch (error) {
+  setAlertData({
+    title: "Error de conexion",
+    message:
+      error?.response?.data?.msg ||
+      "No se puede conectar con el servidor",
+    error: true,
+  });
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  try {
-    await api.post("/contacto", payload);
-
-    setSuccess(true);
-    setNombre("");
-    setEmail("");
-    setMensaje("");
-
-    setTimeout(() => {
-      setSuccess(false);
-      setIsModalOpen(false);
-    }, 3000);
-  } catch (error) {
-    console.error("Error:", error);
-
-    setAlertData({
-      title: "Error de conexion",
-      message:
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        "No se puede conectar con el servidor",
-      error: true,
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
 
   if (!isVisible) return null;
 
@@ -112,7 +108,9 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       <div
         ref={modalRef}
         className={`fixed inset-0 z-50 flex items-end justify-end transition-opacity duration-300 ${
-          isModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          isModalOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={closeModal}
       >
@@ -122,7 +120,9 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
         >
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-bold mb-3">
-              {nombreDependencia ? `Contactar con ${nombreDependencia}` : "Contacto"}
+              {nombreDependencia
+                ? `Contactar con ${nombreDependencia}`
+                : "Contacto"}
             </h3>
           </div>
 
@@ -172,18 +172,18 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
                   <span className="loading loading-dots loading-md"></span>
                 ) : (
                   "Enviar"
-                )}    
+                )}
               </button>
-               {alertData && (
-            <div className="mt-3 flex justify-center">
-              <Alert
-                title={alertData.title}
-                message={alertData.message}
-                error={alertData.error}
-                duration={4000}
-              />
-            </div>
-          )}
+              {alertData && (
+                <div className="mt-3 flex justify-center">
+                  <Alert
+                    title={alertData.title}
+                    message={alertData.message}
+                    error={alertData.error}
+                    duration={4000}
+                  />
+                </div>
+              )}
             </form>
           )}
         </div>

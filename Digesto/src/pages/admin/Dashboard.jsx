@@ -1,15 +1,14 @@
-import { useAuth } from "../../context/useAuth";
-import StatCard from "../../components/layout/StatCard";
+import { useEffect, useState } from "react";
 import {
-  FaTags,
   FaBuilding,
   FaFileLines,
+  FaTags,
   FaUser,
   FaUserGroup,
 } from "react-icons/fa6";
+import { useAuth } from "../../context/useAuth";
+import StatCard from "../../components/layout/StatCard";
 import api from "../../api/axiosPrivate";
-import { useEffect, useState } from "react";
-
 
 function Dashboard() {
   const [totales, setTotales] = useState({
@@ -24,10 +23,15 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const res = await api.get("/dashboard/resumen");
-        console.log("Datos reales:", res.data);
         setTotales(res.data);
-      } catch (err) {
-        console.error("Error al obtener totales del dashboard", err);
+      } catch {
+        setTotales({
+          normativas: 0,
+          usuarios: 0,
+          dependencias: 0,
+          palabras_clave: 0,
+          emisores: 0,
+        });
       }
     };
 
@@ -46,7 +50,9 @@ function Dashboard() {
       title: "Normativas",
       description: "Gestion, creácion o edicion de las normativas vigentes.",
       value: totales.normativas,
-      iconFront: <FaFileLines className="text-4xl mr-2 sm:text-5xl md:text-6xl"  />,
+      iconFront: (
+        <FaFileLines className="text-4xl mr-2 sm:text-5xl md:text-6xl" />
+      ),
       iconBg: <FaFileLines className="mb-3" />,
       color: "bg-blue-600",
       toList: "/admin/ListadoNormativa",
@@ -58,7 +64,9 @@ function Dashboard() {
       title: "Usuarios",
       description: "Cuentas, roles y permisos del sistema.",
       value: totales.usuarios,
-      iconFront: <FaUserGroup className="text-4xl mr-2 sm:text-5xl md:text-6xl" />,
+      iconFront: (
+        <FaUserGroup className="text-4xl mr-2 sm:text-5xl md:text-6xl" />
+      ),
       iconBg: <FaUserGroup />,
       color: "bg-slate-600",
       toList: "/admin/ListadoUsuarios",
@@ -71,7 +79,9 @@ function Dashboard() {
       title: "Dependencias",
       description: "Areas y estructuras administrativas.",
       value: totales.dependencias,
-      iconFront: <FaBuilding className="text-4xl mr-2 sm:text-5xl md:text-6xl" />,
+      iconFront: (
+        <FaBuilding className="text-4xl mr-2 sm:text-5xl md:text-6xl" />
+      ),
       iconBg: <FaBuilding className="mb-2" />,
       color: "bg-blue-900",
       toList: "/admin/ListadoDependencias",
@@ -84,7 +94,7 @@ function Dashboard() {
       title: "Palabras Clave",
       description: "Etiquetas del sistema.",
       value: totales.palabras_clave,
-      iconFront: <FaTags className="text-4xl mr-2 sm:text-5xl md:text-6xl"  />,
+      iconFront: <FaTags className="text-4xl mr-2 sm:text-5xl md:text-6xl" />,
       iconBg: <FaTags className="mb-2" />,
       color: "bg-gray-700",
       toList: "/admin/ListadoPalabrasClave",
@@ -112,11 +122,13 @@ function Dashboard() {
       <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col md:flex-row items-center justify-between mb-10">
         <div className="mb-6 md:mb-0 md:mr-6 max-w-xl">
           <h1 className="text-2xl font-bold mb-2">Hola, {user.nombre} 👋</h1>
+
           <p className="text-gray-600 text-sm mb-2">
             Bienvenido al panel de administración del sistema Digesto. Desde
             aquí podés acceder y trabajar con las secciones que tenés
             habilitadas.
           </p>
+
           <p className="text-gray-500 text-sm">
             Utilizá los accesos directos a continuación para navegar por las
             secciones disponibles.

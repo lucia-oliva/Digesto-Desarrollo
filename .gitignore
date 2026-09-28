@@ -22,3 +22,9 @@ node_modules/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Otros
+.clineignore
+
+# Archivos temporales generados por tests
+/Backend/tests/.tmp/

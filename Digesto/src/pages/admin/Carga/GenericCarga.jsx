@@ -14,16 +14,25 @@ function GenericCarga() {
   const { auth } = useAuth();
   const user = auth.user;
   const location = useLocation();
+
   const pathSegment = location.pathname
     .split("/")
-    .find((s) => s.startsWith("Nueva") || s.startsWith("Nuevo"));
+    .find(
+      (segment) => segment.startsWith("Nueva") || segment.startsWith("Nuevo"),
+    );
+
   const entidad = pathSegment
     ? pathSegment.replace("Nueva", "").replace("Nuevo", "").toLowerCase()
     : null;
+
   const [alertData, setAlertData] = useState(null);
+
   const pasos = flujoPorEntidad[entidad] || [];
+
   const [currentStep, setCurrentStep] = useState(0);
+
   const [formData, setFormData] = useState({});
+
   const [errores, setErrores] = useState({});
 
   useEffect(() => {
@@ -32,80 +41,85 @@ function GenericCarga() {
 
   const handleNext = () =>
     setCurrentStep((prev) => Math.min(prev + 1, pasos.length - 1));
+
   const handleBack = () => setCurrentStep((prev) => Math.max(0, prev - 1));
+
   const canBack = currentStep > 0;
 
-  const handleSubmit = () => {
-    const dataToSend = { ...formData };
+  const handleSubmit = async () => {
+    const dataToSend = {
+      ...formData,
+    };
+
     const ruta = getRuta(entidad);
 
     try {
-      api
-        .post(`/${ruta}/create`, {
-          ...dataToSend,
-          archivo: dataToSend.archivo?.name || "",
-          user,
-        })
-        .then(async (res) => {
-          const data = res.data;
+      const response = await api.post(`/${ruta}/create`, {
+        ...dataToSend,
+        archivo: dataToSend.archivo?.name || "",
+        user,
+      });
 
-          console.log(`[POST] /api/${ruta}/create =>`, data);
+      const data = response.data;
 
-          if (data.ok === false) {
-            throw new Error(data.msg || "Error al crear registro");
-          }
-          if (
-            entidad === "normativa" &&
-            dataToSend.archivo instanceof File &&
-            data?.id
-          ) {
-            const formDataUpload = new FormData();
-            formDataUpload.append("file", dataToSend.archivo);
-            formDataUpload.append("resolucion", String(dataToSend.numero));
-            formDataUpload.append("anio", String(dataToSend.anio));
-            formDataUpload.append("titulo", dataToSend.titulo);
-            formDataUpload.append(
-              "id_dependencia",
-              String(dataToSend.dependencia),
-            );
-            formDataUpload.append("id_emisor", dataToSend.emisor);
-            formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
+      if (data?.ok === false) {
+        setAlertData({
+          id: Date.now(),
+          title: "Error",
+          message: data?.msg || "No se pudo crear el registro.",
+          error: true,
+        });
+        return;
+      }
 
-            const resUpload = await api.post(
-              `/file/upload/${data.id}`,
-              formDataUpload,
-            );
+      if (
+        entidad === "normativa" &&
+        dataToSend.archivo instanceof File &&
+        data?.id
+      ) {
+        const formDataUpload = new FormData();
 
-            const resJson = resUpload.data;
-            console.log("Resultado de subida de archivo:", resJson);
-          }
-          setFormData({});
-          setErrores({});
-          setCurrentStep(0);
-          setAlertData({
-            id: Date.now(),
-            title: "Exito",
-            message:
-              data.msg ||
-              `${entidad.charAt(0).toUpperCase() + entidad.slice(1)} creado/a correctamente`,
-            error: false,
-          });
-        })
-        .catch((err) =>
-          setAlertData({
-            id: Date.now(),
-            title: "Error",
-            message: err.message || "Error al crear registro",
-            error: true,
-          }),
-        );
-    } catch (err) {
-      console.log("Error al serializar JSON:", err);
+        formDataUpload.append("file", dataToSend.archivo);
+        formDataUpload.append("resolucion", String(dataToSend.numero));
+        formDataUpload.append("anio", String(dataToSend.anio));
+        formDataUpload.append("titulo", dataToSend.titulo);
+        formDataUpload.append("id_dependencia", String(dataToSend.dependencia));
+        formDataUpload.append("id_emisor", dataToSend.emisor);
+        formDataUpload.append("tipo_normativa", dataToSend.tipo_normativa);
+
+        await api.post(`/file/upload/${data.id}`, formDataUpload);
+      }
+
+      setFormData({});
+      setErrores({});
+      setCurrentStep(0);
+
+      setAlertData({
+        id: Date.now(),
+        title: "Exito",
+        message:
+          data?.msg ||
+          `${
+            entidad.charAt(0).toUpperCase() + entidad.slice(1)
+          } creado/a correctamente`,
+        error: false,
+      });
+    } catch (error) {
+      const publicMessage =
+        error?.response?.data?.msg || "Error al crear el registro.";
+
+      setAlertData({
+        id: Date.now(),
+        title: "Error",
+        message: publicMessage,
+        error: true,
+      });
     }
   };
 
   const renderPaso = () => {
     const paso = pasos[currentStep];
+
     switch (paso) {
       case "seleccionTipo":
         return (
@@ -117,6 +131,7 @@ function GenericCarga() {
             canBack={canBack}
           />
         );
+
       case "formulario":
         return (
           <PasoFormulario
@@ -130,6 +145,7 @@ function GenericCarga() {
             canBack={canBack}
           />
         );
+
       case "modificaNormativa":
         return (
           <PasoModifica
@@ -140,6 +156,7 @@ function GenericCarga() {
             canBack={canBack}
           />
         );
+
       case "verificacion":
         return (
           <PasoVerificacion
@@ -149,6 +166,7 @@ function GenericCarga() {
             canBack={canBack}
           />
         );
+
       default:
         return <p>No hay pasos configurados para esta entidad.</p>;
     }
@@ -167,6 +185,7 @@ function GenericCarga() {
           />
         </div>
       )}
+
       <h2 className="text-xl font-semibold mb-4 text-center">
         {entidad === "palabraclave"
           ? "Crear Palabra Clave"
@@ -174,16 +193,18 @@ function GenericCarga() {
               entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""
             }`}
       </h2>
+
       <div className="w-full flex justify-center mb-4 sm:mb-6">
-        <ul className=" z-0 steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
-          {pasos.map((paso, i) => {
+        <ul className="z-0 steps steps-horizontal inline-grid w-auto gap-1 sm:gap-3">
+          {pasos.map((paso, index) => {
             const label = paso
               .replace(/([A-Z])/g, " $1")
-              .replace(/^./, (s) => s.toUpperCase());
+              .replace(/^./, (value) => value.toUpperCase());
+
             return (
               <li
                 key={paso}
-                className={`step ${i <= currentStep ? "step-primary" : ""}`}
+                className={`step ${index <= currentStep ? "step-primary" : ""}`}
                 title={label}
                 aria-label={label}
               >

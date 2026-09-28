@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { useParams, useNavigate } from "react-router";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { useNavigate, useParams } from "react-router";
 import SesionForm from "../Sesiones/SesionForm";
 import api from "../../../api/axiosPrivate";
 
@@ -17,19 +22,31 @@ export default function EditarSesion() {
       try {
         const res = await api.get(`/sesiones/${id}`);
         const data = res.data;
+
         setSesion(data);
-      } catch (err) {
-        console.error(err);
-        setGlobalError("Error al obtener los datos de la sesión.");
+      } catch (error) {
+        setGlobalError(
+          error?.response?.data?.msg ||
+            "Error al obtener los datos de la sesión.",
+        );
       } finally {
         setFetching(false);
       }
     };
+
     fetchSesion();
   }, [id]);
 
   const initialValues = useMemo(() => {
-    if (!sesion) return { nombre: "", fecha: "", nombreActa: "", acta: null };
+    if (!sesion) {
+      return {
+        nombre: "",
+        fecha: "",
+        nombreActa: "",
+        acta: null,
+      };
+    }
+
     return {
       nombre: sesion.nombre_orden ?? "",
       fecha: sesion.fecha_sesion ?? "",
@@ -61,8 +78,12 @@ export default function EditarSesion() {
         type: "static",
         renderStatic: (values) => (
           <p className="text-sm">
-            <span className="text-gray-500">PDF actual (orden): </span>
-            <span className="text-gray-800">{values._ordenActual || "—"}</span>
+            <span className="text-gray-500">
+              PDF actual (orden):{" "}
+            </span>
+            <span className="text-gray-800">
+              {values._ordenActual || "—"}
+            </span>
           </p>
         ),
       },
@@ -71,7 +92,10 @@ export default function EditarSesion() {
         label: "Nombre del acta",
         type: "text",
         placeholder: "Ej.: Acta del 02-04-2025",
-        validate: (v) => (!String(v ?? "").trim() ? "Ingresá el nombre del acta." : ""),
+        validate: (v) =>
+          !String(v ?? "").trim()
+            ? "Ingresá el nombre del acta."
+            : "",
       },
       {
         key: "acta",
@@ -80,8 +104,14 @@ export default function EditarSesion() {
         accept: "application/pdf",
         help: "Formato PDF.",
         validate: (file) => {
-          if (!file) return "Adjuntá el PDF del acta.";
-          if (file.type !== "application/pdf") return "El archivo debe ser un PDF (.pdf).";
+          if (!file) {
+            return "Adjuntá el PDF del acta.";
+          }
+
+          if (file.type !== "application/pdf") {
+            return "El archivo debe ser un PDF (.pdf).";
+          }
+
           return "";
         },
       },
@@ -92,47 +122,61 @@ export default function EditarSesion() {
     () => [
       {
         title: "Requisitos",
-        items: ["El acta debe ser PDF.", "Completar el nombre del acta."],
+        items: [
+          "El acta debe ser PDF.",
+          "Completar el nombre del acta.",
+        ],
       },
       {
         title: "Sugerencias",
-        items: ["Verificá que el PDF del acta abra bien antes de subirlo."],
+        items: [
+          "Verificá que el PDF del acta abra bien antes de subirlo.",
+        ],
       },
     ],
-    []
+    [],
   );
 
   const onSubmit = useCallback(
     async (values) => {
       if (!sesion) return;
+
       setGlobalError("");
       setLoading(true);
+
       try {
         const formDataUpload = new FormData();
+
         formDataUpload.append("file", values.acta);
         formDataUpload.append("type", "acta");
         formDataUpload.append("id_sesion", sesion.id_sesion);
-        formDataUpload.append("fecha_sesion", sesion.fecha_sesion);
+        formDataUpload.append(
+          "fecha_sesion",
+          sesion.fecha_sesion,
+        );
         formDataUpload.append("nombre_acta", values.nombreActa);
 
         await api.post(`/file/upload/${id}`, formDataUpload);
 
-        // Éxito
         navigate("/consejo-superior/sesiones");
-      } catch (err) {
-        console.error(err);
-        setGlobalError("Error al subir el acta.");
+      } catch (error) {
+        setGlobalError(
+          error?.response?.data?.msg ||
+            "Error al subir el acta.",
+        );
       } finally {
         setLoading(false);
       }
     },
-    [id, sesion, navigate]
+    [id, sesion, navigate],
   );
 
   if (fetching) {
     return (
       <main className="min-h-[60vh] bg-base-100 py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-2xl mx-auto text-center text-gray-600">Cargando sesión…</div>
+        <div className="max-w-2xl mx-auto text-center text-gray-600">
+          Cargando sesión…
+        </div>
       </main>
     );
   }

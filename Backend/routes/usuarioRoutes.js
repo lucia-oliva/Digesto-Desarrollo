@@ -3,6 +3,7 @@ import UsuariosDB from "../services/usuarios.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
+import { httpError } from "../utils/httpError.js";
 
 const router = express.Router();
 router.use(authorizePolicy(POLICIES.SUPER_ADMIN));
@@ -95,7 +96,7 @@ router.get(
     const id = req.params.id;
     const users = await UsuariosDB.filterUsuariosporDepartament(id);
     if (!users || users.affectedRows === 0) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+      throw httpError(404, "Usuario no encontrado.");
     }
     res.json(users);
   })

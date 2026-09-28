@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-
 import request from "supertest";
 import {
   afterEach,
@@ -11,11 +10,12 @@ import {
   jest,
   test,
 } from "@jest/globals";
-
-import { MAX_PDF_SIZE_BYTES } from "../../config/files.js";
+import {
+  FILES_ROOT,
+  MAX_PDF_SIZE_BYTES,
+} from "../../config/files.js";
 import { generateAccessToken } from "../../utils/authToken.js";
 
-const FILES_ROOT = path.resolve("archivos");
 const DEFAULT_DEPENDENCY_ID = 3;
 const OTHER_DEPENDENCY_ID = 999;
 const TEST_USER_ID = "9001";
@@ -123,62 +123,76 @@ function applyServiceMocks() {
 let app;
 
 beforeAll(async () => {
+  assertSafeTestFilesRoot();
+
   ({ default: app } = await import("../../app.js"));
 
   await fs.mkdir(FILES_ROOT, { recursive: true });
 });
 
 // ---------------------------------------------------------------------------
-// Helpers de disco: baseline/diff para no dejar archivos residuales.
+// Directorio aislado de archivos para tests.
 // ---------------------------------------------------------------------------
 
-async function listFiles() {
-  try {
-    return (await fs.readdir(FILES_ROOT)).sort();
-  } catch {
-    return [];
+const EXPECTED_TEST_FILES_ROOT = path.resolve(
+  process.cwd(),
+  "tests",
+  ".tmp",
+  "archivos",
+);
+
+function assertSafeTestFilesRoot() {
+  if (path.resolve(FILES_ROOT) !== EXPECTED_TEST_FILES_ROOT) {
+    throw new Error(
+      `FILES_ROOT inseguro para tests: ${FILES_ROOT}`,
+    );
   }
 }
 
-// La limpieza por `res.on("close")` es asincrona: se espera un margen acotado.
-async function waitForNoNewFiles(baseline, timeoutMs = 1000) {
+async function listTestFiles() {
+  return (await fs.readdir(FILES_ROOT)).sort();
+}
+
+// Algunas limpiezas del middleware ocurren al cerrarse la respuesta.
+// Esperamos un margen corto antes de considerar que quedó un residuo.
+async function waitForEmptyTestDirectory(timeoutMs = 1000) {
   const deadline = Date.now() + timeoutMs;
 
   for (;;) {
-    const created = (await listFiles()).filter(
-      (name) => !baseline.includes(name),
-    );
+    const files = await listTestFiles();
 
-    if (created.length === 0 || Date.now() >= deadline) {
-      return created;
+    if (files.length === 0 || Date.now() >= deadline) {
+      return files;
     }
 
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
 }
 
-async function removeNewFiles(baseline) {
-  const created = (await listFiles()).filter(
-    (name) => !baseline.includes(name),
-  );
-
-  await Promise.all(
-    created.map((name) => fs.rm(path.join(FILES_ROOT, name), { force: true })),
-  );
-}
-
-let baselineFiles = [];
-
 beforeEach(async () => {
-  baselineFiles = await listFiles();
+  assertSafeTestFilesRoot();
+
+  await fs.rm(FILES_ROOT, {
+    recursive: true,
+    force: true,
+  });
+
+  await fs.mkdir(FILES_ROOT, {
+    recursive: true,
+  });
+
   normativaDependencyId = DEFAULT_DEPENDENCY_ID;
   applyServiceMocks();
 });
 
 afterEach(async () => {
-  await removeNewFiles(baselineFiles);
-});
+  assertSafeTestFilesRoot();
 
+  await fs.rm(FILES_ROOT, {
+    recursive: true,
+    force: true,
+  });
+});
 // ---------------------------------------------------------------------------
 // Builders de requests
 // ---------------------------------------------------------------------------
@@ -270,7 +284,7 @@ describe(".txt renombrado / MIME falso", () => {
     });
 
     expect(res.status).toBe(415);
-    expect(await waitForNoNewFiles(baselineFiles)).toEqual([]);
+    expect(await waitForEmptyTestDirectory()).toEqual([]);
   });
 
   test("no confia en el mimetype: application/pdf con contenido ajeno => 415", async () => {
@@ -340,7 +354,7 @@ describe("archivo demasiado grande", () => {
     });
 
     expect(res.status).toBe(413);
-    expect(await waitForNoNewFiles(baselineFiles)).toEqual([]);
+    expect(await waitForEmptyTestDirectory()).toEqual([]);
   });
 });
 
@@ -359,7 +373,7 @@ describe("usuario sin permiso", () => {
     });
 
     expect(res.status).toBe(403);
-    expect(await waitForNoNewFiles(baselineFiles)).toEqual([]);
+    expect(await waitForEmptyTestDirectory()).toEqual([]);
   });
 
   test("/upload/:id con recurso de otra dependencia => 403", async () => {
@@ -428,3 +442,4 @@ describe("filename malicioso", () => {
     expect(res.status).toBe(415);
   });
 });
+

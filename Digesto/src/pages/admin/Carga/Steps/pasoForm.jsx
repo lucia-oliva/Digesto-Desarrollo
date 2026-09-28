@@ -21,7 +21,6 @@ function PasoForm({
   const user = auth?.user;
   const isSuperAdmin = user?.tipo_usuario === "SuperAdministrador";
   const esAdminDep = user?.tipo_usuario === "Administrador de Dependencia";
-  console.log(user?.tipo_usuario);
 
   const shouldLockEstado = esAdminDep;
   const userDepNombre = String(user?.dependencia ?? "").trim();
