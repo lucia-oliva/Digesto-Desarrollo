@@ -1,6 +1,7 @@
 import path from "path";
 
 import { beforeAll, describe, expect, jest, test } from "@jest/globals";
+import { FILES_ROOT } from "../../config/files.js";
 
 // resolveSafePath no usa la base de datos. Se mockea db.js para no inicializar
 // el pool de MySQL al importar el servicio.
@@ -25,7 +26,7 @@ beforeAll(async () => {
   ({ resolveSafePath } = await import("../../services/file.js"));
 });
 
-const FILES_ROOT = path.resolve("archivos");
+
 const ROOT_PREFIX = FILES_ROOT.endsWith(path.sep)
   ? FILES_ROOT
   : FILES_ROOT + path.sep;

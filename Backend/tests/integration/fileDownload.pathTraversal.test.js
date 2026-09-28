@@ -1,6 +1,5 @@
 import fs from "fs/promises";
 import path from "path";
-
 import request from "supertest";
 import {
   afterAll,
@@ -11,8 +10,9 @@ import {
   jest,
   test,
 } from "@jest/globals";
+import { FILES_ROOT } from "../../config/files.js";
 
-const ARTIFACTS_ROOT = path.resolve("archivos");
+const ARTIFACTS_ROOT = FILES_ROOT;
 const FIXTURE_NAME = "adversarial_fixture.pdf";
 const FIXTURE_PATH = path.join(ARTIFACTS_ROOT, FIXTURE_NAME);
 const FIXTURE_CONTENT = "%PDF-1.4 adversarial fixture %%EOF";

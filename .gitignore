@@ -25,3 +25,6 @@ Thumbs.db
 
 # Otros
 .clineignore
+
+# Archivos temporales generados por tests
+/Backend/tests/.tmp/

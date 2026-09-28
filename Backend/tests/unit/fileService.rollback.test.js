@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs/promises";
 import crypto from "crypto";
-
+import { FILES_ROOT } from "../../config/files.js";
 import {
   afterEach,
   beforeAll,
@@ -28,7 +28,7 @@ jest.unstable_mockModule("../../services/db.js", () => ({
 
 let procesarArchivoDeNormativa;
 
-const FILES_ROOT = path.resolve("archivos");
+
 const pathsToCleanup = new Set();
 
 beforeAll(async () => {
