@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs/promises";
 import db from "./db.js";
 import { FILES_ROOT } from "../config/files.js";
+import { httpError } from "../utils/httpError.js";
 
 async function moverArchivoYPersistir({
   origen,
@@ -26,7 +27,11 @@ async function moverArchivoYPersistir({
   }
 }
 
-export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
+export async function procesarArchivoDeNormativa({
+  file,
+  body,
+  normativaId,
+}) {
   const {
     id_sesion,
     fecha_sesion,
@@ -38,19 +43,22 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
   } = body;
 
   if (!file) {
-    throw new Error("No se ha proporcionado un archivo");
+    throw httpError(400, "No se ha proporcionado un archivo.");
   }
 
   const carpeta = FILES_ROOT;
   const viejoPath = path.join(carpeta, file.filename);
 
   // Multer genera previamente un UUID como nombre temporal.
-  // Reutilizamos ese identificador para generar nombres definitivos únicos.
+  // Se reutiliza para generar nombres definitivos únicos.
   const uploadId = path.parse(file.filename).name;
 
   if (type === "normativa") {
     if (!id_dependencia || !resolucion || !anio) {
-      throw new Error("Faltan parámetros obligatorios para normativa");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la normativa.",
+      );
     }
 
     const normativa = await db.queryOne(
@@ -59,7 +67,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     );
 
     if (!normativa) {
-      throw new Error("Normativa no encontrada");
+      throw httpError(404, "Normativa no encontrada.");
     }
 
     const resultado = await db.queryOne(
@@ -68,7 +76,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     );
 
     if (!resultado) {
-      throw new Error("Dependencia no encontrada");
+      throw httpError(404, "Dependencia no encontrada.");
     }
 
     const { codificacion } = resultado;
@@ -97,13 +105,11 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
 
   if (type === "consejo") {
     if (!id_sesion || !fecha_sesion) {
-      throw new Error("Faltan parámetros obligatorios para sesión");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la sesión.",
+      );
     }
-
-    console.log(
-      "Procesando archivo de consejo con ID de sesión:",
-      id_sesion,
-    );
 
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
@@ -111,9 +117,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     );
 
     if (!sesion) {
-      throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
-      );
+      throw httpError(404, "Sesión no encontrada.");
     }
 
     const fechaFormateada = new Date(fecha_sesion)
@@ -144,21 +148,12 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
   }
 
   if (type === "acta") {
-    console.log(
-      "entro al acta:",
-      id_sesion,
-      fecha_sesion,
-      nombre_acta,
-    );
-
     if (!id_sesion || !fecha_sesion || !nombre_acta) {
-      throw new Error("Faltan parámetros obligatorios para sesión");
+      throw httpError(
+        400,
+        "Faltan parámetros obligatorios para la sesión.",
+      );
     }
-
-    console.log(
-      "Procesando archivo de consejo con ID de sesión:",
-      id_sesion,
-    );
 
     const sesion = await db.queryOne(
       "SELECT * FROM sesiones WHERE id_sesion = ?",
@@ -166,9 +161,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     );
 
     if (!sesion) {
-      throw new Error(
-        "Sesión no encontrada, recibimos el id_sesion: " + id_sesion,
-      );
+      throw httpError(404, "Sesión no encontrada.");
     }
 
     const fechaFormateada = new Date(fecha_sesion)
@@ -198,13 +191,7 @@ export async function procesarArchivoDeNormativa({ file, body, normativaId }) {
     };
   }
 
-  throw new Error("Tipo de procesamiento no reconocido");
-}
-
-function httpError(status, message) {
-  const err = new Error(message);
-  err.status = status;
-  return err;
+  throw httpError(400, "Tipo de procesamiento no reconocido.");
 }
 
 const ALLOWED_FILE_TYPES = Object.freeze([
@@ -217,7 +204,7 @@ function normalizeFileType(tipo) {
   const value = String(tipo ?? "").trim().toLowerCase();
 
   if (!ALLOWED_FILE_TYPES.includes(value)) {
-    throw httpError(400, "Tipo de recurso inválido");
+    throw httpError(400, "Tipo de recurso inválido.");
   }
 
   return value;
@@ -225,7 +212,7 @@ function normalizeFileType(tipo) {
 
 export function resolveSafePath(relativePath) {
   if (path.isAbsolute(relativePath)) {
-    throw httpError(400, "Ruta absoluta no permitida");
+    throw httpError(400, "Ruta absoluta no permitida.");
   }
 
   const absolute = path.resolve(FILES_ROOT, relativePath);
@@ -238,7 +225,7 @@ export function resolveSafePath(relativePath) {
     absolute !== FILES_ROOT &&
     !absolute.startsWith(rootWithSeparator)
   ) {
-    throw httpError(400, "Ruta de archivo no permitida");
+    throw httpError(400, "Ruta de archivo no permitida.");
   }
 
   return absolute;
@@ -248,7 +235,7 @@ export async function getFileAccessContextById(tipo, id) {
   const normalizedTipo = normalizeFileType(tipo);
 
   if (!id) {
-    throw httpError(400, "ID de recurso requerido");
+    throw httpError(400, "ID de recurso requerido.");
   }
 
   if (normalizedTipo === "normativa") {
@@ -264,7 +251,7 @@ export async function getFileAccessContextById(tipo, id) {
     );
 
     if (!normativa) {
-      throw httpError(404, "Normativa no encontrada");
+      throw httpError(404, "Normativa no encontrada.");
     }
 
     return {
@@ -279,7 +266,7 @@ export async function getFileAccessContextById(tipo, id) {
   );
 
   if (!sesion) {
-    throw httpError(404, "Sesión no encontrada");
+    throw httpError(404, "Sesión no encontrada.");
   }
 
   return {
@@ -293,7 +280,7 @@ export async function getFileDownloadInfo(tipo, id) {
   const normalizedTipo = normalizeFileType(tipo);
 
   if (!id) {
-    throw httpError(400, "ID de recurso requerido");
+    throw httpError(400, "ID de recurso requerido.");
   }
 
   if (normalizedTipo === "normativa") {
@@ -303,7 +290,7 @@ export async function getFileDownloadInfo(tipo, id) {
     );
 
     if (!normativa || !normativa.archivo) {
-      throw httpError(404, "Archivo no encontrado");
+      throw httpError(404, "Archivo no encontrado.");
     }
 
     const filename = String(normativa.archivo);
@@ -321,7 +308,7 @@ export async function getFileDownloadInfo(tipo, id) {
   );
 
   if (!sesion) {
-    throw httpError(404, "Sesión no encontrada");
+    throw httpError(404, "Sesión no encontrada.");
   }
 
   const column =
@@ -332,7 +319,7 @@ export async function getFileDownloadInfo(tipo, id) {
   const filename = sesion[column];
 
   if (!filename) {
-    throw httpError(404, "Archivo no encontrado");
+    throw httpError(404, "Archivo no encontrado.");
   }
 
   const dir =

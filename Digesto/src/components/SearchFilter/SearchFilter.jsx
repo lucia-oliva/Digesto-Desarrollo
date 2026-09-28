@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+
 import { useEffect, useMemo, useState } from "react";
 import AlphabetFilter from "./AlphabetFilter";
 import { filterConfig } from "./configFilters";
@@ -17,8 +18,10 @@ function useContextOptions(fromContext) {
   switch (fromContext) {
     case "dependencias":
       return mapList(dependencias);
+
     case "emisores":
       return mapList(emisores);
+
     default:
       return [];
   }
@@ -30,6 +33,7 @@ function useAsyncOptions(field, type) {
 
   const cacheKey = useMemo(() => {
     if (!field?.async || !field?.endpoint) return null;
+
     return `async:${type}:${field.name}:${field.key || "default"}`;
   }, [field, type]);
 
@@ -38,26 +42,30 @@ function useAsyncOptions(field, type) {
 
     async function fetchOptions() {
       if (!field?.async || !field?.endpoint || !cacheKey) return;
+
       setLoading(true);
+
       try {
         const { data } = await api.get(field.endpoint);
         const list = Array.isArray(data?.data) ? data.data : [];
+
         if (cancel) return;
 
         const mapped = list.map((it) => ({
           label: String(it?.label ?? it?.[field.key] ?? it).trim(),
           value: String(it?.value ?? it?.[field.key] ?? it).trim(),
         }));
+
         setOptions(mapped);
-      } catch (e) {
+      } catch {
         setOptions([]);
-        console.log(e);
       } finally {
         if (!cancel) setLoading(false);
       }
     }
 
     fetchOptions();
+
     return () => {
       cancel = true;
     };
@@ -69,9 +77,11 @@ function useAsyncOptions(field, type) {
 function pruneStateForFields(state, fields) {
   const allowed = new Set(fields.map((f) => f.name));
   const next = {};
+
   for (const k of Object.keys(state || {})) {
     if (allowed.has(k)) next[k] = state[k];
   }
+
   return next;
 }
 
@@ -92,6 +102,7 @@ function FieldRenderer({ field, value, onChange, disabled }) {
         <label className="mb-1 font-medium max-[426px]:text-xs">
           <span className="label-text">{label}</span>
         </label>
+
         <input
           className="input input-bordered max-[426px]:input-sm w-full"
           value={value ?? ""}
@@ -108,6 +119,7 @@ function FieldRenderer({ field, value, onChange, disabled }) {
         <label className="mb-1 font-medium max-[426px]:text-xs">
           <span className="label-text">{label}</span>
         </label>
+
         <select
           className="select select-bordered max-[425px]:select-sm w-full"
           value={value ?? ""}
@@ -117,6 +129,7 @@ function FieldRenderer({ field, value, onChange, disabled }) {
           {!effectiveOptions.some((o) => String(o.value) === "") && (
             <option value="">Todos</option>
           )}
+
           {effectiveOptions.map((opt) => (
             <option key={`${name}-${opt.value}`} value={opt.value}>
               {opt.label}
@@ -147,6 +160,7 @@ export default function GenericFilterSearch({
 
   useEffect(() => {
     if (isDirty) return;
+
     const next = pruneStateForFields({ ...initialState }, fields);
     setFormState(next);
   }, [initialState, fields, isDirty]);
@@ -161,11 +175,13 @@ export default function GenericFilterSearch({
     onSearch(next);
   };
 
-  //autoSearch debe reaccionar al cambio real de formState
+  // autoSearch debe reaccionar al cambio real de formState
   useEffect(() => {
     if (!autoSearch) return;
+
     const next = pruneStateForFields(formState, fields);
     onSearch(next);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSearch, JSON.stringify(formState)]);
 
@@ -176,8 +192,10 @@ export default function GenericFilterSearch({
 
   const handleLetterSelect = (letra) => {
     setIsDirty(true);
+
     const next = { ...formState, letra };
     const pruned = pruneStateForFields(next, fields);
+
     setFormState(pruned);
     onSearch(pruned);
   };

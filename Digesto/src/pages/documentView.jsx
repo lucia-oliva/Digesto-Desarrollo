@@ -5,7 +5,7 @@ import { useLocation, useParams, useNavigate } from "react-router";
 import { PdfViewer } from "../components/ui/PdfViewer";
 import { Loading } from "../components/ui/Ui";
 import { tipoNormativaOptions } from "../pages/admin/Carga/config/mapeo";
-import api  from "../api/axiosPrivate";
+import api from "../api/axiosPrivate";
 
 const ACCION_BADGE = {
   1: {
@@ -27,10 +27,12 @@ const ACCION_BADGE = {
 
 const tipoNormativaLabel = (valor) => {
   if (valor == null || valor === "") return "—";
+
   const str = String(valor).trim();
 
   if (/^\d+$/.test(str)) {
     const found = tipoNormativaOptions.find((opt) => String(opt.value) === str);
+
     return found?.label ?? str;
   }
 
@@ -42,18 +44,22 @@ const tipoNormativaLabel = (valor) => {
       .trim();
 
   const txt = normalize(str);
+
   const exact = tipoNormativaOptions.find(
-    (opt) => normalize(opt.label) === txt
+    (opt) => normalize(opt.label) === txt,
   );
+
   if (exact) return exact.label;
 
   const starts = tipoNormativaOptions.filter((opt) =>
-    normalize(opt.label).startsWith(txt)
+    normalize(opt.label).startsWith(txt),
   );
+
   if (starts.length === 1) return starts[0].label;
 
   return str;
 };
+
 function MetaGrid({ normativa }) {
   return (
     <div className="mt-4 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -61,18 +67,20 @@ function MetaGrid({ normativa }) {
         <div className="text-[10px] sm:text-xs uppercase text-gray-500">
           Tipo y número
         </div>
+
         <div className="text-sm sm:text-base font-medium font-[Montserrat] text-black">
           {tipoNormativaLabel(
-            normativa?.tipo_normativa ?? normativa?.id_tipo_normativa
+            normativa?.tipo_normativa ?? normativa?.id_tipo_normativa,
           )}{" "}
           {normativa?.numero ? `N° ${normativa.numero}` : ""}
         </div>
       </div>
 
       <div className="rounded-lg p-3 sm:p-4 border border-base-200">
-        <div className="text-[10px] sm:text-xs uppercase  text-black">
+        <div className="text-[10px] sm:text-xs uppercase text-black">
           Emisor
         </div>
+
         <div className="text-sm sm:text-base font-medium text-black">
           {normativa?.emisor || "—"}
         </div>
@@ -82,6 +90,7 @@ function MetaGrid({ normativa }) {
         <div className="text-[10px] sm:text-xs uppercase text-gray-500">
           Dependencia
         </div>
+
         <div className="text-sm sm:text-base font-medium text-black">
           {normativa?.dependencia || "—"}
         </div>
@@ -97,6 +106,7 @@ function ResumenBlock({ texto, open, onToggle }) {
         <h2 className="text-base sm:text-lg font-medium text-gray-700">
           Resumen
         </h2>
+
         <button
           type="button"
           className="text-xs sm:text-sm link text-black"
@@ -105,8 +115,9 @@ function ResumenBlock({ texto, open, onToggle }) {
           {open ? "Ver menos" : "Ver más"}
         </button>
       </div>
+
       <div
-        className={` text-black transition-all duration-200 rounded-lg bg-base-100 border border-gray-300 p-3 text-[14px] sm:text-[15px] leading-relaxed ${
+        className={`text-black transition-all duration-200 rounded-lg bg-base-100 border border-gray-300 p-3 text-[14px] sm:text-[15px] leading-relaxed ${
           open
             ? "max-h-[50vh] sm:max-h-[60vh] overflow-auto"
             : "max-h-24 sm:max-h-32 overflow-hidden"
@@ -120,6 +131,7 @@ function ResumenBlock({ texto, open, onToggle }) {
 
 function AccionesPDF({ pdfUrl, filename }) {
   if (!pdfUrl) return null;
+
   return (
     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3 mt-2 lg:mt-0 w-full lg:w-auto">
       <a
@@ -129,6 +141,7 @@ function AccionesPDF({ pdfUrl, filename }) {
       >
         Descargar PDF
       </a>
+
       <a
         href={pdfUrl}
         target="_blank"
@@ -140,8 +153,10 @@ function AccionesPDF({ pdfUrl, filename }) {
     </div>
   );
 }
+
 function useVariant(forcedVariant) {
   const location = useLocation();
+
   return useMemo(() => {
     if (
       forcedVariant &&
@@ -149,52 +164,58 @@ function useVariant(forcedVariant) {
     ) {
       return forcedVariant;
     }
+
     if (location.pathname.includes("/admin")) return "admin";
-    if (location.pathname.includes("/consejo-superior")) return "consejo";
+
+    if (location.pathname.includes("/consejo-superior")) {
+      return "consejo";
+    }
+
     return "public";
   }, [forcedVariant, location.pathname]);
 }
 
 function DocumentView({ variant = "auto" }) {
   const resolvedVariant = useVariant(variant === "auto" ? undefined : variant);
+
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [pdfUrl, setPdfUrl] = useState("");
   const [resumenOpen, setResumenOpen] = useState(false);
-
   const [normativa, setNormativa] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-      let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-      const cargarNormativa = async () => {
-        try {
-          setLoading(true);
+    const cargarNormativa = async () => {
+      try {
+        setLoading(true);
 
-          const response = await api.get(`/normativa/datos/${id}`);
+        const response = await api.get(`/normativa/datos/${id}`);
 
-          if (!cancelled) {
-            setNormativa(response.data);
-          }
-        } catch (error) {
-          if (!cancelled) {
-            console.error("Error al cargar normativa:", error);
-          }
-        } finally {
-          if (!cancelled) {
-            setLoading(false);
-          }
+        if (!cancelled) {
+          setNormativa(response.data);
         }
-      };
+      } catch {
+        if (!cancelled) {
+          setNormativa(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
 
-      cargarNormativa();
+    cargarNormativa();
 
-      return () => {
-        cancelled = true;
-      };
-    }, [id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
   const [vinculosData, setVinculosData] = useState(null);
 
   useEffect(() => {
@@ -207,9 +228,9 @@ const [loading, setLoading] = useState(true);
         if (!cancelled) {
           setVinculosData(response.data);
         }
-      } catch (error) {
+      } catch {
         if (!cancelled) {
-          console.error("Error al cargar relaciones:", error);
+          setVinculosData({ data: [] });
         }
       }
     };
@@ -220,6 +241,7 @@ const [loading, setLoading] = useState(true);
       cancelled = true;
     };
   }, [id]);
+
   const [vinculosInvData, setVinculosInvData] = useState(null);
 
   useEffect(() => {
@@ -232,9 +254,9 @@ const [loading, setLoading] = useState(true);
         if (!cancelled) {
           setVinculosInvData(response.data);
         }
-      } catch (error) {
+      } catch {
         if (!cancelled) {
-          console.error("Error al cargar relaciones complementarias:", error);
+          setVinculosInvData({ data: [] });
         }
       }
     };
@@ -250,9 +272,11 @@ const [loading, setLoading] = useState(true);
   const vinculosSalida = vinculosInvData?.data || [];
 
   const isAdmin = resolvedVariant === "admin";
+
   const vinculosEntradaVisibles = isAdmin
     ? vinculosEntrada
     : vinculosEntrada.filter((v) => v.comp_estado === "publicado");
+
   const vinculosSalidaVisibles = isAdmin
     ? vinculosSalida
     : vinculosSalida.filter((v) => v.orig_estado === "publicado");
@@ -261,28 +285,32 @@ const [loading, setLoading] = useState(true);
     resolvedVariant === "admin"
       ? "/admin/document/"
       : resolvedVariant === "consejo"
-      ? "/consejo-superior/document/"
-      : "/document/";
+        ? "/consejo-superior/document/"
+        : "/document/";
 
   const renderCompTexto = (v) => {
-    // para los que "modifican a esta": usan comp_*
     const tipo = v.comp_tipo || "Normativa";
+
     const num =
       v.comp_numero != null
         ? `N° ${v.comp_numero}`
         : `ID ${v.normativa_complementaria}`;
+
     const anio = v.comp_anio ? `/${v.comp_anio}` : "";
+
     return `${tipo} ${num}${anio}`;
   };
 
   const renderOrigTexto = (v) => {
-    // para los que "esta modifica": usan orig_*
     const tipo = v.orig_tipo || "Normativa";
+
     const num =
       v.orig_numero != null
         ? `N° ${v.orig_numero}`
         : `ID ${v.normativa_original}`;
+
     const anio = v.orig_anio ? `/${v.orig_anio}` : "";
+
     return `${tipo} ${num}${anio}`;
   };
 
@@ -291,21 +319,25 @@ const [loading, setLoading] = useState(true);
       <div className="min-h-screen flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
         <aside className="w-full bg-base-100 rounded-xl border border-base-300 p-4 sm:p-6">
           {loading && <Loading />}
+
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-1 sm:space-y-2">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
                 {normativa?.titulo || "—"}
               </h1>
+
               <p className="text-xs sm:text-sm text-gray-500">
                 {normativa?.fecha || "—"}
               </p>
+
               {vinculosEntradaVisibles.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2 ">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {vinculosEntradaVisibles.map((v) => {
                     const meta = ACCION_BADGE[v.id_acciones] || {
                       label_entrada: "Vinculada por",
                       className: "badge-outline",
                     };
+
                     return (
                       <button
                         key={`in-${v.id}`}
@@ -322,6 +354,7 @@ const [loading, setLoading] = useState(true);
                   })}
                 </div>
               )}
+
               {vinculosSalidaVisibles.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {vinculosSalidaVisibles.map((v) => {
@@ -329,6 +362,7 @@ const [loading, setLoading] = useState(true);
                       label_salida: "Modifica a",
                       className: "badge-outline",
                     };
+
                     return (
                       <button
                         key={`out-${v.id}`}
@@ -346,14 +380,16 @@ const [loading, setLoading] = useState(true);
                 </div>
               )}
             </div>
+
             <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
           </div>
 
           <MetaGrid normativa={normativa} />
+
           <ResumenBlock
             texto={normativa?.resumen}
             open={resumenOpen}
-            onToggle={() => setResumenOpen((v) => !v)}
+            onToggle={() => setResumenOpen((value) => !value)}
           />
         </aside>
 
@@ -371,6 +407,7 @@ const [loading, setLoading] = useState(true);
       </div>
     );
   }
+
   if (resolvedVariant === "consejo") {
     return (
       <div className="min-h-screen p-0 pt-15">
@@ -389,9 +426,11 @@ const [loading, setLoading] = useState(true);
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
                   {normativa?.titulo || "—"}
                 </h1>
+
                 <p className="text-xs sm:text-sm text-gray-500">
                   {normativa?.fecha || "—"}
                 </p>
+
                 {vinculosEntradaVisibles.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {vinculosEntradaVisibles.map((v) => {
@@ -399,6 +438,7 @@ const [loading, setLoading] = useState(true);
                         label_entrada: "Vinculada por",
                         className: "badge-outline",
                       };
+
                       return (
                         <button
                           key={`in-${v.id}`}
@@ -415,6 +455,7 @@ const [loading, setLoading] = useState(true);
                     })}
                   </div>
                 )}
+
                 {vinculosSalidaVisibles.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {vinculosSalidaVisibles.map((v) => {
@@ -422,6 +463,7 @@ const [loading, setLoading] = useState(true);
                         label_salida: "Modifica a",
                         className: "badge-outline",
                       };
+
                       return (
                         <button
                           key={`out-${v.id}`}
@@ -439,14 +481,16 @@ const [loading, setLoading] = useState(true);
                   </div>
                 )}
               </div>
+
               <AccionesPDF pdfUrl={pdfUrl} filename={normativa?.archivo} />
             </div>
 
             <MetaGrid normativa={normativa} />
+
             <ResumenBlock
               texto={normativa?.resumen}
               open={resumenOpen}
-              onToggle={() => setResumenOpen((v) => !v)}
+              onToggle={() => setResumenOpen((value) => !value)}
             />
           </aside>
 
@@ -462,6 +506,7 @@ const [loading, setLoading] = useState(true);
             </div>
           </div>
         </div>
+
         <div className="hidden lg:block">
           <div className="drawer drawer-end lg:drawer-open">
             <input
@@ -469,6 +514,7 @@ const [loading, setLoading] = useState(true);
               type="checkbox"
               className="drawer-toggle"
             />
+
             <div className="drawer-content flex flex-col items-stretch justify-start">
               <div className="flex-1 min-h-0 bg-base-300 overflow-hidden">
                 <PdfViewer
@@ -479,6 +525,7 @@ const [loading, setLoading] = useState(true);
                   setPdfUrl={setPdfUrl}
                 />
               </div>
+
               <label
                 htmlFor="dv_consejo_drawer"
                 className="btn-custom-reader bg-primary text-primary-content lg:hidden m-3 self-end"
@@ -493,6 +540,7 @@ const [loading, setLoading] = useState(true);
                 aria-label="close sidebar"
                 className="drawer-overlay"
               />
+
               <div className="bg-base-200 border-l-2 border-base-300 min-h-full w-96 p-6 overflow-y-auto">
                 {loading && <Loading />}
 
@@ -501,6 +549,7 @@ const [loading, setLoading] = useState(true);
                     <span className="badge badge-info badge-outline">
                       Consejo Superior
                     </span>
+
                     <label htmlFor="dv_consejo_drawer" className="lg:hidden">
                       <LuArrowRightToLine className="w-6 h-6" size={20} />
                     </label>
@@ -510,19 +559,23 @@ const [loading, setLoading] = useState(true);
                     <h2 className="text-sm font-medium text-gray-500">
                       {normativa?.fecha || "—"}
                     </h2>
+
                     <h1 className="text-2xl font-semibold text-blue-400">
                       {normativa?.titulo || "—"}
                     </h1>
+
                     <h3 className="text-sm text-gray-500">
                       {tipoNormativaLabel(
                         normativa?.tipo_normativa ??
-                          normativa?.id_tipo_normativa
+                          normativa?.id_tipo_normativa,
                       )}{" "}
                       {normativa?.numero ? `N° ${normativa.numero}` : ""}
                     </h3>
+
                     <p className="text-sm text-gray-500">
                       Emisor: {normativa?.emisor || "—"}
                     </p>
+
                     <p className="text-sm text-gray-500">
                       Dependencia: {normativa?.dependencia || "—"}
                     </p>
@@ -532,6 +585,7 @@ const [loading, setLoading] = useState(true);
                     <h4 className="text-sm font-medium text-gray-500 mb-1">
                       Resumen
                     </h4>
+
                     <p className="text-sm bg-base-100 p-2 rounded-lg font-light text-base-content">
                       {normativa?.resumen ||
                         "No se provisto un resumen para esta normativa"}
@@ -547,19 +601,23 @@ const [loading, setLoading] = useState(true);
       </div>
     );
   }
+
   return (
     <div className="min-h-screen p-0">
       <div className="lg:hidden flex flex-col gap-3 sm:gap-4 p-2 sm:p-4">
         <aside className="w-full bg-base-100 rounded-xl border border-base-300 p-4 sm:p-6">
           {loading && <Loading />}
+
           <div className="flex flex-col gap-3">
             <div className="space-y-1 sm:space-y-2">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-blue-500 leading-tight">
                 {normativa?.titulo || "—"}
               </h1>
+
               <p className="text-xs sm:text-sm text-gray-500">
                 {normativa?.fecha || "—"}
               </p>
+
               {vinculosEntradaVisibles.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {vinculosEntradaVisibles.map((v) => {
@@ -567,6 +625,7 @@ const [loading, setLoading] = useState(true);
                       label_entrada: "Vinculada por",
                       className: "badge-outline",
                     };
+
                     return (
                       <button
                         key={`in-${v.id}`}
@@ -583,6 +642,7 @@ const [loading, setLoading] = useState(true);
                   })}
                 </div>
               )}
+
               {vinculosSalidaVisibles.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   {vinculosSalidaVisibles.map((v) => {
@@ -590,6 +650,7 @@ const [loading, setLoading] = useState(true);
                       label_salida: "Modifica a",
                       className: "badge-outline",
                     };
+
                     return (
                       <button
                         key={`out-${v.id}`}
@@ -612,10 +673,11 @@ const [loading, setLoading] = useState(true);
           </div>
 
           <MetaGrid normativa={normativa} />
+
           <ResumenBlock
             texto={normativa?.resumen}
             open={resumenOpen}
-            onToggle={() => setResumenOpen((v) => !v)}
+            onToggle={() => setResumenOpen((value) => !value)}
           />
         </aside>
 
@@ -631,6 +693,7 @@ const [loading, setLoading] = useState(true);
           </div>
         </div>
       </div>
+
       <div className="hidden lg:block">
         <div className="drawer drawer-end lg:drawer-open">
           <input
@@ -638,6 +701,7 @@ const [loading, setLoading] = useState(true);
             type="checkbox"
             className="drawer-toggle"
           />
+
           <div className="drawer-content flex flex-col items-stretch justify-start">
             <div className="flex-1 min-h-0 bg-base-300 overflow-hidden">
               <PdfViewer
@@ -648,6 +712,7 @@ const [loading, setLoading] = useState(true);
                 setPdfUrl={setPdfUrl}
               />
             </div>
+
             <label
               htmlFor="dv_public_drawer"
               className="btn-custom-reader bg-primary text-primary-content lg:hidden m-3 self-end"
@@ -662,6 +727,7 @@ const [loading, setLoading] = useState(true);
               aria-label="close sidebar"
               className="drawer-overlay"
             />
+
             <div className="bg-base-200 border-l-2 border-base-300 min-h-full w-96 p-6 overflow-y-auto">
               {loading && <Loading />}
 
@@ -670,6 +736,7 @@ const [loading, setLoading] = useState(true);
                   <label htmlFor="dv_public_drawer" className="lg:hidden">
                     <LuArrowRightToLine className="w-6 h-6" size={20} />
                   </label>
+
                   <h2 className="text-lg font-medium font-sans text-gray-500">
                     {normativa?.fecha || "—"}
                   </h2>
@@ -679,6 +746,7 @@ const [loading, setLoading] = useState(true);
                   <h1 className="text-2xl font-semibold text-blue-400">
                     {normativa?.titulo || "—"}
                   </h1>
+
                   <div className="space-y-1 sm:space-y-2">
                     {vinculosEntradaVisibles.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -687,6 +755,7 @@ const [loading, setLoading] = useState(true);
                             label_entrada: "Vinculada por",
                             className: "badge-outline",
                           };
+
                           return (
                             <button
                               key={`in-${v.id}`}
@@ -711,6 +780,7 @@ const [loading, setLoading] = useState(true);
                             label_salida: "Modifica a",
                             className: "badge-outline",
                           };
+
                           return (
                             <button
                               key={`out-${v.id}`}
@@ -736,7 +806,7 @@ const [loading, setLoading] = useState(true);
 
                 <h3 className="text-lg font-sans font-medium text-gray-500">
                   {tipoNormativaLabel(
-                    normativa?.tipo_normativa ?? normativa?.id_tipo_normativa
+                    normativa?.tipo_normativa ?? normativa?.id_tipo_normativa,
                   )}{" "}
                   {normativa?.numero ? `N° ${normativa.numero}` : ""} <br />
                 </h3>

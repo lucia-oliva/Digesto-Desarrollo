@@ -55,7 +55,6 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
     label: String(e.nombre ?? e.label ?? "").trim(),
     value: String(e.id ?? e.value ?? "").trim()
   }));
-  console.log(formData);
   const location = useLocation();
   const pathSegment = location.pathname
     .split("/")
@@ -64,7 +63,6 @@ function PasoVerificacion({ formData, onBack, onSubmit }) {
   const entidad = pathSegment
     ? pathSegment.replace("Editar", "").replace("Nuevo", "").replace("Nueva", "").toLowerCase()
     : null;
-    console.log(entidad)
 
   const camposIgnorados = entidad
     ? camposOcultosVerificacion[entidad] || []

@@ -8,6 +8,7 @@ import {
 } from "../Middleware/authMiddleware.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
+import { httpError } from "../utils/httpError.js";
 const router = express.Router();
 
 router.delete(
@@ -25,7 +26,6 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    console.log(id);
 
     const tag = await tagsDB.getById(id);
     res.status(200).json(tag);
@@ -46,11 +46,10 @@ router.post(
   "/edit",
   authenticateToken,
   asyncHandler(async (req, res) => {
-    console.log("Cuerpo de la solicitud:", req.body);
     const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
     if(!result.success){
-      return res.status(400).json({ ok: false, msg: result.message });
+      throw httpError(400, result.message);
     }
     res.status(200).json({ ok: true, msg: "Tag editado correctamente." });
   })
@@ -64,7 +63,7 @@ router.post(
     const tagData = req.body; 
     const result = await tagsDB.create(tagData);
     if(!result.success){
-      return res.status(400).json({ ok: false, msg: result.message });
+      throw httpError(400, result.message);
     }
     res.status(200).json({ ok: true, msg: "Tags insertados correctamente." });
   })
@@ -92,9 +91,7 @@ router.post(
     const { id } = req.params; 
     const { tags } = req.body; 
     if (!Array.isArray(tags) || tags.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "No se proporcionaron tags válidos." });
+      throw httpError(400, "No se proporcionaron tags válidos.");
     }
     await tagsDB.insertTagsForNormativa(id, tags);
     res
@@ -108,29 +105,24 @@ router.post(
   "/search",
   authenticateToken,
   asyncHandler(async (req, res) => {
-    try {
-      let { nombre, letra } = req.body;
-      console.log("parametros:", nombre, letra);
-      console.log("query:", req.query);
-      let page = req.query.page !== undefined ? req.query.page : 1;
-      let limite = req.query.limite !== undefined ? req.query.limite : 10;
-      limite = parseInt(limite, 10) || 10;
-      page = parseInt(page, 10) || 1;
-  
-      const offset = (page - 1) * limite;
-   
-      const { data, totalResults } = await tagsDB.searchTagsByParameters(
+    const { nombre, letra } = req.body;
+    let page = req.query.page ?? 1;
+    let limite = req.query.limite ?? 10;
+    limite = parseInt(limite, 10) || 10;
+    page = parseInt(page, 10) || 1;
+    const offset = (page - 1) * limite;
+    const { data, totalResults } =
+      await tagsDB.searchTagsByParameters(
         nombre,
         letra,
         limite,
-        offset
+        offset,
       );
-      res.status(200).json({ data, totalResults });
-    } catch (error) {
-      console.error("Error en /search:", error);
-      res.status(500).json({ error: "Error interno del servidor." });
-    }
-  })
+    return res.status(200).json({
+      data,
+      totalResults,
+    });
+  }),
 );
 
 export default router;
