@@ -25,6 +25,18 @@ export const camposPorEntidad = {
       fromContext: "emisor",
     },
     {
+      name: "tipo_normativa",
+      label: "Tipo de Normativa",
+      type: "select",
+      required: true,
+      options: [
+        { label: "Resolución", value: "5" },
+        { label: "Convenio", value: "3" },
+        { label: "Ordenanza", value: "1" },
+        { label: "Otros", value: "7" },
+      ],
+    },
+    {
       name: "estado",
       label: "Estado",
       type: "select",
@@ -84,6 +96,7 @@ export const camposPorEntidad = {
       name: "estado",
       label: "Estado",
       type: "select",
+      required: true,
       options: ["publicado", "despublicado"],
     },
     { name: "codificacion", label: "Codificacion", type: "text" },
@@ -95,7 +108,7 @@ export const camposPorEntidad = {
       type: "text",
       required: true,
     },
-    { name: "estado", label: "Estado", type: "select", options: ["publicado", "despublicado"] },
+    { name: "estado", label: "Estado", type: "select", required: true, options: ["publicado", "despublicado"] },
   ],
   palabraclave: [
     {

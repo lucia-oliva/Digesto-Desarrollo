@@ -4,8 +4,19 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { authenticateToken } from "../Middleware/authMiddleware.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
+import { validateRequiredFields } from "../utils/requestValidation.js";
 
 const router = express.Router();
+
+const EMISOR_REQUIRED_FIELDS = [
+  { key: "nombre", label: "nombre" },
+  { key: "estado", label: "estado" },
+];
+
+const EMISOR_EDIT_REQUIRED_FIELDS = [
+  { key: "id", label: "id" },
+  ...EMISOR_REQUIRED_FIELDS,
+];
 
 router.get(
   "/datos/:id",
@@ -38,6 +49,7 @@ router.post(
   "/edit",
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
+  validateRequiredFields(EMISOR_EDIT_REQUIRED_FIELDS),
   asyncHandler(async (req, res) => {
     const emisorDataEdit = req.body;
     const result = await emisoresDB.edit(emisorDataEdit);
@@ -61,6 +73,7 @@ router.post(
   "/create",
   authenticateToken,
   authorizePolicy(POLICIES.SUPER_ADMIN),
+  validateRequiredFields(EMISOR_REQUIRED_FIELDS),
   asyncHandler(async (req, res) => {
     const emisorData = req.body;
     const result = await emisoresDB.create(emisorData);

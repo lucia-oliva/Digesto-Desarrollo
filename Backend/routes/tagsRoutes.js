@@ -9,7 +9,17 @@ import {
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
 import { httpError } from "../utils/httpError.js";
+import { validateRequiredFields } from "../utils/requestValidation.js";
 const router = express.Router();
+
+const TAG_CREATE_REQUIRED_FIELDS = [
+  { key: "Tag", label: "nombre" },
+];
+
+const TAG_EDIT_REQUIRED_FIELDS = [
+  { key: "id", label: "id" },
+  { key: "nombre", label: "nombre" },
+];
 
 router.delete(
   "/eliminar/:id",
@@ -45,6 +55,7 @@ router.get(
 router.post(
   "/edit",
   authenticateToken,
+  validateRequiredFields(TAG_EDIT_REQUIRED_FIELDS),
   asyncHandler(async (req, res) => {
     const dataTagEdit = req.body;
     const result = await tagsDB.edit(dataTagEdit);
@@ -62,6 +73,7 @@ router.post(
 router.post(
   "/create",
   authenticateToken,
+  validateRequiredFields(TAG_CREATE_REQUIRED_FIELDS),
   asyncHandler(async (req, res) => {
     const tagData = req.body; 
     const result = await tagsDB.create(tagData);
@@ -86,23 +98,6 @@ router.get(
     res.status(200).json(tags);
   })
 );
-
-router.post(
-  "/tags/normativa/:id",
-  authenticateToken,
-  asyncHandler(async (req, res) => {
-    const { id } = req.params; 
-    const { tags } = req.body; 
-    if (!Array.isArray(tags) || tags.length === 0) {
-      throw httpError(400, "No se proporcionaron tags válidos.");
-    }
-    await tagsDB.insertTagsForNormativa(id, tags);
-    res
-      .status(200)
-      .json({ message: "Tags asociados correctamente a la normativa." });
-  })
-);
-
 
 router.post(
   "/search",
