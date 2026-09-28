@@ -1,8 +1,12 @@
 import express from "express";
 import db from "../services/db.js";
-import path from "path";
 import fs from "fs/promises";
-import { pdfHandler } from "../Middleware/fileMiddleware.js";
+import {
+  pdfHandler,
+  handleUploadError,
+  cleanupTempFileOnError,
+  validatePdfContent,
+} from "../Middleware/fileMiddleware.js";
 import {
   authenticateToken,
   optionalAuthenticateToken,
@@ -22,7 +26,7 @@ router.get(
 
   authorizePolicy(POLICIES.PUBLIC_PUBLISHED, {
     getResourceAccessContext: (req) =>
-      fileDB.getFileAccessContext(req.query.filename),
+      fileDB.getFileAccessContextById(req.query.tipo, req.query.id),
 
     getUserDependency: (req) =>
       dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
@@ -30,70 +34,30 @@ router.get(
 
   async (req, res) => {
     try {
-      const filename = req.query.filename;
+      const { tipo, id } = req.query;
 
-      console.log("Filename:", filename);
+      const info = await fileDB.getFileDownloadInfo(tipo, id);
 
-      if (!filename) {
-        return res.status(400).json({
-          error: "Filename is required",
-        });
-      }
-
-      const base = path.resolve("archivos");
-
-      const candidates = [
-        {
-          dir: base,
-          updateVisita: true,
-        },
-        {
-          dir: path.join(base, "Actas"),
-          updateVisita: false,
-        },
-        {
-          dir: path.join(base, "OrdenesDelDia"),
-          updateVisita: false,
-        },
-      ];
-
-      let foundPath = null;
-      let shouldUpdateVisita = false;
-
-      for (const candidate of candidates) {
-        const p = path.join(candidate.dir, filename);
-
-        try {
-          await fs.access(p);
-
-          foundPath = p;
-
-          shouldUpdateVisita = candidate.updateVisita;
-
-          break;
-        } catch {
-          // Continuar buscando.
-        }
-      }
-
-      if (!foundPath) {
+      try {
+        await fs.access(info.absolutePath);
+      } catch {
         return res.status(404).json({
           error: "File not found",
         });
       }
 
-      if (shouldUpdateVisita) {
+      if (info.tipo === "normativa") {
         try {
           await db.query(
-            "UPDATE normativa SET visitas = visitas + 1 WHERE archivo = ?",
-            [filename],
+            "UPDATE normativa SET visitas = visitas + 1 WHERE id = ?",
+            [id],
           );
         } catch (err) {
           console.error("Error updating visitas count:", err);
         }
       }
 
-      res.download(foundPath, filename, (err) => {
+      res.download(info.absolutePath, info.downloadName, (err) => {
         if (err) {
           console.error("Error downloading file:", err);
 
@@ -108,8 +72,9 @@ router.get(
       console.error("Unexpected error:", error);
 
       if (!res.headersSent) {
-        res.status(500).json({
-          error: "Unexpected server error",
+        const status = error.status || 500;
+        res.status(status).json({
+          error: error.message || "Unexpected server error",
         });
       }
     }
@@ -123,6 +88,10 @@ router.post(
 
   pdfHandler.single("file"),
 
+  handleUploadError,
+
+  cleanupTempFileOnError,
+
   authorizePolicy(POLICIES.RESOURCE_UPLOAD, {
     getDestinationType: (req) => req.body.type ?? "normativa",
 
@@ -132,6 +101,8 @@ router.post(
     getUserDependency: (req) =>
       dependenciaDB.getDepenendenciaById(req.user.dependenciaId),
   }),
+
+  validatePdfContent,
 
   async (req, res) => {
     try {
@@ -162,11 +133,17 @@ router.post(
 
   pdfHandler.single("file"),
 
+  handleUploadError,
+
+  cleanupTempFileOnError,
+
   authorizePolicy(POLICIES.RESOURCE_UPLOAD, {
     getDestinationType: () => "normativa",
 
     getTargetDependencyId: (req) => req.body.id_dependencia,
   }),
+
+  validatePdfContent,
 
   async (req, res) => {
     try {

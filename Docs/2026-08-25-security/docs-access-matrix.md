@@ -118,6 +118,8 @@ Los nombres de rol son canónicos y sensibles a mayúsculas.
 | usuarios | GET | `/api/usuarios/filter/:id` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 | usuarios | POST | `/api/usuarios/search` | Protegida | `SUPER_ADMIN` | SA | Global | active |
 
+> Nota (SEC-02): `GET /api/file/download` recibe `tipo` + `id` (`tipo`: `normativa` | `consejo` | `acta`) y resuelve el archivo desde DB; ya no acepta `filename`.
+
 ## 7. Fuentes y Validaciones
 
 ### Definiciones

@@ -3,7 +3,7 @@ import { Alert, Loading } from "components/ui/Ui";
 import propTypes from "prop-types";
 import api from "../../api/axiosPrivate";
 
-export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
+export function PdfViewer({ tipo, id, filename, pdfUrl, setPdfUrl }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,7 +12,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
   const lastBlobUrlRef = useRef(null);
 
   useEffect(() => {
-    if (pdfUrl || !filename) return;
+    if (pdfUrl || !tipo || !id) return;
 
     let cancelled = false;
 
@@ -22,7 +22,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
 
       try {
         const response = await api.get("/file/download", {
-          params: { filename },
+          params: { tipo, id },
           responseType: "blob",
         });
 
@@ -46,7 +46,7 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
     return () => {
       cancelled = true;
     };
-  }, [filename, pdfUrl]);
+  }, [tipo, id, pdfUrl]);
 
   // Si este visor descargó el PDF, genera su propia URL.
   useEffect(() => {
@@ -139,6 +139,8 @@ export function PdfViewer({ filename, pdfUrl, setPdfUrl }) {
 }
 
 PdfViewer.propTypes = {
+  tipo: propTypes.string,
+  id: propTypes.oneOfType([propTypes.string, propTypes.number]),
   filename: propTypes.string,
   pdfUrl: propTypes.string,
   setPdfUrl: propTypes.func,
