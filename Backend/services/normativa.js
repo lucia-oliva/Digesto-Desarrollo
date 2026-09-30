@@ -159,7 +159,7 @@ async function editNormativaModificada(
   }
 }
 
-async function edit(data) {
+async function edit(data, actorId) {
   const {
     id,
     id_emisor,
@@ -175,7 +175,6 @@ async function edit(data) {
     cambia_normativa,
     tags,
     normativas_modificadas,
-    userId,
   } = data;
 
   const id_interdependencia = 0;
@@ -221,14 +220,12 @@ async function edit(data) {
     await eliminarRelacionesDeNormativa(id);
   }
 
-  if (userId) {
     await auditoriaService.crearRegistroAuditoria({
       id_normativa: id,
-      id_usuario: userId,
+      actorId,
       tipo: "modificacion",
     });
-  }
-
+  
   return {
     message: `Normativa ${id} editada correctamente`,
   };
@@ -277,7 +274,7 @@ async function registrarModificacion({
   };
 }
 
-async function create(data) {
+async function create(data, actorId) {
   const {
     numero,
     anio,
@@ -291,7 +288,6 @@ async function create(data) {
     tags,
     archivo,
     normativas_modificadas,
-    user,
   } = data;
 
   const fechaSubida = new Date().toISOString().split("T")[0];
@@ -326,7 +322,7 @@ async function create(data) {
       estado,
       archivo,
       fechaSubida,
-      user.id,
+      actorId,
     ],
   );
 
@@ -357,13 +353,11 @@ async function create(data) {
 
   await tagService.setTagsForNormativa(normativaId, tags);
 
-  if (user?.id) {
     await auditoriaService.crearRegistroAuditoria({
       id_normativa: normativaId,
-      id_usuario: user.id,
+      actorId,
       tipo: "alta",
     });
-  }
 
   return {
     id: normativaId,
@@ -371,7 +365,7 @@ async function create(data) {
   };
 }
 
-async function eliminar(id, userId, motivo = null) {
+async function eliminar(id, actorId, motivo = null) {
   const row = await db.queryOne("SELECT estado FROM normativa WHERE id = ?", [
     id,
   ]);
@@ -395,13 +389,11 @@ async function eliminar(id, userId, motivo = null) {
     throw httpError(400, "No se pudo actualizar la normativa");
   }
 
-  if (userId) {
     await auditoriaService.crearRegistroAuditoria({
       id_normativa: id,
-      id_usuario: userId,
+      actorId,
       tipo: "baja",
     });
-  }
 
   return {
     message: "Normativa marcada como eliminada",
@@ -756,7 +748,7 @@ async function getMostPopularNormatives() {
   return db.query(sql);
 }
 
-async function restaurar(id, userId) {
+async function restaurar(id, actorId) {
   const row = await db.queryOne("SELECT estado FROM normativa WHERE id = ?", [
     id,
   ]);
@@ -778,20 +770,18 @@ async function restaurar(id, userId) {
     throw httpError(400, "No se pudo restaurar la normativa");
   }
 
-  if (userId) {
     await auditoriaService.crearRegistroAuditoria({
       id_normativa: id,
-      id_usuario: userId,
+      actorId,
       tipo: "restauracion",
     });
-  }
 
   return {
     message: "Normativa restaurada a 'despublicada'",
   };
 }
 
-async function publicar(id, userId) {
+async function publicar(id, actorId) {
   const row = await db.queryOne("SELECT estado FROM normativa WHERE id = ?", [
     id,
   ]);
@@ -813,13 +803,11 @@ async function publicar(id, userId) {
     throw httpError(400, "No se pudo publicar la normativa");
   }
 
-  if (userId) {
     await auditoriaService.crearRegistroAuditoria({
       id_normativa: id,
-      id_usuario: userId,
+      actorId,
       tipo: "re-publicacion",
     });
-  }
 
   return {
     message: "Normativa publicada correctamente",

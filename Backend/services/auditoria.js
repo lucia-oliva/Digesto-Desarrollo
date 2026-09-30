@@ -63,7 +63,7 @@ async function searchAuditoriaByParameters(
   };
 }
 
-async function crearRegistroAuditoria({ id_normativa, id_usuario, tipo }) {
+async function crearRegistroAuditoria({ id_normativa, actorId, tipo }) {
   try {
     const fecha = new Date().toISOString().split("T")[0];
 
@@ -77,7 +77,7 @@ async function crearRegistroAuditoria({ id_normativa, id_usuario, tipo }) {
       VALUES (?, ?, ?, ?)
     `;
 
-    await db.execute(sql, [id_normativa, id_usuario, fecha, tipo]);
+    await db.execute(sql, [id_normativa, actorId, fecha, tipo]);
 
     return {
       ok: true,
