@@ -23,16 +23,6 @@ function getPagination(req, defaultLimit = 10) {
   return { page: p, limite: l, offset };
 }
 
-
-function attachAuthenticatedUserToBody(req, _res, next) {
-  req.body.user = {
-    ...(req.body.user || {}),
-    id: req.user?.sub,
-  };
-
-  next();
-}
-
 const NORMATIVA_CREATE_REQUIRED_FIELDS = [
   { key: "numero", label: "número" },
   { key: "anio", label: "año" },
@@ -90,7 +80,7 @@ router.post(
     getTargetDependencyId: (req) => req.body.id_dependencia,
   }),
   asyncHandler(async (req, res) => {
-    const result = await normativaDB.edit(req.body);
+    const result = await normativaDB.edit(req.body, req.user.sub);
 
     res.status(200).json({
       ok: true,
@@ -102,13 +92,12 @@ router.post(
 router.post(
   "/create",
   authenticateToken,
-  attachAuthenticatedUserToBody,
   validateRequiredFields(NORMATIVA_CREATE_REQUIRED_FIELDS),
   authorizePolicy(POLICIES.NORM_ADMIN, {
     getTargetDependencyId: (req) => req.body.dependencia,
   }),
   asyncHandler(async (req, res) => {
-    const result = await normativaDB.create(req.body);
+    const result = await normativaDB.create(req.body, req.user.sub);
 
     res.status(201).json({
       ok: true,
@@ -139,13 +128,7 @@ router.delete(
       normativaDB.getNormativaDependencyById(req.params.id),
   }),
   asyncHandler(async (req, res) => {
-    const userId = req.header("x-user-id");
-
-    if (!userId) {
-      throw httpError(401);
-    }
-
-    const result = await normativaDB.eliminar(req.params.id, userId);
+    const result = await normativaDB.eliminar(req.params.id, req.user.sub);
 
     res.status(200).json({
       ok: true,
@@ -270,10 +253,7 @@ router.post(
   }),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-
-    const userId = req.header("x-user-id") || req.body.userId || null;
-
-    const result = await normativaDB.publicar(id, userId);
+    const result = await normativaDB.publicar(id, req.user.sub);
 
     res.status(200).json({
       ok: true,
@@ -327,9 +307,7 @@ router.post(
   }),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const userId = req.header("x-user-id") || req.body.userId || null;
-
-    const result = await normativaDB.restaurar(id, userId);
+    const result = await normativaDB.restaurar(id, req.user.sub);
 
     res.status(200).json({
       ok: true,

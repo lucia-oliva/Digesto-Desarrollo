@@ -52,8 +52,6 @@ export function buildRbacRequest(
     req.set("Authorization", `Bearer ${token}`);
   }
 
-  req.set("x-user-id", "9001");
-
   for (const [name, value] of Object.entries(headers)) {
     req.set(name, value);
   }

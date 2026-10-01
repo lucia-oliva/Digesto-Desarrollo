@@ -6,7 +6,6 @@ import PasoModifica from "../Carga/Steps/pasoNormativasModificadas.jsx";
 import PasoVerificacion from "../Carga/Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
 import { buildRelacionesNormativas, getRuta } from "../Carga/config/mapeo.js";
-import { useAuth } from "../../../context/useAuth.jsx";
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
 import { useReferencias } from "../../../context/referenciasContext.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
@@ -15,10 +14,7 @@ import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericEdit() {
   const [alertData, setAlertData] = useState(null);
-
   const navigate = useNavigate();
-  const { auth } = useAuth();
-  const user = auth.user;
   const { dependencias, emisores } = useReferencias();
 
   const findIdByNameOrId = (list, value) => {
@@ -205,6 +201,43 @@ function GenericEdit() {
     };
 
     const mappedData = mapCamposEditar(entidad, safeForm);
+
+    if (entidad === "usuario") {
+      delete mappedData.password;
+      delete mappedData.confirmPassword;
+      delete mappedData._passwordEdited;
+    }
+
+    const dataToSend = {
+      ...mappedData,
+      archivo: archivoNombre,
+      normativas_modificadas: cambios,
+    };
+
+    api
+      .post(`/${ruta}/edit`, dataToSend)
+      .then((response) => response.data)
+      .then(async (data) => {
+        if (data?.ok === false) {
+          setAlertData({
+            id: Date.now(),
+            title: "Error",
+            message: data?.msg || "No se pudieron actualizar los datos.",
+            error: true,
+          });
+          return;
+        }
+
+        if (
+          entidad === "usuario" &&
+          formData._passwordEdited &&
+          formData.password?.trim()
+        ) {
+          await api.post("/usuarios/cambiar-contrasena", {
+            id: formData.id,
+            password: formData.password.trim(),
+          });
+        }
 
 if (entidad === "usuario") {
   delete mappedData.password;

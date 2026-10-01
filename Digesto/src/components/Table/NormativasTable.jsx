@@ -365,7 +365,7 @@ const NormativaTable = ({
                           if (!ok) return;
 
                           try {
-                            const data = await restoreApi(item.id, user?.id);
+                            const data = await restoreApi(item.id);
 
                             if (!data?.ok && !data?.success) {
                               setAlertData({
@@ -439,7 +439,7 @@ const NormativaTable = ({
                           if (!ok) return;
 
                           try {
-                            const data = await publicarApi(item.id, user?.id);
+                            const data = await publicarApi(item.id);
 
                             if (!data?.ok && !data?.success) {
                               setAlertData({
