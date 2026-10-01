@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
+
 import PasoSeleccionTipo from "../Carga/Steps/pasoSeleccionTipo.jsx";
 import PasoFormulario from "../Carga/Steps/pasoForm.jsx";
 import PasoModifica from "../Carga/Steps/pasoNormativasModificadas.jsx";
 import PasoVerificacion from "../Carga/Steps/pasoVerificacion.jsx";
+
 import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
-import { buildRelacionesNormativas, getRuta } from "../Carga/config/mapeo.js";
+import {
+  buildRelacionesNormativas,
+  getRuta,
+} from "../Carga/config/mapeo.js";
+
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
+
 import { useReferencias } from "../../../context/referenciasContext.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
 import api from "../../../api/axiosPrivate.js";
@@ -14,6 +21,7 @@ import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericEdit() {
   const [alertData, setAlertData] = useState(null);
+
   const navigate = useNavigate();
   const { dependencias, emisores } = useReferencias();
 
@@ -44,7 +52,8 @@ function GenericEdit() {
   const pathSegment = location.pathname
     .split("/")
     .find(
-      (segment) => segment.startsWith("Editar") || segment.startsWith("Nuevo"),
+      (segment) =>
+        segment.startsWith("Editar") || segment.startsWith("Nuevo"),
     );
 
   const entidad = pathSegment
@@ -54,9 +63,7 @@ function GenericEdit() {
   const pasos = flujoPorEntidad[entidad] || [];
 
   const [currentStep, setCurrentStep] = useState(0);
-
   const [formData, setFormData] = useState(null);
-
   const [errores, setErrores] = useState({});
 
   useEffect(() => {
@@ -81,7 +88,10 @@ function GenericEdit() {
           } else if (entidad === "normativa") {
             setFormData({
               ...data,
-              emisor: findIdByNameOrId(emisores, data.id_emisor ?? data.emisor),
+              emisor: findIdByNameOrId(
+                emisores,
+                data.id_emisor ?? data.emisor,
+              ),
               dependencia: findIdByNameOrId(
                 dependencias,
                 data.id_dependencia ?? data.dependencia,
@@ -122,9 +132,15 @@ function GenericEdit() {
 
   useEffect(() => {
     if (entidad === "normativa" && formData) {
-      const depId = findIdByNameOrId(dependencias, formData.dependencia);
+      const depId = findIdByNameOrId(
+        dependencias,
+        formData.dependencia,
+      );
 
-      const emiId = findIdByNameOrId(emisores, formData.emisor);
+      const emiId = findIdByNameOrId(
+        emisores,
+        formData.emisor,
+      );
 
       if (
         (depId && depId !== formData.dependencia) ||
@@ -160,9 +176,15 @@ function GenericEdit() {
       return;
     }
 
-    const safeDep = findIdByNameOrId(dependencias, formData.dependencia);
+    const safeDep = findIdByNameOrId(
+      dependencias,
+      formData.dependencia,
+    );
 
-    const safeEmi = findIdByNameOrId(emisores, formData.emisor);
+    const safeEmi = findIdByNameOrId(
+      emisores,
+      formData.emisor,
+    );
 
     const safeTipo = formData.tipo_normativa ?? "";
 
@@ -222,7 +244,8 @@ function GenericEdit() {
           setAlertData({
             id: Date.now(),
             title: "Error",
-            message: data?.msg || "No se pudieron actualizar los datos.",
+            message:
+              data?.msg || "No se pudieron actualizar los datos.",
             error: true,
           });
           return;
@@ -239,43 +262,6 @@ function GenericEdit() {
           });
         }
 
-if (entidad === "usuario") {
-  delete mappedData.password;
-  delete mappedData.confirmPassword;
-  delete mappedData._passwordEdited;
-}
-
-const dataToSend = {
-  ...mappedData,
-  archivo: archivoNombre,
-  userId: user.id,
-  normativas_modificadas: cambios,
-};
-
-api
-  .post(`/${ruta}/edit`, dataToSend)
-  .then((response) => response.data)
-  .then(async (data) => {
-        if (data?.ok === false) {
-          setAlertData({
-            id: Date.now(),
-            title: "Error",
-            message: data?.msg || "No se pudieron actualizar los datos.",
-            error: true,
-          });
-          return;
-        }
-        if (
-            entidad === "usuario" &&
-            formData._passwordEdited &&
-            formData.password?.trim()
-          ) {
-            await api.post("/usuarios/cambiar-contrasena", {
-              id: formData.id,
-              password: formData.password.trim(),
-            });
-          }
-
         if (
           entidad === "normativa" &&
           formData.archivo instanceof File &&
@@ -284,24 +270,42 @@ api
           const formDataUpload = new FormData();
 
           formDataUpload.append("file", formData.archivo);
-          formDataUpload.append("resolucion", String(formData.numero));
-          formDataUpload.append("anio", String(formData.anio));
-          formDataUpload.append("titulo", formData.titulo);
+          formDataUpload.append(
+            "resolucion",
+            String(formData.numero),
+          );
+          formDataUpload.append(
+            "anio",
+            String(formData.anio),
+          );
+          formDataUpload.append(
+            "titulo",
+            formData.titulo,
+          );
           formDataUpload.append(
             "id_dependencia",
-            String(safeDep || formData.dependencia || ""),
+            String(
+              safeDep || formData.dependencia || "",
+            ),
           );
           formDataUpload.append(
             "id_emisor",
-            String(safeEmi || formData.emisor || ""),
+            String(
+              safeEmi || formData.emisor || "",
+            ),
           );
           formDataUpload.append(
             "tipo_normativa",
-            String(safeTipo || formData.tipo_normativa || ""),
+            String(
+              safeTipo || formData.tipo_normativa || "",
+            ),
           );
 
           return api
-            .post(`/file/upload/${formData.id}`, formDataUpload)
+            .post(
+              `/file/upload/${formData.id}`,
+              formDataUpload,
+            )
             .then(() => {
               setAlertData({
                 id: Date.now(),
@@ -315,7 +319,8 @@ api
                 id: Date.now(),
                 title: "Error",
                 message:
-                  error?.response?.data?.msg || "Error al subir archivo PDF",
+                  error?.response?.data?.msg ||
+                  "Error al subir archivo PDF",
                 error: true,
               });
             });
@@ -378,7 +383,11 @@ api
 
   const renderPaso = () => {
     if (!formData) {
-      return <p className="text-center">Cargando datos...</p>;
+      return (
+        <p className="text-center">
+          Cargando datos...
+        </p>
+      );
     }
 
     const paso = pasos[currentStep];
@@ -441,7 +450,11 @@ api
         );
 
       default:
-        return <p>No hay pasos configurados para esta entidad.</p>;
+        return (
+          <p>
+            No hay pasos configurados para esta entidad.
+          </p>
+        );
     }
   };
 
@@ -461,7 +474,10 @@ api
 
       <h2 className="text-xl font-semibold mb-4 text-center">
         Editar{" "}
-        {entidad ? entidad.charAt(0).toUpperCase() + entidad.slice(1) : ""}
+        {entidad
+          ? entidad.charAt(0).toUpperCase() +
+            entidad.slice(1)
+          : ""}
       </h2>
 
       <div className="w-full flex justify-center mb-4 sm:mb-6">
@@ -469,12 +485,16 @@ api
           {pasos.map((paso, index) => {
             const label = paso
               .replace(/([A-Z])/g, " $1")
-              .replace(/^./, (value) => value.toUpperCase());
+              .replace(/^./, (value) =>
+                value.toUpperCase(),
+              );
 
             return (
               <li
                 key={paso}
-                className={`step ${index <= currentStep ? "step-primary" : ""}`}
+                className={`step ${
+                  index <= currentStep ? "step-primary" : ""
+                }`}
                 title={label}
                 aria-label={label}
               >
