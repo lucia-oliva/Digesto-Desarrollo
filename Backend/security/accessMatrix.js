@@ -124,12 +124,8 @@ const endpointRows = [
   [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/cambiar-estado", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/create", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/edit", POLICIES.SUPER_ADMIN],
-  [ROUTE_GROUPS.USUARIOS, "GET", "/api/usuarios", POLICIES.SUPER_ADMIN],
-  [ROUTE_GROUPS.USUARIOS, "GET", "/api/usuarios/:id", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "GET", "/api/usuarios/datos/:id", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "DELETE", "/api/usuarios/eliminar/:id", POLICIES.SUPER_ADMIN],
-  [ROUTE_GROUPS.USUARIOS, "PUT", "/api/usuarios/:id", POLICIES.SUPER_ADMIN],
-  [ROUTE_GROUPS.USUARIOS, "GET", "/api/usuarios/filter/:id", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/search", POLICIES.SUPER_ADMIN],
 ];
 

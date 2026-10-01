@@ -124,55 +124,6 @@ async function create(data) {
   }
 }
 
-export async function updateUsuario(id, datos) {
-
-  const campos = [];
-  const valores = [];
-
-  if (datos.nombre !== undefined) {
-    campos.push("nombre=?");
-    valores.push(datos.nombre);
-  }
-  if (datos.email !== undefined) {
-    campos.push("email=?");
-    valores.push(datos.email);
-  }
-  if (datos.telefono !== undefined) {
-    campos.push("telefono=?");
-    valores.push(datos.telefono);
-  }
-  if (datos.id_tipo_usuario !== undefined) {
-    campos.push("id_tipo_usuario=?");
-    valores.push(datos.id_tipo_usuario);
-  }
-
-  if (datos.clave && datos.clave_actual) {
-
-    const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [
-      id,
-    ]);
-    if (!result[0] || result.length === 0) {
-      throw new Error("Usuario no encontrado");
-    }
-    const claveGuardada = result[0].clave;
-    const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
-    if (!isMatch) {
-      throw new Error("La contraseña actual es incorrecta");
-    }
-    const nuevaClave = await hashPasswordBcrypt(datos.clave);
-    campos.push("clave=?");
-    valores.push(nuevaClave);
-  }
-
-  if (campos.length === 0)
-    throw new Error("No hay campos para actualizar", 400);
-
-  const sql = `UPDATE usuario SET ${campos.join(", ")} WHERE id=?`;
-  valores.push(id);
-
-  await db.query(sql, valores);
-  return true;
-}
 
 async function eliminar(id) {
   const sql = "DELETE FROM usuario WHERE id = ?";
@@ -180,11 +131,6 @@ async function eliminar(id) {
   return results;
 }
 
-async function filterUsuariosporDepartament(id) {
-  const sql = "SELECT id, nombre, telefono, email, fecha_alta, ultima_visita, estado, id_tipo_usuario, id_dependencia FROM usuario WHERE id_dependencia LIKE ?";
-  const results = await db.query(sql, [id]);
-  return results;
-}
 
 async function searchUsuariosByParameters(
   rol,
@@ -232,9 +178,7 @@ async function searchUsuariosByParameters(
 
 export default {
   getUsuarioByIdDatos,
-  updateUsuario,
   eliminar,
-  filterUsuariosporDepartament,
   searchUsuariosByParameters,
   create,
   edit,cambiarEstado

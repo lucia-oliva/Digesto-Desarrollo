@@ -82,22 +82,6 @@ router.post(
   })
 );
 
-router.get(
-  "/",
-  asyncHandler(async (req, res) => {
-    const users = await UsuariosDB.getAllUsuarios();
-    res.json(users);
-  })
-);
-
-router.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const users = await UsuariosDB.getUsuarioById(id);
-    res.json(users);
-  })
-);
 
 router.get(
   "/datos/:id",
@@ -122,25 +106,6 @@ router.delete(
   })
 );
 
-router.put(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    await UsuariosDB.updateUsuario(req.params.id, req.body);
-    res.json({ success: true, message: "Usuario actualizado" });
-  })
-);
-
-router.get(
-  "/filter/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const users = await UsuariosDB.filterUsuariosporDepartament(id);
-    if (!users || users.affectedRows === 0) {
-      throw httpError(404, "Usuario no encontrado.");
-    }
-    res.json(users);
-  })
-);
 
 router.post(
   "/search",
