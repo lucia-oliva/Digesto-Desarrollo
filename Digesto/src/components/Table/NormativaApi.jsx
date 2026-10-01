@@ -57,64 +57,39 @@ export const searchNormativasDespublicadas = async (
   return response.data;
 };
 
-export const deleteApi = async (id, type, userId) => {
+export const deleteApi = async (id, type) => {
   if (type === "normativaDespublicadas") {
     type = "normativa";
   }
 
   const response = await api.delete(
     `/${type}/eliminar/${id}`,
-    {
-      headers: {
-        "x-user-id": userId,
-      },
-    },
   );
-
   return response.data;
 };
 
 export const editApi = async (
   dataToEdit,
-  type,
-  userId,
+  type
 ) => {
-  const payload = {
-    ...dataToEdit,
-    userId,
-  };
-
   const response = await api.post(
     `/${type}/edit`,
-    payload,
+    dataToEdit,
   );
-
   return response.data;
 };
 
-export const restoreApi = async (id, userId) => {
+export const restoreApi = async (id) => {
   const response = await api.post(
     `/normativa/restaurar/${id}`,
-    {},
-    {
-      headers: {
-        "x-user-id": userId,
-      },
-    },
   );
 
   return response.data;
 };
 
-export const publicarApi = async (id, userId) => {
+export const publicarApi = async (id) => {
   const response = await api.post(
     `/normativa/publicar/${id}`,
-    {},
-    {
-      headers: {
-        "x-user-id": userId,
-      },
-    },
   );
 
   return response.data;

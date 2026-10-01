@@ -6,7 +6,6 @@ import PasoModifica from "../Carga/Steps/pasoNormativasModificadas.jsx";
 import PasoVerificacion from "../Carga/Steps/pasoVerificacion.jsx";
 import { flujoPorEntidad } from "../Carga/config/flujoSteps.js";
 import { buildRelacionesNormativas, getRuta } from "../Carga/config/mapeo.js";
-import { useAuth } from "../../../context/useAuth.jsx";
 import { mapCamposEditar } from "./mapeoCamposEdit.js";
 import { useReferencias } from "../../../context/referenciasContext.js";
 import ActualizarContrasenia from "../Edit/ActualizarContrasenia.jsx";
@@ -15,10 +14,7 @@ import { Alert } from "../../../components/ui/Ui.jsx";
 
 function GenericEdit() {
   const [alertData, setAlertData] = useState(null);
-
   const navigate = useNavigate();
-  const { auth } = useAuth();
-  const user = auth.user;
   const { dependencias, emisores } = useReferencias();
 
   const findIdByNameOrId = (list, value) => {
@@ -207,7 +203,6 @@ function GenericEdit() {
     const dataToSend = {
       ...mapCamposEditar(entidad, safeForm),
       archivo: archivoNombre,
-      userId: user.id,
       normativas_modificadas: cambios,
     };
 
