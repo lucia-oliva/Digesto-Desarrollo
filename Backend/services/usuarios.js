@@ -1,5 +1,5 @@
 import db from "./db.js";
-import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
+import { hashPasswordBcrypt} from "../utils/authPass.js";
 
 async function cambiarEstado({ id_usuario, nuevo_estado}) {
   if (!id_usuario || !nuevo_estado) {
@@ -28,28 +28,22 @@ async function cambiarEstado({ id_usuario, nuevo_estado}) {
 
 
 async function edit(data) {
-  const { id, rol, nombre, email, password, estado, dependencia } = data;
+  const { id, rol, nombre, email, estado, dependencia } = data;
   const telefono = data.telefono ?? "";
 
   const dependenciaFinal = dependencia ?? 0;
 
   const fechaSubida = new Date().toISOString().split("T")[0];
 
-
-  let claveHasheada = null;
-  if (typeof password === "string" && password.trim() !== "") {
-    claveHasheada = await hashPasswordBcrypt(password.trim());
-  }
   try {
 
     const sqlUpdate =
-      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = COALESCE(?, clave), estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
+      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
     const result = await db.execute(sqlUpdate, [
       nombre,
       rol,
       telefono,
       email,
-      claveHasheada,
       estado,
       fechaSubida,
       fechaSubida,
@@ -68,6 +62,31 @@ async function edit(data) {
   } catch (error) {
     throw error;
   }
+}
+
+async function cambiarContrasena({ id, password }) {
+  if (!id || typeof password !== "string" || password.trim() === "") {
+    const err = new Error("La nueva contraseña es requerida.");
+    err.status = 400;
+    throw err;
+  }
+
+  const claveHasheada = await hashPasswordBcrypt(password.trim());
+
+  const result = await db.execute(
+    "UPDATE usuario SET clave = ? WHERE id = ?",
+    [claveHasheada, id],
+  );
+
+  if (result.affectedRows === 0) {
+    const err = new Error("Usuario no encontrado");
+    err.status = 404;
+    throw err;
+  }
+
+  return {
+    mensaje: "Contraseña actualizada correctamente",
+  };
 }
 
 
@@ -181,5 +200,6 @@ export default {
   eliminar,
   searchUsuariosByParameters,
   create,
-  edit,cambiarEstado
+  edit,cambiarEstado,
+  cambiarContrasena,
 };

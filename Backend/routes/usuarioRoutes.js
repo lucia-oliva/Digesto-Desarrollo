@@ -3,7 +3,6 @@ import UsuariosDB from "../services/usuarios.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
-import { httpError } from "../utils/httpError.js";
 import {
   normalizeOptionalFields,
   validateRequiredFields,
@@ -80,6 +79,25 @@ router.post(
     const result = await UsuariosDB.edit(usuarioDataEdit);
     res.status(200).json({ ok: true, message: result.mensaje });
   })
+);
+
+router.post(
+  "/cambiar-contrasena",
+  validateRequiredFields([
+    { key: "id", label: "id" },
+    { key: "password", label: "contraseña" },
+  ]),
+  asyncHandler(async (req, res) => {
+    const result = await UsuariosDB.cambiarContrasena({
+      id: req.body.id,
+      password: req.body.password,
+    });
+
+    res.status(200).json({
+      ok: true,
+      message: result.mensaje,
+    });
+  }),
 );
 
 

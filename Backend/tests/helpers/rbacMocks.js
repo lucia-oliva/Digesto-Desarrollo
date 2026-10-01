@@ -128,6 +128,9 @@ const usuariosMock = {
     data: [{ id: 1 }],
     totalResults: 1,
   })),
+  cambiarContrasena: jest.fn(async () => ({
+  mensaje: "Contraseña actualizada correctamente",
+})),
 };
 
 jest.unstable_mockModule("../../services/db.js", () => ({

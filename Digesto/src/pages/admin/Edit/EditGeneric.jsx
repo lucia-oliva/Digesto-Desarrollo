@@ -204,24 +204,25 @@ function GenericEdit() {
       tipo_normativa: safeTipo,
     };
 
-    const dataToSend = {
-      ...mapCamposEditar(entidad, safeForm),
-      archivo: archivoNombre,
-      userId: user.id,
-      normativas_modificadas: cambios,
-    };
+    const mappedData = mapCamposEditar(entidad, safeForm);
 
-    if (entidad === "usuario") {
-      dataToSend.password =
-        formData._passwordEdited && formData.password?.trim()
-          ? formData.password.trim()
-          : null;
-    }
+if (entidad === "usuario") {
+  delete mappedData.password;
+  delete mappedData.confirmPassword;
+  delete mappedData._passwordEdited;
+}
 
-    api
-      .post(`/${ruta}/edit`, dataToSend)
-      .then((response) => response.data)
-      .then((data) => {
+const dataToSend = {
+  ...mappedData,
+  archivo: archivoNombre,
+  userId: user.id,
+  normativas_modificadas: cambios,
+};
+
+api
+  .post(`/${ruta}/edit`, dataToSend)
+  .then((response) => response.data)
+  .then(async (data) => {
         if (data?.ok === false) {
           setAlertData({
             id: Date.now(),
@@ -231,6 +232,16 @@ function GenericEdit() {
           });
           return;
         }
+        if (
+            entidad === "usuario" &&
+            formData._passwordEdited &&
+            formData.password?.trim()
+          ) {
+            await api.post("/usuarios/cambiar-contrasena", {
+              id: formData.id,
+              password: formData.password.trim(),
+            });
+          }
 
         if (
           entidad === "normativa" &&

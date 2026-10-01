@@ -127,6 +127,7 @@ const endpointRows = [
   [ROUTE_GROUPS.USUARIOS, "GET", "/api/usuarios/datos/:id", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "DELETE", "/api/usuarios/eliminar/:id", POLICIES.SUPER_ADMIN],
   [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/search", POLICIES.SUPER_ADMIN],
+  [ROUTE_GROUPS.USUARIOS, "POST", "/api/usuarios/cambiar-contrasena", POLICIES.SUPER_ADMIN,],
 ];
 
 export const ACCESS_MATRIX = Object.freeze(
