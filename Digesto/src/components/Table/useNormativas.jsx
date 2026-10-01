@@ -8,7 +8,6 @@ import {
 import { useNavigate } from "react-router";
 import { nombreRutaPorEntidad } from "../../pages/admin/Edit/mapeoCamposEdit.js";
 import api from "../../api/axiosPrivate.js";
-import { useAuth } from "../../context/useAuth";
 
 const DEFAULT_EMPTY_MESSAGE =
   "No se encontraron resultados. Probá cambiar los filtros.";
@@ -26,11 +25,7 @@ const DELETE_ERROR_MESSAGE =
  */
 export const useNormativas = (type, filtros, options = {}) => {
   const { ns = `ns:admin:${type}`, pageSize = 6, confirmFn } = options;
-
-  const { auth } = useAuth();
-  const user = auth?.user;
   const navigate = useNavigate();
-
   const [normativas, setNormativas] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -234,7 +229,7 @@ export const useNormativas = (type, filtros, options = {}) => {
     try {
       setLoading(true);
 
-      const response = await deleteApi(idParaBorrar, type, user?.id);
+      const response = await deleteApi(idParaBorrar, type);
 
       const ok =
         (typeof response?.ok === "boolean" && response.ok) ||
