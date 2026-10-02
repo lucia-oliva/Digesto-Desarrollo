@@ -1,5 +1,5 @@
 import db from "./db.js";
-import { hashPasswordBcrypt, verifyPassword } from "../utils/authPass.js";
+import { hashPasswordBcrypt} from "../utils/authPass.js";
 
 async function cambiarEstado({ id_usuario, nuevo_estado}) {
   if (!id_usuario || !nuevo_estado) {
@@ -28,28 +28,22 @@ async function cambiarEstado({ id_usuario, nuevo_estado}) {
 
 
 async function edit(data) {
-  const { id, rol, nombre, email, password, estado, dependencia } = data;
+  const { id, rol, nombre, email, estado, dependencia } = data;
   const telefono = data.telefono ?? "";
 
   const dependenciaFinal = dependencia ?? 0;
 
   const fechaSubida = new Date().toISOString().split("T")[0];
 
-
-  let claveHasheada = null;
-  if (typeof password === "string" && password.trim() !== "") {
-    claveHasheada = await hashPasswordBcrypt(password.trim());
-  }
   try {
 
     const sqlUpdate =
-      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, clave = COALESCE(?, clave), estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
+      "UPDATE usuario SET nombre = ?, id_tipo_usuario = ?, telefono = ?, email = ?, estado = ?, fecha_alta = ?, ultima_visita = ?, id_dependencia = ? WHERE id = ?";
     const result = await db.execute(sqlUpdate, [
       nombre,
       rol,
       telefono,
       email,
-      claveHasheada,
       estado,
       fechaSubida,
       fechaSubida,
@@ -68,6 +62,31 @@ async function edit(data) {
   } catch (error) {
     throw error;
   }
+}
+
+async function cambiarContrasena({ id, password }) {
+  if (!id || typeof password !== "string" || password.trim() === "") {
+    const err = new Error("La nueva contraseña es requerida.");
+    err.status = 400;
+    throw err;
+  }
+
+  const claveHasheada = await hashPasswordBcrypt(password.trim());
+
+  const result = await db.execute(
+    "UPDATE usuario SET clave = ? WHERE id = ?",
+    [claveHasheada, id],
+  );
+
+  if (result.affectedRows === 0) {
+    const err = new Error("Usuario no encontrado");
+    err.status = 404;
+    throw err;
+  }
+
+  return {
+    mensaje: "Contraseña actualizada correctamente",
+  };
 }
 
 
@@ -124,55 +143,6 @@ async function create(data) {
   }
 }
 
-export async function updateUsuario(id, datos) {
-
-  const campos = [];
-  const valores = [];
-
-  if (datos.nombre !== undefined) {
-    campos.push("nombre=?");
-    valores.push(datos.nombre);
-  }
-  if (datos.email !== undefined) {
-    campos.push("email=?");
-    valores.push(datos.email);
-  }
-  if (datos.telefono !== undefined) {
-    campos.push("telefono=?");
-    valores.push(datos.telefono);
-  }
-  if (datos.id_tipo_usuario !== undefined) {
-    campos.push("id_tipo_usuario=?");
-    valores.push(datos.id_tipo_usuario);
-  }
-
-  if (datos.clave && datos.clave_actual) {
-
-    const result = await db.query("SELECT clave FROM usuario WHERE id = ?", [
-      id,
-    ]);
-    if (!result[0] || result.length === 0) {
-      throw new Error("Usuario no encontrado");
-    }
-    const claveGuardada = result[0].clave;
-    const { isMatch } = await verifyPassword(datos.clave_actual, claveGuardada);
-    if (!isMatch) {
-      throw new Error("La contraseña actual es incorrecta");
-    }
-    const nuevaClave = await hashPasswordBcrypt(datos.clave);
-    campos.push("clave=?");
-    valores.push(nuevaClave);
-  }
-
-  if (campos.length === 0)
-    throw new Error("No hay campos para actualizar", 400);
-
-  const sql = `UPDATE usuario SET ${campos.join(", ")} WHERE id=?`;
-  valores.push(id);
-
-  await db.query(sql, valores);
-  return true;
-}
 
 async function eliminar(id) {
   const sql = "DELETE FROM usuario WHERE id = ?";
@@ -180,11 +150,6 @@ async function eliminar(id) {
   return results;
 }
 
-async function filterUsuariosporDepartament(id) {
-  const sql = "SELECT id, nombre, telefono, email, fecha_alta, ultima_visita, estado, id_tipo_usuario, id_dependencia FROM usuario WHERE id_dependencia LIKE ?";
-  const results = await db.query(sql, [id]);
-  return results;
-}
 
 async function searchUsuariosByParameters(
   rol,
@@ -232,10 +197,9 @@ async function searchUsuariosByParameters(
 
 export default {
   getUsuarioByIdDatos,
-  updateUsuario,
   eliminar,
-  filterUsuariosporDepartament,
   searchUsuariosByParameters,
   create,
-  edit,cambiarEstado
+  edit,cambiarEstado,
+  cambiarContrasena,
 };

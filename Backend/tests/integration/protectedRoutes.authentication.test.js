@@ -18,11 +18,6 @@ jest.unstable_mockModule("../../services/db.js", () => {
   return { ...dbMock, default: dbMock };
 });
 
-jest.unstable_mockModule("../../services/usuarios.js", () => ({
-  default: {
-    getAllUsuarios: async () => [{ id: 1, nombre: "usuario-test" }],
-  },
-}));
 
 jest.unstable_mockModule("../../services/normativa.js", () => ({
   default: {
@@ -43,7 +38,6 @@ beforeAll(async () => {
 });
 
 const RUTAS_PROTEGIDAS = [
-  { nombre: "usuarios", method: "get", path: "/api/usuarios" },
   {
     nombre: "normativas",
     method: "post",

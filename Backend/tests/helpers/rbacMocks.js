@@ -122,16 +122,15 @@ const usuariosMock = {
   cambiarEstado: jest.fn(async () => ({ mensaje: "actualizado" })),
   create: jest.fn(async () => ({ mensaje: "creado" })),
   edit: jest.fn(async () => ({ mensaje: "editado" })),
-  getAllUsuarios: jest.fn(async () => [{ id: 1 }]),
-  getUsuarioById: jest.fn(async () => ({ id: 1 })),
   getUsuarioByIdDatos: jest.fn(async () => ({ id: 1 })),
   eliminar: jest.fn(async () => ({ affectedRows: 1 })),
-  updateUsuario: jest.fn(async () => true),
-  filterUsuariosporDepartament: jest.fn(async () => [{ id: 1 }]),
   searchUsuariosByParameters: jest.fn(async () => ({
     data: [{ id: 1 }],
     totalResults: 1,
   })),
+  cambiarContrasena: jest.fn(async () => ({
+  mensaje: "Contraseña actualizada correctamente",
+})),
 };
 
 jest.unstable_mockModule("../../services/db.js", () => ({

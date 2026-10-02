@@ -9,7 +9,6 @@ import Login from "./pages/auth/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import Logout from "./pages/auth/Logout";
-import EditarUsuario from "./pages/admin/editUser";
 import { VistaAdministrativa } from "./pages/admin/VistaAdministrativa";
 import GenericCarga from "./pages/admin/Carga/GenericCarga";
 import RouteGuard from "./services/RouteGuard";
@@ -85,7 +84,6 @@ const Router = () => {
               <Route path="EditarUsuario/:id" element={<GenericEdit />} />
               <Route path="EditarDependencia/:id" element={<GenericEdit />} />
               <Route path="EditarEmisor/:id" element={<GenericEdit />} />
-              <Route path="usuario" element={<EditarUsuario />} />
             </Route>
             <Route path="ListadoNormativa" element={<VistaAdministrativa />} />
             <Route

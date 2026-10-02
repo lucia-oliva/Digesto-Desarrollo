@@ -60,7 +60,7 @@ function dependencyForScope(scope) {
 
 describe("matriz RBAC: cobertura", () => {
   test("incluye todas las rutas con autenticación obligatoria", () => {
-    expect(requiredEndpoints).toHaveLength(43);
+    expect(requiredEndpoints).toHaveLength(40);
     expect(roleCases).toHaveLength(requiredEndpoints.length * TEST_ROLES.length);
   });
 

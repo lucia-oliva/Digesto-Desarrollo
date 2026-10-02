@@ -3,7 +3,6 @@ import UsuariosDB from "../services/usuarios.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { authorizePolicy } from "../Middleware/rbacMiddleware.js";
 import { POLICIES } from "../security/policies.js";
-import { httpError } from "../utils/httpError.js";
 import {
   normalizeOptionalFields,
   validateRequiredFields,
@@ -82,22 +81,25 @@ router.post(
   })
 );
 
-router.get(
-  "/",
+router.post(
+  "/cambiar-contrasena",
+  validateRequiredFields([
+    { key: "id", label: "id" },
+    { key: "password", label: "contraseña" },
+  ]),
   asyncHandler(async (req, res) => {
-    const users = await UsuariosDB.getAllUsuarios();
-    res.json(users);
-  })
+    const result = await UsuariosDB.cambiarContrasena({
+      id: req.body.id,
+      password: req.body.password,
+    });
+
+    res.status(200).json({
+      ok: true,
+      message: result.mensaje,
+    });
+  }),
 );
 
-router.get(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const users = await UsuariosDB.getUsuarioById(id);
-    res.json(users);
-  })
-);
 
 router.get(
   "/datos/:id",
@@ -122,25 +124,6 @@ router.delete(
   })
 );
 
-router.put(
-  "/:id",
-  asyncHandler(async (req, res) => {
-    await UsuariosDB.updateUsuario(req.params.id, req.body);
-    res.json({ success: true, message: "Usuario actualizado" });
-  })
-);
-
-router.get(
-  "/filter/:id",
-  asyncHandler(async (req, res) => {
-    const id = req.params.id;
-    const users = await UsuariosDB.filterUsuariosporDepartament(id);
-    if (!users || users.affectedRows === 0) {
-      throw httpError(404, "Usuario no encontrado.");
-    }
-    res.json(users);
-  })
-);
 
 router.post(
   "/search",
