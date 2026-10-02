@@ -105,13 +105,3 @@ npm run test:unit
 npm run test:integration
 npm test
 ```
-Los tests viven en `Backend/tests/unit/`, `Backend/tests/integration/` y `Backend/tests/helpers/`.
-
-## Documentación de la feature
-
-- Dockerización del entorno: `Specs/2026-08-19-dockerizacion-digesto/`.
-- Contrato único de autenticación (JWT): `Specs/2026-08-25-contrato-unico-autenticacion/`.
-server-desarrollo/chore/db-seed- Tests base de autenticación (Jest + Supertest): `Docs/2026-08-31-tests-base-autenticacion/`.
-- Tests de uploads (AUD-11): `Docs/2026-09-24-aud-11-tests-uploads/` (implementación base en `Docs/2026-09-24-sec-04-uploads-seguros/`).
-- Dump sanitizado de base de datos: `Docs/2026-09-15-dump_bd/`.
-
