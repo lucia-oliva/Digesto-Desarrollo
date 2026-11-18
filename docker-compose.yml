@@ -49,6 +49,8 @@ services:
     restart: unless-stopped
     environment:
       CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-false}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000/api}
+      VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:-}
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     volumes:

@@ -14,13 +14,16 @@ Sistema de gestión administrativa de documentos institucionales. Repositorio mo
 
 ## Puesta en marcha
 
-1. (Opcional) Crear el archivo de variables de entorno a partir del ejemplo:
+1. Crear el `.env` de la raíz a partir de la plantilla versionada:
 
    ```bash
    cp .env.example .env
    ```
 
-   Si no se crea, Compose usa valores por defecto.
+   Esta configuración es usada por Docker Compose para la base de datos, el
+   backend y las variables públicas del frontend. Completar los valores del
+   formulario de contacto según
+   [`Docs/2026-11-17-sec-08-sec-12-contacto/README.md`](Docs/2026-11-17-sec-08-sec-12-contacto/README.md).
 
 2. Levantar los servicios:
 
@@ -55,7 +58,14 @@ Sistema de gestión administrativa de documentos institucionales. Repositorio mo
 
 ## Variables de entorno
 
-Todas las variables están documentadas en `.env.example` (raíz) y `Backend/.env.example`.
+Las plantillas versionadas son:
+
+- `.env.example`: Docker Compose, backend y variables públicas del frontend.
+- `Backend/.env.example`: backend ejecutado directamente fuera de Docker.
+
+Las variables específicas del formulario de contacto están explicadas en
+`Docs/2026-11-17-sec-08-sec-12-contacto/README.md`. Las plantillas no se cargan
+automáticamente y no deben contener secretos reales.
 
 Principales:
 
@@ -64,7 +74,18 @@ Principales:
 - `MARIADB_PORT`, `BACKEND_PORT`, `FRONTEND_PORT`: puertos publicados en el host.
 - `ACCESS_SECRET`, `REFRESH_SECRET`: secretos JWT (necesarios para autenticación).
 - `FRONT_ORIGINS`: origen permitido por CORS (default `http://localhost:5173`).
-- `CHOKIDAR_USEPOLLING`: `true` si en Docker Desktop/Windows no se reflejan los cambios del frontend.
+- `MAIL_USER`, `MAIL_PASS`: cuenta SMTP institucional usada como remitente.
+- `CONTACT_RECIPIENT_*`: buzones institucionales autorizados para cada dependencia.
+- `VITE_TURNSTILE_SITE_KEY`: clave pública de Cloudflare Turnstile para el frontend.
+- `TURNSTILE_SECRET_KEY`: clave privada de Turnstile, disponible solo en el backend.
+- `TURNSTILE_EXPECTED_HOSTNAME`: hostname esperado al validar el CAPTCHA (recomendado en producción).
+- `CONTACT_RATE_LIMIT_WINDOW_MS`, `CONTACT_RATE_LIMIT_MAX`: ventana y máximo de solicitudes del formulario público.
+- `CHOKIDAR_USEPOLLING`: variable del frontend; usar `true` si Docker Desktop/Windows no refleja cambios.
+
+Para habilitar el formulario de contacto se deben configurar el buzón de cada
+dependencia utilizada y las claves de Turnstile. Las direcciones receptoras y
+la clave secreta del CAPTCHA no deben incluirse en variables `VITE_*` ni en el
+código del frontend.
 
 ## Modo desarrollo (recarga automática)
 
@@ -109,9 +130,10 @@ Los tests viven en `Backend/tests/unit/`, `Backend/tests/integration/` y `Backen
 
 ## Documentación de la feature
 
-- Dockerización del entorno: `Specs/2026-08-19-dockerizacion-digesto/`.
-- Contrato único de autenticación (JWT): `Specs/2026-08-25-contrato-unico-autenticacion/`.
-server-desarrollo/chore/db-seed- Tests base de autenticación (Jest + Supertest): `Docs/2026-08-31-tests-base-autenticacion/`.
+- Formulario de contacto seguro (SEC-08/SEC-12): `Docs/2026-11-17-sec-08-sec-12-contacto/`.
+- Dockerización del entorno: `Docs/2026-08-19-dockerizacion-digesto/`.
+- Contrato único de autenticación (JWT): `Docs/2026-08-25-contrato-unico-autenticacion/`.
+- Tests base de autenticación (Jest + Supertest): `Docs/2026-08-31-tests-base-autenticacion/`.
 - Tests de uploads (AUD-11): `Docs/2026-09-24-aud-11-tests-uploads/` (implementación base en `Docs/2026-09-24-sec-04-uploads-seguros/`).
 - Dump sanitizado de base de datos: `Docs/2026-09-15-dump_bd/`.
 

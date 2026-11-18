@@ -1,4 +1,5 @@
 import { createTransport } from "nodemailer";
+import { isValidEmailAddress } from "../config/contact.js";
 
 const transporter = createTransport({
   service: "gmail",
@@ -8,18 +9,32 @@ const transporter = createTransport({
   },
 });
 
-const enviarCorreo = async (nombre, email, mensaje, destinatario) => {
-  if (!nombre || !email || !mensaje || !destinatario) {
-    const error = new Error("Faltan datos obligatorios");
-    error.status = 400;
-    error.publicMessage = "Faltan datos obligatorios.";
-    throw error;
+function mailConfigurationError() {
+  const error = new Error("Mail service is not configured");
+  error.status = 503;
+  error.publicMessage =
+    "El servicio de correo no está disponible. Intente nuevamente más tarde.";
+  return error;
+}
+
+const enviarCorreo = async ({ nombre, email, mensaje, recipient }) => {
+  const sender = process.env.MAIL_USER?.trim();
+
+  if (
+    !nombre ||
+    !mensaje ||
+    !isValidEmailAddress(email) ||
+    !isValidEmailAddress(recipient) ||
+    !isValidEmailAddress(sender) ||
+    !process.env.MAIL_PASS
+  ) {
+    throw mailConfigurationError();
   }
 
   try {
     await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: destinatario,
+      from: sender,
+      to: recipient,
       subject: "Nuevo mensaje de: " + nombre,
       text: mensaje,
       replyTo: email,
@@ -30,10 +45,11 @@ const enviarCorreo = async (nombre, email, mensaje, destinatario) => {
       message: "Correo enviado correctamente",
     };
   } catch (error) {
-    error.status = 502;
-    error.publicMessage =
+    const publicError = new Error("Mail delivery failed", { cause: error });
+    publicError.status = 502;
+    publicError.publicMessage =
       "No se pudo enviar el correo. Intente nuevamente más tarde.";
-    throw error;
+    throw publicError;
   }
 };
 
