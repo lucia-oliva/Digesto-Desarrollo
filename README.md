@@ -19,12 +19,9 @@ Sistema de gestión administrativa de documentos institucionales. Repositorio mo
    ```bash
    cp .env.example .env
    ```
-
    Esta configuración es usada por Docker Compose para la base de datos, el
-   backend y las variables públicas del frontend. Completar los valores del
-   formulario de contacto según
-   [`Docs/2026-11-17-sec-08-sec-12-contacto/README.md`](Docs/2026-11-17-sec-08-sec-12-contacto/README.md).
-
+   backend y las variables públicas del frontend. 
+   
 2. Levantar los servicios:
 
    ```bash
@@ -64,8 +61,7 @@ Las plantillas versionadas son:
 - `Backend/.env.example`: backend ejecutado directamente fuera de Docker.
 
 Las variables específicas del formulario de contacto están explicadas en
-`Docs/2026-11-17-sec-08-sec-12-contacto/README.md`. Las plantillas no se cargan
-automáticamente y no deben contener secretos reales.
+`Docs/2026-11-17-sec-08-sec-12-contacto/README.md`. 
 
 Principales:
 
