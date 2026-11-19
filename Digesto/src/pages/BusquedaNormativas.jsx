@@ -79,7 +79,12 @@ function NormativasContainer({ isAdmin = false }) {
         <NormativaTable type={type} filtros={filtros} modo={modo} />
       </div>
 
-      {!isAdmin && <ContactModal dependencia={dependenciaSeleccionada} />}
+      {!isAdmin && (
+        <ContactModal
+          dependencia={dependenciaSeleccionada}
+          dependenciaId={String(filtrosGenericos?.dependencia || "")}
+        />
+      )}
     </div>
   );
 }

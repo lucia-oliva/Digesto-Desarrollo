@@ -5,48 +5,138 @@ import { useLocation } from "react-router";
 import { Alert } from "../ui/Ui";
 import api from "../../api/axiosPrivate";
 
-export default function ContactModal({ dependencia: dependenciaProp = "" }) {
+const TURNSTILE_SCRIPT_ID = "cloudflare-turnstile-script";
+const TURNSTILE_CALLBACK = "digestoTurnstileLoaded";
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
+const DEPENDENCY_LABELS = Object.freeze({
+  1: "Aplicadas",
+  2: "Exactas",
+  3: "Salud",
+  4: "Sociales",
+  5: "Humanas",
+  20: "C. Superior",
+  22: "Chepes",
+  23: "Catuna",
+  24: "Aimogasta",
+  25: "Chamical",
+  26: "Villa Union",
+});
+
+let turnstileLoader;
+
+function loadTurnstile() {
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+  if (turnstileLoader) return turnstileLoader;
+
+  turnstileLoader = new Promise((resolve, reject) => {
+    window[TURNSTILE_CALLBACK] = () => resolve(window.turnstile);
+
+    const existingScript = document.getElementById(TURNSTILE_SCRIPT_ID);
+    if (existingScript) {
+      existingScript.addEventListener("error", reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = TURNSTILE_SCRIPT_ID;
+    script.src = `https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=${TURNSTILE_CALLBACK}`;
+    script.async = true;
+    script.defer = true;
+    script.onerror = () => {
+      script.remove();
+      reject(new Error("No se pudo cargar Cloudflare Turnstile."));
+    };
+    document.head.appendChild(script);
+  }).catch((error) => {
+    turnstileLoader = undefined;
+    throw error;
+  });
+
+  return turnstileLoader;
+}
+
+export default function ContactModal({
+  dependencia: dependenciaProp = "",
+  dependenciaId = "",
+}) {
   const modalRef = useRef(null);
+  const captchaRef = useRef(null);
+  const widgetIdRef = useRef(null);
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [nombreDependencia, setNombreDependencia] = useState("");
+  const [selectedDependencyId, setSelectedDependencyId] = useState("");
   const [alertData, setAlertData] = useState(null);
 
-  const dependenciaEmails = {
-    Exactas: "lucia222lr@gmail.com",
-    Aplicadas: "lucia222lr@gmail.com",
-    Sociales: "lucia222lr@gmail.com",
-    Humanas: "lucia222lr@gmail.com",
-    "C. Superior": "lucia222lr@gmail.com",
-    Chepes: "lucia222lr@gmail.com",
-    "Villa Union": "lucia222lr@gmail.com",
-    Chamical: "lucia222lr@gmail.com",
-    Aimogasta: "lucia222lr@gmail.com",
-    Catuna: "lucia222lr@gmail.com",
-  };
-
   useEffect(() => {
-    if (dependenciaProp && dependenciaProp.trim() !== "") {
+    const normalizedPropId = String(dependenciaId || "").trim();
+
+    if (dependenciaProp?.trim() && normalizedPropId) {
       setIsVisible(true);
       setNombreDependencia(dependenciaProp.trim());
+      setSelectedDependencyId(normalizedPropId);
       return;
     }
 
     const searchParams = new URLSearchParams(location.search);
-    const depFromUrl = searchParams.get("dependencia") || "";
-    const decoded = decodeURIComponent(depFromUrl);
+    const depFromUrl = (searchParams.get("dependencia") || "").trim();
+    const dependencyLabel = DEPENDENCY_LABELS[depFromUrl] || "";
 
-    setIsVisible(Boolean(decoded));
-    setNombreDependencia(decoded);
-  }, [location.search, dependenciaProp]);
+    setIsVisible(Boolean(dependencyLabel));
+    setNombreDependencia(dependencyLabel);
+    setSelectedDependencyId(dependencyLabel ? depFromUrl : "");
+  }, [location.search, dependenciaProp, dependenciaId]);
 
-  const openModal = () => setIsModalOpen(true);
+  useEffect(() => {
+    if (!isModalOpen || !TURNSTILE_SITE_KEY || !captchaRef.current) return;
+
+    let active = true;
+
+    loadTurnstile()
+      .then((turnstile) => {
+        if (!active || !captchaRef.current) return;
+
+        widgetIdRef.current = turnstile.render(captchaRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          action: "contact",
+          size: "flexible",
+          callback: (token) => setCaptchaToken(token),
+          "expired-callback": () => setCaptchaToken(""),
+          "error-callback": () => setCaptchaToken(""),
+        });
+      })
+      .catch(() => {
+        if (active) {
+          setAlertData({
+            title: "Error de conexión",
+            message: "No se pudo cargar la verificación anti-bot.",
+            error: true,
+          });
+        }
+      });
+
+    return () => {
+      active = false;
+      setCaptchaToken("");
+
+      if (window.turnstile && widgetIdRef.current !== null) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+    };
+  }, [isModalOpen]);
+
+  const openModal = () => {
+    setAlertData(null);
+    setIsModalOpen(true);
+  };
 
   const closeModal = (event) => {
     if (modalRef.current && event.target === modalRef.current) {
@@ -56,17 +146,33 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
     }
   };
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
+  const resetCaptcha = () => {
+    setCaptchaToken("");
 
-    const destinatario =
-      dependenciaEmails[nombreDependencia] || "default@unlar.edu.ar";
+    if (window.turnstile && widgetIdRef.current !== null) {
+      window.turnstile.reset(widgetIdRef.current);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!TURNSTILE_SITE_KEY || !captchaToken) {
+      setAlertData({
+        title: "Verificación requerida",
+        message: "Complete la verificación anti-bot antes de enviar.",
+        error: true,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setAlertData(null);
 
     const payload = {
+      dependenciaId: selectedDependencyId,
       nombre,
       email,
       mensaje,
-      destinatario,
+      captchaToken,
     };
 
     try {
@@ -76,19 +182,21 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
       setNombre("");
       setEmail("");
       setMensaje("");
+      resetCaptcha();
 
       setTimeout(() => {
         setSuccess(false);
         setIsModalOpen(false);
       }, 3000);
     } catch (error) {
-  setAlertData({
-    title: "Error de conexion",
-    message:
-      error?.response?.data?.msg ||
-      "No se puede conectar con el servidor",
-    error: true,
-  });
+      resetCaptcha();
+      setAlertData({
+        title: "Error de conexión",
+        message:
+          error?.response?.data?.msg ||
+          "No se puede conectar con el servidor",
+        error: true,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -158,11 +266,13 @@ export default function ContactModal({ dependencia: dependenciaProp = "" }) {
               <textarea
                 placeholder="Mensaje"
                 rows="4"
+                maxLength="5000"
                 className="w-full p-2 border border-gray-300 rounded mb-2 resize-none"
                 required
                 value={mensaje}
                 onChange={(e) => setMensaje(e.target.value)}
               ></textarea>
+              <div ref={captchaRef} className="w-full my-2" />
               <button
                 type="submit"
                 className="w-full bg-primary opacity-75 text-white p-2 rounded transition mt-2 hover:opacity-100 flex justify-center items-center"
